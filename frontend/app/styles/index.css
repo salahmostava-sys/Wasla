@@ -218,18 +218,24 @@
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     box-shadow: var(--shadow-card);
-    transition: box-shadow 200ms;
+    transition: box-shadow 300ms ease, transform 300ms ease;
   }
-  .metric-card:hover { box-shadow: var(--shadow-card-md); }
+  .metric-card:hover { 
+    box-shadow: var(--shadow-card-md), 0 0 20px rgba(38, 66, 230, 0.08); 
+    transform: translateY(-2px);
+  }
 
   .stat-card {
     background: var(--ds-surface-lowest);
     border-radius: var(--radius-xl);
     padding: 1rem 1.25rem;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 200ms;
+    transition: box-shadow 300ms ease, transform 300ms ease;
   }
-  .stat-card:hover { box-shadow: var(--shadow-card-md); }
+  .stat-card:hover { 
+    box-shadow: var(--shadow-card-md), 0 0 20px rgba(38, 66, 230, 0.08);
+    transform: translateY(-2px);
+  }
 
   .chart-card {
     background: var(--ds-surface-lowest);
@@ -447,7 +453,10 @@
     color: #ffffff;
     box-shadow: var(--shadow-brand);
   }
-  .ds-btn--primary:hover:not(:disabled) { opacity: 0.90; }
+  .ds-btn--primary:hover:not(:disabled) { 
+    opacity: 0.95;
+    box-shadow: 0 0 15px rgba(38, 66, 230, 0.4), var(--shadow-brand); 
+  }
 
   .ds-btn--secondary {
     background: var(--ds-surface-container);
@@ -481,13 +490,16 @@
     border: none;
     cursor: pointer;
     white-space: nowrap;
-    transition: opacity 150ms ease, transform 100ms ease;
+    transition: opacity 150ms ease, transform 100ms ease, box-shadow 150ms ease;
     background: linear-gradient(135deg, var(--ds-primary), var(--ds-primary-container));
     color: #ffffff;
     box-shadow: var(--shadow-brand);
     font-family: 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
   }
-  .ds-btn-primary:hover:not(:disabled) { opacity: 0.90; }
+  .ds-btn-primary:hover:not(:disabled) { 
+    opacity: 0.95; 
+    box-shadow: 0 0 15px rgba(38, 66, 230, 0.4), var(--shadow-brand);
+  }
   .ds-btn-primary:active:not(:disabled) { transform: scale(0.97); }
   .ds-btn-primary:disabled { opacity: 0.45; pointer-events: none; }
 
