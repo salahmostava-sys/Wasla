@@ -100,7 +100,6 @@ async function exportBackupFiles(): Promise<number> {
 function renderLanguageButtons(
   defaultLang: string,
   setDefaultLang: (lang: string) => void,
-  isRTL: boolean,
 ) {
   return (
     <div className="flex gap-2">
@@ -344,7 +343,7 @@ export default function ProjectSettings() {
             <Label className="text-xs font-medium text-muted-foreground">
               {isRTL ? 'اللغة الافتراضية' : 'Default Language'}
             </Label>
-            {renderLanguageButtons(defaultLang, setDefaultLang, isRTL)}
+            {renderLanguageButtons(defaultLang, setDefaultLang)}
           </div>
 
           <div className="space-y-2">
