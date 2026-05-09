@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react';
+﻿import { Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { AppData, AppEmployee } from '@modules/apps/types';
@@ -104,13 +104,13 @@ export const AppEmployeesPanel = ({
                       <span className={`${statusClass} text-[10px]`}>{statusLabel}</span>
                     </td>
                     <td className="ta-td text-center text-sm font-black" style={{ color: app.brand_color }}>
-                      {employee.monthOrders.toLocaleString()}
+                      {employee.monthOrders.toLocaleString('en-US')}
                     </td>
                     <td className="ta-td text-center text-xs tabular-nums text-muted-foreground">
-                      {employee.targetShare == null ? '—' : Math.round(employee.targetShare).toLocaleString()}
+                      {employee.targetShare == null ? '—' : Math.round(employee.targetShare).toLocaleString('en-US')}
                     </td>
                     <td className="ta-td text-center text-xs font-semibold tabular-nums">
-                      {employee.projectedMonthEnd == null ? '—' : employee.projectedMonthEnd.toLocaleString()}
+                      {employee.projectedMonthEnd == null ? '—' : employee.projectedMonthEnd.toLocaleString('en-US')}
                     </td>
                     <td className="ta-td text-center">
                       {(() => {

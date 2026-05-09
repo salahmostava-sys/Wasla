@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Edit2, Trash2,
   ChevronDown, ChevronUp,
@@ -88,13 +88,13 @@ const renderMonthlyTotalsRow = (
   <tr className="border-t-2 border-border bg-muted/20 font-semibold text-sm">
     <td className="px-4 py-3 text-foreground">الإجمالي ({filteredCount} مندوب)</td>
     <td className="px-4 py-3 text-center text-muted-foreground">—</td>
-    <td className="px-4 py-3 text-center text-primary">{totalKm.toLocaleString()} كم</td>
-    <td className="px-4 py-3 text-center text-warning">{totalFuel.toLocaleString()} ر.س</td>
+    <td className="px-4 py-3 text-center text-primary">{totalKm.toLocaleString('en-US')} كم</td>
+    <td className="px-4 py-3 text-center text-warning">{totalFuel.toLocaleString('en-US')} ر.س</td>
     <td className={`px-4 py-3 text-center ${costPerKmColor(avgCostPerKm)}`}>
       {avgCostPerKm > 0 ? `${avgCostPerKm.toFixed(3)} ر.س/كم` : '—'}
     </td>
     <td className="px-4 py-3 text-center text-muted-foreground">—</td>
-    <td className="px-4 py-3 text-center">{totalOrders.toLocaleString()}</td>
+    <td className="px-4 py-3 text-center">{totalOrders.toLocaleString('en-US')}</td>
     <td className="px-4 py-3 text-center text-muted-foreground">
       {totalOrders > 0 ? `${(totalFuel / totalOrders).toFixed(2)} ر.س` : '—'}
     </td>
@@ -226,8 +226,8 @@ export function FuelMonthlyView(props: Readonly<{
               <td className="px-4 py-3 text-center">
                 <span className="text-xs bg-muted px-2 py-0.5 rounded-full">{row.daily_count} يوم</span>
               </td>
-              <td className="px-4 py-3 text-center font-medium text-primary">{row.km_total.toLocaleString()} كم</td>
-              <td className="px-4 py-3 text-center font-medium text-warning">{row.fuel_cost.toLocaleString()} ر.س</td>
+              <td className="px-4 py-3 text-center font-medium text-primary">{row.km_total.toLocaleString('en-US')} كم</td>
+              <td className="px-4 py-3 text-center font-medium text-warning">{row.fuel_cost.toLocaleString('en-US')} ر.س</td>
               <td className={`px-4 py-3 text-center ${costPerKmColor(costPerKm)}`}>
                 {costPerKm === null ? '—' : `${costPerKm.toFixed(3)} ر.س/كم`}
               </td>
@@ -247,7 +247,7 @@ export function FuelMonthlyView(props: Readonly<{
               </td>
               <td className="px-4 py-3 text-center">
                 {row.orders_count > 0
-                  ? <span className="font-semibold text-foreground">{row.orders_count.toLocaleString()}</span>
+                  ? <span className="font-semibold text-foreground">{row.orders_count.toLocaleString('en-US')}</span>
                   : <span className="text-muted-foreground/40">—</span>}
               </td>
               <td className="px-4 py-3 text-center">
@@ -387,11 +387,11 @@ export function FuelDailyDetailedView(props: Readonly<{
             </td>
             <td className="px-4 py-2 text-center">
               {riderMonthOrders(emp.id) > 0
-                ? <span className="font-semibold text-foreground">{riderMonthOrders(emp.id).toLocaleString()}</span>
+                ? <span className="font-semibold text-foreground">{riderMonthOrders(emp.id).toLocaleString('en-US')}</span>
                 : <span className="text-muted-foreground/40">—</span>}
             </td>
-            <td className="px-4 py-2 text-center font-medium text-primary">{riderMonthKm(emp.id).toLocaleString()}</td>
-            <td className="px-4 py-2 text-center text-warning">{riderMonthFuel(emp.id).toLocaleString()} ر.س</td>
+            <td className="px-4 py-2 text-center font-medium text-primary">{riderMonthKm(emp.id).toLocaleString('en-US')}</td>
+            <td className="px-4 py-2 text-center text-warning">{riderMonthFuel(emp.id).toLocaleString('en-US')} ر.س</td>
           </tr>
           {open && (
             <tr className="bg-muted/10">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Settings, Plus, Pencil, Trash2, Check, X, Pin, Loader2, Lock, Link2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
@@ -657,7 +657,7 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
                 {isFixed ? (
                   <div className="bg-accent rounded-lg px-3 py-2 text-sm mb-3">
                     <span className="text-accent-foreground font-medium">📅 الراتب الشهري الكامل:</span>
-                    <span className="font-bold ms-2">{(s.monthly_amount || 0).toLocaleString()} ر.س</span>
+                    <span className="font-bold ms-2">{(s.monthly_amount || 0).toLocaleString('en-US')} ر.س</span>
                     <p className="text-xs text-muted-foreground mt-0.5">(monthly_amount ÷ 30) × أيام الحضور</p>
                   </div>
                 ) : (

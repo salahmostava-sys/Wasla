@@ -1,4 +1,4 @@
-type Rider = { name: string; orders: number; app: string; appColor: string; appId: string };
+﻿type Rider = { name: string; orders: number; app: string; appColor: string; appId: string };
 type AppTop = { id: string; name: string; brand_color: string; riders: Rider[] };
 type AtRiskRider = Rider & { projected: number; share: number; gap: number };
 
@@ -41,7 +41,7 @@ export function TopEmployees(props: Readonly<{
                 {topRidersOverall.map((r) => (
                   <div key={r.appId} className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-muted/40">
                     <span className="text-sm font-semibold truncate">{r.name}</span>
-                    <span className="text-sm font-black">{r.orders.toLocaleString()}</span>
+                    <span className="text-sm font-black">{r.orders.toLocaleString('en-US')}</span>
                   </div>
                 ))}
               </div>
@@ -60,7 +60,7 @@ export function TopEmployees(props: Readonly<{
                         {app.riders.map((r) => (
                           <div key={r.id} className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-muted/40">
                             <span className="text-sm truncate">{r.name}</span>
-                            <span className="text-sm font-black">{r.orders.toLocaleString()}</span>
+                            <span className="text-sm font-black">{r.orders.toLocaleString('en-US')}</span>
                           </div>
                         ))}
                       </div>
@@ -83,7 +83,7 @@ export function TopEmployees(props: Readonly<{
                         {app.riders.map((r) => (
                           <div key={`bottom-${app.id}-${r.id}`} className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-rose-50/50 border border-rose-100/60">
                             <span className="text-sm truncate">{r.name}</span>
-                            <span className="text-sm font-black text-rose-700">{r.orders.toLocaleString()}</span>
+                            <span className="text-sm font-black text-rose-700">{r.orders.toLocaleString('en-US')}</span>
                           </div>
                         ))}
                       </div>
@@ -109,11 +109,11 @@ export function TopEmployees(props: Readonly<{
                         </span>
                       </div>
                       <div className="text-[11px] text-right tabular-nums" dir="rtl">
-                        <span className="font-bold text-foreground">{r.orders.toLocaleString()}</span>
+                        <span className="font-bold text-foreground">{r.orders.toLocaleString('en-US')}</span>
                         <span className="text-muted-foreground mx-1">←</span>
-                        <span className="text-amber-800">إسقاط {r.projected.toLocaleString()}</span>
+                        <span className="text-amber-800">إسقاط {r.projected.toLocaleString('en-US')}</span>
                         <span className="text-muted-foreground mx-1">/</span>
-                        <span>حصة {Math.round(r.share).toLocaleString()}</span>
+                        <span>حصة {Math.round(r.share).toLocaleString('en-US')}</span>
                       </div>
                     </div>
                   ))}

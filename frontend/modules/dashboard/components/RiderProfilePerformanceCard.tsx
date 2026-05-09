@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RiderProfilePerformanceCard — Comprehensive rider profile showing
  * performance, comparison, trends, AI analysis, finance, and targets.
  */
@@ -64,9 +64,9 @@ function ComparisonRow({
     <div className="flex items-center justify-between py-2 border-b border-border/30 last:border-b-0">
       <span className="text-xs text-muted-foreground">{label}</span>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-muted-foreground">{previous.toLocaleString()}</span>
+        <span className="text-xs text-muted-foreground">{previous.toLocaleString('en-US')}</span>
         <span className="text-xs text-muted-foreground">→</span>
-        <span className="text-sm font-bold text-foreground">{current.toLocaleString()}</span>
+        <span className="text-sm font-bold text-foreground">{current.toLocaleString('en-US')}</span>
         <span className={`text-xs font-bold ${positive ? 'text-emerald-600' : 'text-rose-500'}`}>
           {positive ? '+' : ''}{pct.toFixed(1)}%
         </span>
@@ -95,14 +95,14 @@ function TargetProgressBar({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">الهدف: {target.toLocaleString()} طلب</span>
+        <span className="text-muted-foreground">الهدف: {target.toLocaleString('en-US')} طلب</span>
         <span className="font-bold text-foreground">{pct.toFixed(0)}%</span>
       </div>
       <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color} transition-all duration-500`} style={{ width: `${clampedPct}%` }} />
       </div>
       <p className="text-[10px] text-muted-foreground">
-        {value.toLocaleString()} من {target.toLocaleString()} طلب
+        {value.toLocaleString('en-US')} من {target.toLocaleString('en-US')} طلب
       </p>
     </div>
   );
@@ -125,7 +125,7 @@ function MonthRow({
     <div className="flex items-center justify-between py-2 border-b border-border/30 last:border-b-0">
       <span className="text-xs font-medium text-foreground">{monthYear}</span>
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span>{totalOrders.toLocaleString()} طلب</span>
+        <span>{totalOrders.toLocaleString('en-US')} طلب</span>
         <span>{avgOrdersPerDay.toFixed(1)}/يوم</span>
         <span>{activeDays} يوم</span>
         {targetPct > 0 && (
@@ -278,16 +278,16 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
           </div>
           {salary ? (
             <>
-              <ProfileStatRow label="الراتب الأساسي" value={`${salary.baseSalary.toLocaleString()} ر.س`} />
-              <ProfileStatRow label="البدلات" value={`+${salary.allowances.toLocaleString()} ر.س`} />
+              <ProfileStatRow label="الراتب الأساسي" value={`${salary.baseSalary.toLocaleString('en-US')} ر.س`} />
+              <ProfileStatRow label="البدلات" value={`+${salary.allowances.toLocaleString('en-US')} ر.س`} />
               <ProfileStatRow
                 label="الاستقطاعات"
-                value={`-${(salary.attendanceDeduction + salary.advanceDeduction + salary.externalDeduction + salary.manualDeduction).toLocaleString()} ر.س`}
+                value={`-${(salary.attendanceDeduction + salary.advanceDeduction + salary.externalDeduction + salary.manualDeduction).toLocaleString('en-US')} ر.س`}
               />
               <div className="flex items-center justify-between py-3 mt-1 border-t-2 border-foreground/10">
                 <span className="text-sm font-bold text-foreground">صافي الراتب</span>
                 <span className="text-lg font-black text-foreground">
-                  {salary.netSalary.toLocaleString()} ر.س
+                  {salary.netSalary.toLocaleString('en-US')} ر.س
                 </span>
               </div>
               <span
@@ -353,7 +353,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
                   {pb.appName}
                 </p>
                 <p className="text-lg font-black text-foreground mt-1">
-                  {pb.orders.toLocaleString()}
+                  {pb.orders.toLocaleString('en-US')}
                 </p>
                 <p className="text-[10px] text-muted-foreground">طلب</p>
               </div>

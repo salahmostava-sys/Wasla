@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { TrendingUp, Fuel, DollarSign, Package, Calendar } from 'lucide-react';
 
 function StatCard(props: Readonly<{ icon: React.ReactNode; label: string; value: string; sub?: string }>) {
@@ -19,10 +19,10 @@ export function FuelMonthlyStats(props: Readonly<{ totalKm: number; totalFuel: n
   const { totalKm, totalFuel, avgCostPerKm, totalOrders } = props;
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatCard icon={<TrendingUp size={22} />} label="إجمالي الكيلومترات" value={totalKm.toLocaleString()} sub="كم هذا الشهر" />
-      <StatCard icon={<Fuel size={22} />} label="إجمالي تكلفة البنزين" value={`${totalFuel.toLocaleString()} ر.س`} sub="هذا الشهر" />
+      <StatCard icon={<TrendingUp size={22} />} label="إجمالي الكيلومترات" value={totalKm.toLocaleString('en-US')} sub="كم هذا الشهر" />
+      <StatCard icon={<Fuel size={22} />} label="إجمالي تكلفة البنزين" value={`${totalFuel.toLocaleString('en-US')} ر.س`} sub="هذا الشهر" />
       <StatCard icon={<DollarSign size={22} />} label="متوسط تكلفة الكيلومتر" value={avgCostPerKm > 0 ? `${avgCostPerKm.toFixed(3)} ر.س` : '—'} sub="ر.س / كم" />
-      <StatCard icon={<Package size={22} />} label="إجمالي الطلبات" value={totalOrders.toLocaleString()} sub="من الطلبات اليومية" />
+      <StatCard icon={<Package size={22} />} label="إجمالي الطلبات" value={totalOrders.toLocaleString('en-US')} sub="من الطلبات اليومية" />
     </div>
   );
 }
@@ -32,8 +32,8 @@ export function FuelDailyStats(props: Readonly<{ count: number; totalKm: number;
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
       <StatCard icon={<Calendar size={22} />} label="إجمالي الإدخالات" value={String(count)} sub="سجل في هذا الشهر" />
-      <StatCard icon={<TrendingUp size={22} />} label="إجمالي الكيلومترات" value={totalKm.toLocaleString()} sub="كم" />
-      <StatCard icon={<Fuel size={22} />} label="إجمالي تكلفة البنزين" value={`${totalFuel.toLocaleString()} ر.س`} sub="هذا الشهر" />
+      <StatCard icon={<TrendingUp size={22} />} label="إجمالي الكيلومترات" value={totalKm.toLocaleString('en-US')} sub="كم" />
+      <StatCard icon={<Fuel size={22} />} label="إجمالي تكلفة البنزين" value={`${totalFuel.toLocaleString('en-US')} ر.س`} sub="هذا الشهر" />
     </div>
   );
 }

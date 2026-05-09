@@ -1,4 +1,4 @@
-import { Loader2, ShieldAlert, Pencil, Trash2, X, Check, Car } from 'lucide-react';
+﻿import { Loader2, ShieldAlert, Pencil, Trash2, X, Check, Car } from 'lucide-react';
 import { useFuelPage } from '@modules/fuel/hooks/useFuelPage';
 import { FuelPageHeader } from '@modules/fuel/components/FuelPageHeader';
 import { FuelFiltersToolbar, FuelPlatformTabs } from '@modules/fuel/components/FuelFilters';
@@ -50,8 +50,8 @@ function MonthlyTable({ rows }: Readonly<{ rows: MonthlyRow[] }>) {
                   ) : '—'}
                 </td>
                 <td className="py-2.5 px-3 text-center">{row.daily_count}</td>
-                <td className="py-2.5 px-3 font-mono">{row.km_total.toLocaleString()}</td>
-                <td className="py-2.5 px-3 font-mono">{row.fuel_cost.toLocaleString()} ر.س</td>
+                <td className="py-2.5 px-3 font-mono">{row.km_total.toLocaleString('en-US')}</td>
+                <td className="py-2.5 px-3 font-mono">{row.fuel_cost.toLocaleString('en-US')} ر.س</td>
                 <td className="py-2.5 px-3 font-mono text-muted-foreground">
                   {costPerKm > 0 ? `${costPerKm.toFixed(3)} ر.س` : '—'}
                 </td>
@@ -105,7 +105,7 @@ function DailyTableRow({
             onChange={(e) => onUpdateEditing('km_total', e.target.value)}
           />
         ) : (
-          <span className="font-mono">{row.km_total.toLocaleString()}</span>
+          <span className="font-mono">{row.km_total.toLocaleString('en-US')}</span>
         )}
       </td>
       <td className="py-2.5 px-3">
@@ -117,7 +117,7 @@ function DailyTableRow({
             onChange={(e) => onUpdateEditing('fuel_cost', e.target.value)}
           />
         ) : (
-          <span className="font-mono">{row.fuel_cost.toLocaleString()} ر.س</span>
+          <span className="font-mono">{row.fuel_cost.toLocaleString('en-US')} ر.س</span>
         )}
       </td>
       <td className="py-2.5 px-3 text-muted-foreground text-xs">
@@ -304,7 +304,7 @@ function SpreadsheetView({
                   </td>
                 );
               })}
-              <td className="py-2 px-3 text-center font-mono font-semibold">{row.km_total.toLocaleString()}</td>
+              <td className="py-2 px-3 text-center font-mono font-semibold">{row.km_total.toLocaleString('en-US')}</td>
             </tr>
           ))}
         </tbody>

@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Search, Save, FolderOpen, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
@@ -122,13 +122,13 @@ export function OrdersSpreadsheetToolbar(props: Readonly<Props>) {
       <div className="flex items-center gap-2 sm:gap-3 rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] shrink-0">
         <span className="whitespace-nowrap">
           <span className="text-muted-foreground">إجمالي الطلبات:</span>{' '}
-          <span className="font-bold tabular-nums text-foreground">{monthGrandTotal.toLocaleString()}</span>
+          <span className="font-bold tabular-nums text-foreground">{monthGrandTotal.toLocaleString('en-US')}</span>
           <span className="text-muted-foreground ms-0.5"> طلب</span>
         </span>
         <span className="hidden sm:inline h-3 w-px bg-border" aria-hidden />
         <span className="whitespace-nowrap">
           <span className="text-muted-foreground">شهري:</span>{' '}
-          <span className="font-semibold tabular-nums text-foreground">{monthDailyAvg.toLocaleString()}</span>
+          <span className="font-semibold tabular-nums text-foreground">{monthDailyAvg.toLocaleString('en-US')}</span>
           <span className="text-muted-foreground ms-0.5"> /يوم</span>
         </span>
         <span className="h-3 w-px bg-border" aria-hidden />
@@ -164,7 +164,7 @@ export function OrdersSpreadsheetToolbar(props: Readonly<Props>) {
                   : 'bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground',
               )}
             >
-              الكل ({allPlatformsGrandTotal.toLocaleString()})
+              الكل ({allPlatformsGrandTotal.toLocaleString('en-US')})
             </button>
             {apps.map((app) => {
               const count = platformOrderTotals[app.id] ?? 0;
@@ -190,7 +190,7 @@ export function OrdersSpreadsheetToolbar(props: Readonly<Props>) {
                     <img src={app.logo_url} className="w-3.5 h-3.5 rounded-full object-cover shrink-0" alt="" />
                   )}
                   <span className="truncate">{app.name}</span>
-                  <span className="shrink-0">({count.toLocaleString()})</span>
+                  <span className="shrink-0">({count.toLocaleString('en-US')})</span>
                 </button>
               );
             })}

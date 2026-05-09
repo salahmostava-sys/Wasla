@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FuelSpreadsheetView — جدول بيانات استهلاك المناديب
  *
  * الصفوف = المناديب
@@ -112,15 +112,15 @@ function CellDetailPopover(props: Readonly<{
           <div className="space-y-2.5">
             <div className="flex items-center justify-between text-sm rounded-lg bg-blue-50 dark:bg-blue-950/30 px-3 py-2">
               <span className="text-muted-foreground flex items-center gap-1.5">📦 الطلبات</span>
-              <span className="font-bold text-blue-600">{popover.data.orders.toLocaleString()}</span>
+              <span className="font-bold text-blue-600">{popover.data.orders.toLocaleString('en-US')}</span>
             </div>
             <div className="flex items-center justify-between text-sm rounded-lg bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
               <span className="text-muted-foreground flex items-center gap-1.5">🛣️ المسافة</span>
-              <span className="font-bold text-emerald-600">{popover.data.km.toLocaleString()} كم</span>
+              <span className="font-bold text-emerald-600">{popover.data.km.toLocaleString('en-US')} كم</span>
             </div>
             <div className="flex items-center justify-between text-sm rounded-lg bg-amber-50 dark:bg-amber-950/30 px-3 py-2">
               <span className="text-muted-foreground flex items-center gap-1.5">⛽ البنزين</span>
-              <span className="font-bold text-amber-600">{popover.data.fuel.toLocaleString()} ر.س</span>
+              <span className="font-bold text-amber-600">{popover.data.fuel.toLocaleString('en-US')} ر.س</span>
             </div>
             {popover.data.notes && (
               <div className="text-xs bg-muted/30 rounded-lg p-2.5 text-muted-foreground">
@@ -308,26 +308,26 @@ export default function FuelSpreadsheetView(props: Readonly<{
         <SpreadsheetStat
           icon={<Package size={18} />}
           label="إجمالي الطلبات"
-          value={grandTotals.orders.toLocaleString()}
+          value={grandTotals.orders.toLocaleString('en-US')}
           accent="bg-blue-500/10 text-blue-600"
         />
         <SpreadsheetStat
           icon={<TrendingUp size={18} />}
           label="إجمالي المسافة"
-          value={`${grandTotals.km.toLocaleString()} كم`}
+          value={`${grandTotals.km.toLocaleString('en-US')} كم`}
           accent="bg-emerald-500/10 text-emerald-600"
         />
         <SpreadsheetStat
           icon={<Fuel size={18} />}
           label="إجمالي البنزين"
-          value={`${grandTotals.fuel.toLocaleString()} ر.س`}
+          value={`${grandTotals.fuel.toLocaleString('en-US')} ر.س`}
           accent="bg-amber-500/10 text-amber-600"
         />
         <SpreadsheetStat
           icon={<Calendar size={18} />}
           label="خلايا مسجّلة"
-          value={stats.filledCells.toLocaleString()}
-          sub={`من ${(riders.length * dayHeaders.length).toLocaleString()}`}
+          value={stats.filledCells.toLocaleString('en-US')}
+          sub={`من ${(riders.length * dayHeaders.length).toLocaleString('en-US')}`}
         />
         <SpreadsheetStat
           icon={<BarChart3 size={18} />}
@@ -473,13 +473,13 @@ export default function FuelSpreadsheetView(props: Readonly<{
                     <td className="border-l border-border/50 px-1.5 py-1 text-center bg-primary/5 min-w-[85px]">
                       <div className="space-y-[1px] leading-none">
                         {row.totalOrders > 0 && (
-                          <p className="font-bold text-blue-600 text-[10px]">📦 {row.totalOrders.toLocaleString()}</p>
+                          <p className="font-bold text-blue-600 text-[10px]">📦 {row.totalOrders.toLocaleString('en-US')}</p>
                         )}
                         {row.totalKm > 0 && (
-                          <p className="font-semibold text-emerald-600 text-[9px]">{row.totalKm.toLocaleString()} كم</p>
+                          <p className="font-semibold text-emerald-600 text-[9px]">{row.totalKm.toLocaleString('en-US')} كم</p>
                         )}
                         {row.totalFuel > 0 && (
-                          <p className="text-amber-600 text-[8px]">{row.totalFuel.toLocaleString()} ر.س</p>
+                          <p className="text-amber-600 text-[8px]">{row.totalFuel.toLocaleString('en-US')} ر.س</p>
                         )}
                         {row.totalOrders === 0 && row.totalKm === 0 && row.totalFuel === 0 && (
                           <span className="text-muted-foreground/40 text-[9px]">—</span>
@@ -509,13 +509,13 @@ export default function FuelSpreadsheetView(props: Readonly<{
                         {hasData ? (
                           <div className="space-y-[1px] leading-none">
                             {ct!.orders > 0 && (
-                              <p className="font-bold text-blue-600 text-[9px]">{ct!.orders.toLocaleString()}</p>
+                              <p className="font-bold text-blue-600 text-[9px]">{ct!.orders.toLocaleString('en-US')}</p>
                             )}
                             {ct!.km > 0 && (
-                              <p className="font-semibold text-emerald-600 text-[8px]">{ct!.km.toLocaleString()}</p>
+                              <p className="font-semibold text-emerald-600 text-[8px]">{ct!.km.toLocaleString('en-US')}</p>
                             )}
                             {ct!.fuel > 0 && (
-                              <p className="text-amber-600 text-[7px]">{ct!.fuel.toLocaleString()}</p>
+                              <p className="text-amber-600 text-[7px]">{ct!.fuel.toLocaleString('en-US')}</p>
                             )}
                           </div>
                         ) : (
@@ -526,9 +526,9 @@ export default function FuelSpreadsheetView(props: Readonly<{
                   })}
                   <td className="border-l border-border/50 px-1.5 py-2 text-center bg-primary/10">
                     <div className="space-y-[2px] leading-none">
-                      <p className="font-black text-blue-600 text-[10px]">📦 {grandTotals.orders.toLocaleString()}</p>
-                      <p className="font-bold text-emerald-600 text-[9px]">{grandTotals.km.toLocaleString()} كم</p>
-                      <p className="font-semibold text-amber-600 text-[8px]">{grandTotals.fuel.toLocaleString()} ر.س</p>
+                      <p className="font-black text-blue-600 text-[10px]">📦 {grandTotals.orders.toLocaleString('en-US')}</p>
+                      <p className="font-bold text-emerald-600 text-[9px]">{grandTotals.km.toLocaleString('en-US')} كم</p>
+                      <p className="font-semibold text-amber-600 text-[8px]">{grandTotals.fuel.toLocaleString('en-US')} ر.س</p>
                     </div>
                   </td>
                 </tr>

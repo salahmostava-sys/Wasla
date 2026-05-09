@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Activity,
@@ -326,7 +326,7 @@ export function DashboardAnalyticsTab() {
             <Target size={16} />
             <span className="text-xs font-semibold opacity-80">الإسقاط المتوقع للشهر</span>
           </div>
-          <p className="text-3xl font-black">{projectedOrders.toLocaleString()}</p>
+          <p className="text-3xl font-black">{projectedOrders.toLocaleString('en-US')}</p>
           <p className="text-xs opacity-70 mt-1">
             بناءً على {daysPassed} يوم منقضي من {daysInMonth}
           </p>
@@ -340,7 +340,7 @@ export function DashboardAnalyticsTab() {
             <BarChart2 size={16} />
             <span className="text-xs font-semibold">متوسط الطلبات/مندوب</span>
           </div>
-          <p className="text-3xl font-black text-foreground">{overallAvg.toLocaleString()}</p>
+          <p className="text-3xl font-black text-foreground">{overallAvg.toLocaleString('en-US')}</p>
           <p className="text-xs text-muted-foreground/80 mt-1">هذا الشهر</p>
           <div className="mt-2 text-xs text-muted-foreground">
             {riderMetrics.filter((rider) => rider.thisMonth >= overallAvg).length} مندوب فوق المتوسط
@@ -448,9 +448,9 @@ export function DashboardAnalyticsTab() {
                   {app.growth}%
                 </span>
               </div>
-              <p className="text-2xl font-black text-foreground">{app.thisMonth.toLocaleString()}</p>
+              <p className="text-2xl font-black text-foreground">{app.thisMonth.toLocaleString('en-US')}</p>
               <p className="text-[11px] text-muted-foreground/80 mt-1">
-                الشهر السابق: {app.lastMonth.toLocaleString()}
+                الشهر السابق: {app.lastMonth.toLocaleString('en-US')}
               </p>
               <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                 <div

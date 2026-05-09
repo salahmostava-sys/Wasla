@@ -1,4 +1,4 @@
-import { escapeHtml } from '@shared/lib/security';
+﻿import { escapeHtml } from '@shared/lib/security';
 import { getManualDeductionTotal } from '@modules/salaries/lib/salaryDomain';
 import { getPlatformActivitySummary } from '@modules/salaries/model/salaryUtils';
 import type { MergedPdfComputed, SalaryRow } from '@modules/salaries/types/salary.types';
@@ -46,33 +46,33 @@ export function buildMergedPlatformsRowsHtml(row: SalaryRow): string {
       const metric = row.platformMetrics[app];
       const activityLabel = getPlatformActivitySummary(metric);
       const salary = row.platformSalaries[app] || 0;
-      return `<tr><td class="label">${escapeHtml(app)}</td><td style="text-align:center">${activityLabel}</td><td class="val-blue" style="text-align:center">${salary.toLocaleString()} ر.س</td></tr>`;
+      return `<tr><td class="label">${escapeHtml(app)}</td><td style="text-align:center">${activityLabel}</td><td class="val-blue" style="text-align:center">${salary.toLocaleString('en-US')} ر.س</td></tr>`;
     })
     .join('');
 }
 
 export function buildMergedAdditionsSectionHtml(row: SalaryRow, c: MergedPdfComputed): string {
   if (c.totalAdditions <= 0) return '';
-  const incentivesRow = row.incentives > 0 ? `<tr><td class="label">الحوافز</td><td class="val-green">+ ${row.incentives.toLocaleString()} ر.س</td></tr>` : '';
-  const sickAllowanceRow = row.sickAllowance > 0 ? `<tr><td class="label">بدل مرضي</td><td class="val-green">+ ${row.sickAllowance.toLocaleString()} ر.س</td></tr>` : '';
+  const incentivesRow = row.incentives > 0 ? `<tr><td class="label">الحوافز</td><td class="val-green">+ ${row.incentives.toLocaleString('en-US')} ر.س</td></tr>` : '';
+  const sickAllowanceRow = row.sickAllowance > 0 ? `<tr><td class="label">بدل مرضي</td><td class="val-green">+ ${row.sickAllowance.toLocaleString('en-US')} ر.س</td></tr>` : '';
   return `
     <h3>الإضافات</h3>
     <table>
       ${incentivesRow}
       ${sickAllowanceRow}
-      <tr class="total-row"><td class="label">المجموع مع الراتب</td><td class="val-blue">${c.totalWithSalary.toLocaleString()} ر.س</td></tr>
+      <tr class="total-row"><td class="label">المجموع مع الراتب</td><td class="val-blue">${c.totalWithSalary.toLocaleString('en-US')} ر.س</td></tr>
     </table>
   `;
 }
 
 export function buildMergedDeductionsSectionHtml(row: SalaryRow, c: MergedPdfComputed): string {
   if (c.totalDeductions <= 0) return '';
-  const advanceRow = row.advanceDeduction > 0 ? `<tr><td class="label">قسط سلفة</td><td class="val-red">- ${row.advanceDeduction.toLocaleString()} ر.س</td></tr>` : '';
-  const remainingAdvanceRow = row.advanceRemaining > 0 ? `<tr><td class="label">رصيد السلفة المتبقي</td><td class="val-orange">${row.advanceRemaining.toLocaleString()} ر.س</td></tr>` : '';
-  const externalRow = row.externalDeduction > 0 ? `<tr><td class="label">خصومات خارجية</td><td class="val-red">- ${row.externalDeduction.toLocaleString()} ر.س</td></tr>` : '';
-  const violationsRow = row.violations > 0 ? `<tr><td class="label">مخالفات</td><td class="val-red">- ${row.violations.toLocaleString()} ر.س</td></tr>` : '';
+  const advanceRow = row.advanceDeduction > 0 ? `<tr><td class="label">قسط سلفة</td><td class="val-red">- ${row.advanceDeduction.toLocaleString('en-US')} ر.س</td></tr>` : '';
+  const remainingAdvanceRow = row.advanceRemaining > 0 ? `<tr><td class="label">رصيد السلفة المتبقي</td><td class="val-orange">${row.advanceRemaining.toLocaleString('en-US')} ر.س</td></tr>` : '';
+  const externalRow = row.externalDeduction > 0 ? `<tr><td class="label">خصومات خارجية</td><td class="val-red">- ${row.externalDeduction.toLocaleString('en-US')} ر.س</td></tr>` : '';
+  const violationsRow = row.violations > 0 ? `<tr><td class="label">مخالفات</td><td class="val-red">- ${row.violations.toLocaleString('en-US')} ر.س</td></tr>` : '';
   const manual = getManualDeductionTotal(row);
-  const manualRow = manual > 0 ? `<tr><td class="label">خصومات يدوية</td><td class="val-red">- ${manual.toLocaleString()} ر.س</td></tr>` : '';
+  const manualRow = manual > 0 ? `<tr><td class="label">خصومات يدوية</td><td class="val-red">- ${manual.toLocaleString('en-US')} ر.س</td></tr>` : '';
   return `
     <h3>المستقطعات</h3>
     <table>
@@ -81,7 +81,7 @@ export function buildMergedDeductionsSectionHtml(row: SalaryRow, c: MergedPdfCom
       ${externalRow}
       ${violationsRow}
       ${manualRow}
-      <tr class="deduction-total"><td class="label">إجمالي المستقطعات</td><td class="val-red">- ${c.totalDeductions.toLocaleString()} ر.س</td></tr>
+      <tr class="deduction-total"><td class="label">إجمالي المستقطعات</td><td class="val-red">- ${c.totalDeductions.toLocaleString('en-US')} ر.س</td></tr>
     </table>
   `;
 }
@@ -104,8 +104,8 @@ export function buildMergedSalaryPageHtml({
     : (row.paymentMethod === 'bank' ? '—' : 'لا يُصرف تحويلاً');
   const transferRows =
     row.transfer > 0
-      ? `<tr><td class="label">المبلغ المحوّل</td><td>${row.transfer.toLocaleString()} ر.س</td></tr>
-       <tr><td class="label">المتبقي نقداً</td><td class="val-orange">${computed.remaining.toLocaleString()} ر.س</td></tr>`
+      ? `<tr><td class="label">المبلغ المحوّل</td><td>${row.transfer.toLocaleString('en-US')} ر.س</td></tr>
+       <tr><td class="label">المتبقي نقداً</td><td class="val-orange">${computed.remaining.toLocaleString('en-US')} ر.س</td></tr>`
       : '';
 
   return `
@@ -125,9 +125,9 @@ export function buildMergedSalaryPageHtml({
         <div class="info-row"><span class="info-label">الجوال</span><span class="info-value">${escapeHtml(row.phone || '—')}</span></div>
         <div class="info-row"><span class="info-label">طريقة الصرف</span><span class="info-value">${paymentMethodLabel}</span></div>
         <div class="info-row"><span class="info-label">الآيبان / الحساب</span><span class="info-value">${ibanLine}</span></div>
-        <div class="info-row"><span class="info-label">أيام العمل</span><span class="info-value">${Number(row.workDays ?? 0).toLocaleString()}</span></div>
-        <div class="info-row"><span class="info-label">تكلفة البنزين</span><span class="info-value">${Number(row.fuelCost ?? 0).toLocaleString()} ر.س</span></div>
-        <div class="info-row"><span class="info-label">دخل المنصات</span><span class="info-value">${Number(row.platformIncome ?? 0).toLocaleString()} ر.س</span></div>
+        <div class="info-row"><span class="info-label">أيام العمل</span><span class="info-value">${Number(row.workDays ?? 0).toLocaleString('en-US')}</span></div>
+        <div class="info-row"><span class="info-label">تكلفة البنزين</span><span class="info-value">${Number(row.fuelCost ?? 0).toLocaleString('en-US')} ر.س</span></div>
+        <div class="info-row"><span class="info-label">دخل المنصات</span><span class="info-value">${Number(row.platformIncome ?? 0).toLocaleString('en-US')} ر.س</span></div>
       </div>
       <h3>النشاط والراتب حسب المنصة</h3>
       <table>
@@ -135,13 +135,13 @@ export function buildMergedSalaryPageHtml({
             <td style="background:#e0e7ff;color:#4338ca;font-weight:700;text-align:center">النشاط</td>
             <td style="background:#e0e7ff;color:#4338ca;font-weight:700;text-align:center">الراتب</td></tr>
         ${buildMergedPlatformsRowsHtml(row)}
-        <tr class="total-row"><td class="label">إجمالي الراتب الأساسي</td><td></td><td class="val-blue" style="text-align:center">${computed.totalPlatformSalary.toLocaleString()} ر.س</td></tr>
+        <tr class="total-row"><td class="label">إجمالي الراتب الأساسي</td><td></td><td class="val-blue" style="text-align:center">${computed.totalPlatformSalary.toLocaleString('en-US')} ر.س</td></tr>
       </table>
       ${buildMergedAdditionsSectionHtml(row, computed)}
       ${buildMergedDeductionsSectionHtml(row, computed)}
       <h3>الصافي</h3>
       <table>
-        <tr class="net-row"><td class="label">إجمالي الراتب الصافي</td><td class="val-green">${computed.netSalary.toLocaleString()} ر.س</td></tr>
+        <tr class="net-row"><td class="label">إجمالي الراتب الصافي</td><td class="val-green">${computed.netSalary.toLocaleString('en-US')} ر.س</td></tr>
         ${transferRows}
       </table>
       <div class="footer">

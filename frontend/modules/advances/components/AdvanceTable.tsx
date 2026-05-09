@@ -1,4 +1,4 @@
-import React, { type RefObject } from 'react';
+﻿import React, { type RefObject } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
@@ -131,15 +131,15 @@ export const AdvanceTable = ({
                   </td>
                   <td className="px-3 py-3 text-center text-sm font-mono text-foreground" dir="ltr">{s.nationalId}</td>
                   <td className="px-3 py-3 text-center">
-                    <span className="font-bold text-info text-sm">{s.totalDebt.toLocaleString()}</span>
+                    <span className="font-bold text-info text-sm">{s.totalDebt.toLocaleString('en-US')}</span>
                     <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
                   </td>
                   <td className="px-3 py-3 text-center">
-                    <span className="font-bold text-success text-sm">{s.totalPaid.toLocaleString()}</span>
+                    <span className="font-bold text-success text-sm">{s.totalPaid.toLocaleString('en-US')}</span>
                     <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
                   </td>
                   <td className="px-3 py-3 text-center">
-                    <span className={`font-bold text-sm ${s.remaining > 0 ? 'text-destructive' : 'text-success'}`}>{s.remaining.toLocaleString()}</span>
+                    <span className={`font-bold text-sm ${s.remaining > 0 ? 'text-destructive' : 'text-success'}`}>{s.remaining.toLocaleString('en-US')}</span>
                     <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
                   </td>
                   {permissions.can_edit && (
@@ -173,15 +173,15 @@ export const AdvanceTable = ({
               </td>
               <td className="px-3 py-3 text-center text-xs text-muted-foreground">—</td>
               <td className="px-3 py-3 text-center">
-                <span className="font-bold text-info text-sm">{grandTotals.totalDebt.toLocaleString()}</span>
+                <span className="font-bold text-info text-sm">{grandTotals.totalDebt.toLocaleString('en-US')}</span>
                 <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
               </td>
               <td className="px-3 py-3 text-center">
-                <span className="font-bold text-success text-sm">{grandTotals.totalPaid.toLocaleString()}</span>
+                <span className="font-bold text-success text-sm">{grandTotals.totalPaid.toLocaleString('en-US')}</span>
                 <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
               </td>
               <td className="px-3 py-3 text-center">
-                <span className="font-bold text-destructive text-sm">{grandTotals.remaining.toLocaleString()}</span>
+                <span className="font-bold text-destructive text-sm">{grandTotals.remaining.toLocaleString('en-US')}</span>
                 <span className="text-[10px] text-muted-foreground ms-0.5">ر.س</span>
               </td>
               {permissions.can_edit && <td />}

@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Search, AlertTriangle, XCircle, CheckCircle, CheckCircle2, RefreshCw, ListChecks, Trash2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
@@ -237,7 +237,7 @@ export default function ViolationSearchTab({
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{row.violation_details || '—'}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{row.violation_date}</td>
                     <td className="px-4 py-3 text-center font-medium text-foreground whitespace-nowrap">
-                      {row.amount.toLocaleString()} ر.س
+                      {row.amount.toLocaleString('en-US')} ر.س
                     </td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">
                       {row.status === 'recorded' ? (

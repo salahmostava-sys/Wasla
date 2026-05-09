@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, User, FileText, Wallet, CreditCard, Clock, Package, DollarSign, ExternalLink, Loader2, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
@@ -516,7 +516,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <InfoField label="نوع الراتب" value={employee.salary_type === 'orders' ? 'طلبات (Orders)' : 'دوام ثابت (Shift)'} />
               {employee.salary_type === 'shift' && (
-                <InfoField label="الراتب الشهري" value={`${employee.base_salary?.toLocaleString()} ر.س`} />
+                <InfoField label="الراتب الشهري" value={`${employee.base_salary?.toLocaleString('en-US')} ر.س`} />
               )}
             </div>
           </div>
@@ -577,15 +577,15 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-medium text-foreground">{adv.amount.toLocaleString()} ر.س</p>
-                            <p className="text-sm text-muted-foreground">قسط شهري: {adv.monthly_amount.toLocaleString()} ر.س · تاريخ الصرف: {adv.disbursement_date}</p>
+                            <p className="font-medium text-foreground">{adv.amount.toLocaleString('en-US')} ر.س</p>
+                            <p className="text-sm text-muted-foreground">قسط شهري: {adv.monthly_amount.toLocaleString('en-US')} ر.س · تاريخ الصرف: {adv.disbursement_date}</p>
                           </div>
                           <span className={advanceStatusStyle[adv.status] || 'badge-info'}>
                             {advanceStatusLabel[adv.status] || adv.status}
                           </span>
                         </div>
                         <div className="mt-2 text-xs text-muted-foreground">
-                          مدفوع: {paid.toLocaleString()} ر.س — متبقي: {remaining.toLocaleString()} ر.س
+                          مدفوع: {paid.toLocaleString('en-US')} ر.س — متبقي: {remaining.toLocaleString('en-US')} ر.س
                         </div>
                         {adv.note && <p className="mt-1 text-xs text-muted-foreground">📝 {adv.note}</p>}
                       </button>
@@ -604,7 +604,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                               {adv.advance_installments.map(inst => (
                                 <tr key={inst.id} className="border-t border-border/20">
                                   <td className="p-2">{inst.month_year}</td>
-                                  <td className="p-2">{inst.amount.toLocaleString()} ر.س</td>
+                                  <td className="p-2">{inst.amount.toLocaleString('en-US')} ر.س</td>
                                   <td className="p-2">
                                     <span className={installmentStatusStyle[inst.status] || ''}>
                                       {installmentStatusLabel[inst.status] || inst.status}
@@ -653,17 +653,17 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="bg-success/10 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">إجمالي الصافي</p>
-                      <p className="text-lg font-bold text-success">{totalNet.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-success">{totalNet.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">ر.س</p>
                     </div>
                     <div className="bg-primary/10 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">إجمالي الأساسي</p>
-                      <p className="text-lg font-bold text-primary">{totalBase.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-primary">{totalBase.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">ر.س</p>
                     </div>
                     <div className="bg-destructive/10 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">إجمالي الخصومات</p>
-                      <p className="text-lg font-bold text-destructive">{totalDeduct.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-destructive">{totalDeduct.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">ر.س</p>
                     </div>
                     <div className="bg-muted/60 rounded-xl p-3 text-center">
@@ -692,10 +692,10 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                           return (
                             <tr key={s.id} className={`border-b border-border/20 ${idx % 2 === 0 ? '' : 'bg-muted/10'}`}>
                               <td className="p-3 font-medium">{monthLabel(s.month_year)}</td>
-                              <td className="p-3 text-muted-foreground">{s.base_salary.toLocaleString()}</td>
-                              <td className="p-3 text-success">{s.allowances > 0 ? `+${s.allowances.toLocaleString()}` : EMPTY_DATA_PLACEHOLDER}</td>
-                              <td className="p-3 text-destructive">{totalDed > 0 ? `-${totalDed.toLocaleString()}` : EMPTY_DATA_PLACEHOLDER}</td>
-                              <td className="p-3 font-bold text-success">{s.net_salary.toLocaleString()} ر.س</td>
+                              <td className="p-3 text-muted-foreground">{s.base_salary.toLocaleString('en-US')}</td>
+                              <td className="p-3 text-success">{s.allowances > 0 ? `+${s.allowances.toLocaleString('en-US')}` : EMPTY_DATA_PLACEHOLDER}</td>
+                              <td className="p-3 text-destructive">{totalDed > 0 ? `-${totalDed.toLocaleString('en-US')}` : EMPTY_DATA_PLACEHOLDER}</td>
+                              <td className="p-3 font-bold text-success">{s.net_salary.toLocaleString('en-US')} ر.س</td>
                               <td className="p-3 text-center">
                                 <span className={s.is_approved ? 'badge-success' : 'badge-warning'}>
                                   {s.is_approved ? 'معتمد' : 'معلق'}
@@ -709,10 +709,10 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                       <tfoot>
                         <tr className="bg-muted/40 border-t-2 border-border/60 font-semibold">
                           <td className="p-3 text-foreground">الإجمالي</td>
-                          <td className="p-3 text-foreground">{totalBase.toLocaleString()}</td>
-                          <td className="p-3 text-success">{salaries.reduce((s,r)=>s+r.allowances,0) > 0 ? `+${salaries.reduce((s,r)=>s+r.allowances,0).toLocaleString()}` : EMPTY_DATA_PLACEHOLDER}</td>
-                          <td className="p-3 text-destructive">-{totalDeduct.toLocaleString()}</td>
-                          <td className="p-3 text-success text-base">{totalNet.toLocaleString()} ر.س</td>
+                          <td className="p-3 text-foreground">{totalBase.toLocaleString('en-US')}</td>
+                          <td className="p-3 text-success">{salaries.reduce((s,r)=>s+r.allowances,0) > 0 ? `+${salaries.reduce((s,r)=>s+r.allowances,0).toLocaleString('en-US')}` : EMPTY_DATA_PLACEHOLDER}</td>
+                          <td className="p-3 text-destructive">-{totalDeduct.toLocaleString('en-US')}</td>
+                          <td className="p-3 text-success text-base">{totalNet.toLocaleString('en-US')} ر.س</td>
                           <td className="p-3 text-center text-xs text-muted-foreground">{approvedCount}/{salaries.length} معتمد</td>
                         </tr>
                       </tfoot>
@@ -752,17 +752,17 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <div className="bg-primary/10 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">إجمالي الطلبات</p>
-                      <p className="text-2xl font-bold text-primary">{grandTotal.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-primary">{grandTotal.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">طلب</p>
                     </div>
                     <div className="bg-muted/60 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">متوسط شهري</p>
-                      <p className="text-2xl font-bold text-foreground">{avgPerMonth.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-foreground">{avgPerMonth.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">طلب/شهر</p>
                     </div>
                     <div className="bg-success/10 rounded-xl p-3 text-center">
                       <p className="text-xs text-muted-foreground mb-1">أفضل شهر</p>
-                      <p className="text-lg font-bold text-success">{bestMonth.total.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-success">{bestMonth.total.toLocaleString('en-US')}</p>
                       <p className="text-[10px] text-muted-foreground">{bestMonth.label}</p>
                     </div>
                   </div>
@@ -808,7 +808,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                                 </div>
                                 <span className="text-xs text-muted-foreground">{pct}%</span>
                               </div>
-                              <span className="text-lg font-bold text-primary">{m.total.toLocaleString()}</span>
+                              <span className="text-lg font-bold text-primary">{m.total.toLocaleString('en-US')}</span>
                               <span className="text-xs text-muted-foreground">طلب</span>
                             </div>
                           </button>

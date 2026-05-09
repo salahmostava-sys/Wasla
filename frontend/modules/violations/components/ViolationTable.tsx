@@ -1,4 +1,4 @@
-import { Button } from '@shared/components/ui/button';
+﻿import { Button } from '@shared/components/ui/button';
 import { CheckCircle2, Pencil, Trash2, CreditCard } from 'lucide-react';
 import { sortArrowOrNeutral } from '@shared/lib/sortTableIndicators';
 import type { ViolationRecord, ViolationSortFieldKey } from '@modules/violations/types/violation.types';
@@ -90,7 +90,7 @@ export default function ViolationTable({
                   <div className="max-w-[520px] whitespace-pre-wrap break-words">{v.violation_details || '—'}</div>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{v.incident_date || '—'}</td>
-                <td className="px-4 py-3 text-center font-medium whitespace-nowrap">{v.amount?.toLocaleString()} ر.س</td>
+                <td className="px-4 py-3 text-center font-medium whitespace-nowrap">{v.amount?.toLocaleString('en-US')} ر.س</td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-[11px] ${statusBadge}`}>
                     {violationApprovalStatusLabel(v.status)}

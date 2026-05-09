@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Button } from '@shared/components/ui/button';
 import { CheckCircle, Printer } from 'lucide-react';
 import { statusLabels, statusStyles, SALARY_CARD_SKELETON_KEYS } from '@modules/salaries/lib/salaryConstants';
@@ -67,21 +67,21 @@ export function SalaryCardsView(props: Readonly<SalaryCardsViewProps>) {
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="bg-muted/40 rounded-lg p-2">
                     <p className="text-muted-foreground">الراتب الأساسي</p>
-                    <p className="font-bold text-primary">{c.totalPlatformSalary.toLocaleString()} ر.س</p>
+                    <p className="font-bold text-primary">{c.totalPlatformSalary.toLocaleString('en-US')} ر.س</p>
                   </div>
                   <div className="bg-muted/40 rounded-lg p-2">
                     <p className="text-muted-foreground">المستقطعات</p>
-                    <p className="font-bold text-destructive">{c.totalDeductions > 0 ? `-${c.totalDeductions.toLocaleString()}` : '—'} {c.totalDeductions > 0 ? 'ر.س' : ''}</p>
+                    <p className="font-bold text-destructive">{c.totalDeductions > 0 ? `-${c.totalDeductions.toLocaleString('en-US')}` : '—'} {c.totalDeductions > 0 ? 'ر.س' : ''}</p>
                   </div>
                 </div>
                 {r.advanceDeduction > 0 && (
                   <div className="text-[10px] bg-warning/10 rounded px-2 py-1 text-warning border border-warning/30">
-                    💳 قسط سلفة: <span className="font-bold">{r.advanceDeduction.toLocaleString()} ر.س</span>
+                    💳 قسط سلفة: <span className="font-bold">{r.advanceDeduction.toLocaleString('en-US')} ر.س</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between bg-success/10 rounded-lg px-3 py-2 mt-auto">
                   <span className="text-xs text-muted-foreground">الصافي</span>
-                  <span className="text-base font-black text-success">{c.netSalary.toLocaleString()} ر.س</span>
+                  <span className="text-base font-black text-success">{c.netSalary.toLocaleString('en-US')} ر.س</span>
                 </div>
                 <div className="flex gap-2">
                   {needsApproval && canEdit && (

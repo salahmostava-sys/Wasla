@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+﻿import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { PerformanceDashboardResponse, PerformanceRankingEntry } from '@services/performanceService';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -49,7 +49,7 @@ function RankingColumn(props: Readonly<{
                     </p>
                   </div>
                   <div className="text-end shrink-0">
-                    <p className="text-lg font-black text-foreground">{row.totalOrders.toLocaleString()}</p>
+                    <p className="text-lg font-black text-foreground">{row.totalOrders.toLocaleString('en-US')}</p>
                     <p className={`text-[11px] font-bold ${row.growthPct >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
                       {row.growthPct >= 0 ? '+' : ''}{row.growthPct.toFixed(1)}%
                     </p>

@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -26,21 +26,21 @@ function PlatformProfitCard({ p }: Readonly<{ p: { name: string; revenue: number
       <div className="grid grid-cols-3 gap-2 text-xs">
         <div>
           <p className="text-muted-foreground">الإيرادات</p>
-          <p className="font-bold text-emerald-600">{p.revenue > 0 ? p.revenue.toLocaleString() : '—'}</p>
+          <p className="font-bold text-emerald-600">{p.revenue > 0 ? p.revenue.toLocaleString('en-US') : '—'}</p>
         </div>
         <div>
           <p className="text-muted-foreground">الرواتب</p>
-          <p className="font-bold text-rose-500">{p.salary > 0 ? p.salary.toLocaleString() : '—'}</p>
+          <p className="font-bold text-rose-500">{p.salary > 0 ? p.salary.toLocaleString('en-US') : '—'}</p>
         </div>
         <div>
           <p className="text-muted-foreground">الفرق</p>
           <p className={`font-bold ${isProfitable ? 'text-emerald-600' : 'text-rose-500'}`}>
-            {profit > 0 ? '+' : ''}{profit.toLocaleString()}
+            {profit > 0 ? '+' : ''}{profit.toLocaleString('en-US')}
           </p>
         </div>
       </div>
       <p className="text-[10px] text-muted-foreground mt-2">
-        {p.orders.toLocaleString()} طلب
+        {p.orders.toLocaleString('en-US')} طلب
         {p.revenue > 0 && p.orders > 0 && ` • متوسط الإيراد/طلب: ${(p.revenue / p.orders).toFixed(1)} ر.س`}
         {p.salary > 0 && p.orders > 0 && ` • تكلفة الراتب/طلب: ${(p.salary / p.orders).toFixed(1)} ر.س`}
       </p>
@@ -86,7 +86,7 @@ function SmartRecommendations({
           <div className="flex items-start gap-2 bg-rose-50 dark:bg-rose-950/20 rounded-lg px-3 py-2.5">
             <span className="text-rose-500 text-lg leading-none mt-0.5">⚠️</span>
             <div>
-              <p className="text-sm font-semibold text-rose-600">أنت خسران {Math.abs(balance).toLocaleString()} ر.س هذا الشهر</p>
+              <p className="text-sm font-semibold text-rose-600">أنت خسران {Math.abs(balance).toLocaleString('en-US')} ر.س هذا الشهر</p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {platformStats && platformStats.platforms.length > 0
                   ? `ركّز على زيادة طلبات ${platformStats.platforms[0].name} أو قلل المصاريف غير الضرورية`
@@ -164,7 +164,7 @@ function RevenueTable(props: Readonly<TableProps>) {
                       className="h-7 text-sm text-center font-bold" dir="ltr" />
                   ) : (
                     <button type="button" className={t.is_auto ? '' : 'cursor-pointer hover:opacity-70'} onClick={() => { if (!t.is_auto) startEdit(t.id, 'amount', String(t.amount)); }} disabled={t.is_auto}>
-                      {t.amount.toLocaleString()}
+                      {t.amount.toLocaleString('en-US')}
                     </button>
                   )}
                 </td>
@@ -239,7 +239,7 @@ function ExpenseTable(props: Readonly<TableProps>) {
                       className="h-7 text-sm text-center font-bold" dir="ltr" />
                   ) : (
                     <button type="button" className={t.is_auto ? '' : 'cursor-pointer hover:opacity-70'} onClick={() => { if (!t.is_auto) startEdit(t.id, 'amount', String(t.amount)); }} disabled={t.is_auto}>
-                      {t.amount.toLocaleString()}
+                      {t.amount.toLocaleString('en-US')}
                     </button>
                   )}
                 </td>
@@ -389,7 +389,7 @@ export default function FinancePage() {
           <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center"><TrendingUp size={22} className="text-emerald-600" /></div>
           <div>
             <p className="text-[11px] text-muted-foreground">الإيرادات</p>
-            <p className="text-2xl font-black text-emerald-600">{revenue.toLocaleString()}</p>
+            <p className="text-2xl font-black text-emerald-600">{revenue.toLocaleString('en-US')}</p>
             <p className="text-[10px] text-muted-foreground">{revenueItems.length} عملية</p>
           </div>
         </div>
@@ -397,7 +397,7 @@ export default function FinancePage() {
           <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center"><TrendingDown size={22} className="text-rose-500" /></div>
           <div>
             <p className="text-[11px] text-muted-foreground">المصاريف</p>
-            <p className="text-2xl font-black text-rose-500">{expenses.toLocaleString()}</p>
+            <p className="text-2xl font-black text-rose-500">{expenses.toLocaleString('en-US')}</p>
             <p className="text-[10px] text-muted-foreground">{expenseItems.length} عملية</p>
           </div>
         </div>
@@ -408,7 +408,7 @@ export default function FinancePage() {
           <div>
             <p className="text-[11px] text-muted-foreground">الرصيد الحالي</p>
             <p className={`text-2xl font-black ${balance >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-              {balance >= 0 ? '+' : ''}{balance.toLocaleString()}
+              {balance >= 0 ? '+' : ''}{balance.toLocaleString('en-US')}
             </p>
             <p className="text-[10px] font-semibold">{balance >= 0 ? '✅ كسبان' : '⚠️ خسران'}</p>
           </div>
@@ -422,7 +422,7 @@ export default function FinancePage() {
         <div className="bg-card rounded-2xl shadow-card overflow-hidden border border-emerald-200/50 dark:border-emerald-800/30">
           <div className="px-4 py-3 border-b border-border/50 bg-emerald-50/50 dark:bg-emerald-950/20 flex items-center justify-between">
             <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400">💰 الإيرادات</h3>
-            <span className="text-xs text-emerald-600 font-bold">{revenue.toLocaleString()} ر.س</span>
+            <span className="text-xs text-emerald-600 font-bold">{revenue.toLocaleString('en-US')} ر.س</span>
           </div>
           <RevenueTable
             loading={loading} items={revenueItems} editingId={editingId} editField={editField}
@@ -437,7 +437,7 @@ export default function FinancePage() {
         <div className="bg-card rounded-2xl shadow-card overflow-hidden border border-rose-200/50 dark:border-rose-800/30">
           <div className="px-4 py-3 border-b border-border/50 bg-rose-50/50 dark:bg-rose-950/20 flex items-center justify-between">
             <h3 className="text-sm font-bold text-rose-600 dark:text-rose-400">💸 المصاريف</h3>
-            <span className="text-xs text-rose-500 font-bold">{expenses.toLocaleString()} ر.س</span>
+            <span className="text-xs text-rose-500 font-bold">{expenses.toLocaleString('en-US')} ر.س</span>
           </div>
           <ExpenseTable
             loading={loading} items={expenseItems} editingId={editingId} editField={editField}

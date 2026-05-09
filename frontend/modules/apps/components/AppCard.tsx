@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Edit2, Plus, Power, PowerOff, Trash2 } from 'lucide-react';
 import {
   Select,
@@ -133,13 +133,13 @@ export const AppCard = ({
           <div className="flex items-center justify-between text-[11px]">
             <span style={{ color: app.text_color, opacity: 0.8 }}>المناديب العاملين</span>
             <span className="font-bold" style={{ color: app.text_color }}>
-              {app.employeeCount.toLocaleString()}
+              {app.employeeCount.toLocaleString('en-US')}
             </span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
             <span style={{ color: app.text_color, opacity: 0.8 }}>إجمالي الطلبات</span>
             <span className="font-bold" style={{ color: app.text_color }}>
-              {app.ordersCount.toLocaleString()}
+              {app.ordersCount.toLocaleString('en-US')}
             </span>
           </div>
         </div>

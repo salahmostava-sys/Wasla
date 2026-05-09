@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Trash2, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import type { OrderImportBatch } from '@services/performanceService';
@@ -75,7 +75,7 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
                     )}
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-1">
-                    {batch.imported_rows.toLocaleString()} / {batch.total_rows.toLocaleString()} صف
+                    {batch.imported_rows.toLocaleString('en-US')} / {batch.total_rows.toLocaleString('en-US')} صف
                     {batch.skipped_rows > 0 ? ` • ${batch.skipped_rows} تخطي` : ''}
                   </p>
                 </div>

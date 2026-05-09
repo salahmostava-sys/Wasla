@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Loader2, TrendingUp } from 'lucide-react';
 import { getAppColor, type AppColorData } from '@shared/hooks/useAppColors';
 import type { App } from '@modules/orders/types';
@@ -42,7 +42,7 @@ export function MonthSummaryStats(props: Readonly<Props>) {
         <div className="bg-card border border-primary/30 rounded-lg px-3 py-2 flex items-center gap-3">
           <TrendingUp size={14} className="text-primary shrink-0" />
           <div>
-            <p className="text-sm font-bold text-foreground leading-tight">{grandTotal.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">طلب</span></p>
+            <p className="text-sm font-bold text-foreground leading-tight">{grandTotal.toLocaleString('en-US')} <span className="text-xs font-normal text-muted-foreground">طلب</span></p>
             <p className="text-[10px] text-muted-foreground">{employeesCount} مندوب</p>
           </div>
         </div>
@@ -66,9 +66,9 @@ export function MonthSummaryStats(props: Readonly<Props>) {
                 {app.name}
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold" style={{ color: c.solid }}>{total.toLocaleString()}</span>
+                <span className="text-sm font-bold" style={{ color: c.solid }}>{total.toLocaleString('en-US')}</span>
                 {targetVal > 0 && (
-                  <span className="text-[10px] text-muted-foreground">/ {targetVal.toLocaleString()}</span>
+                  <span className="text-[10px] text-muted-foreground">/ {targetVal.toLocaleString('en-US')}</span>
                 )}
                 {overTarget && <span className="text-[9px] text-success font-bold">✓</span>}
               </div>

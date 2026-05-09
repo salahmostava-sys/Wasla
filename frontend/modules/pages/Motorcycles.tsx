@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { Suspense, lazy, useEffect, useRef, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { Search, Plus, FolderOpen, Edit, Trash2, Bike } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
@@ -596,7 +596,7 @@ const Motorcycles = () => {
 
       {data.length >= VEHICLES_QUERY_MAX_ROWS && (
         <p className="text-xs text-amber-700 dark:text-amber-400/90 bg-amber-500/10 border border-amber-500/25 rounded-lg px-3 py-2">
-          يُحمّل حتى {VEHICLES_QUERY_MAX_ROWS.toLocaleString()} مركبة في الصفحة. إذا كان لديك أكثر، قسّم الاستيراد أو راجع تقارير أخرى.
+          يُحمّل حتى {VEHICLES_QUERY_MAX_ROWS.toLocaleString('en-US')} مركبة في الصفحة. إذا كان لديك أكثر، قسّم الاستيراد أو راجع تقارير أخرى.
         </p>
       )}
 

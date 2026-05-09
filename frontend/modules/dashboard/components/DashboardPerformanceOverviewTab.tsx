@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DashboardPerformanceOverviewTab — نظرة عامة على الأداء مع تحليلات ذكية
  * وتوصيات ودرجات أداء وجدول تفصيلي.
  */
@@ -128,9 +128,9 @@ function AppCard(props: Readonly<{
           {formatPercent(growthPct)}
         </span>
       </div>
-      <p className="text-2xl font-black text-foreground">{orders.toLocaleString()}</p>
+      <p className="text-2xl font-black text-foreground">{orders.toLocaleString('en-US')}</p>
       <p className="text-[11px] text-muted-foreground mt-1">
-        {riders} مندوب • الهدف {targetOrders.toLocaleString()} • {targetAchievementPct.toFixed(0)}%
+        {riders} مندوب • الهدف {targetOrders.toLocaleString('en-US')} • {targetAchievementPct.toFixed(0)}%
       </p>
     </div>
   );
@@ -194,7 +194,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
         <EnrichedStatCard
           label="إجمالي الطلبات"
-          value={summary.totalOrders.toLocaleString()}
+          value={summary.totalOrders.toLocaleString('en-US')}
           delta={fleetSummary.totalOrdersDelta}
           sub={`${summary.activeRiders} مندوب نشط`}
           icon={Target}
@@ -209,14 +209,14 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         <EnrichedStatCard
           label="تحقيق الهدف"
           value={`${targets.targetAchievementPct.toFixed(0)}%`}
-          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString()} طلب`}
+          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString('en-US')} طلب`}
           icon={Trophy}
           tier={targetTier(targets.targetAchievementPct)}
         />
         <EnrichedStatCard
           label="أفضل مندوب اليوم"
           value={bestToday}
-          sub={`${bestTodayOrders.toLocaleString()} طلب`}
+          sub={`${bestTodayOrders.toLocaleString('en-US')} طلب`}
           icon={TrendingUp}
           tier="excellent"
         />
@@ -243,15 +243,15 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         <div className="space-y-4">
           <ComparisonCard
             title="الشهر الحالي vs السابق"
-            currentValue={comparison.month.currentOrders.toLocaleString()}
-            previousValue={comparison.month.previousOrders.toLocaleString()}
+            currentValue={comparison.month.currentOrders.toLocaleString('en-US')}
+            previousValue={comparison.month.previousOrders.toLocaleString('en-US')}
             change={comparison.month.growthPct}
             hint={`أيام العمل: ${comparison.month.currentActiveDays} مقابل ${comparison.month.previousActiveDays}`}
           />
           <ComparisonCard
             title="الأسبوع الحالي vs السابق"
-            currentValue={comparison.week.currentOrders.toLocaleString()}
-            previousValue={comparison.week.previousOrders.toLocaleString()}
+            currentValue={comparison.week.currentOrders.toLocaleString('en-US')}
+            previousValue={comparison.week.previousOrders.toLocaleString('en-US')}
             change={comparison.week.growthPct}
             hint="قراءة سريعة لتغيّر الزخم"
           />
@@ -303,7 +303,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
               {ordersByCity.map((row) => (
                 <div key={row.city} className="rounded-xl bg-muted/30 px-4 py-3 flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">{row.city}</span>
-                  <span className="text-lg font-black text-foreground">{row.orders.toLocaleString()}</span>
+                  <span className="text-lg font-black text-foreground">{row.orders.toLocaleString('en-US')}</span>
                 </div>
               ))}
             </div>

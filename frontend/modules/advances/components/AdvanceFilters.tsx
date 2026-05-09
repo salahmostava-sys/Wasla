@@ -1,4 +1,4 @@
-import { Search, AlertTriangle } from 'lucide-react';
+﻿import { Search, AlertTriangle } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 
 interface AdvanceFiltersProps {
@@ -29,7 +29,7 @@ export const AdvanceFilters = ({
           className={`w-full flex items-center gap-3 rounded-xl border p-3 text-sm transition-colors ${showWrittenOff ? 'bg-destructive/10 border-destructive/30' : 'bg-muted/30 border-border/40 hover:bg-muted/50'}`}>
           <AlertTriangle size={16} className="text-destructive flex-shrink-0" />
           <span className="font-medium text-foreground">الديون المعدومة: {writtenOffTotals.count} مندوب</span>
-          <span className="font-bold text-destructive ms-1">{writtenOffTotals.remaining.toLocaleString()} ر.س</span>
+          <span className="font-bold text-destructive ms-1">{writtenOffTotals.remaining.toLocaleString('en-US')} ر.س</span>
           <span className="ms-auto text-xs text-muted-foreground">{showWrittenOff ? 'إخفاء ←' : 'عرض ←'}</span>
         </button>
       )}

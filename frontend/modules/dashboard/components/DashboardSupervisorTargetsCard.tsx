@@ -1,4 +1,4 @@
-import type { SupervisorPerformanceRow } from '@services/dashboardService';
+﻿import type { SupervisorPerformanceRow } from '@services/dashboardService';
 
 type Props = {
   loading: boolean;
@@ -22,7 +22,7 @@ export function DashboardSupervisorTargetsCard({ loading, rows }: Readonly<Props
         <div>
           <h3 className="text-sm font-bold text-foreground">أداء تارجت المشرفين</h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            الإجمالي: {totalActual.toLocaleString()} / {totalTarget.toLocaleString()} ({totalPct}%)
+            الإجمالي: {totalActual.toLocaleString('en-US')} / {totalTarget.toLocaleString('en-US')} ({totalPct}%)
           </p>
         </div>
       </div>
@@ -55,10 +55,10 @@ export function DashboardSupervisorTargetsCard({ loading, rows }: Readonly<Props
                   return (
                     <tr key={r.supervisor_id} className="border-b border-border/40">
                       <td className="px-3 py-2 font-semibold text-foreground">{r.supervisor_name}</td>
-                      <td className="px-3 py-2">{r.target_orders.toLocaleString()}</td>
-                      <td className="px-3 py-2">{r.actual_orders.toLocaleString()}</td>
+                      <td className="px-3 py-2">{r.target_orders.toLocaleString('en-US')}</td>
+                      <td className="px-3 py-2">{r.actual_orders.toLocaleString('en-US')}</td>
                       <td className={`px-3 py-2 font-semibold ${gap >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {gap >= 0 ? '+' : ''}{gap.toLocaleString()}
+                        {gap >= 0 ? '+' : ''}{gap.toLocaleString('en-US')}
                       </td>
                       <td className={`px-3 py-2 font-bold ${pctClass(r.achievement_percent)}`}>
                         {r.achievement_percent.toFixed(1)}%

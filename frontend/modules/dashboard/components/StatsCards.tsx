@@ -1,4 +1,4 @@
-import { Users, UserCheck, Package, Award, Bike, Bell, ArrowUpRight, ArrowDownRight, Fuel, Wrench, type LucideIcon } from 'lucide-react';
+﻿import { Users, UserCheck, Package, Award, Bike, Bell, ArrowUpRight, ArrowDownRight, Fuel, Wrench, type LucideIcon } from 'lucide-react';
 
 type StatsCardsProps = Readonly<{
   loading: boolean;
@@ -57,7 +57,7 @@ export function StatsCards({ loading, kpis, orderGrowth }: Readonly<StatsCardsPr
   const avgPerRider = kpis.activeRiders > 0 ? Math.round(kpis.totalOrders / kpis.activeRiders) : 0;
   const ordersSub =
     kpis.totalMonthTarget > 0
-      ? `هذا الشهر · ${kpis.targetAchievementPct}% من هدف المنصات (${kpis.totalMonthTarget.toLocaleString()})`
+      ? `هذا الشهر · ${kpis.targetAchievementPct}% من هدف المنصات (${kpis.totalMonthTarget.toLocaleString('en-US')})`
       : 'هذا الشهر';
   
   const hasFuel = kpis.fuelCost !== undefined || kpis.fuelLiters !== undefined;
@@ -68,7 +68,7 @@ export function StatsCards({ loading, kpis, orderGrowth }: Readonly<StatsCardsPr
       <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-6 gap-3">
         <StatCard label="المناديب النشطون" value={kpis.activeRiders} icon={Users} sub="مرتبطون بمنصة توصيل" loading={loading} />
         <StatCard label="حاضرون اليوم" value={kpis.presentToday} icon={UserCheck} sub={`${kpis.absentToday} غائب`} loading={loading} />
-        <StatCard label="إجمالي طلبات الشهر" value={kpis.totalOrders.toLocaleString()} icon={Package} trend={{ value: orderGrowth, positive: orderGrowth >= 0 }} sub={ordersSub} loading={loading} />
+        <StatCard label="إجمالي طلبات الشهر" value={kpis.totalOrders.toLocaleString('en-US')} icon={Package} trend={{ value: orderGrowth, positive: orderGrowth >= 0 }} sub={ordersSub} loading={loading} />
         <StatCard label="متوسط طلبات/مندوب" value={avgPerRider} icon={Award} sub="على المناديب المرتبطين بالمنصات" loading={loading} />
         <StatCard label="المركبات النشطة" value={kpis.activeVehicles} icon={Bike} loading={loading} />
         <StatCard label="التنبيهات" value={kpis.activeAlerts} icon={Bell} sub="غير محلولة" loading={loading} />
@@ -79,16 +79,16 @@ export function StatsCards({ loading, kpis, orderGrowth }: Readonly<StatsCardsPr
           {hasFuel && (
             <StatCard 
               label="استهلاك الوقود" 
-              value={`${(kpis.fuelCost || 0).toLocaleString()} ر.س`} 
+              value={`${(kpis.fuelCost || 0).toLocaleString('en-US')} ر.س`} 
               icon={Fuel} 
-              sub={kpis.fuelLiters ? `${kpis.fuelLiters.toLocaleString()} لتر` : 'هذا الشهر'} 
+              sub={kpis.fuelLiters ? `${kpis.fuelLiters.toLocaleString('en-US')} لتر` : 'هذا الشهر'} 
               loading={loading} 
             />
           )}
           {hasMaintenance && (
             <StatCard 
               label="تكلفة الصيانة" 
-              value={`${(kpis.maintenanceCost || 0).toLocaleString()} ر.س`} 
+              value={`${(kpis.maintenanceCost || 0).toLocaleString('en-US')} ر.س`} 
               icon={Wrench} 
               sub="هذا الشهر" 
               loading={loading} 

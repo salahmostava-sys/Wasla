@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { Wallet, TrendingUp, Users, Building2, Package, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components/ui/button';
@@ -90,7 +90,7 @@ export function SalarySummaryCards(props: Readonly<SalarySummaryCardsProps>) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground leading-tight">إجمالي الرواتب</p>
-            <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{totalNet.toLocaleString()}</p>
+            <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{totalNet.toLocaleString('en-US')}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">ريال سعودي</p>
           </div>
           <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -106,7 +106,7 @@ export function SalarySummaryCards(props: Readonly<SalarySummaryCardsProps>) {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground leading-tight truncate">{p}</p>
-                <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{(platformTotals[p] ?? 0).toLocaleString()}</p>
+                <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{(platformTotals[p] ?? 0).toLocaleString('en-US')}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">ريال سعودي</p>
               </div>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${pc?.header}20` }}>
@@ -121,7 +121,7 @@ export function SalarySummaryCards(props: Readonly<SalarySummaryCardsProps>) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground leading-tight">الرواتب الإدارية</p>
-            <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{adminTotal.toLocaleString()}</p>
+            <p className="text-[22px] font-semibold text-foreground leading-tight mt-1">{adminTotal.toLocaleString('en-US')}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">ريال سعودي</p>
           </div>
           <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">

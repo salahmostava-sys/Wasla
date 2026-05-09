@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type KeyboardEvent, type ReactNode } from 'react';
+﻿import { useState, useRef, useEffect, type KeyboardEvent, type ReactNode } from 'react';
 import { getOrdersCellBackground } from '@modules/salaries/lib/salaryConstants';
 import { getPlatformActivitySummary, getPrimaryPlatformActivityCount } from '@modules/salaries/model/salaryUtils';
 import type { PlatformSalaryMetric, SalaryRow, SchemeData } from '@modules/salaries/types/salary.types';
@@ -45,7 +45,7 @@ export const EditableCell = ({
       className={`cursor-pointer hover:bg-primary/10 rounded px-1 py-0.5 text-xs min-w-[40px] inline-block text-center ${className}`}
       title="نقر مزدوج للتعديل"
     >
-      {value === 0 ? <span className="text-muted-foreground/40">0</span> : value.toLocaleString()}
+      {value === 0 ? <span className="text-muted-foreground/40">0</span> : value.toLocaleString('en-US')}
     </span>
   );
 };
@@ -110,7 +110,7 @@ export const SalaryBreakdown = ({ orders, scheme, salary, children }: Readonly<S
           </div>
           <div className="border-t border-border/50 mt-2 pt-1 flex justify-between font-bold text-primary">
             <span>الإجمالي</span>
-            <span>{salary.toLocaleString()} ر.س</span>
+            <span>{salary.toLocaleString('en-US')} ر.س</span>
           </div>
         </div>
       )}
@@ -149,7 +149,7 @@ function platformOrdersSalaryMeta(
   }
   return (
     <span className="text-[10px] text-foreground font-medium">
-      {salary.toLocaleString()} ر.س
+      {salary.toLocaleString('en-US')} ر.س
     </span>
   );
 }

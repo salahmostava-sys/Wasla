@@ -1,4 +1,4 @@
-import {
+﻿import {
   Bar,
   BarChart,
   CartesianGrid,
@@ -112,7 +112,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[12px] text-muted-foreground mt-2">
-                  <span>{app.orders.toLocaleString()} طلب</span>
+                  <span>{app.orders.toLocaleString('en-US')} طلب</span>
                   <span>{app.riders} مندوب</span>
                   <span>{app.targetAchievementPct.toFixed(0)}% من الهدف</span>
                 </div>

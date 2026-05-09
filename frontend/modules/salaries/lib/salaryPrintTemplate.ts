@@ -1,4 +1,4 @@
-import { escapeHtml } from '@shared/lib/security';
+﻿import { escapeHtml } from '@shared/lib/security';
 import { getManualDeductionTotal } from '@modules/salaries/lib/salaryDomain';
 import { getStatusStyleForPrint } from '@modules/salaries/lib/salaryConstants';
 import type { SalaryRow } from '@modules/salaries/types/salary.types';
@@ -76,15 +76,15 @@ function buildRowHtml(
     <td style="text-align:center">${payLabel}</td>
     <td style="text-align:center;font-size:10px;word-break:break-all" dir="ltr">${ibanDisp}</td>
     <td style="text-align:center">${Number(r.workDays ?? 0)}</td>
-    <td style="text-align:center">${Number(r.fuelCost ?? 0).toLocaleString()}</td>
-    <td style="text-align:center">${Number(r.platformIncome ?? 0).toLocaleString()}</td>
-    <td style="text-align:center">${manual > 0 ? manual.toLocaleString() : '—'}</td>
+    <td style="text-align:center">${Number(r.fuelCost ?? 0).toLocaleString('en-US')}</td>
+    <td style="text-align:center">${Number(r.platformIncome ?? 0).toLocaleString('en-US')}</td>
+    <td style="text-align:center">${manual > 0 ? manual.toLocaleString('en-US') : '—'}</td>
     ${platformCols}
-    <td style="text-align:center;font-weight:700;color:#1d4ed8">${c.totalPlatformSalary.toLocaleString()}</td>
-    <td style="text-align:center">${c.totalAdditions > 0 ? `+${c.totalAdditions.toLocaleString()}` : '—'}</td>
-    <td style="text-align:center;color:#dc2626">${c.totalDeductions > 0 ? `-${c.totalDeductions.toLocaleString()}` : '—'}</td>
-    <td style="text-align:center;font-weight:800;font-size:14px;color:#15803d">${c.netSalary.toLocaleString()} ر.س</td>
-    <td style="text-align:center">${r.transfer > 0 ? r.transfer.toLocaleString() : '—'}</td>
+    <td style="text-align:center;font-weight:700;color:#1d4ed8">${c.totalPlatformSalary.toLocaleString('en-US')}</td>
+    <td style="text-align:center">${c.totalAdditions > 0 ? `+${c.totalAdditions.toLocaleString('en-US')}` : '—'}</td>
+    <td style="text-align:center;color:#dc2626">${c.totalDeductions > 0 ? `-${c.totalDeductions.toLocaleString('en-US')}` : '—'}</td>
+    <td style="text-align:center;font-weight:800;font-size:14px;color:#15803d">${c.netSalary.toLocaleString('en-US')} ر.س</td>
+    <td style="text-align:center">${r.transfer > 0 ? r.transfer.toLocaleString('en-US') : '—'}</td>
     <td style="text-align:center"><span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;${statusStyle}">${statusLabel}</span></td>
   </tr>`;
 }
@@ -126,22 +126,22 @@ export function buildSalaryTablePrintHtml(params: PrintTableParams): string {
       </div>
       <div style="text-align:left">
         <div style="font-size:11px;color:#888">إجمالي صافي الرواتب</div>
-        <div style="font-size:24px;font-weight:900;color:#15803d">${totalNet.toLocaleString()} ر.س</div>
+        <div style="font-size:24px;font-weight:900;color:#15803d">${totalNet.toLocaleString('en-US')} ر.س</div>
       </div>
     </div>
 
     <div class="summary">
       <div class="summary-card">
         <div class="summary-label">إجمالي الرواتب الأساسية</div>
-        <div class="summary-value" style="color:#1d4ed8">${totalPlatformSalary.toLocaleString()} ر.س</div>
+        <div class="summary-value" style="color:#1d4ed8">${totalPlatformSalary.toLocaleString('en-US')} ر.س</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">إجمالي المستقطعات</div>
-        <div class="summary-value" style="color:#dc2626">${totalDeductions.toLocaleString()} ر.س</div>
+        <div class="summary-value" style="color:#dc2626">${totalDeductions.toLocaleString('en-US')} ر.س</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">صافي الرواتب</div>
-        <div class="summary-value" style="color:#15803d">${totalNet.toLocaleString()} ر.س</div>
+        <div class="summary-value" style="color:#15803d">${totalNet.toLocaleString('en-US')} ر.س</div>
       </div>
       <div class="summary-card">
         <div class="summary-label">عدد الموظفين</div>
@@ -179,10 +179,10 @@ export function buildSalaryTablePrintHtml(params: PrintTableParams): string {
         <tr class="tfoot">
           <td colspan="${staticLeadColCount}"><strong>الإجمالي (${rows.length} موظف)</strong></td>
           ${platforms.map(() => '<td></td>').join('')}
-          <td style="text-align:center;color:#1d4ed8">${totalPlatformSalary.toLocaleString()}</td>
+          <td style="text-align:center;color:#1d4ed8">${totalPlatformSalary.toLocaleString('en-US')}</td>
           <td></td>
-          <td style="text-align:center;color:#dc2626">-${totalDeductions.toLocaleString()}</td>
-          <td style="text-align:center;color:#15803d;font-size:15px">${totalNet.toLocaleString()} ر.س</td>
+          <td style="text-align:center;color:#dc2626">-${totalDeductions.toLocaleString('en-US')}</td>
+          <td style="text-align:center;color:#15803d;font-size:15px">${totalNet.toLocaleString('en-US')} ر.س</td>
           <td></td>
           <td></td>
         </tr>

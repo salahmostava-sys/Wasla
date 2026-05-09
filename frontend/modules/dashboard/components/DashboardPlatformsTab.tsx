@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DashboardPlatformsTab — مقارنة أداء المنصات جنبًا إلى جنب
  * مع بطاقات، جدول مقارنة قابل للترتيب، ورسم بياني.
  */
@@ -78,7 +78,7 @@ function PlatformCard(props: Readonly<{
         </div>
       </div>
 
-      <p className="text-3xl font-black text-foreground">{orders.toLocaleString()}</p>
+      <p className="text-3xl font-black text-foreground">{orders.toLocaleString('en-US')}</p>
       <p className="text-xs text-muted-foreground mt-1">طلب هذا الشهر</p>
 
       <div className="mt-4 space-y-3">
@@ -105,7 +105,7 @@ function PlatformCard(props: Readonly<{
               }}
             />
           </div>
-          <p className="text-[11px] text-muted-foreground">الهدف: {targetOrders.toLocaleString()} طلب</p>
+          <p className="text-[11px] text-muted-foreground">الهدف: {targetOrders.toLocaleString('en-US')} طلب</p>
         </div>
       </div>
     </div>
@@ -220,7 +220,7 @@ export function DashboardPlatformsTab(props: Readonly<{
               <TrendingUp size={16} />
             </div>
           </div>
-          <p className="text-2xl font-black text-foreground">{totals.orders.toLocaleString()}</p>
+          <p className="text-2xl font-black text-foreground">{totals.orders.toLocaleString('en-US')}</p>
           <p className="text-xs text-muted-foreground mt-1">إجمالي الطلبات</p>
         </div>
         <div className="bg-card rounded-2xl p-4 shadow-card">
@@ -229,7 +229,7 @@ export function DashboardPlatformsTab(props: Readonly<{
               <Users size={16} />
             </div>
           </div>
-          <p className="text-2xl font-black text-foreground">{totals.riders.toLocaleString()}</p>
+          <p className="text-2xl font-black text-foreground">{totals.riders.toLocaleString('en-US')}</p>
           <p className="text-xs text-muted-foreground mt-1">إجمالي المناديب</p>
         </div>
         <div className="bg-card rounded-2xl p-4 shadow-card">
@@ -319,10 +319,10 @@ export function DashboardPlatformsTab(props: Readonly<{
                       {app.appName}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-center font-bold text-foreground">{app.orders.toLocaleString()}</td>
+                  <td className="px-3 py-3 text-center font-bold text-foreground">{app.orders.toLocaleString('en-US')}</td>
                   <td className="px-3 py-3 text-center">{app.riders}</td>
                   <td className="px-3 py-3 text-center">{app.avgPerRider.toFixed(1)}</td>
-                  <td className="px-3 py-3 text-center">{app.targetOrders.toLocaleString()}</td>
+                  <td className="px-3 py-3 text-center">{app.targetOrders.toLocaleString('en-US')}</td>
                   <td className="px-3 py-3 text-center">
                     <span className={`font-bold ${achievementTextClass(app.targetAchievementPct)}`}>
                       {app.targetAchievementPct.toFixed(0)}%
@@ -333,17 +333,17 @@ export function DashboardPlatformsTab(props: Readonly<{
                       {formatPercent(app.growthPct)}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-center text-muted-foreground">{app.previousOrders.toLocaleString()}</td>
+                  <td className="px-3 py-3 text-center text-muted-foreground">{app.previousOrders.toLocaleString('en-US')}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-border bg-muted/20 font-semibold text-sm">
                 <td className="px-3 py-3 font-bold text-foreground">الإجمالي</td>
-                <td className="px-3 py-3 text-center font-bold text-primary">{totals.orders.toLocaleString()}</td>
+                <td className="px-3 py-3 text-center font-bold text-primary">{totals.orders.toLocaleString('en-US')}</td>
                 <td className="px-3 py-3 text-center">{totals.riders}</td>
                 <td className="px-3 py-3 text-center">{totals.avgPerRider.toFixed(1)}</td>
-                <td className="px-3 py-3 text-center">{totals.targetOrders.toLocaleString()}</td>
+                <td className="px-3 py-3 text-center">{totals.targetOrders.toLocaleString('en-US')}</td>
                 <td className="px-3 py-3 text-center">
                   {totals.targetOrders > 0 ? (
                     <span className="font-bold">
@@ -358,7 +358,7 @@ export function DashboardPlatformsTab(props: Readonly<{
                     </span>
                   ) : '—'}
                 </td>
-                <td className="px-3 py-3 text-center text-muted-foreground">{totals.previousOrders.toLocaleString()}</td>
+                <td className="px-3 py-3 text-center text-muted-foreground">{totals.previousOrders.toLocaleString('en-US')}</td>
               </tr>
             </tfoot>
           </table>
