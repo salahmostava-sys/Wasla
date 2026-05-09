@@ -5,6 +5,7 @@ import {
   Fuel, Settings2, X, FileWarning,
   Layers, ChevronsLeft, ChevronsRight, ShieldCheck, Sparkles, Wrench,
   ChevronDown, CalendarDays, FileText, Star,
+  Activity, Car
 } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@shared/components/ui/collapsible';
@@ -106,6 +107,15 @@ const iconByRouteId: Record<string, ComponentType<{ size?: string | number; clas
   leaves: CalendarDays,
   documents: FileText,
   performance_reviews: Star,
+};
+
+const groupIcons: Record<RouteGroup, ComponentType<{ size?: string | number; className?: string }>> = {
+  dashboard: LayoutDashboard,
+  hr: Users,
+  finance: Wallet,
+  operations: Activity,
+  fleet: Car,
+  system: Settings2,
 };
 
 function setHoverStylesIf(
@@ -236,6 +246,7 @@ const AppSidebar = () => {
       return {
         key: groupKey,
         sectionLabel: routeGroupTitleAr[groupKey],
+        groupIcon: groupIcons[groupKey],
         items,
       };
     }).filter((group) => group.items.length > 0);
@@ -388,10 +399,11 @@ const AppSidebar = () => {
                     'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start transition-colors',
                     'hover:bg-[var(--ds-surface-container)]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    isOpen ? 'text-[var(--ds-primary)]' : 'text-[var(--ds-on-surface-variant)]'
                   )}
-                  style={{ color: 'var(--ds-on-surface-variant)' }}
                 >
-                  <span className="min-w-0 flex-1 text-[13px] font-semibold uppercase tracking-wider">
+                  {group.groupIcon && <group.groupIcon size={16} className={cn("flex-shrink-0", isOpen ? "text-[var(--ds-primary)]" : "opacity-70")} />}
+                  <span className="min-w-0 flex-1 text-[13px] font-bold uppercase tracking-wider">
                     {group.sectionLabel}
                   </span>
                   <ChevronDown
@@ -404,7 +416,10 @@ const AppSidebar = () => {
                   />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden space-y-0.5">
-                  <div className="mt-0.5 space-y-0.5">
+                  <div className={cn(
+                    "mt-1 space-y-0.5 relative before:absolute before:inset-y-1 before:w-[2px] before:bg-border/60 before:rounded-full",
+                    isRTL ? "pe-4 before:right-2" : "ps-4 before:left-2"
+                  )}>
                     {group.items.map((item) => (
                       <SidebarNavLink
                         key={item.path}

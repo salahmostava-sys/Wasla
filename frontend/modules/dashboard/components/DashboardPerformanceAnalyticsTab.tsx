@@ -2,8 +2,8 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Line,
-  LineChart,
+  Area,
+  AreaChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -51,11 +51,17 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={monthlyTrend}>
+              <defs>
+                <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1}/>
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.5}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip />
-              <Bar dataKey="totalOrders" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+              <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-card-md)' }} />
+              <Bar dataKey="totalOrders" fill="url(#colorBar)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -66,13 +72,19 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
             <p className="text-[11px] text-muted-foreground mt-1">قراءة سريعة لزخم الشهر الحالي يومًا بيوم</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={dailyTrend}>
+            <AreaChart data={dailyTrend} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip />
-              <Line type="monotone" dataKey="orders" stroke="#f97316" strokeWidth={3} dot={{ r: 2 }} />
-            </LineChart>
+              <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-card-md)' }} />
+              <Area type="monotone" dataKey="orders" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorArea)" activeDot={{ r: 6, fill: '#f97316', strokeWidth: 0 }} />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
