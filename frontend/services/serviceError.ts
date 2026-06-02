@@ -17,6 +17,30 @@ function readErrorStringProp(obj: object, key: "message" | "error"): string | nu
   return typeof v === "string" && v ? v : null;
 }
 
+function sanitizePostgresMessage(rawMessage: string): string {
+  if (!rawMessage) return rawMessage;
+  
+  const lowerMsg = rawMessage.toLowerCase();
+  
+  if (lowerMsg.includes('operator does not exist')) {
+    return 'تعذر معالجة البيانات بسبب عدم توافق في أنواع الحقول.';
+  }
+  if (lowerMsg.includes('permission denied')) {
+    return 'عذراً، لا تملك الصلاحيات الكافية لتنفيذ هذه العملية.';
+  }
+  if (lowerMsg.includes('violates foreign key constraint') || lowerMsg.includes('foreign key constraint')) {
+    return 'لا يمكن إتمام العملية لارتباط هذا السجل ببيانات أخرى في النظام.';
+  }
+  if (lowerMsg.includes('violates unique constraint') || lowerMsg.includes('duplicate key')) {
+    return 'هذا السجل موجود مسبقاً.';
+  }
+  if (lowerMsg.includes('timeout') || lowerMsg.includes('statement timeout')) {
+    return 'انتهى وقت الاتصال بالخادم، يرجى المحاولة لاحقاً.';
+  }
+  
+  return rawMessage;
+}
+
 function resolveEdgeFunctionMessage(rawMessage: string, errorObj: object): string {
   if (!rawMessage.includes("Edge Function returned a non-2xx status code")) {
     return rawMessage;
@@ -43,6 +67,7 @@ export function toServiceError(error: unknown, context?: string): ServiceError {
       : null;
   if (raw) {
     message = resolveEdgeFunctionMessage(raw, error as object);
+    message = sanitizePostgresMessage(message);
   } else if (context) {
     message = `Service failure: ${context}`;
   } else {

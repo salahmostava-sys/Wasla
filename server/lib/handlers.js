@@ -20,6 +20,22 @@ const {
   AI_CHAT_SYSTEM_PROMPT, AI_CHAT_TOOLS, executeAiTool, callGroqChat,
 } = require('../../api/_lib.js');
 
+// ─── Rate Limiting Helper ───────────────────────────────────────────────────
+
+async function checkRateLimit(supabaseClient, userId, action, limit, windowSeconds) {
+  const key = `${action}_${userId}`;
+  const { data, error } = await supabaseClient.rpc('enforce_rate_limit', {
+    p_key: key,
+    p_limit: limit,
+    p_window_seconds: windowSeconds
+  });
+  if (error) {
+    logError('Rate limit check failed', { error: error.message, action, user_id: userId });
+    return { allowed: true }; // Fail-open so we don't block legit traffic if RPC has issues
+  }
+  return data?.[0] ?? { allowed: true };
+}
+
 // ─── Salary engine error classifier ──────────────────────────────────────────
 
 function classifySalaryError(message) {
@@ -97,6 +113,12 @@ export async function salaryEngineHandler(req, res) {
     }
 
     const adminClient = getAdminClient();
+    
+    const rl = await checkRateLimit(adminClient, user.id, 'salary_engine', 30, 60);
+    if (!rl.allowed) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before trying again.' });
+    }
+
     logInfo('Salary engine request accepted', { request_id: requestId, user_id: user.id, mode: payload.mode, month_year: payload.month_year });
 
     const result = await executeSalaryEngineMode(adminClient, payload);
@@ -105,7 +127,9 @@ export async function salaryEngineHandler(req, res) {
   } catch (err) {
     const message = getErrorMessage(err);
     logError('Salary engine failed', { request_id: requestId, error: message });
-    return res.status(classifySalaryError(message)).json({ error: message });
+    const status = classifySalaryError(message);
+    const safeMessage = status === 500 ? 'Internal server error' : message;
+    return res.status(status).json({ error: safeMessage });
   }
 }
 
@@ -158,11 +182,8 @@ async function handleDeleteUser(supabaseAdmin, user_id, callerId) {
 }
 
 async function handleRevokeSession(supabaseAdmin, user_id) {
-  const authSchema = supabaseAdmin.schema('auth');
-  const { error: refreshErr } = await authSchema.from('refresh_tokens').delete().eq('user_id', user_id);
-  if (refreshErr) throw refreshErr;
-  const { error: sessErr } = await authSchema.from('sessions').delete().eq('user_id', user_id);
-  if (sessErr) throw sessErr;
+  const { error } = await supabaseAdmin.auth.admin.signOut(user_id, 'global');
+  if (error) throw error;
   return { success: true };
 }
 
@@ -209,6 +230,12 @@ export async function adminUpdateUserHandler(req, res) {
     }
 
     const supabaseAdmin = getAdminClient();
+    
+    const rl = await checkRateLimit(supabaseAdmin, callerUser.id, 'admin_update_user', 30, 60);
+    if (!rl.allowed) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before trying again.' });
+    }
+
     const { user_id, password, email, name, role, action } = req.body;
     let normalizedAction = action;
     if (!normalizedAction && password) normalizedAction = 'update_password';
@@ -243,7 +270,23 @@ export async function groqChatHandler(req, res) {
 
     const auth = await requireAuth(req, res);
     if (!auth) return;
-    const { user: callerUser } = auth;
+    const { user: callerUser, callerClient } = auth;
+
+    const { data: roleRows, error: roleError } = await callerClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', callerUser.id);
+    if (roleError) throw new Error(roleError.message);
+    const roles = new Set((roleRows ?? []).map(r => r.role));
+    if (!roles.has('admin') && !roles.has('supervisor')) {
+      return res.status(403).json({ error: 'Only admin/supervisor can access groq-chat directly' });
+    }
+
+    const adminClient = getAdminClient();
+    const rl = await checkRateLimit(adminClient, callerUser.id, 'groq_chat', 15, 60);
+    if (!rl.allowed) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before trying again.' });
+    }
 
     const { messages, model, temperature, max_tokens } = req.body;
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -316,7 +359,13 @@ export async function aiChatHandler(req, res) {
 
     const auth = await requireAuth(req, res);
     if (!auth) return;
-    const { callerClient } = auth;
+    const { user: callerUser, callerClient } = auth;
+
+    const adminClient = getAdminClient();
+    const rl = await checkRateLimit(adminClient, callerUser.id, 'ai_chat', 15, 60);
+    if (!rl.allowed) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before trying again.' });
+    }
 
     // Fail-closed: default to most restrictive role so sensitive tools stay gated.
     let userRole = 'viewer';
@@ -344,6 +393,6 @@ export async function aiChatHandler(req, res) {
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     logError('[ai-chat] error', { request_id: requestId, error: message });
-    return res.status(500).json({ error: message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

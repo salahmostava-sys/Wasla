@@ -807,7 +807,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return handleCorsPreflight(requestOrigin);
 
   try {
-    const { supabaseUrl, serviceRoleKey, groqKey, supabaseAnonKey } = await getEnvConfig();
+    const { supabaseUrl, groqKey, supabaseAnonKey } = await getEnvConfig();
     const { supabaseClient, user } = await authorizeUser(req, supabaseUrl, supabaseAnonKey);
 
     await checkRateLimit(supabaseClient, user.id);

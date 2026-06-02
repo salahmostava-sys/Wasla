@@ -259,33 +259,37 @@ const Salaries = () => {
     <div className="space-y-4" dir="rtl">
       {/* Breadcrumb is rendered inside SalaryMonthSelector — no duplicate here */}
 
-      <SalaryMonthSelector
-        loadingData={loadingData}
-        previewBackendError={previewBackendError}
-        isRefreshingPreview={isRefreshingPreview}
-      />
+      <CardErrorBoundary title="فشل تحميل محدد الشهر">
+        <SalaryMonthSelector
+          loadingData={loadingData}
+          previewBackendError={previewBackendError}
+          isRefreshingPreview={isRefreshingPreview}
+        />
+      </CardErrorBoundary>
 
       {/* Phase 1 load failure — inline error card */}
-      {showSalaryDataError && (
-        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3">
-          <AlertTriangle size={18} className="text-destructive flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">تعذر تحميل بيانات الرواتب</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {salaryDataError?.message || 'حدث خطأ غير متوقع أثناء تحميل الرواتب'}
-            </p>
+      <CardErrorBoundary title="فشل تحميل الرواتب الأساسية">
+        {showSalaryDataError && (
+          <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3">
+            <AlertTriangle size={18} className="text-destructive flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">تعذر تحميل بيانات الرواتب</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {salaryDataError?.message || 'حدث خطأ غير متوقع أثناء تحميل الرواتب'}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="flex-shrink-0 text-xs font-medium text-destructive hover:underline px-3 py-1.5 rounded-lg border border-destructive/30 hover:bg-destructive/10 transition-colors"
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ['salaries', uid, 'context', selectedMonth] });
+              }}
+            >
+              إعادة المحاولة
+            </button>
           </div>
-          <button
-            type="button"
-            className="flex-shrink-0 text-xs font-medium text-destructive hover:underline px-3 py-1.5 rounded-lg border border-destructive/30 hover:bg-destructive/10 transition-colors"
-            onClick={() => {
-              queryClient.invalidateQueries({ queryKey: ['salaries', uid, 'context', selectedMonth] });
-            }}
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      )}
+        )}
+      </CardErrorBoundary>
 
       {/* Placeholder banner — shown when previous month's data is displayed while new month loads */}
       {isShowingPlaceholder && (
@@ -316,29 +320,31 @@ const Salaries = () => {
         computeRow={computeRow}
       />
 
-      {previewBackendError && (
-        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3">
-          <AlertTriangle size={18} className="text-destructive flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">تعذّر تحميل معاينة الرواتب</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              فشل كلٌّ من محرك الرواتب وقاعدة البيانات. {previewBackendError}
-            </p>
+      <CardErrorBoundary title="فشل تحميل معاينة الرواتب">
+        {previewBackendError && (
+          <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3">
+            <AlertTriangle size={18} className="text-destructive flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">تعذّر تحميل معاينة الرواتب</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                فشل كلٌّ من محرك الرواتب وقاعدة البيانات. {previewBackendError}
+              </p>
+            </div>
+            {/* FIX #8: retry button for phase 2 preview failures */}
+            <button
+              type="button"
+              className="flex-shrink-0 text-xs font-medium text-destructive hover:underline px-3 py-1.5 rounded-lg border border-destructive/30 hover:bg-destructive/10 transition-colors"
+              onClick={() => {
+                queryClient.invalidateQueries({
+                  queryKey: ['salaries', uid, 'preview', selectedMonth],
+                });
+              }}
+            >
+              إعادة المحاولة
+            </button>
           </div>
-          {/* FIX #8: retry button for phase 2 preview failures */}
-          <button
-            type="button"
-            className="flex-shrink-0 text-xs font-medium text-destructive hover:underline px-3 py-1.5 rounded-lg border border-destructive/30 hover:bg-destructive/10 transition-colors"
-            onClick={() => {
-              queryClient.invalidateQueries({
-                queryKey: ['salaries', uid, 'preview', selectedMonth],
-              });
-            }}
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      )}
+        )}
+      </CardErrorBoundary>
 
       <SalarySchemeSelector
         appsWithoutScheme={salaryMeta.appsWithoutScheme}
