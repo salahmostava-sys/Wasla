@@ -2748,7 +2748,7 @@ ALTER FUNCTION public.is_salary_month_visible_employee(uuid, text, text, text, t
 -- FILE: 20260505000000_get_my_role_privilege_order.sql
 -- =============================================================================
 
--- Return highest-privilege role deterministically for multi-role users.
+DROP FUNCTION IF EXISTS public.get_my_role() CASCADE;
 CREATE OR REPLACE FUNCTION public.get_my_role()
 RETURNS text
 LANGUAGE sql
