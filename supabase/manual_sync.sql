@@ -1358,8 +1358,7 @@ NOTIFY pgrst, 'reload schema';
 --   3. Reduces typo risks
 --   4. Makes code more readable
 
--- First, ensure constants are available
-\i 20260415000000_constants.sql
+-- First, ensure constants are available (already included above in manual sync)
 
 -- =============================================================================
 -- Refactored: calc_tier_salary with constants
