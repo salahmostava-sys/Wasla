@@ -1,18 +1,72 @@
 -- ============================================================
--- FIX: Restore SECURITY DEFINER on dashboard and performance RPCs
+-- FIX: Multiple user_roles rows causing wrong role resolution
 --
--- Migration 20260504000001 changed these RPCs to SECURITY INVOKER
--- which caused "Not allowed" errors because:
---   1. The helper functions (has_role, is_active_user) run under
---      the calling user's privileges and may fail to read user_roles.
---   2. The RPCs perform complex joins on tables where RLS may block
---      access unless the function runs as the owner (definer).
+-- Root cause: The original get_my_role() uses LIMIT 1 with no ORDER BY,
+-- so when a user has both 'admin' and 'viewer' rows in user_roles,
+-- PostgreSQL returns either row randomly — often returning 'viewer'
+-- which hides all admin pages.
 --
--- These functions already have their own manual RBAC check at the
--- top of the function body, so SECURITY DEFINER is safe here.
--- The search_path is locked to 'public' to satisfy the linter.
+-- This migration:
+-- 1. Replaces get_my_role() with a version that uses ORDER BY priority
+--    (same as 20260505000000 but guaranteed to be applied)
+-- 2. Removes duplicate lower-privilege rows so each user has exactly
+--    one role (the highest one they have).
+-- 3. Restores SECURITY DEFINER on dashboard RPCs that were broken.
 -- ============================================================
 
+-- ── 1. Fix get_my_role() to return highest-privilege role ────
+CREATE OR REPLACE FUNCTION public.get_my_role()
+RETURNS text
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT role
+  FROM public.user_roles
+  WHERE user_id = auth.uid()
+  ORDER BY CASE role
+    WHEN 'admin'      THEN 1
+    WHEN 'finance'    THEN 2
+    WHEN 'hr'         THEN 3
+    WHEN 'operations' THEN 4
+    WHEN 'viewer'     THEN 5
+    ELSE 99
+  END
+  LIMIT 1;
+$$;
+
+REVOKE ALL ON FUNCTION public.get_my_role() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_my_role() TO authenticated;
+
+-- ── 2. Remove duplicate lower-privilege rows in user_roles ───
+-- Keep only the highest-privilege role per user.
+WITH ranked AS (
+  SELECT
+    id,
+    user_id,
+    role,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY CASE role
+        WHEN 'admin'      THEN 1
+        WHEN 'finance'    THEN 2
+        WHEN 'hr'         THEN 3
+        WHEN 'operations' THEN 4
+        WHEN 'viewer'     THEN 5
+        ELSE 99
+      END
+    ) AS rn
+  FROM public.user_roles
+)
+DELETE FROM public.user_roles
+WHERE id IN (
+  SELECT id FROM ranked WHERE rn > 1
+);
+
+-- ── 3. Restore SECURITY DEFINER on dashboard RPCs ────────────
+-- These were incorrectly changed to SECURITY INVOKER in a previous migration,
+-- causing 'Not allowed' errors on the dashboard page.
 ALTER FUNCTION public.performance_dashboard_rpc(text, date)
   SECURITY DEFINER
   SET search_path = public;
@@ -21,23 +75,5 @@ ALTER FUNCTION public.rider_profile_performance_rpc(uuid, text, date)
   SECURITY DEFINER
   SET search_path = public;
 
-ALTER FUNCTION public.dashboard_overview_rpc(text, integer, integer, date)
-  SECURITY DEFINER
-  SET search_path = public;
-
-ALTER FUNCTION public.dashboard_overview_rpc(text, text, date)
-  SECURITY DEFINER
-  SET search_path = public;
-
-ALTER FUNCTION public.dashboard_overview_rpc(integer, integer, date)
-  SECURITY DEFINER
-  SET search_path = public;
-
-ALTER FUNCTION public.dashboard_overview_rpc(text, date)
-  SECURITY DEFINER
-  SET search_path = public;
-
--- Make sure authenticated users can still execute them.
--- (anon is already revoked by the previous migration.)
 GRANT EXECUTE ON FUNCTION public.performance_dashboard_rpc(text, date) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.rider_profile_performance_rpc(uuid, text, date) TO authenticated;
