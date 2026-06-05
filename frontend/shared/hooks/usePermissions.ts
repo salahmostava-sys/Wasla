@@ -162,14 +162,19 @@ export const usePermissions = (pageKey: string) => {
   const fallbackPermission =
     role === null ? DENY_ALL : (DEFAULT_PERMISSIONS[role as AppRole] || DEFAULT_PERMISSIONS.viewer)[pageKey] || DENY_ALL;
 
+  // While user exists but role hasn't resolved yet (auth race condition), treat as loading.
+  // This prevents PageGuard from immediately showing "Access Denied" before the role arrives.
+  const roleStillLoading = Boolean(user) && role === null;
+
   // Hardening: while permissions are loading, do NOT render edit buttons based on
   // a permissive fallback. Default to deny-all until the query resolves.
   let permissions: PagePermission = DENY_ALL;
-  if (user && role && !query.isLoading && !query.isError) {
-    permissions = query.data ?? fallbackPermission;
+  if (user && role && !query.isLoading) {
+    // On DB error: fall back to role-based defaults instead of DENY_ALL so pages remain accessible.
+    permissions = query.isError ? fallbackPermission : (query.data ?? fallbackPermission);
   }
 
-  const loading = Boolean(user && role) && query.isLoading;
+  const loading = roleStillLoading || (Boolean(user && role) && query.isLoading);
 
   return { permissions, loading, isAdmin: role === 'admin' };
 };

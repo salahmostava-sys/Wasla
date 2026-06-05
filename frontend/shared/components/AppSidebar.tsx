@@ -220,7 +220,9 @@ const AppSidebar = () => {
     const pageKey = toPagePermissionKey(permission);
     if (!pageKey) return true;
     if (role === 'admin') return true;
-    if (!role) return false;
+    // When role is still loading (null), optimistically show all pages.
+    // PageGuard will handle the actual permission enforcement per page.
+    if (!role) return true;
     const defaults = DEFAULT_PERMISSIONS[role as AppRole] ?? DEFAULT_PERMISSIONS.viewer;
     return defaults[pageKey]?.can_view ?? false;
   }, [role]);
