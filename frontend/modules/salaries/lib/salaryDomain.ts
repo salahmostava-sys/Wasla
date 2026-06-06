@@ -349,6 +349,120 @@ const resolvePlatformPreviewMetric = ({
   return previewMetric ?? null;
 };
 
+function buildEmployeeSalaryRow(
+  emp: Record<string, unknown>,
+  selectedMonth: string,
+  platformNames: string[],
+  appWorkTypeMap: Record<string, WorkType>,
+  empOrders: Record<string, number>,
+  attendanceDays: number,
+  saved: SavedSalaryRecord | undefined,
+  preview: PreviewMapEntry,
+  pendingInstallmentIds: string[],
+  deductedInstallmentIds: string[],
+  advRemaining: number,
+  fuelCost: number,
+): SalaryRow {
+  const employeeId = String(emp.id);
+
+  const platformOrders: Record<string, number> = {};
+  const platformSalaries: Record<string, number> = {};
+  const platformMetrics: Record<string, PlatformSalaryMetric> = {};
+  for (const platformName of platformNames) {
+    const previewMetric = resolvePlatformPreviewMetric({
+      previewMetric: preview?.platform_breakdown[platformName],
+    });
+    if (previewMetric) {
+      platformMetrics[platformName] = previewMetric;
+      platformOrders[platformName] = getPrimaryPlatformActivityCount(previewMetric);
+      platformSalaries[platformName] = Math.round(previewMetric.salary);
+      continue;
+    }
+
+    const orders = empOrders[platformName] || 0;
+    const fallbackMetric: PlatformSalaryMetric = {
+      appName: platformName,
+      workType: appWorkTypeMap[platformName] || 'orders',
+      calculationMethod: null,
+      ordersCount: orders,
+      shiftDays: 0,
+      salary: 0,
+    };
+
+    platformMetrics[platformName] = fallbackMetric;
+    platformOrders[platformName] = getPrimaryPlatformActivityCount(fallbackMetric);
+    platformSalaries[platformName] = 0;
+  }
+
+  const savedSnapshot = readSavedSnapshot(saved?.sheet_snapshot);
+  const status = resolveRowStatus(saved, pendingInstallmentIds.length, deductedInstallmentIds.length);
+  const hasIban = !!emp.iban;
+  const rawCity = (emp.city as string | null | undefined) ?? null;
+  const cityKey: 'makkah' | 'jeddah' | null = rawCity === 'makkah' || rawCity === 'jeddah' ? rawCity : null;
+  const preferredLanguage = (emp.preferred_language as SlipLanguage | null | undefined) ?? 'ar';
+  const phone = (emp.phone as string | null | undefined) ?? null;
+  const workDays = Math.max(attendanceDays, preview.total_shift_days || 0);
+  const fallbackPaymentMethod = hasIban ? 'bank' : 'cash';
+
+  const baseRow: SalaryRow = {
+    id: `${employeeId}-${selectedMonth}`,
+    employeeId,
+    employeeName: emp.name ? String(emp.name) : '',
+    jobTitle: String(emp.job_title || 'مندوب توصيل'),
+    nationalId: String(emp.national_id || '•'),
+    city: toCityArabicLabel(rawCity),
+    cityKey,
+    bankAccount: emp.iban ? String(emp.iban).slice(-6) : '',
+    hasIban,
+    paymentMethod: normalizePaymentMethod(saved?.payment_method, fallbackPaymentMethod),
+    registeredApps: platformNames.filter((platformName) => hasPlatformActivity(platformMetrics[platformName])),
+    platformOrders,
+    platformSalaries,
+    platformMetrics,
+    incentives: Number(saved?.allowances || 0),
+    sickAllowance: 0,
+    violations: Number(saved?.attendance_deduction || 0),
+    customDeductions: getFallbackSavedCustomDeductions(Number(saved?.manual_deduction || 0)),
+    transfer: 0,
+    advanceDeduction: Number(saved?.advance_deduction ?? preview.advance_deduction ?? 0),
+    advanceInstallmentIds: pendingInstallmentIds,
+    advanceRemaining: advRemaining,
+    externalDeduction: Number(saved?.external_deduction ?? preview.external_deduction ?? 0),
+    status,
+    preferredLanguage,
+    phone,
+    workDays,
+    fuelCost,
+    platformIncome: 0,
+    engineBaseSalary: Number(saved?.base_salary ?? preview.base_salary ?? 0),
+    preferEngineBaseSalary: !!saved && !savedSnapshot && Number(saved.base_salary || 0) > 0,
+  };
+
+  const mergedRow = savedSnapshot
+    ? {
+        ...baseRow,
+        ...savedSnapshot,
+        paymentMethod: normalizePaymentMethod(savedSnapshot.paymentMethod, baseRow.paymentMethod),
+        status,
+        preferredLanguage,
+        phone,
+        city: toCityArabicLabel(rawCity),
+        cityKey,
+        advanceInstallmentIds: pendingInstallmentIds,
+        advanceRemaining: advRemaining,
+        workDays,
+        fuelCost,
+        preferEngineBaseSalary: false,
+      }
+    : baseRow;
+
+  mergedRow.registeredApps = platformNames.filter((platformName) =>
+    hasPlatformActivity(mergedRow.platformMetrics[platformName]),
+  );
+
+  return mergedRow;
+}
+
 export const buildSalaryRows = ({
   employees,
   selectedMonth,
@@ -395,107 +509,22 @@ export const buildSalaryRows = ({
       platform_breakdown: {},
     };
 
-    const platformOrders: Record<string, number> = {};
-    const platformSalaries: Record<string, number> = {};
-    const platformMetrics: Record<string, PlatformSalaryMetric> = {};
-    for (const platformName of platformNames) {
-      const previewMetric = resolvePlatformPreviewMetric({
-        previewMetric: preview?.platform_breakdown[platformName],
-      });
-      if (previewMetric) {
-        platformMetrics[platformName] = previewMetric;
-        platformOrders[platformName] = getPrimaryPlatformActivityCount(previewMetric);
-        platformSalaries[platformName] = Math.round(previewMetric.salary);
-        continue;
-      }
-
-      // No local fallback calculation — all salary logic lives in Supabase RPC.
-      // If the RPC didn't return data for this platform, show 0.
-      const orders = empOrders[platformName] || 0;
-
-      const fallbackMetric: PlatformSalaryMetric = {
-        appName: platformName,
-        workType: appWorkTypeMap[platformName] || 'orders',
-        calculationMethod: null,
-        ordersCount: orders,
-        shiftDays: 0,
-        salary: 0,
-      };
-
-      platformMetrics[platformName] = fallbackMetric;
-      platformOrders[platformName] = getPrimaryPlatformActivityCount(fallbackMetric);
-      platformSalaries[platformName] = 0;
-    }
-
-    const saved = savedMap[employeeId];
-    const savedSnapshot = readSavedSnapshot(saved?.sheet_snapshot);
-    const pendingInstallmentsCount = (advInstIds[employeeId] || []).length;
-    const deductedInstallmentsCount = (deductedInstIds[employeeId] || []).length;
-    const status = resolveRowStatus(saved, pendingInstallmentsCount, deductedInstallmentsCount);
-    const hasIban = !!emp.iban;
-    const rawCity = (emp.city as string | null | undefined) ?? null;
-    const cityKey: 'makkah' | 'jeddah' | null = rawCity === 'makkah' || rawCity === 'jeddah' ? rawCity : null;
-    const preferredLanguage = (emp.preferred_language as SlipLanguage | null | undefined) ?? 'ar';
-    const phone = (emp.phone as string | null | undefined) ?? null;
-    const workDays = Math.max(attendanceDays, preview.total_shift_days || 0);
-    const fallbackPaymentMethod = hasIban ? 'bank' : 'cash';
-    const baseRow: SalaryRow = {
-      id: `${employeeId}-${selectedMonth}`,
-      employeeId,
-      employeeName: emp.name ? String(emp.name) : '',
-      jobTitle: String(emp.job_title || 'مندوب توصيل'),
-      nationalId: String(emp.national_id || '•'),
-      city: toCityArabicLabel(rawCity),
-      cityKey,
-      bankAccount: emp.iban ? String(emp.iban).slice(-6) : '',
-      hasIban,
-      paymentMethod: normalizePaymentMethod(saved?.payment_method, fallbackPaymentMethod),
-      registeredApps: platformNames.filter((platformName) => hasPlatformActivity(platformMetrics[platformName])),
-      platformOrders,
-      platformSalaries,
-      platformMetrics,
-      incentives: Number(saved?.allowances || 0),
-      sickAllowance: 0,
-      violations: Number(saved?.attendance_deduction || 0),
-      customDeductions: getFallbackSavedCustomDeductions(Number(saved?.manual_deduction || 0)),
-      transfer: 0,
-      advanceDeduction: Number(saved?.advance_deduction ?? preview.advance_deduction ?? 0),
-      advanceInstallmentIds: advInstIds[employeeId] || [],
-      advanceRemaining: advRemainingMap[employeeId] || 0,
-      externalDeduction: Number(saved?.external_deduction ?? preview.external_deduction ?? 0),
-      status,
-      preferredLanguage,
-      phone,
-      workDays,
-      fuelCost: fuelCostMap[employeeId] || 0,
-      platformIncome: 0,
-      engineBaseSalary: Number(saved?.base_salary ?? preview.base_salary ?? 0),
-      preferEngineBaseSalary: !!saved && !savedSnapshot && Number(saved.base_salary || 0) > 0,
-    };
-
-    const mergedRow = savedSnapshot
-      ? {
-          ...baseRow,
-          ...savedSnapshot,
-          paymentMethod: normalizePaymentMethod(savedSnapshot.paymentMethod, baseRow.paymentMethod),
-          status,
-          preferredLanguage,
-          phone,
-          city: toCityArabicLabel(rawCity),
-          cityKey,
-          advanceInstallmentIds: advInstIds[employeeId] || [],
-          advanceRemaining: advRemainingMap[employeeId] || 0,
-          workDays,
-          fuelCost: fuelCostMap[employeeId] || 0,
-          preferEngineBaseSalary: false,
-        }
-      : baseRow;
-
-    mergedRow.registeredApps = platformNames.filter((platformName) =>
-      hasPlatformActivity(mergedRow.platformMetrics[platformName]),
+    newRows.push(
+      buildEmployeeSalaryRow(
+        emp,
+        selectedMonth,
+        platformNames,
+        appWorkTypeMap,
+        empOrders,
+        attendanceDays,
+        savedMap[employeeId],
+        preview,
+        advInstIds[employeeId] || [],
+        deductedInstIds[employeeId] || [],
+        advRemainingMap[employeeId] || 0,
+        fuelCostMap[employeeId] || 0,
+      )
     );
-
-    newRows.push(mergedRow);
   }
 
   return newRows;
