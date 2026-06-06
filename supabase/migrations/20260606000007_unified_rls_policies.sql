@@ -1,4 +1,4 @@
-﻿-- Migration to consolidate ALL permissive RLS policies into 1 per action
+-- Migration to consolidate ALL permissive RLS policies into 1 per action
 
 -- Table: public.account_assignments
 DROP POLICY IF EXISTS "account_assignments_insert_update" ON "public"."account_assignments";
@@ -361,22 +361,22 @@ CREATE POLICY "unified_delete_policy" ON "public"."departments" FOR DELETE
 DROP POLICY IF EXISTS "service_role_full_access" ON "public"."edge_rate_limits";
 CREATE POLICY "unified_select_policy" ON "public"."edge_rate_limits" FOR SELECT
   USING (
-    ((auth.role() = 'service_role'::text))
+    (((select auth.role()) = 'service_role'::text))
   );
 CREATE POLICY "unified_insert_policy" ON "public"."edge_rate_limits" FOR INSERT
   WITH CHECK (
-    ((auth.role() = 'service_role'::text))
+    (((select auth.role()) = 'service_role'::text))
   );
 CREATE POLICY "unified_update_policy" ON "public"."edge_rate_limits" FOR UPDATE
   USING (
-    ((auth.role() = 'service_role'::text))
+    (((select auth.role()) = 'service_role'::text))
   )
   WITH CHECK (
-    ((auth.role() = 'service_role'::text))
+    (((select auth.role()) = 'service_role'::text))
   );
 CREATE POLICY "unified_delete_policy" ON "public"."edge_rate_limits" FOR DELETE
   USING (
-    ((auth.role() = 'service_role'::text))
+    (((select auth.role()) = 'service_role'::text))
   );
 
 -- Table: public.employee_apps
@@ -559,22 +559,22 @@ DROP POLICY IF EXISTS "Finance/admin can manage finance_transactions" ON "public
 DROP POLICY IF EXISTS "Authenticated users can view finance_transactions" ON "public"."finance_transactions";
 CREATE POLICY "unified_select_policy" ON "public"."finance_transactions" FOR SELECT
   USING (
-    ((auth.role() = 'authenticated'::text))
+    (((select auth.role()) = 'authenticated'::text))
   );
 CREATE POLICY "unified_insert_policy" ON "public"."finance_transactions" FOR INSERT
   WITH CHECK (
-    ((auth.role() = 'authenticated'::text))
+    (((select auth.role()) = 'authenticated'::text))
   );
 CREATE POLICY "unified_update_policy" ON "public"."finance_transactions" FOR UPDATE
   USING (
-    ((auth.role() = 'authenticated'::text))
+    (((select auth.role()) = 'authenticated'::text))
   )
   WITH CHECK (
-    ((auth.role() = 'authenticated'::text))
+    (((select auth.role()) = 'authenticated'::text))
   );
 CREATE POLICY "unified_delete_policy" ON "public"."finance_transactions" FOR DELETE
   USING (
-    ((auth.role() = 'authenticated'::text))
+    (((select auth.role()) = 'authenticated'::text))
   );
 
 -- Table: public.hr_performance_reviews
@@ -1258,26 +1258,28 @@ CREATE POLICY "unified_delete_policy" ON "public"."vehicle_assignments" FOR DELE
   );
 
 -- Table: public.vehicle_mileage
-DROP POLICY IF EXISTS "Admin/operations can manage vehicle_mileage" ON "public"."vehicle_mileage";
-DROP POLICY IF EXISTS "Ops/admin can view vehicle_mileage" ON "public"."vehicle_mileage";
+DROP POLICY IF EXISTS "Active users can view vehicle_mileage" ON "public"."vehicle_mileage";
+DROP POLICY IF EXISTS "Authenticated can create vehicle_mileage" ON "public"."vehicle_mileage";
+DROP POLICY IF EXISTS "Ops/admin can manage vehicle_mileage" ON "public"."vehicle_mileage";
 CREATE POLICY "unified_select_policy" ON "public"."vehicle_mileage" FOR SELECT
   USING (
-    ((is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))
+    ((((select auth.role()) = 'authenticated'::text) OR (is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))) OR 
+    (is_active_user(( SELECT auth.uid() AS uid)))
   );
 CREATE POLICY "unified_insert_policy" ON "public"."vehicle_mileage" FOR INSERT
   WITH CHECK (
-    ((is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))
+    ((((select auth.role()) = 'authenticated'::text) OR (is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations())))))
   );
 CREATE POLICY "unified_update_policy" ON "public"."vehicle_mileage" FOR UPDATE
   USING (
-    ((is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))
+    ((((select auth.role()) = 'authenticated'::text) OR (is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations())))))
   )
   WITH CHECK (
-    ((is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))
+    ((((select auth.role()) = 'authenticated'::text) OR (is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations())))))
   );
 CREATE POLICY "unified_delete_policy" ON "public"."vehicle_mileage" FOR DELETE
   USING (
-    ((is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations()))))
+    ((((select auth.role()) = 'authenticated'::text) OR (is_active_user(( SELECT auth.uid() AS uid)) AND (has_role(( SELECT auth.uid() AS uid), _const_role_admin()) OR has_role(( SELECT auth.uid() AS uid), _const_role_operations())))))
   );
 
 -- Table: public.vehicle_mileage_daily

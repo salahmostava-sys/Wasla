@@ -75,6 +75,17 @@ function PerformanceSummaryCards({ perf, growthPct, targetPct }: Readonly<{
   growthPct: number | undefined;
   targetPct: number | undefined;
 }>) {
+  let growthText = '—';
+  if (growthPct !== undefined && !Number.isNaN(growthPct)) {
+    const sign = growthPct >= 0 ? '+' : '';
+    growthText = `${sign}${growthPct.toFixed(1)}٪`;
+  }
+
+  let targetText = '—';
+  if (targetPct !== undefined && !Number.isNaN(targetPct)) {
+    targetText = `${targetPct.toFixed(1)}٪`;
+  }
+
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <Card>
@@ -109,9 +120,7 @@ function PerformanceSummaryCards({ perf, growthPct, targetPct }: Readonly<{
         </CardHeader>
         <CardContent>
           <p className="text-2xl font-bold tabular-nums">
-            {growthPct === undefined || Number.isNaN(growthPct)
-              ? '—'
-              : `${growthPct >= 0 ? '+' : ''}${growthPct.toFixed(1)}٪`}
+            {growthText}
           </p>
         </CardContent>
       </Card>
@@ -124,9 +133,7 @@ function PerformanceSummaryCards({ perf, growthPct, targetPct }: Readonly<{
         </CardHeader>
         <CardContent>
           <p className="text-2xl font-bold tabular-nums">
-            {targetPct === undefined || Number.isNaN(targetPct)
-              ? '—'
-              : `${targetPct.toFixed(1)}٪`}
+            {targetText}
           </p>
         </CardContent>
       </Card>
@@ -431,7 +438,7 @@ const AiAnalyticsPage = () => {
       .map((r) => ({
         name: r.appName || '—',
         orders: r.orders,
-        fill: r.brandColor && r.brandColor.startsWith('#') ? r.brandColor : 'hsl(var(--primary))',
+        fill: r.brandColor?.startsWith('#') ? r.brandColor : 'hsl(var(--primary))',
       }));
   }, [perf?.ordersByApp]);
 

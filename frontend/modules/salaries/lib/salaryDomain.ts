@@ -178,7 +178,7 @@ const normalizePreviewPlatformBreakdown = (value: unknown) => {
 export const buildPreviewMap = (previewData: Array<Record<string, unknown>> | null | undefined) => {
   const previewMap: Record<string, PreviewMapEntry> = {};
   (previewData || []).forEach((row) => {
-    const employeeId = String(row.employee_id ?? '');
+    const employeeId = row.employee_id ? String(row.employee_id) : '';
     if (!employeeId) return;
     previewMap[employeeId] = {
       base_salary: Number(row.base_salary || 0),
@@ -442,7 +442,7 @@ export const buildSalaryRows = ({
     const baseRow: SalaryRow = {
       id: `${employeeId}-${selectedMonth}`,
       employeeId,
-      employeeName: String(emp.name ?? ''),
+      employeeName: emp.name ? String(emp.name) : '',
       jobTitle: String(emp.job_title || 'مندوب توصيل'),
       nationalId: String(emp.national_id || '•'),
       city: toCityArabicLabel(rawCity),

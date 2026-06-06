@@ -29,7 +29,6 @@ import { EmployeeKPIs } from '@modules/employees/components/EmployeeKPIs';
 import {
   ALL_COLUMNS, DEFAULT_HIDDEN_COLS,
   type Employee, type SortDir, type ColKey,
-  type EmployeeProfileProps,
   type UploadReport, type UploadLiveStats,
 } from '@modules/employees/types/employee.types';
 

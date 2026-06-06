@@ -392,6 +392,56 @@ const Alerts = () => {
 
   if (!enabled) return null;
 
+  let alertsContent = null;
+  if (alertsQuery.isLoading) {
+    alertsContent = (
+      <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
+        <p className="text-muted-foreground">جارٍ تحميل التنبيهات...</p>
+      </div>
+    );
+  } else if (filtered.length === 0) {
+    alertsContent = (
+      <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
+        <CheckCircle size={40} className="mx-auto text-success mb-3" />
+        <p className="text-muted-foreground">لا توجد تنبيهات مفعّلة</p>
+        <p className="text-xs text-muted-foreground mt-1">جميع المستندات سارية المفعول ✅.</p>
+      </div>
+    );
+  } else {
+    alertsContent = [...filtered].sort((a, b) => {
+      const order: Record<string, number> = { urgent: 0, warning: 1, info: 2 };
+      return (order[a.severity] ?? 3) - (order[b.severity] ?? 3);
+    }).map(a => (
+      <div key={a.id} className={`bg-card rounded-xl border shadow-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow ${severityBorderClass(a.severity)}`}>
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${severityBgClass(a.severity)}`}>
+          {typeIcons[a.type] || '🔔'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-semibold text-foreground">{alertTypeLabels[a.type] || a.type}</p>
+            <span className="text-muted-foreground text-xs">—</span>
+            <p className="text-sm text-foreground">{a.entityName}</p>
+            <span className={severityStyles[a.severity]}>{severityLabels[a.severity]}</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            تاريخ الاستحقاق: <span className="font-medium">{a.dueDate}</span>
+            <span className={`mr-3 font-bold ${daysLeftClass(a.daysLeft)}`}>
+              {a.daysLeft < 0 ? `منتهي منذ ${Math.abs(a.daysLeft)} يوم` : `متبقي ${a.daysLeft} يوم`}
+            </span>
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button size="sm" variant="outline" className="gap-1 text-xs h-8" onClick={() => setDeferDialog(a)}>
+            <Clock size={12} /> تأجيل
+          </Button>
+          <Button size="sm" className="gap-1 text-xs h-8 bg-success hover:bg-success/90" onClick={() => setResolveDialog(a)}>
+            <CheckCircle size={12} /> حسم
+          </Button>
+        </div>
+      </div>
+    ));
+  }
+
   return (
     <div className="space-y-4">
       <div className="page-header">
@@ -514,48 +564,7 @@ const Alerts = () => {
       </div>
 
       <div className="space-y-3">
-        {alertsQuery.isLoading ? (
-          <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
-            <p className="text-muted-foreground">جارٍ تحميل التنبيهات...</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
-            <CheckCircle size={40} className="mx-auto text-success mb-3" />
-            <p className="text-muted-foreground">لا توجد تنبيهات مفعّلة</p>
-            <p className="text-xs text-muted-foreground mt-1">جميع المستندات سارية المفعول ✅.</p>
-          </div>
-        ) : [...filtered].sort((a, b) => {
-          const order: Record<string, number> = { urgent: 0, warning: 1, info: 2 };
-          return (order[a.severity] ?? 3) - (order[b.severity] ?? 3);
-        }).map(a => (
-          <div key={a.id} className={`bg-card rounded-xl border shadow-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow ${severityBorderClass(a.severity)}`}>
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${severityBgClass(a.severity)}`}>
-              {typeIcons[a.type] || '🔔'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-semibold text-foreground">{alertTypeLabels[a.type] || a.type}</p>
-                <span className="text-muted-foreground text-xs">—</span>
-                <p className="text-sm text-foreground">{a.entityName}</p>
-                <span className={severityStyles[a.severity]}>{severityLabels[a.severity]}</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                تاريخ الاستحقاق: <span className="font-medium">{a.dueDate}</span>
-                <span className={`mr-3 font-bold ${daysLeftClass(a.daysLeft)}`}>
-                  {a.daysLeft < 0 ? `منتهي منذ ${Math.abs(a.daysLeft)} يوم` : `متبقي ${a.daysLeft} يوم`}
-                </span>
-              </p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Button size="sm" variant="outline" className="gap-1 text-xs h-8" onClick={() => setDeferDialog(a)}>
-                <Clock size={12} /> تأجيل
-              </Button>
-              <Button size="sm" className="gap-1 text-xs h-8 bg-success hover:bg-success/90" onClick={() => setResolveDialog(a)}>
-                <CheckCircle size={12} /> حسم
-              </Button>
-            </div>
-          </div>
-        ))}
+        {alertsContent}
       </div>
 
       {resolved.length > 0 && (

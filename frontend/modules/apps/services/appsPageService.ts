@@ -4,9 +4,6 @@ import { buildAppEmployees, buildAppsOverview, getMonthBounds } from '@modules/a
 import type {
   AppData,
   AppEmployee,
-  AppEmployeeAssignmentRow,
-  AppEmployeeOrderRow,
-  AppMonthlyOrderRow,
 } from '@modules/apps/types';
 import type { Json } from '@services/supabase/types';
 

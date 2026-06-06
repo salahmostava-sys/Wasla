@@ -21,10 +21,6 @@ import type {
   DailyRow,
   Employee,
   AppRow,
-  DailyMileageResponseRow,
-  MonthlyOrderRow,
-  VehicleAssignmentRow,
-  DailyMileageAggSource,
 } from '@modules/fuel/types/fuel.types';
 import {
   getErrorMessageOrFallback,
