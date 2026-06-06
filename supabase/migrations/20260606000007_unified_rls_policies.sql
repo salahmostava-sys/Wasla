@@ -1,4 +1,4 @@
--- Migration to consolidate ALL permissive RLS policies into 1 per action
+﻿-- Migration to consolidate ALL permissive RLS policies into 1 per action
 
 -- Table: public.account_assignments
 DROP POLICY IF EXISTS "account_assignments_insert_update" ON "public"."account_assignments";
@@ -286,26 +286,26 @@ DROP POLICY IF EXISTS "daily_orders_update_policy" ON "public"."daily_orders";
 CREATE POLICY "unified_select_policy" ON "public"."daily_orders" FOR SELECT
   USING (
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role)))) OR 
-    (((is_internal_user() AND has_permission('orders'::text, 'view'::text)) OR (is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'finance'::app_role)))))
+    (((is_internal_user() AND has_permission(_const_work_orders()::text, 'view'::text)) OR (is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'finance'::app_role)))))
   );
 CREATE POLICY "unified_insert_policy" ON "public"."daily_orders" FOR INSERT
   WITH CHECK (
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role)))) OR 
-    ((is_internal_user() AND has_permission('orders'::text, 'write'::text)))
+    ((is_internal_user() AND has_permission(_const_work_orders()::text, 'write'::text)))
   );
 CREATE POLICY "unified_update_policy" ON "public"."daily_orders" FOR UPDATE
   USING (
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role)))) OR 
-    ((is_internal_user() AND has_permission('orders'::text, 'write'::text)))
+    ((is_internal_user() AND has_permission(_const_work_orders()::text, 'write'::text)))
   )
   WITH CHECK (
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role)))) OR 
-    ((is_internal_user() AND has_permission('orders'::text, 'write'::text)))
+    ((is_internal_user() AND has_permission(_const_work_orders()::text, 'write'::text)))
   );
 CREATE POLICY "unified_delete_policy" ON "public"."daily_orders" FOR DELETE
   USING (
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role)))) OR 
-    ((is_internal_user() AND has_permission('orders'::text, 'delete'::text)))
+    ((is_internal_user() AND has_permission(_const_work_orders()::text, 'delete'::text)))
   );
 
 -- Table: public.daily_shifts

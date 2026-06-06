@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- PHASE 1.5 VALIDATION CHECKS
 -- Safe + repeatable validation for core RLS, policy drift, and permission matrix.
 -- NOTE:
@@ -257,7 +257,7 @@ BEGIN
   -- INSERT
   BEGIN
     INSERT INTO public.employees (name, status)
-    VALUES ('PHASE15_ADMIN_TEST', 'active')
+    VALUES ('PHASE15_ADMIN_TEST', _const_employee_active())
     RETURNING id INTO v_test_employee;
     RAISE NOTICE '[admin][INSERT employees] actual=ALLOW expected=ALLOW';
   EXCEPTION WHEN OTHERS THEN
@@ -321,7 +321,7 @@ BEGIN
   -- INSERT (expected deny)
   BEGIN
     INSERT INTO public.employees (name, status)
-    VALUES ('PHASE15_VIEWER_TEST', 'active');
+    VALUES ('PHASE15_VIEWER_TEST', _const_employee_active());
     RAISE NOTICE '[viewer][INSERT employees] actual=ALLOW expected=DENY';
   EXCEPTION WHEN OTHERS THEN
     RAISE NOTICE '[viewer][INSERT employees] actual=DENY expected=DENY err=%', SQLERRM;
@@ -382,7 +382,7 @@ BEGIN
   PERFORM set_config('request.jwt.claim.sub', v_admin::text, true);
 
   INSERT INTO public.employees (name, status)
-  VALUES ('PHASE15_AUDIT_TEST', 'active')
+  VALUES ('PHASE15_AUDIT_TEST', _const_employee_active())
   RETURNING id, created_by, updated_by
   INTO v_emp_id, v_created_by, v_updated_by;
 

@@ -1,4 +1,4 @@
--- MANUAL SYNC FILE
+﻿-- MANUAL SYNC FILE
 -- Contains all migrations from 20260415000000_constants.sql onwards
 
 -- =============================================================================
@@ -15,66 +15,66 @@
 DO $$ BEGIN
   -- Order statuses
   CREATE TEMP TABLE IF NOT EXISTS _order_statuses AS
-  SELECT 'cancelled'::TEXT AS cancelled;
+  SELECT _const_order_cancelled()::TEXT AS cancelled;
 
   -- Installment statuses
   CREATE TEMP TABLE IF NOT EXISTS _installment_statuses AS
   SELECT 
-    'pending'::TEXT AS pending,
-    'deferred'::TEXT AS deferred;
+    _const_installment_pending()::TEXT AS pending,
+    _const_installment_deferred()::TEXT AS deferred;
 
   -- Approval statuses
   CREATE TEMP TABLE IF NOT EXISTS _approval_statuses AS
-  SELECT 'approved'::TEXT AS approved;
+  SELECT _const_approval_approved()::TEXT AS approved;
 
   -- Work types
   CREATE TEMP TABLE IF NOT EXISTS _work_types AS
   SELECT
-    'orders'::TEXT AS orders,
-    'shift'::TEXT AS shift,
-    'hybrid'::TEXT AS hybrid;
+    _const_work_orders()::TEXT AS orders,
+    _const_work_shift()::TEXT AS shift,
+    _const_work_hybrid()::TEXT AS hybrid;
 
   -- Calculation methods
   CREATE TEMP TABLE IF NOT EXISTS _calc_methods AS
   SELECT
-    'orders'::TEXT AS orders,
-    'shift'::TEXT AS shift,
-    'shift_fixed'::TEXT AS shift_fixed,
-    'shift_full_month'::TEXT AS shift_full_month,
-    'mixed'::TEXT AS mixed,
-    'orders_fallback'::TEXT AS orders_fallback;
+    _const_work_orders()::TEXT AS orders,
+    _const_work_shift()::TEXT AS shift,
+    _const_calc_method_shift_fixed()::TEXT AS shift_fixed,
+    _const_calc_method_shift_full_month()::TEXT AS shift_full_month,
+    _const_calc_method_mixed()::TEXT AS mixed,
+    _const_calc_method_orders_fallback()::TEXT AS orders_fallback;
 
   -- Tier types
   CREATE TEMP TABLE IF NOT EXISTS _tier_types AS
   SELECT
-    'fixed_amount'::TEXT AS fixed_amount,
-    'base_plus_incremental'::TEXT AS base_plus_incremental,
+    _const_tier_fixed()::TEXT AS fixed_amount,
+    _const_tier_incremental()::TEXT AS base_plus_incremental,
     'per_order'::TEXT AS per_order;
 
   -- Payment methods
   CREATE TEMP TABLE IF NOT EXISTS _payment_methods AS
   SELECT
-    'cash'::TEXT AS cash,
-    'bank'::TEXT AS bank;
+    _const_payment_cash()::TEXT AS cash,
+    _const_payment_bank()::TEXT AS bank;
 
   -- Calculation statuses
   CREATE TEMP TABLE IF NOT EXISTS _calc_statuses AS
-  SELECT 'calculated'::TEXT AS calculated;
+  SELECT _const_calc_calculated()::TEXT AS calculated;
 
   -- Calculation sources
   CREATE TEMP TABLE IF NOT EXISTS _calc_sources AS
   SELECT
-    'engine_v6_shift_fallback'::TEXT AS v6_shift_fallback,
-    'engine_v7_shift_fixed'::TEXT AS v7_shift_fixed;
+    _const_calc_source_v6()::TEXT AS v6_shift_fallback,
+    _const_calc_source_v7()::TEXT AS v7_shift_fixed;
 
   -- Employee statuses
   CREATE TEMP TABLE IF NOT EXISTS _employee_statuses AS
-  SELECT 'active'::TEXT AS active;
+  SELECT _const_employee_active()::TEXT AS active;
 
   -- Numeric constants
   CREATE TEMP TABLE IF NOT EXISTS _numeric_constants AS
   SELECT
-    30.0::NUMERIC AS days_per_month,
+    _const_days_per_month()::NUMERIC AS days_per_month,
     0::NUMERIC AS zero;
 
 END $$;
@@ -85,101 +85,101 @@ END $$;
 
 -- Get order status: cancelled
 CREATE OR REPLACE FUNCTION _const_order_cancelled() RETURNS TEXT AS $$
-  SELECT 'cancelled'::TEXT;
+  SELECT _const_order_cancelled()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get installment statuses: pending, deferred
 CREATE OR REPLACE FUNCTION _const_installment_pending() RETURNS TEXT AS $$
-  SELECT 'pending'::TEXT;
+  SELECT _const_installment_pending()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_installment_deferred() RETURNS TEXT AS $$
-  SELECT 'deferred'::TEXT;
+  SELECT _const_installment_deferred()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get approval status: approved
 CREATE OR REPLACE FUNCTION _const_approval_approved() RETURNS TEXT AS $$
-  SELECT 'approved'::TEXT;
+  SELECT _const_approval_approved()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get work types
 CREATE OR REPLACE FUNCTION _const_work_orders() RETURNS TEXT AS $$
-  SELECT 'orders'::TEXT;
+  SELECT _const_work_orders()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_work_shift() RETURNS TEXT AS $$
-  SELECT 'shift'::TEXT;
+  SELECT _const_work_shift()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_work_hybrid() RETURNS TEXT AS $$
-  SELECT 'hybrid'::TEXT;
+  SELECT _const_work_hybrid()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get days per month constant
 CREATE OR REPLACE FUNCTION _const_days_per_month() RETURNS NUMERIC AS $$
-  SELECT 30.0::NUMERIC;
+  SELECT _const_days_per_month()::NUMERIC;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get employee status: active
 CREATE OR REPLACE FUNCTION _const_employee_active() RETURNS TEXT AS $$
-  SELECT 'active'::TEXT;
+  SELECT _const_employee_active()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get payment methods
 CREATE OR REPLACE FUNCTION _const_payment_cash() RETURNS TEXT AS $$
-  SELECT 'cash'::TEXT;
+  SELECT _const_payment_cash()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_payment_bank() RETURNS TEXT AS $$
-  SELECT 'bank'::TEXT;
+  SELECT _const_payment_bank()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get calculation status
 CREATE OR REPLACE FUNCTION _const_calc_calculated() RETURNS TEXT AS $$
-  SELECT 'calculated'::TEXT;
+  SELECT _const_calc_calculated()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get calculation sources
 CREATE OR REPLACE FUNCTION _const_calc_source_v6() RETURNS TEXT AS $$
-  SELECT 'engine_v6_shift_fallback'::TEXT;
+  SELECT _const_calc_source_v6()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_source_v7() RETURNS TEXT AS $$
-  SELECT 'engine_v7_shift_fixed'::TEXT;
+  SELECT _const_calc_source_v7()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get calculation methods
 CREATE OR REPLACE FUNCTION _const_calc_method_orders() RETURNS TEXT AS $$
-  SELECT 'orders'::TEXT;
+  SELECT _const_work_orders()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift() RETURNS TEXT AS $$
-  SELECT 'shift'::TEXT;
+  SELECT _const_work_shift()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift_fixed() RETURNS TEXT AS $$
-  SELECT 'shift_fixed'::TEXT;
+  SELECT _const_calc_method_shift_fixed()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift_full_month() RETURNS TEXT AS $$
-  SELECT 'shift_full_month'::TEXT;
+  SELECT _const_calc_method_shift_full_month()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_method_mixed() RETURNS TEXT AS $$
-  SELECT 'mixed'::TEXT;
+  SELECT _const_calc_method_mixed()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_calc_method_orders_fallback() RETURNS TEXT AS $$
-  SELECT 'orders_fallback'::TEXT;
+  SELECT _const_calc_method_orders_fallback()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 -- Get tier types
 CREATE OR REPLACE FUNCTION _const_tier_fixed() RETURNS TEXT AS $$
-  SELECT 'fixed_amount'::TEXT;
+  SELECT _const_tier_fixed()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 CREATE OR REPLACE FUNCTION _const_tier_incremental() RETURNS TEXT AS $$
-  SELECT 'base_plus_incremental'::TEXT;
+  SELECT _const_tier_incremental()::TEXT;
 $$ LANGUAGE SQL IMMUTABLE SET search_path = public;
 
 COMMENT ON FUNCTION _const_order_cancelled() IS 'Constant: cancelled order status';
@@ -475,7 +475,7 @@ BEGIN
              s.id AS sid, s.scheme_type, s.monthly_amount
       FROM apps a
       LEFT JOIN salary_schemes s ON s.id = a.scheme_id
-      WHERE a.is_active = true AND a.scheme_id IS NOT NULL
+      WHERE a.is_active IS TRUE AND a.scheme_id IS NOT NULL
     LOOP
       v_app_orders := 0; v_app_shift_days := 0; v_app_earnings := 0;
 
@@ -1524,19 +1524,19 @@ COMMENT ON FUNCTION public.preview_salary_for_month_v2(TEXT) IS
 -- =============================================================================
 
 -- FIX #9: Prevent multiple default salary slip templates.
--- Only one row can have is_default = true at a time.
+-- Only one row can have is_default IS TRUE at a time.
 -- This replaces the application-level "unset others first" logic with a DB constraint.
 
 -- First, ensure only one default exists (keep the newest)
 DO $$
 BEGIN
-  IF (SELECT count(*) FROM salary_slip_templates WHERE is_default = true) > 1 THEN
+  IF (SELECT count(*) FROM salary_slip_templates WHERE is_default IS TRUE) > 1 THEN
     UPDATE salary_slip_templates
-    SET is_default = false
-    WHERE is_default = true
+    SET is_default IS FALSE
+    WHERE is_default IS TRUE
       AND id != (
         SELECT id FROM salary_slip_templates
-        WHERE is_default = true
+        WHERE is_default IS TRUE
         ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
         LIMIT 1
       );
@@ -1545,7 +1545,7 @@ END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_salary_slip_templates_single_default
   ON salary_slip_templates (is_default)
-  WHERE is_default = true;
+  WHERE is_default IS TRUE;
 
 
 -- =============================================================================
@@ -2550,8 +2550,8 @@ COMMENT ON COLUMN public.daily_shifts.hours_worked IS
 -- =============================================================================
 
 -- Add is_archived to apps table for soft-delete / archive workflow.
--- is_active = false means "temporarily disabled this month"
--- is_archived = true means "permanently retired, hide everywhere"
+-- is_active IS FALSE means "temporarily disabled this month"
+-- is_archived IS TRUE means "permanently retired, hide everywhere"
 
 ALTER TABLE public.apps
   ADD COLUMN IF NOT EXISTS is_archived BOOLEAN NOT NULL DEFAULT false;

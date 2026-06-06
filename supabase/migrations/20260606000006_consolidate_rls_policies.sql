@@ -1,4 +1,4 @@
--- Migration to consolidate multiple permissive RLS policies
+﻿-- Migration to consolidate multiple permissive RLS policies
 
 -- Consolidating 2 policies for public.advance_installments.SELECT
 DROP POLICY IF EXISTS "advance_installments_select_policy" ON "public"."advance_installments";
@@ -63,7 +63,7 @@ DROP POLICY IF EXISTS "daily_orders_select_policy" ON "public"."daily_orders";
 DROP POLICY IF EXISTS "Daily orders: select own company" ON "public"."daily_orders";
 CREATE POLICY "combined_select_policy" ON "public"."daily_orders" FOR SELECT
   USING (
-    ((is_internal_user() AND has_permission('orders'::text, 'view'::text))) OR 
+    ((is_internal_user() AND has_permission(_const_work_orders()::text, 'view'::text))) OR 
     ((is_active_user(( SELECT auth.uid() AS uid)) AND employee_in_my_company(employee_id) AND (has_role(( SELECT auth.uid() AS uid), 'admin'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'hr'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'operations'::app_role) OR has_role(( SELECT auth.uid() AS uid), 'finance'::app_role))))
   );
 

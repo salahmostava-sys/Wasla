@@ -122,10 +122,10 @@ function Apply-Replacements {
 
         # Count occurrences
         $matchRes = [regex]::Matches($modified, $pattern)
-        if ($matches.Count -gt 0) {
+        if ($matchRes.Count -gt 0) {
             $modified = $modified -replace $pattern, $value
-            $changeCount += $matches.Count
-            Write-ColorOutput "  [OK] Replaced $key with $value ($($matches.Count) times)" "Green"
+            $changeCount += $matchRes.Count
+            Write-ColorOutput "  [OK] Replaced $key with $value ($($matchRes.Count) times)" "Green"
         }
     }
 
@@ -146,10 +146,10 @@ function Fix-BooleanComparisons {
         $pattern = [regex]::Escape($key)
 
         $matchRes = [regex]::Matches($modified, $pattern)
-        if ($matches.Count -gt 0) {
+        if ($matchRes.Count -gt 0) {
             $modified = $modified -replace $pattern, $value
-            $changeCount += $matches.Count
-            Write-ColorOutput "  [OK] Fixed boolean: $key with $value ($($matches.Count) times)" "Cyan"
+            $changeCount += $matchRes.Count
+            Write-ColorOutput "  [OK] Fixed boolean: $key with $value ($($matchRes.Count) times)" "Cyan"
         }
     }
 
