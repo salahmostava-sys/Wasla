@@ -198,14 +198,15 @@ function buildInsights(
 // ─── Alerts ─────────────────────────────────────────────────────────────────
 
 function buildSuddenDropAlert(rider: RiderPerformanceProfile): AIAlert | null {
-  if (rider.growthPct >= -20) return null;
+  // Ignore drops if the performance score is still good or total orders is very small
+  if (rider.growthPct >= -20 || rider.performanceScore >= 75 || rider.totalOrders < 15) return null;
   const name = getFirstTwoNames(rider.employeeName);
   return {
     id: `drop-${rider.employeeId}`,
     employeeId: rider.employeeId,
     employeeName: name,
     category: 'sudden_drop',
-    severity: rider.growthPct < -40 ? 'critical' : 'warning',
+    severity: rider.growthPct < -40 && rider.performanceScore < 50 ? 'critical' : 'warning',
     message: `انخفاض مفاجئ في أداء ${name}`,
     detail: `انخفض بنسبة ${Math.abs(rider.growthPct).toFixed(0)}% عن الشهر الماضي`,
     value: rider.growthPct,
@@ -243,7 +244,8 @@ function buildWeakPerformanceAlert(rider: RiderPerformanceProfile): AIAlert | nu
 }
 
 function buildExceptionalAlert(rider: RiderPerformanceProfile): AIAlert | null {
-  if (rider.performanceScore < 90 || rider.growthPct <= 10) return null;
+  // Require both high performance and significant volume to be "exceptional"
+  if (rider.performanceScore < 90 || rider.growthPct <= 5 || rider.totalOrders < 50) return null;
   const name = getFirstTwoNames(rider.employeeName);
   return {
     id: `exceptional-${rider.employeeId}`,
@@ -299,20 +301,20 @@ export function generateRecommendations(
 ): AIRecommendation[] {
   const recommendations: AIRecommendation[] = [];
 
-  // 1. Reward candidates (high score + positive growth)
+  // 1. Reward candidates (high score + positive growth, or consistently excellent)
   const rewardCandidates = riders.filter(
-    (r) => r.performanceScore >= 80 && r.growthPct > 5,
+    (r) => (r.performanceScore >= 85 && r.totalOrders >= 40) || (r.performanceScore >= 80 && r.growthPct > 5 && r.totalOrders >= 40),
   );
   if (rewardCandidates.length > 0) {
     recommendations.push({
       id: 'reward',
       type: 'reward',
       title: 'مناديب يستحقون مكافأة',
-      description: `${rewardCandidates.length} مندوب تقييمهم عالي مع تحسّن مستمر`,
+      description: `${rewardCandidates.length} مندوب أدائهم استثنائي ومستمر`,
       riders: rewardCandidates.slice(0, 5).map((r) => ({
         employeeId: r.employeeId,
         employeeName: getFirstTwoNames(r.employeeName),
-        reason: `تقييم ${r.performanceScore}/100 — تحسّن ${r.growthPct.toFixed(0)}%`,
+        reason: `تقييم ${r.performanceScore}/100 — طلبات ${r.totalOrders}`,
       })),
       severity: 'success',
       icon: '🏆',
@@ -385,8 +387,9 @@ export function generateRecommendations(
 // ─── Per-Rider AI Analysis ──────────────────────────────────────────────────
 
 function determinePerformanceTrend(growthPct: number): PerformanceTrend {
-  if (growthPct > 5) return 'improving';
-  if (growthPct < -5) return 'declining';
+  // Use a wider margin (e.g. 10%) so small natural fluctuations aren't marked as declining/improving
+  if (growthPct > 10) return 'improving';
+  if (growthPct < -10) return 'declining';
   return 'stable';
 }
 
@@ -474,11 +477,12 @@ export function analyzeRider(rider: RiderPerformanceProfile): RiderAIAnalysis {
   details.push(`متوسط ${rider.avgOrdersPerDay.toFixed(1)} طلب/يوم — ${rider.activeDays} يوم عمل`);
 
   // Follow-up need
+  // Only flag for follow-up if their score is truly low, or they dropped significantly and are underperforming.
   const needsFollowUp =
-    rider.performanceScore < 40 ||
-    rider.growthPct < -20 ||
-    rider.activeDays <= 5 ||
-    (rider.consistencyRatio < 0.4 && rider.activeDays > 5);
+    (rider.performanceScore < 40 && rider.activeDays > 0) ||
+    (rider.growthPct < -25 && rider.performanceScore < 60) ||
+    rider.activeDays <= 3 ||
+    (rider.consistencyRatio < 0.4 && rider.activeDays > 10 && rider.performanceScore < 60);
 
   // Build judgment text
   const tier = classifyPerformance(rider.performanceScore);
