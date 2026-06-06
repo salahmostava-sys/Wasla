@@ -2,11 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { fromMock, upsertMock, rpcMock, tableResults } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, any> = {};
+  const upsertMockLocal = vi.fn();
   return {
     tableResults: tableResultsLocal,
     fromMock: vi.fn((table: string) => {
       const result = tableResultsLocal[table] ?? { data: null, error: null };
-      const queryBuilder = {
+      const chainObj = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         in: vi.fn().mockReturnThis(),
@@ -17,23 +18,30 @@ const { fromMock, upsertMock, rpcMock, tableResults } = vi.hoisted(() => {
         range: vi.fn().mockReturnThis(),
         ilike: vi.fn().mockReturnThis(),
         delete: vi.fn().mockReturnThis(),
-        upsert: vi.fn().mockReturnValue(Promise.resolve(result)),
         maybeSingle: vi.fn().mockReturnValue(Promise.resolve(result)),
         single: vi.fn().mockReturnValue(Promise.resolve(result)),
         then: (resolve: any) => Promise.resolve(result).then(resolve),
       };
-      // Allow upsertMock to override upsert behavior if needed
-      if (table === 'daily_orders') {
-        queryBuilder.upsert = vi.fn((...args: any[]) => {
-          if (upsertMock.mock.calls.length > 0) {
-             return upsertMock(...args);
+      const queryBuilder = {
+        ...chainObj,
+        upsert: vi.fn((...args: any[]) => {
+          const val = upsertMockLocal(...args);
+          if (val !== undefined) {
+             // if val is a promise, return it directly for bulkUpsert, but also attach chain methods just in case
+             if (val instanceof Promise) {
+               const prom = val as any;
+               prom.select = () => prom;
+               prom.single = () => prom;
+               return prom;
+             }
+             return val;
           }
-          return { select: () => ({ single: () => Promise.resolve(result) }) };
-        }) as any;
-      }
+          return chainObj;
+        }),
+      };
       return queryBuilder;
     }),
-    upsertMock: vi.fn(),
+    upsertMock: upsertMockLocal,
     rpcMock: vi.fn(),
   };
 });

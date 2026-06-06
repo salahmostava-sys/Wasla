@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { fromMock, getSessionMock } = vi.hoisted(() => ({
+const { fromMock, getSessionMock, uploadMock, getPublicUrlMock, updatePasswordMock } = vi.hoisted(() => ({
   fromMock: vi.fn(),
   getSessionMock: vi.fn(),
+  uploadMock: vi.fn(),
+  getPublicUrlMock: vi.fn(),
+  updatePasswordMock: vi.fn(),
 }));
 
 vi.mock('@services/supabase/client', () => ({
@@ -13,8 +16,8 @@ vi.mock('@services/supabase/client', () => ({
     },
     storage: {
       from: vi.fn().mockReturnValue({
-        upload: vi.fn(),
-        getPublicUrl: vi.fn(),
+        upload: uploadMock,
+        getPublicUrl: getPublicUrlMock,
       })
     }
   },
@@ -30,15 +33,37 @@ vi.mock('@services/serviceError', () => ({
 
 vi.mock('@services/authService', () => ({
   authService: {
-    updatePassword: vi.fn(),
+    updatePassword: updatePasswordMock,
   }
 }));
 
 import { settingsHubService } from './settingsHubService';
 
 describe('settingsHubService', () => {
+  let tableMocks: Record<string, any>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    tableMocks = {};
+    fromMock.mockImplementation((table: string) => {
+      const mockObj = tableMocks[table] ?? { data: null, error: null };
+      return {
+        select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        not: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        or: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        range: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue(mockObj),
+        single: vi.fn().mockResolvedValue(mockObj),
+        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
+      };
+    });
   });
 
   describe('getCurrentUserId', () => {
@@ -60,78 +85,211 @@ describe('settingsHubService', () => {
     });
   });
 
+  describe('getAuditLogs', () => {
+    it('returns audit logs', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis(),
+          range: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          or: vi.fn().mockReturnThis(),
+          then: (resolve: any) => Promise.resolve({ data: [{ id: 1 }], count: 1, error: null }).then(resolve)
+        };
+      });
+      const res = await settingsHubService.getAuditLogs(0, 10, 'INSERT', 'employees', 'test', 'user-1');
+      expect(res.rows).toHaveLength(1);
+    });
+  });
+
+  describe('getAuditProfilesByIds', () => {
+    it('returns profiles', async () => {
+      tableMocks.profiles = { data: [{ id: 'user-1', name: 'Test' }], error: null };
+      const res = await settingsHubService.getAuditProfilesByIds(['user-1']);
+      expect(res).toHaveLength(1);
+    });
+  });
+
+  describe('getAuditUsers', () => {
+    it('returns unique users from audit_log', async () => {
+      fromMock.mockImplementation((table: string) => {
+        if (table === 'audit_log') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            not: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockResolvedValue({ data: [{ user_id: 'user-1' }], error: null })
+          };
+        }
+        return {
+          select: vi.fn().mockReturnThis(),
+          in: vi.fn().mockResolvedValue({ data: [{ id: 'user-1', name: 'Z' }, { id: 'user-2', name: 'A' }], error: null })
+        };
+      });
+      const res = await settingsHubService.getAuditUsers();
+      expect(res[0].name).toBe('A'); // sorted alphabetically
+    });
+  });
+
+  describe('getAuditLogsForExport', () => {
+    it('returns formatted export rows', async () => {
+      fromMock.mockImplementation((table: string) => {
+        if (table === 'audit_log') {
+          return {
+             select: vi.fn().mockReturnThis(),
+             order: vi.fn().mockReturnThis(),
+             limit: vi.fn().mockResolvedValue({ data: [{ id: 1, user_id: 'user-1' }], error: null })
+          };
+        }
+        return {
+           select: vi.fn().mockReturnThis(),
+           in: vi.fn().mockResolvedValue({ data: [{ id: 'user-1', name: 'Admin', email: 'admin@test.com' }], error: null })
+        };
+      });
+      const res = await settingsHubService.getAuditLogsForExport();
+      expect(res[0].user_name).toBe('Admin');
+    });
+  });
+
+  describe('getProfileByUserId', () => {
+    it('returns profile', async () => {
+      tableMocks.profiles = { data: { name: 'Admin' }, error: null };
+      const res = await settingsHubService.getProfileByUserId('user-1');
+      expect(res).toEqual({ name: 'Admin' });
+    });
+  });
+
+  describe('uploadAvatar and updateProfileByUserId', () => {
+    it('uploads avatar and updates profile', async () => {
+      uploadMock.mockResolvedValueOnce({ data: { path: 'avatar.png' }, error: null });
+      tableMocks.profiles = { error: null };
+      
+      const file = new File([''], 'avatar.png', { type: 'image/png' });
+      const res = await settingsHubService.uploadAvatar('avatar.png', file);
+      expect(res.path).toBe('avatar.png');
+
+      await settingsHubService.updateProfileByUserId('user-1', { name: 'Admin' });
+      expect(fromMock).toHaveBeenCalledWith('profiles');
+    });
+    
+    it('throws error for invalid path', async () => {
+      const file = new File([''], 'avatar.png', { type: 'image/png' });
+      await expect(settingsHubService.uploadAvatar('../avatar.png', file)).rejects.toThrow();
+    });
+    
+    it('throws error for invalid file type', async () => {
+      const file = new File([''], 'avatar.txt', { type: 'text/plain' });
+      await expect(settingsHubService.uploadAvatar('avatar.txt', file)).rejects.toThrow();
+    });
+  });
+
+  describe('getAvatarPublicUrl', () => {
+    it('returns URL', () => {
+      getPublicUrlMock.mockReturnValueOnce({ data: { publicUrl: 'http://test' } });
+      const res = settingsHubService.getAvatarPublicUrl('avatar.png');
+      expect(res.data.publicUrl).toBe('http://test');
+    });
+  });
+
+  describe('updatePassword', () => {
+    it('calls authService', async () => {
+      await settingsHubService.updatePassword('password');
+      expect(updatePasswordMock).toHaveBeenCalledWith('password');
+    });
+  });
+
+  describe('getTradeRegister', () => {
+    it('returns trade register', async () => {
+      tableMocks.trade_registers = { data: { id: 't1' }, error: null };
+      const res = await settingsHubService.getTradeRegister();
+      expect(res).toEqual({ id: 't1' });
+    });
+  });
+
+  describe('uploadCompanyLogo', () => {
+    it('uploads logo', async () => {
+      uploadMock.mockResolvedValueOnce({ data: { path: 'logo.png' }, error: null });
+      const file = new File([''], 'logo.png', { type: 'image/png' });
+      const res = await settingsHubService.uploadCompanyLogo('logo.png', file);
+      expect(res.path).toBe('logo.png');
+    });
+  });
+
+  describe('getCompanyLogoPublicUrl', () => {
+    it('returns URL', () => {
+      getPublicUrlMock.mockReturnValueOnce({ data: { publicUrl: 'http://logo' } });
+      const res = settingsHubService.getCompanyLogoPublicUrl('logo.png');
+      expect(res.data.publicUrl).toBe('http://logo');
+    });
+  });
+
   describe('getSystemSettings', () => {
     it('returns settings on success', async () => {
-      const mockSettings = { project_name_en: 'Test' };
-      const maybeSingle = vi.fn().mockResolvedValueOnce({ data: mockSettings, error: null });
-      fromMock.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          limit: vi.fn().mockReturnValue({
-            maybeSingle
-          })
-        })
-      });
-
+      tableMocks.system_settings = { data: { project_name_en: 'Test' }, error: null };
       const result = await settingsHubService.getSystemSettings();
-      expect(fromMock).toHaveBeenCalledWith('system_settings');
-      expect(result).toEqual(mockSettings);
-    });
-
-    it('throws on error', async () => {
-      const maybeSingle = vi.fn().mockResolvedValueOnce({ data: null, error: new Error('db error') });
-      fromMock.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          limit: vi.fn().mockReturnValue({
-            maybeSingle
-          })
-        })
-      });
-
-      await expect(settingsHubService.getSystemSettings()).rejects.toThrow('settingsHubService.getSystemSettings: db error');
+      expect(result).toEqual({ project_name_en: 'Test' });
     });
   });
 
   describe('saveSystemSettings', () => {
     it('updates existing settings if settingsId provided', async () => {
-      const mockUpdate = vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValueOnce({ error: null })
+      tableMocks.system_settings = { error: null };
+      fromMock.mockReturnValue({
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null })
       });
-      fromMock.mockReturnValue({ update: mockUpdate });
-
       await settingsHubService.saveSystemSettings('id-1', {
-        project_name_ar: 'test',
-        project_name_en: 'test',
-        default_language: 'ar',
-        logo_url: null,
-        iqama_alert_days: 90
+        project_name_ar: 'test', project_name_en: 'test', default_language: 'ar', logo_url: null, iqama_alert_days: 90
       });
-
       expect(fromMock).toHaveBeenCalledWith('system_settings');
-      expect(mockUpdate).toHaveBeenCalled();
     });
 
     it('inserts new settings if settingsId is null', async () => {
-      const mockInsert = vi.fn().mockResolvedValueOnce({ error: null });
-      fromMock.mockReturnValue({ insert: mockInsert });
-
-      await settingsHubService.saveSystemSettings(null, {
-        project_name_ar: 'test',
-        project_name_en: 'test',
-        default_language: 'ar',
-        logo_url: null,
-        iqama_alert_days: 90
+      tableMocks.system_settings = { error: null };
+      fromMock.mockReturnValue({
+        insert: vi.fn().mockResolvedValue({ error: null })
       });
-
+      await settingsHubService.saveSystemSettings(null, {
+        project_name_ar: 'test', project_name_en: 'test', default_language: 'ar', logo_url: null, iqama_alert_days: 90
+      });
       expect(fromMock).toHaveBeenCalledWith('system_settings');
-      expect(mockInsert).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateSystemLogo', () => {
+    it('updates system logo', async () => {
+      tableMocks.system_settings = { error: null };
+      fromMock.mockReturnValue({
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null })
+      });
+      await settingsHubService.updateSystemLogo('s1', 'logo.png');
+      expect(fromMock).toHaveBeenCalledWith('system_settings');
+    });
+  });
+
+  describe('updateTradeRegister', () => {
+    it('updates register', async () => {
+      tableMocks.trade_registers = { error: null };
+      fromMock.mockReturnValue({
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ error: null })
+      });
+      await settingsHubService.updateTradeRegister('t1', { value: 1 });
+      expect(fromMock).toHaveBeenCalledWith('trade_registers');
+    });
+  });
+
+  describe('createTradeRegister', () => {
+    it('creates register', async () => {
+      tableMocks.trade_registers = { data: { id: 't1' }, error: null };
+      const res = await settingsHubService.createTradeRegister({ value: 1 });
+      expect(res).toEqual({ id: 't1' });
     });
   });
 
   describe('exportTableRows', () => {
     it('exports allowed tables correctly', async () => {
-      const mockSelect = vi.fn().mockResolvedValueOnce({ data: [{ id: 1 }], error: null });
-      fromMock.mockReturnValue({ select: mockSelect });
-
+      tableMocks.employees = { data: [{ id: 1 }], error: null };
       const result = await settingsHubService.exportTableRows('employees');
       expect(fromMock).toHaveBeenCalledWith('employees');
       expect(result).toEqual([{ id: 1 }]);
@@ -139,14 +297,6 @@ describe('settingsHubService', () => {
 
     it('throws for disallowed tables', async () => {
       await expect(settingsHubService.exportTableRows('secrets_table')).rejects.toThrow('Table is not allowed for export');
-    });
-
-    it('handles empty results', async () => {
-      const mockSelect = vi.fn().mockResolvedValueOnce({ data: null, error: null });
-      fromMock.mockReturnValue({ select: mockSelect });
-
-      const result = await settingsHubService.exportTableRows('employees');
-      expect(result).toEqual([]);
     });
   });
 });

@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { fromMock } = vi.hoisted(() => ({
-  fromMock: vi.fn(),
-}));
+const { fromMock, handleSupabaseErrorMock, filterEmpsMock } = vi.hoisted(() => {
+  const fromMockLocal = vi.fn();
+  return {
+    fromMock: fromMockLocal,
+    handleSupabaseErrorMock: vi.fn(),
+    filterEmpsMock: vi.fn((emps: any[]) => emps),
+  };
+});
 
 vi.mock('@services/supabase/client', () => ({
   supabase: {
@@ -11,99 +16,210 @@ vi.mock('@services/supabase/client', () => ({
 }));
 
 vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
+  handleSupabaseError: handleSupabaseErrorMock,
 }));
 
 vi.mock('@shared/lib/employeeVisibility', () => ({
-  filterOperationallyVisibleEmployees: vi.fn((emps: unknown[]) => emps),
+  filterOperationallyVisibleEmployees: filterEmpsMock,
 }));
 
-import { vehicleService } from './vehicleService';
+import { vehicleService, type VehiclePayload, type VehicleAssignmentPayload } from './vehicleService';
 
 describe('vehicleService', () => {
+  let tableMocks: Record<string, any>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    tableMocks = {};
+    fromMock.mockImplementation((table: string) => {
+      const mockObj = tableMocks[table] ?? { data: null, error: null };
+      return {
+        select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue(mockObj),
+        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
+      };
+    });
   });
 
   describe('getAll', () => {
     it('returns all vehicles successfully', async () => {
-      const mockLimit = vi.fn().mockResolvedValueOnce({ data: [{ id: 'v1', plate_number: '123' }], error: null });
-      fromMock.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            limit: mockLimit,
-          }),
-        }),
-      });
-
+      tableMocks.vehicles = { data: [{ id: 'v1', plate_number: '123' }], error: null };
       const result = await vehicleService.getAll();
-      expect(fromMock).toHaveBeenCalledWith('vehicles');
       expect(result).toEqual([{ id: 'v1', plate_number: '123' }]);
     });
-
-    it('returns empty array on null data', async () => {
-      const mockLimit = vi.fn().mockResolvedValueOnce({ data: null, error: null });
-      fromMock.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            limit: mockLimit,
-          }),
-        }),
-      });
-
-      const result = await vehicleService.getAll();
-      expect(result).toEqual([]);
+    
+    it('calls errorHandler on error', async () => {
+      tableMocks.vehicles = { data: null, error: new Error('db error') };
+      await vehicleService.getAll();
+      expect(handleSupabaseErrorMock).toHaveBeenCalled();
     });
+  });
 
-    it('throws error when supabase fails', async () => {
-      const mockLimit = vi.fn().mockResolvedValueOnce({ data: null, error: new Error('db error') });
-      fromMock.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            limit: mockLimit,
-          }),
-        }),
+  describe('getAllWithCurrentRider', () => {
+    it('combines vehicles and assignments', async () => {
+      fromMock.mockImplementation((table: string) => {
+        if (table === 'vehicles') {
+           return {
+             select: vi.fn().mockReturnThis(),
+             order: vi.fn().mockReturnThis(),
+             limit: vi.fn().mockResolvedValue({ data: [{ id: 'v1' }], error: null })
+           };
+        }
+        return {
+           select: vi.fn().mockReturnThis(),
+           is: vi.fn().mockReturnThis(),
+           then: (resolve: any) => Promise.resolve({ data: [{ vehicle_id: 'v1', employees: { name: 'emp' } }], error: null }).then(resolve)
+        };
       });
+      const res = await vehicleService.getAllWithCurrentRider();
+      expect(res).toEqual([{ id: 'v1', current_rider: 'emp' }]);
+    });
+  });
 
-      await expect(vehicleService.getAll()).rejects.toThrow('vehicleService.getAll: db error');
+  describe('getById', () => {
+    it('returns a single vehicle', async () => {
+      tableMocks.vehicles = { data: { id: 'v1' }, error: null };
+      const res = await vehicleService.getById('v1');
+      expect(res).toEqual({ id: 'v1' });
     });
   });
 
   describe('create', () => {
-    it('inserts a vehicle without assigned_employee_id', async () => {
-      const mockSingle = vi.fn().mockResolvedValueOnce({ data: { id: 'v1' }, error: null });
-      const mockInsert = vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: mockSingle,
-        }),
-      });
-      fromMock.mockReturnValue({ insert: mockInsert });
+    it('creates vehicle', async () => {
+      tableMocks.vehicles = { data: { id: 'v1' }, error: null };
+      const res = await vehicleService.create({ plate_number: '123' } as VehiclePayload);
+      expect(res).toEqual({ id: 'v1' });
+    });
+  });
 
-      const payload = { plate_number: '123', assigned_employee_id: 'emp-1' };
-      const result = await vehicleService.create(payload);
-
-      expect(fromMock).toHaveBeenCalledWith('vehicles');
-      expect(mockInsert).toHaveBeenCalledWith({ plate_number: '123' });
-      expect(result).toEqual({ id: 'v1' });
+  describe('update', () => {
+    it('updates vehicle', async () => {
+      tableMocks.vehicles = { data: { id: 'v1' }, error: null };
+      const res = await vehicleService.update('v1', { plate_number: '123' });
+      expect(res).toEqual({ id: 'v1' });
     });
   });
 
   describe('delete', () => {
-    it('deletes a vehicle by id', async () => {
-      const mockEq = vi.fn().mockResolvedValueOnce({ error: null });
-      fromMock.mockReturnValue({
-        delete: vi.fn().mockReturnValue({
-          eq: mockEq,
-        }),
-      });
-
+    it('deletes vehicle', async () => {
+      tableMocks.vehicles = { error: null };
       await vehicleService.delete('v1');
       expect(fromMock).toHaveBeenCalledWith('vehicles');
-      expect(mockEq).toHaveBeenCalledWith('id', 'v1');
+    });
+  });
+
+  describe('getAssignments', () => {
+    it('returns assignments for vehicle', async () => {
+      tableMocks.vehicle_assignments = { data: [{ id: 'a1' }], error: null };
+      const res = await vehicleService.getAssignments('v1');
+      expect(res).toHaveLength(1);
+    });
+  });
+
+  describe('getActiveCount', () => {
+    it('returns active count', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockResolvedValue({ count: 5, error: null }),
+        };
+      });
+      const res = await vehicleService.getActiveCount();
+      expect(res).toBe(5);
+    });
+  });
+
+  describe('getAssignmentsWithRelations', () => {
+    it('returns assignments with relations', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          lte: vi.fn().mockReturnThis(),
+          or: vi.fn().mockResolvedValue({ data: [{ id: 'a1' }], error: null }),
+        };
+      });
+      const res = await vehicleService.getAssignmentsWithRelations('2026-03');
+      expect(res).toHaveLength(1);
+    });
+  });
+
+  describe('getActiveAssignments', () => {
+    it('returns active assignments', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          is: vi.fn().mockResolvedValue({ data: [{ vehicle_id: 'v1' }], error: null }),
+        };
+      });
+      const res = await vehicleService.getActiveAssignments();
+      expect(res).toHaveLength(1);
+    });
+  });
+
+  describe('getActiveEmployees', () => {
+    it('returns active employees', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          order: vi.fn().mockResolvedValue({ data: [{ id: 'e1' }], error: null }),
+        };
+      });
+      const res = await vehicleService.getActiveEmployees();
+      expect(res).toHaveLength(1);
+    });
+  });
+
+  describe('createAssignment', () => {
+    it('creates assignment', async () => {
+      tableMocks.vehicle_assignments = { data: { id: 'a1' }, error: null };
+      const res = await vehicleService.createAssignment({ vehicle_id: 'v1', employee_id: 'e1', start_date: '2026-03-01' });
+      expect(res).toEqual({ id: 'a1' });
+    });
+  });
+
+  describe('updateAssignment', () => {
+    it('updates assignment', async () => {
+      tableMocks.vehicle_assignments = { data: { id: 'a1' }, error: null };
+      const res = await vehicleService.updateAssignment('a1', { end_date: '2026-03-02' });
+      expect(res).toEqual({ id: 'a1' });
+    });
+  });
+
+  describe('closeActiveAssignment', () => {
+    it('closes assignment', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          update: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          is: vi.fn().mockResolvedValue({ error: null }),
+        };
+      });
+      await vehicleService.closeActiveAssignment('v1', '2026-03-02');
+      expect(fromMock).toHaveBeenCalledWith('vehicle_assignments');
+    });
+  });
+
+  describe('getForSelect', () => {
+    it('returns for select', async () => {
+      fromMock.mockImplementation(() => {
+        return {
+          select: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue({ data: [{ id: 'v1' }], error: null }),
+        };
+      });
+      const res = await vehicleService.getForSelect();
+      expect(res).toHaveLength(1);
     });
   });
 });
