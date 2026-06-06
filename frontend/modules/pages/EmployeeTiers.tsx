@@ -13,7 +13,7 @@ import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { differenceInDays, parseISO } from 'date-fns';
 import { employeeTierService } from '@services/employeeTierService';
-import { cn } from '@shared/lib/utils';
+
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { defaultQueryRetry } from '@shared/lib/query';
 import { printHtmlTable } from '@shared/lib/printTable';
