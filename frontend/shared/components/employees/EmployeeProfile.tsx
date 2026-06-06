@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, User, FileText, Wallet, CreditCard, Clock, Package, DollarSign, ExternalLink, Loader2, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
@@ -430,7 +430,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
                 </div>
               )}
               {(employee.birth_date || employee.dob) && (
-                <InfoField label="تاريخ الميلاد" value={employee.birth_date || employee.dob ?? ''} />
+                <InfoField label="تاريخ الميلاد" value={(employee.birth_date || employee.dob) ?? ''} />
               )}
               {(employee.city || employee.cities?.length) && <InfoField label="المدن" value={employeeCitySummary(employee)} />}
               {employee.job_title && <InfoField label="المسمى الوظيفي" value={employee.job_title} />}

@@ -14,7 +14,7 @@ import { useRef } from 'react';
 import type React from 'react';
 import type JSZip from 'jszip';
 import { toast as sonnerToast } from '@shared/components/ui/sonner';
-import { salaryService, type PricingRule, type } from '@services/salaryService';
+import { salaryService, type PricingRule } from '@services/salaryService';
 import type { SalaryRow, SchemeData, SortDir } from '@modules/salaries/types/salary.types';
 import { computeSalaryRow } from '@modules/salaries/hooks/useSalaryTable';
 import { getPrimaryPlatformActivityCount } from '@modules/salaries/model/salaryUtils';

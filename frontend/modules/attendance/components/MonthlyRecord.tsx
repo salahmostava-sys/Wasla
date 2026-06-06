@@ -37,8 +37,6 @@ const _MONTHS_EN = [
 const SKELETON_ROW_IDS = ["r1", "r2", "r3", "r4", "r5"];
 const SKELETON_CELL_IDS = ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"];
 
-type = { id: string; name: string; national_id: string | null; salary_type: string; base_salary: number };
-type = { employee_id: string; status: string; note?: string | null; date?: string | null };
 
 interface Props {
   selectedMonth: number;
