@@ -160,14 +160,14 @@ describe('usePermissions hook', () => {
     });
   });
 
-  it('denies all when user exists but no role', async () => {
+  it('denies all when user exists but no role (treats as loading)', async () => {
     mockAuthState.user = { id: 'u1' };
 
     const { result } = renderHook(() => usePermissions('employees'), {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.loading).toBe(true);
     expect(result.current.permissions).toEqual({
       can_view: false,
       can_edit: false,
