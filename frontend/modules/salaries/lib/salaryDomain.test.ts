@@ -547,8 +547,6 @@ describe('salaryDomain deductions & pricing', () => {
 });
 
 import { prepareSalaryState } from './salaryDomain';
-import { salaryDraftService } from '@services/salaryDraftService';
-import { salaryDataService } from '@services/salaryDataService';
 
 vi.mock('@services/salaryDraftService', () => ({
   salaryDraftService: {

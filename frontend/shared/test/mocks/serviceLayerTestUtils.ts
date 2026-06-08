@@ -12,3 +12,8 @@ export function formatServiceError(error: unknown, context: string) {
 export function throwFormattedServiceError(error: unknown, context: string): never {
   throw formatServiceError(error, context);
 }
+
+export function throwIfErrorMock(error: unknown, context: string): void {
+  if (!error) return;
+  throw formatServiceError(error, context);
+}

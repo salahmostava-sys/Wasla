@@ -102,6 +102,30 @@ describe('employeeService', () => {
     });
   });
 
+  describe('simple query methods return data', () => {
+    it.each([
+      ['getById', () => employeeService.getById('e1'), 'employees', { id: 'e1' }],
+      ['findByNationalId', () => employeeService.findByNationalId('123'), 'employees', { id: 'e1' }],
+      ['getActiveSalarySchemes', () => employeeService.getActiveSalarySchemes(), 'salary_schemes', [{ id: 's1' }]],
+      ['getActiveApps', () => employeeService.getActiveApps(), 'apps', [{ id: 'a1' }]],
+    ] as const)('%s returns expected data', async (_name, call, tableName, payload) => {
+      tableResults[tableName] = { data: payload, error: null };
+      await expect(call()).resolves.toEqual(payload);
+    });
+  });
+
+  describe('simple query methods throw on database error', () => {
+    it.each([
+      ['getById', () => employeeService.getById('e1'), 'employees'],
+      ['findByNationalId', () => employeeService.findByNationalId('123'), 'employees'],
+      ['getActiveSalarySchemes', () => employeeService.getActiveSalarySchemes(), 'salary_schemes'],
+      ['getActiveApps', () => employeeService.getActiveApps(), 'apps'],
+    ])('%s throws when query fails', async (_name, call, tableName) => {
+      tableResults[tableName] = { data: null, error: new Error(`${tableName} error`) };
+      await expect(call()).rejects.toThrow(`${tableName} error`);
+    });
+  });
+
   describe('createEmployee', () => {
     it('returns created employee', async () => {
       tableResults.employees = { data: { id: 'e1', name: 'A' } };
@@ -143,6 +167,10 @@ describe('employeeService', () => {
       tableResults.employees = { data: null };
       await expect(employeeService.updateEmployeeDocumentPaths('e1', { id: 'e1' })).resolves.toBeUndefined();
     });
+    it('throws on database error', async () => {
+      tableResults.employees = { data: null, error: new Error('paths update failed') };
+      await expect(employeeService.updateEmployeeDocumentPaths('e1', { id: 'e1' })).rejects.toThrow('paths update failed');
+    });
   });
 
   describe('deleteEmployeeDocuments', () => {
@@ -157,12 +185,31 @@ describe('employeeService', () => {
       tableResults.employee_apps = { data: null };
       await expect(employeeService.replaceEmployeeApps('e1', ['a1', 'a2'])).resolves.toBeUndefined();
     });
+    it('throws on database error', async () => {
+      tableResults.employee_apps = { data: null, error: new Error('replace failed') };
+      await expect(employeeService.replaceEmployeeApps('e1', ['a1'])).rejects.toThrow('replace failed');
+    });
   });
 
   describe('upsertEmployeeApp', () => {
     it('completes without error on success', async () => {
       tableResults.employee_apps = { data: null };
       await expect(employeeService.upsertEmployeeApp('e1', 'a1')).resolves.toBeUndefined();
+    });
+    it('throws on database error', async () => {
+      tableResults.employee_apps = { data: null, error: new Error('upsert app failed') };
+      await expect(employeeService.upsertEmployeeApp('e1', 'a1')).rejects.toThrow('upsert app failed');
+    });
+  });
+
+  describe('updateCity', () => {
+    it('completes without error on success', async () => {
+      tableResults.employees = { data: null };
+      await expect(employeeService.updateCity('e1', 'jeddah')).resolves.toBeUndefined();
+    });
+    it('throws on database error', async () => {
+      tableResults.employees = { data: null, error: new Error('city update failed') };
+      await expect(employeeService.updateCity('e1', 'jeddah')).rejects.toThrow('city update failed');
     });
   });
 });

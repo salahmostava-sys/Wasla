@@ -80,19 +80,19 @@ describe('UsersAndPermissions', () => {
   it('allows admins to open the add-user dialog and submit a new user', async () => {
     render(<UsersAndPermissions />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'إضافة مستخدم' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'إضافة مستخدم' }));
 
-    fireEvent.change(screen.getByLabelText('الاسم'), {
+    fireEvent.change(await screen.findByLabelText('الاسم'), {
       target: { value: 'New User' },
     });
-    fireEvent.change(screen.getByLabelText('البريد الإلكتروني'), {
+    fireEvent.change(await screen.findByLabelText('البريد الإلكتروني'), {
       target: { value: 'new@example.com' },
     });
-    fireEvent.change(screen.getByLabelText('كلمة المرور'), {
+    fireEvent.change(await screen.findByLabelText('كلمة المرور'), {
       target: { value: 'password123' },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'إنشاء المستخدم' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'إنشاء المستخدم' }));
 
     await waitFor(() =>
       expect(authServiceMock.createManagedUser).toHaveBeenCalledWith({

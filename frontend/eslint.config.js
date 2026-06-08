@@ -96,11 +96,25 @@ export default tseslint.config(
     },
   },
   {
+    // UI-heavy TSX repeats Tailwind classes and i18n keys; SonarCloud still tracks duplication.
+    files: ["**/*.tsx", "e2e/**/*.ts"],
+    rules: {
+      "sonarjs/no-duplicate-string": ["warn", { threshold: 20 }],
+    },
+  },
+  {
+    files: ["services/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "sonarjs/no-duplicate-string": ["warn", { threshold: 5 }],
+    },
+  },
+  {
     files: ["**/*.test.ts", "**/*.test.tsx", "**/*.setup.ts", "**/__tests__/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unnecessary-type-assertion": "off",
-      "sonarjs/no-duplicate-string": "off"
-    }
-  }
+      "sonarjs/no-duplicate-string": "off",
+    },
+  },
 );

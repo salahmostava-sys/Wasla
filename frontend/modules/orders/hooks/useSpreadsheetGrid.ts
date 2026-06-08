@@ -49,13 +49,17 @@ export function useSpreadsheetGrid() {
   const [nameMappingCallback, setNameMappingCallback] = useState<((mapping: Map<string, string>) => void) | null>(null);
 
   const monthKey = monthYear(year, month);
+  const importHistoryQueryKey = useMemo(
+    () => ['orders', uid, 'import-history', monthKey] as const,
+    [monthKey, uid],
+  );
   const { data: activeIdsData } = useMonthlyActiveEmployeeIds(monthKey);
   const activeEmployeeIdsInMonth = activeIdsData?.orderEmployeeIds;
 
   const sq = useSpreadsheetQueries(uid, enabled, year, month, activeEmployeeIdsInMonth);
   const canEditMonth = permissions.can_edit && !isMonthLocked;
   const { data: importHistory = [] } = useQuery({
-    queryKey: ['orders', uid, 'import-history', monthKey],
+    queryKey: importHistoryQueryKey,
     enabled,
     staleTime: 60_000,
     queryFn: () => performanceService.getImportHistory(monthKey),
@@ -66,9 +70,9 @@ export function useSpreadsheetGrid() {
       queryClient.invalidateQueries({ queryKey: ['orders', uid] }),
       queryClient.invalidateQueries({ queryKey: ['employees', uid, 'active-ids', monthKey] }),
       queryClient.invalidateQueries({ queryKey: ['salaries', uid, 'base-context', monthKey] }),
-      queryClient.invalidateQueries({ queryKey: ['orders', uid, 'import-history', monthKey] }),
+      queryClient.invalidateQueries({ queryKey: importHistoryQueryKey }),
     ]);
-  }, [monthKey, queryClient, uid]);
+  }, [importHistoryQueryKey, monthKey, queryClient, uid]);
 
   useEffect(() => {
     setData(sq.spreadsheetMonthData);
@@ -396,12 +400,12 @@ export function useSpreadsheetGrid() {
     try {
       await performanceService.deleteImportBatch(batchId);
       toast.success('تم حذف سجل الاستيراد');
-      await queryClient.invalidateQueries({ queryKey: ['orders', uid, 'import-history', monthKey] });
+      await queryClient.invalidateQueries({ queryKey: importHistoryQueryKey });
     } catch (e: unknown) {
       const message = getErrorMessage(e, 'فشل حذف السجل');
       toast.error(TOAST_ERROR_GENERIC, { description: message });
     }
-  }, [monthKey, queryClient, uid]);
+  }, [importHistoryQueryKey, queryClient]);
 
   const seqColMin = 36;
   const repColMin = 132;

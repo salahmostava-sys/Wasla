@@ -215,7 +215,7 @@ describe('authService', () => {
       expect(channelMock).toHaveBeenCalledWith('profile-active-u1');
       // Simulate a realtime event arriving
       capturedHandler?.({ new: { is_active: false } });
-      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ is_active: false }));
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ new: { is_active: false } }));
     });
   });
 

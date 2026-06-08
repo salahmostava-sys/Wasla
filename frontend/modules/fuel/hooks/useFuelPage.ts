@@ -35,6 +35,8 @@ import {
 import { useFuelTable } from '@modules/fuel/hooks/useFuelTable';
 import { useTemporalContext } from '@app/providers/TemporalContext';
 
+const ISO_DATE_FORMAT = 'yyyy-MM-dd';
+
 export function useFuelPage() { // NOSONAR: page data layer with many independent handlers
   const { toast } = useToast();
   const fuelApi = useFuel();
@@ -66,8 +68,8 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
 
   const monthYear = `${selectedYear}-${selectedMonth}`;
   const monthStart = `${monthYear}-01`;
-  const monthEnd = format(endOfMonth(new Date(`${monthYear}-01`)), 'yyyy-MM-dd');
-  const todayStr = format(now, 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
+  const todayStr = format(now, ISO_DATE_FORMAT);
   const defaultEntryDate = todayStr >= monthStart && todayStr <= monthEnd ? todayStr : monthStart;
 
   const employeeIdsOnPlatform = useMemo(() => {
@@ -147,7 +149,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     enabled,
     queryFn: async () => {
       const ms = `${monthYear}-01`;
-      const me = format(endOfMonth(new Date(`${monthYear}-01`)), 'yyyy-MM-dd');
+      const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
       const rows = await fuelApi.getMonthlyOrders(ms, me);
       return (rows || []);
     },
@@ -190,7 +192,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     enabled: enabled && (view === 'monthly' || view === 'spreadsheet'),
     queryFn: async () => {
       const ms = `${monthYear}-01`;
-      const me = format(endOfMonth(new Date(`${monthYear}-01`)), 'yyyy-MM-dd');
+      const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
       const [dailyRowsRaw, orderRows, assignmentRows] = await Promise.all([
         fuelApi.getMonthlyDailyMileage(ms, me),
         fuelApi.getMonthlyOrders(ms, me),
@@ -215,7 +217,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     enabled: enabled && (view === 'daily' || view === 'spreadsheet'),
     queryFn: async () => {
       const ms = `${monthYear}-01`;
-      const me = format(endOfMonth(new Date(`${monthYear}-01`)), 'yyyy-MM-dd');
+      const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
       const dailyData = await fuelApi.getDailyMileageByMonth(ms, me);
       const mappedRows = mapDailyRows((dailyData || []));
       return applyDailyFilters(mappedRows, selectedEmployee, employeeIdsOnPlatform);

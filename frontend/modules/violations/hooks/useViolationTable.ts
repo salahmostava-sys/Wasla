@@ -23,6 +23,9 @@ import {
   getViolationSortValue,
 } from '@modules/violations/lib/violationUtils';
 
+const VIOLATION_DATE_REQUIRED_TITLE = 'أدخل تاريخ المخالفة';
+const VIOLATION_DATE_REQUIRED_DESC = 'تاريخ المخالفة مطلوب';
+
 export function useViolationTable() {
   const { toast } = useToast();
   const { enabled, userId } = useAuthQueryGate();
@@ -172,7 +175,7 @@ export function useViolationTable() {
     // التحقق من التاريخ
     const dateVal = form.use_time ? form.violation_datetime : form.violation_date_only;
     if (!dateVal) { 
-      toast({ title: 'أدخل تاريخ المخالفة', description: 'تاريخ المخالفة مطلوب', variant: 'destructive' }); 
+      toast({ title: VIOLATION_DATE_REQUIRED_TITLE, description: VIOLATION_DATE_REQUIRED_DESC, variant: 'destructive' }); 
       return; 
     }
 
@@ -180,7 +183,7 @@ export function useViolationTable() {
       ? (form.violation_datetime.split('T')[0] || '')
       : form.violation_date_only;
     if (!violationDate) { 
-      toast({ title: 'أدخل تاريخ المخالفة', description: 'تاريخ المخالفة مطلوب', variant: 'destructive' }); 
+      toast({ title: VIOLATION_DATE_REQUIRED_TITLE, description: VIOLATION_DATE_REQUIRED_DESC, variant: 'destructive' }); 
       return; 
     }
 
@@ -379,7 +382,7 @@ export function useViolationTable() {
     if (!editViolationId) return;
     const amount = Number.parseFloat(editForm.amount);
     if (!amount || amount <= 0) { toast({ title: 'خطأ', description: 'أدخل مبلغ صحيح', variant: 'destructive' }); return; }
-    if (!editForm.incident_date) { toast({ title: 'خطأ', description: 'أدخل تاريخ المخالفة', variant: 'destructive' }); return; }
+    if (!editForm.incident_date) { toast({ title: 'خطأ', description: VIOLATION_DATE_REQUIRED_TITLE, variant: 'destructive' }); return; }
 
     setEditSaving(true);
     try {

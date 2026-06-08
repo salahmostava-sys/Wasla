@@ -285,7 +285,7 @@ describe('salaryService', () => {
         return {
           select: vi.fn().mockReturnThis(),
           eq: vi.fn().mockReturnThis(),
-          range: vi.fn().mockImplementation((offset) => {
+          range: vi.fn().mockImplementation((_offset) => {
             rangeCallCount++;
             const data = rangeCallCount <= 2 ? [{ id: '1' }] : [];
             return Promise.resolve({ data, error: null });

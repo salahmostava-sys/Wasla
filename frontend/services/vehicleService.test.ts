@@ -19,7 +19,7 @@ vi.mock('@shared/lib/employeeVisibility', () => ({
   filterOperationallyVisibleEmployees: filterEmpsMock,
 }));
 
-import { vehicleService, type VehiclePayload, type VehicleAssignmentPayload } from './vehicleService';
+import { vehicleService, type VehiclePayload } from './vehicleService';
 
 describe('vehicleService', () => {
   let tableMocks: Record<string, any>;

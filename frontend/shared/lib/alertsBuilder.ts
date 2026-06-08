@@ -1,5 +1,7 @@
 import { addDays, differenceInDays, format, parseISO } from "date-fns";
 
+const ISO_DATE_FORMAT = "yyyy-MM-dd";
+
 export interface Alert {
   id: string;
   type: string;
@@ -154,7 +156,7 @@ const pushAbscondedSummaryAlerts = (
   today: Date
 ) => {
   if (!rows?.length) return;
-  const dueDate = format(today, "yyyy-MM-dd");
+  const dueDate = format(today, ISO_DATE_FORMAT);
   for (const emp of rows) {
     const openAssignments = (emp.vehicle_assignments ?? []).filter((va) => !va.end_date);
     const custodyParts = openAssignments
@@ -237,7 +239,7 @@ const pushPlatformAccountAlerts = (out: Alert[], rows: PlatformAccountAlertRow[]
 
 const pushLowStockSparePartAlerts = (out: Alert[], rows: LowStockSparePartAlertRow[] | null | undefined, today: Date) => {
   if (!rows?.length) return;
-  const dueDate = format(today, "yyyy-MM-dd");
+  const dueDate = format(today, ISO_DATE_FORMAT);
   for (const p of rows) {
     if (Number(p.stock_quantity) >= Number(p.min_stock_alert ?? 0)) continue;
     out.push({
@@ -254,7 +256,7 @@ const pushLowStockSparePartAlerts = (out: Alert[], rows: LowStockSparePartAlertR
 
 const pushPersistedDbAlerts = (out: Alert[], rows: PersistedAlertRow[], today: Date) => {
   for (const a of rows) {
-    const dueDate = a.due_date ?? format(today, "yyyy-MM-dd");
+    const dueDate = a.due_date ?? format(today, ISO_DATE_FORMAT);
     const daysLeft = differenceInDays(parseISO(dueDate), today);
     const details = a.details ?? {};
     const detailsEmployeeName = typeof details.employee_name === "string" ? details.employee_name : null;
@@ -297,4 +299,4 @@ export function buildAlertsFromResponses(
   return generatedAlerts;
 }
 
-export const daysFromTodayIso = (days: number) => format(addDays(new Date(), days), "yyyy-MM-dd");
+export const daysFromTodayIso = (days: number) => format(addDays(new Date(), days), ISO_DATE_FORMAT);
