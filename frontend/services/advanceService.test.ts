@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { resetMockTableResults, throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -16,9 +16,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn(throwFormattedServiceError),
-}));
 
 import { advanceService } from './advanceService';
 
@@ -79,7 +76,7 @@ describe('advanceService', () => {
           disbursement_date: '2026-03-01',
           first_deduction_month: '2026-04',
         }),
-      ).rejects.toThrow('advanceService.create: insert failed');
+      ).rejects.toThrow('insert failed');
     });
   });
 

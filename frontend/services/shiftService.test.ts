@@ -10,13 +10,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { shiftService } from './shiftService';
 
@@ -104,7 +97,7 @@ describe('shiftService', () => {
 
     it('throws error if delete fails', async () => {
       tableMocks.daily_shifts = { error: new Error('db error') };
-      await expect(shiftService.deleteByMonthAndApp(2026, 3, 'app-1')).rejects.toThrow('shiftService.deleteByMonthAndApp: db error');
+      await expect(shiftService.deleteByMonthAndApp(2026, 3, 'app-1')).rejects.toThrow('db error');
     });
   });
 

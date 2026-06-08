@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { fromMock, handleSupabaseErrorMock, filterEmpsMock } = vi.hoisted(() => {
+const { fromMock, filterEmpsMock } = vi.hoisted(() => {
   const fromMockLocal = vi.fn();
   return {
     fromMock: fromMockLocal,
-    handleSupabaseErrorMock: vi.fn(),
     filterEmpsMock: vi.fn((emps: any[]) => emps),
   };
 });
@@ -15,9 +14,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: handleSupabaseErrorMock,
-}));
 
 vi.mock('@shared/lib/employeeVisibility', () => ({
   filterOperationallyVisibleEmployees: filterEmpsMock,
@@ -55,10 +51,9 @@ describe('vehicleService', () => {
       expect(result).toEqual([{ id: 'v1', plate_number: '123' }]);
     });
     
-    it('calls errorHandler on error', async () => {
+    it('throws on database error', async () => {
       tableMocks.vehicles = { data: null, error: new Error('db error') };
-      await vehicleService.getAll();
-      expect(handleSupabaseErrorMock).toHaveBeenCalled();
+      await expect(vehicleService.getAll()).rejects.toThrow('db error');
     });
   });
 

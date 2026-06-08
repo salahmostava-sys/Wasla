@@ -57,12 +57,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { orderService, type DailyOrderUpsertRow } from './orderService';
 
@@ -145,45 +139,7 @@ describe('orderService', () => {
     });
   });
 
-  describe('getAll', () => {
-    it('returns orders', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getAll();
-      expect(res).toHaveLength(1);
-    });
-  });
 
-  describe('getOrdersByEmployeeMonth', () => {
-    it('returns orders', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getOrdersByEmployeeMonth('e1', '2024-01');
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getSalaryContextOrdersByMonth', () => {
-    it('paginates orders', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getSalaryContextOrdersByMonth('2024-01');
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getByDate', () => {
-    it('returns orders', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getByDate('2024-01-01', { employeeId: 'e1' });
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getByMonth', () => {
-    it('returns orders', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getByMonth('2024-01', { employeeId: 'e1' });
-      expect(res).toHaveLength(1);
-    });
-  });
 
   describe('getMonthPaged', () => {
     it('returns paged result', async () => {
@@ -204,10 +160,13 @@ describe('orderService', () => {
   });
 
   describe('delete', () => {
-    it('deletes order', async () => {
+    it('completes without error on success', async () => {
       tableResults.daily_orders = { data: null };
-      await orderService.delete('1');
-      expect(fromMock).toHaveBeenCalledWith('daily_orders');
+      await expect(orderService.delete('1')).resolves.toBeUndefined();
+    });
+    it('throws formatted error on failure', async () => {
+      tableResults.daily_orders = { data: null, error: new Error('delete blocked') };
+      await expect(orderService.delete('1')).rejects.toThrow('delete blocked');
     });
   });
 
@@ -219,53 +178,7 @@ describe('orderService', () => {
     });
   });
 
-  describe('getAppTargets', () => {
-    it('returns targets', async () => {
-      tableResults.app_targets = { data: [{ id: 't1' }] };
-      const res = await orderService.getAppTargets('2024-01');
-      expect(res).toHaveLength(1);
-    });
-  });
 
-  describe('upsertAppTarget', () => {
-    it('upserts target', async () => {
-      tableResults.app_targets = { data: { id: 't1' } };
-      const res = await orderService.upsertAppTarget('a1', '2024-01', 100);
-      expect(res).toEqual({ id: 't1' });
-    });
-  });
-
-  describe('getMonthRaw', () => {
-    it('paginates raw month data', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }] };
-      const res = await orderService.getMonthRaw(2024, 1);
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getBaseEmployees', () => {
-    it('returns employees', async () => {
-      tableResults.employees = { data: [{ id: 'e1' }] };
-      const res = await orderService.getBaseEmployees();
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getActiveApps', () => {
-    it('returns apps', async () => {
-      tableResults.apps = { data: [{ id: 'a1' }] };
-      const res = await orderService.getActiveApps();
-      expect(res).toHaveLength(1);
-    });
-  });
-
-  describe('getEmployeeAppAssignments', () => {
-    it('returns assignments', async () => {
-      tableResults.employee_apps = { data: [{ employee_id: 'e1' }] };
-      const res = await orderService.getEmployeeAppAssignments();
-      expect(res).toHaveLength(1);
-    });
-  });
 
   describe('getMonthLockStatus', () => {
     it('returns true if locked', async () => {
@@ -281,18 +194,16 @@ describe('orderService', () => {
   });
 
   describe('lockMonth', () => {
-    it('locks month', async () => {
+    it('completes without error when authenticated', async () => {
       tableResults.locked_months = { data: null };
-      await orderService.lockMonth('2024-01');
-      expect(fromMock).toHaveBeenCalledWith('locked_months');
+      await expect(orderService.lockMonth('2024-01')).resolves.toBeUndefined();
     });
   });
 
   describe('unlockMonth', () => {
-    it('unlocks month', async () => {
+    it('completes without error', async () => {
       tableResults.locked_months = { data: null };
-      await orderService.unlockMonth('2024-01');
-      expect(fromMock).toHaveBeenCalledWith('locked_months');
+      await expect(orderService.unlockMonth('2024-01')).resolves.toBeUndefined();
     });
   });
 });

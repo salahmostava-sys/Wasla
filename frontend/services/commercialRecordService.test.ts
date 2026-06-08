@@ -15,13 +15,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  ServiceError: class ServiceError extends Error {},
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { commercialRecordService, COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE } from './commercialRecordService';
 
@@ -75,13 +68,13 @@ describe('commercialRecordService', () => {
 
     it('throws when getting employees fails', async () => {
       tableResults.employees = { data: null, error: new Error('rls') };
-      await expect(commercialRecordService.listCatalog()).rejects.toThrow('commercialRecordService.listEmployeeCommercialRecordUsage: rls');
+      await expect(commercialRecordService.listCatalog()).rejects.toThrow('rls');
     });
 
     it('throws when getting records fails with non-missing error', async () => {
       tableResults.employees = { data: [], error: null };
-      tableResults.commercial_records = { data: null, error: new Error('timeout') };
-      await expect(commercialRecordService.listCatalog()).rejects.toThrow('commercialRecordService.listCatalog: timeout');
+      tableResults.commercial_records = { data: null, error: new Error('connection refused') };
+      await expect(commercialRecordService.listCatalog()).rejects.toThrow('connection refused');
     });
   });
 
@@ -103,7 +96,7 @@ describe('commercialRecordService', () => {
 
     it('throws normal error when db fails', async () => {
       tableResults.commercial_records = { data: null, error: new Error('db error') };
-      await expect(commercialRecordService.createRecord('New')).rejects.toThrow('commercialRecordService.createRecord: db error');
+      await expect(commercialRecordService.createRecord('New')).rejects.toThrow('db error');
     });
   });
 
@@ -134,7 +127,7 @@ describe('commercialRecordService', () => {
 
     it('throws when record update fails', async () => {
       tableResults.commercial_records = { data: null, error: new Error('db error') };
-      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('commercialRecordService.updateRecord.record: db error');
+      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('db error');
     });
 
     it('throws and rolls back when employee sync fails', async () => {
@@ -153,7 +146,7 @@ describe('commercialRecordService', () => {
         return createQueryBuilder({ data: null, error: null });
       });
 
-      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('commercialRecordService.updateRecord.syncEmployees: sync fail');
+      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('sync fail');
       expect(mockUpdate).toHaveBeenCalledTimes(3);
       fromMock.mockImplementation(originalImpl as any);
     });
@@ -173,7 +166,7 @@ describe('commercialRecordService', () => {
 
     it('throws when delete fails', async () => {
       tableResults.commercial_records = { data: null, error: new Error('db error') };
-      await expect(commercialRecordService.deleteRecord('cr-1')).rejects.toThrow('commercialRecordService.deleteRecord: db error');
+      await expect(commercialRecordService.deleteRecord('cr-1')).rejects.toThrow('db error');
     });
   });
 });

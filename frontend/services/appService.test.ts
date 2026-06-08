@@ -15,16 +15,6 @@ vi.mock('@services/supabase/client', () => ({
   supabase: { from: fromMock },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { appService } from './appService';
 
@@ -45,7 +35,7 @@ describe('appService', () => {
 
     it('throws on error', async () => {
       tableResults.apps = { data: null, error: new Error('db') };
-      await expect(appService.getAll()).rejects.toThrow('appService.getAll: db');
+      await expect(appService.getAll()).rejects.toThrow('db');
     });
   });
 

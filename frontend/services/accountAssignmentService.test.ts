@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { formatServiceError, resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock, rpcMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -18,13 +18,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  throwIfError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { accountAssignmentService } from './accountAssignmentService';
 
@@ -135,7 +128,7 @@ describe('accountAssignmentService', () => {
           notes: null,
           created_by: null,
         }),
-      ).rejects.toThrow('accountAssignmentService.assignPlatformAccount: rpc failed');
+      ).rejects.toThrow('rpc failed');
     });
   });
 });

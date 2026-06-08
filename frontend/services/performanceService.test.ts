@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
 import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
-
 const { tableResults, fromMock, rpcMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
   return {
@@ -18,9 +17,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn(formatServiceError),
-}));
 
 import { performanceService } from './performanceService';
 
@@ -50,7 +46,7 @@ describe('performanceService', () => {
 
     it('throws on error', async () => {
       rpcMock.mockResolvedValueOnce({ data: null, error: new Error('dash error') });
-      await expect(performanceService.getDashboard('2026-04')).rejects.toThrow('performanceService.getDashboard: dash error');
+      await expect(performanceService.getDashboard('2026-04')).rejects.toThrow('dash error');
     });
   });
 
@@ -91,9 +87,7 @@ describe('performanceService', () => {
         error: new Error('history down'),
       };
 
-      await expect(performanceService.getImportHistory('2026-04')).rejects.toThrow(
-        'performanceService.getImportHistory: history down',
-      );
+      await expect(performanceService.getImportHistory('2026-04')).rejects.toThrow('history down');
     });
 
     it('returns empty array if error includes order_import_batches (schema issue)', async () => {

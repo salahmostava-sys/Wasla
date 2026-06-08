@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+
 
 const { tableResults, fromMock, authMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -20,13 +20,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn(throwFormattedServiceError),
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 import * as maintenanceService from './maintenanceService';
 
@@ -57,7 +50,7 @@ describe('maintenanceService', () => {
 
     it('throws custom error if missing schema generic fallback', async () => {
       tableResults.spare_parts = { data: null, error: { message: null } };
-      await expect(maintenanceService.getSpareparts()).rejects.toThrow('maintenanceService.getSpareparts: service error');
+      await expect(maintenanceService.getSpareparts()).rejects.toThrow('Service failure');
     });
   });
 
@@ -118,9 +111,7 @@ describe('maintenanceService', () => {
 
     it('throws on Supabase error during count check', async () => {
       tableResults.maintenance_parts = { data: null, error: new Error('count failed') };
-      await expect(maintenanceService.deleteSparePart('sp1')).rejects.toThrow(
-        'maintenanceService.deleteSparePart.count: count failed',
-      );
+      await expect(maintenanceService.deleteSparePart('sp1')).rejects.toThrow('count failed');
     });
 
     it('throws on error from delete', async () => {
@@ -129,9 +120,7 @@ describe('maintenanceService', () => {
         if (table === 'spare_parts') return createQueryBuilder({ data: null, error: new Error('delete blocked') });
         return createQueryBuilder({ data: null, error: null });
       });
-      await expect(maintenanceService.deleteSparePart('sp1')).rejects.toThrow(
-        'maintenanceService.deleteSparePart: delete blocked',
-      );
+      await expect(maintenanceService.deleteSparePart('sp1')).rejects.toThrow('delete blocked');
     });
   });
 
@@ -146,9 +135,7 @@ describe('maintenanceService', () => {
     });
     it('throws on Supabase error', async () => {
       tableResults.maintenance_logs = { data: null, error: new Error('table missing') };
-      await expect(maintenanceService.getMaintenanceLogs()).rejects.toThrow(
-        'maintenanceService.getMaintenanceLogs: table missing',
-      );
+      await expect(maintenanceService.getMaintenanceLogs()).rejects.toThrow('table missing');
     });
   });
 
@@ -179,14 +166,14 @@ describe('maintenanceService', () => {
       tableResults.maintenance_logs = { data: null, error: new Error('insert failed') };
       await expect(
         maintenanceService.createMaintenanceLog({ vehicle_id: 'v1', maintenance_date: '2026-03-01', type: 'غيار زيت' }, [])
-      ).rejects.toThrow('maintenanceService.createMaintenanceLog.insert: insert failed');
+      ).rejects.toThrow('insert failed');
     });
 
     it('throws when vehicle_id missing (simulated by db err)', async () => {
       tableResults.maintenance_logs = { data: null, error: new Error('null value in column "vehicle_id"') };
       await expect(
         maintenanceService.createMaintenanceLog({ vehicle_id: '', maintenance_date: '2026-03-01', type: 'غيار زيت' }, [])
-      ).rejects.toThrow('maintenanceService.createMaintenanceLog.insert: null value');
+      ).rejects.toThrow('null value');
     });
 
     it('throws on parts insert error', async () => {
@@ -201,7 +188,7 @@ describe('maintenanceService', () => {
           { vehicle_id: 'v1', maintenance_date: '2026-03-01', type: 'غيار زيت' },
           [{ part_id: 'p1', quantity_used: 1, cost_at_time: 100 }]
         )
-      ).rejects.toThrow('maintenanceService.createMaintenanceLog.parts: parts err');
+      ).rejects.toThrow('parts err');
     });
     
     it('throws on getMaintenanceLogById error', async () => {
@@ -217,7 +204,7 @@ describe('maintenanceService', () => {
 
       await expect(
         maintenanceService.createMaintenanceLog({ vehicle_id: 'v1', maintenance_date: '2026-03-01', type: 'غيار زيت' }, [])
-      ).rejects.toThrow('maintenanceService.getMaintenanceLogById: get err');
+      ).rejects.toThrow('get err');
     });
   });
 

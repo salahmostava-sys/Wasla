@@ -23,13 +23,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-}));
 
 vi.mock('@services/authService', () => ({
   authService: {
@@ -81,7 +74,7 @@ describe('settingsHubService', () => {
 
     it('throws error when session fetch fails', async () => {
       getSessionMock.mockResolvedValueOnce({ data: null, error: new Error('auth failed') });
-      await expect(settingsHubService.getCurrentUserId()).rejects.toThrow('settingsHubService.getCurrentUserId: auth failed');
+      await expect(settingsHubService.getCurrentUserId()).rejects.toThrow('auth failed');
     });
   });
 

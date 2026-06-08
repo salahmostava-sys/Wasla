@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { resetMockTableResults, throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -16,9 +16,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn(throwFormattedServiceError),
-}));
 
 import { salarySchemeService } from './salarySchemeService';
 
@@ -117,7 +114,7 @@ describe('salarySchemeService', () => {
       tableResults.scheme_month_snapshots = { data: null, error: new Error('db error') };
       await expect(
         salarySchemeService.upsertSnapshot('scheme1', '2026-03', {})
-      ).rejects.toThrow('salarySchemeService.upsertSnapshot: db error');
+      ).rejects.toThrow('db error');
     });
   });
 

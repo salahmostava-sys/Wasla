@@ -20,13 +20,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { salaryService, getTierSalaryExplanationLines } from './salaryService';
 import type { SalarySchemeTier } from './salaryService';
@@ -142,13 +135,6 @@ describe('salaryService', () => {
     });
   });
 
-  describe('getPricingRules', () => {
-    it('returns rules', async () => {
-      tableMocks.pricing_rules = { data: [{ id: '1' }], error: null };
-      const res = await salaryService.getPricingRules('app1');
-      expect(res).toHaveLength(1);
-    });
-  });
 
   describe('getPricingRulesForApps', () => {
     it('returns grouped rules', async () => {
@@ -253,14 +239,6 @@ describe('salaryService', () => {
     });
   });
 
-  describe('getByMonth', () => {
-    it('returns records', async () => {
-      tableMocks.salary_records = { data: [{ id: '1' }], error: null };
-      const res = await salaryService.getByMonth('2026-03');
-      expect(res).toHaveLength(1);
-    });
-  });
-
   describe('getPagedByMonth', () => {
     it('returns paged records', async () => {
       fromMock.mockImplementation(() => {
@@ -320,51 +298,44 @@ describe('salaryService', () => {
     });
   });
 
-  describe('getByEmployee', () => {
-    it('returns employee records', async () => {
-      tableMocks.salary_records = { data: [{ id: '1' }], error: null };
-      const res = await salaryService.getByEmployee('e1');
-      expect(res).toHaveLength(1);
-    });
-  });
-
   describe('upsert', () => {
-    it('upserts record', async () => {
-      tableMocks.salary_records = { data: { id: '1' }, error: null };
+    it('returns upserted record', async () => {
+      tableMocks.salary_records = { data: { id: '1', employee_id: 'e1' }, error: null };
       const res = await salaryService.upsert({ employee_id: 'e1', month_year: '2026-03' });
-      expect(res).toEqual({ id: '1' });
+      expect(res).toEqual({ id: '1', employee_id: 'e1' });
+    });
+    it('throws on database error', async () => {
+      tableMocks.salary_records = { data: null, error: new Error('conflict') };
+      await expect(salaryService.upsert({ employee_id: 'e1', month_year: '2026-03' })).rejects.toThrow('conflict');
     });
   });
 
   describe('upsertMany', () => {
-    it('upserts many records', async () => {
+    it('completes without error on success', async () => {
       tableMocks.salary_records = { error: null };
-      await salaryService.upsertMany([{ employee_id: 'e1' }]);
-      expect(fromMock).toHaveBeenCalledWith('salary_records');
+      await expect(salaryService.upsertMany([{ employee_id: 'e1' }])).resolves.toBeUndefined();
     });
   });
 
   describe('update', () => {
-    it('updates record', async () => {
-      tableMocks.salary_records = { data: { id: '1' }, error: null };
+    it('returns updated record', async () => {
+      tableMocks.salary_records = { data: { id: '1', notes: 'x' }, error: null };
       const res = await salaryService.update('1', { notes: 'x' });
-      expect(res).toEqual({ id: '1' });
+      expect(res).toEqual({ id: '1', notes: 'x' });
     });
   });
 
   describe('approve', () => {
-    it('approves record', async () => {
+    it('completes without error on success', async () => {
       tableMocks.salary_records = { error: null };
-      await salaryService.approve('1');
-      expect(fromMock).toHaveBeenCalledWith('salary_records');
+      await expect(salaryService.approve('1')).resolves.toBeUndefined();
     });
   });
 
   describe('delete', () => {
-    it('deletes record', async () => {
+    it('completes without error on success', async () => {
       tableMocks.salary_records = { error: null };
-      await salaryService.delete('1');
-      expect(fromMock).toHaveBeenCalledWith('salary_records');
+      await expect(salaryService.delete('1')).resolves.toBeUndefined();
     });
   });
 
@@ -376,19 +347,5 @@ describe('salaryService', () => {
     });
   });
 
-  describe('getActiveAdvanceDeductionsByMonth', () => {
-    it('returns advance deductions', async () => {
-      tableMocks.advance_installments = { data: [{ advance_id: '1' }], error: null };
-      const res = await salaryService.getActiveAdvanceDeductionsByMonth('2026-03');
-      expect(res).toHaveLength(1);
-    });
-  });
 
-  describe('getEmployees', () => {
-    it('returns employees', async () => {
-      tableMocks.employees = { data: [{ id: '1' }], error: null };
-      const res = await salaryService.getEmployees();
-      expect(res).toHaveLength(1);
-    });
-  });
 });

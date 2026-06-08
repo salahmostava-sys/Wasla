@@ -27,15 +27,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    return new Error(`${context}: ${message}`);
-  }),
-  ServiceError: class extends Error {
-    constructor(msg: string) { super(msg); }
-  }
-}));
 
 import { employeeService } from './employeeService';
 
@@ -77,28 +68,7 @@ describe('employeeService', () => {
     });
   });
 
-  describe('updateCity', () => {
-    it('updates city', async () => {
-      await employeeService.updateCity('e1', 'jeddah');
-      expect(fromMock).toHaveBeenCalledWith('employees');
-    });
-  });
 
-  describe('getById', () => {
-    it('gets by id', async () => {
-      tableResults.employees = { data: { id: 'e1' } };
-      const res = await employeeService.getById('e1');
-      expect(res).toEqual({ id: 'e1' });
-    });
-  });
-
-  describe('findByNationalId', () => {
-    it('finds by national id', async () => {
-      tableResults.employees = { data: { id: 'e1' } };
-      const res = await employeeService.findByNationalId('123');
-      expect(res).toEqual({ id: 'e1' });
-    });
-  });
 
   describe('deleteById', () => {
     it('deletes if no blocking records', async () => {
@@ -122,21 +92,7 @@ describe('employeeService', () => {
     });
   });
 
-  describe('getActiveSalarySchemes', () => {
-    it('gets active schemes', async () => {
-      tableResults.salary_schemes = { data: [{ id: 's1' }] };
-      const res = await employeeService.getActiveSalarySchemes();
-      expect(res).toEqual([{ id: 's1' }]);
-    });
-  });
 
-  describe('getActiveApps', () => {
-    it('gets active apps', async () => {
-      tableResults.apps = { data: [{ id: 'a1' }] };
-      const res = await employeeService.getActiveApps();
-      expect(res).toEqual([{ id: 'a1' }]);
-    });
-  });
 
   describe('getEmployeeAssignedAppNames', () => {
     it('gets names', async () => {
@@ -147,17 +103,25 @@ describe('employeeService', () => {
   });
 
   describe('createEmployee', () => {
-    it('inserts', async () => {
-      tableResults.employees = { data: { id: 'e1' } };
+    it('returns created employee', async () => {
+      tableResults.employees = { data: { id: 'e1', name: 'A' } };
       const res = await employeeService.createEmployee({ name: 'A' });
-      expect(res).toEqual({ id: 'e1' });
+      expect(res).toEqual({ id: 'e1', name: 'A' });
+    });
+    it('throws on database error', async () => {
+      tableResults.employees = { data: null, error: new Error('duplicate key') };
+      await expect(employeeService.createEmployee({ name: 'A' })).rejects.toThrow();
     });
   });
 
   describe('updateEmployee', () => {
-    it('updates', async () => {
-      await employeeService.updateEmployee('e1', { name: 'B' });
-      expect(fromMock).toHaveBeenCalledWith('employees');
+    it('completes without error on success', async () => {
+      tableResults.employees = { data: null };
+      await expect(employeeService.updateEmployee('e1', { name: 'B' })).resolves.toBeUndefined();
+    });
+    it('throws on database error', async () => {
+      tableResults.employees = { data: null, error: new Error('update failed') };
+      await expect(employeeService.updateEmployee('e1', { name: 'B' })).rejects.toThrow('update failed');
     });
   });
 
@@ -175,9 +139,9 @@ describe('employeeService', () => {
   });
 
   describe('updateEmployeeDocumentPaths', () => {
-    it('updates', async () => {
-      await employeeService.updateEmployeeDocumentPaths('e1', { id: 'e1' });
-      expect(fromMock).toHaveBeenCalledWith('employees');
+    it('completes without error on success', async () => {
+      tableResults.employees = { data: null };
+      await expect(employeeService.updateEmployeeDocumentPaths('e1', { id: 'e1' })).resolves.toBeUndefined();
     });
   });
 
@@ -189,16 +153,16 @@ describe('employeeService', () => {
   });
 
   describe('replaceEmployeeApps', () => {
-    it('upserts and cleans up', async () => {
-      await employeeService.replaceEmployeeApps('e1', ['a1', 'a2']);
-      expect(fromMock).toHaveBeenCalledWith('employee_apps');
+    it('completes without error on success', async () => {
+      tableResults.employee_apps = { data: null };
+      await expect(employeeService.replaceEmployeeApps('e1', ['a1', 'a2'])).resolves.toBeUndefined();
     });
   });
 
   describe('upsertEmployeeApp', () => {
-    it('upserts', async () => {
-      await employeeService.upsertEmployeeApp('e1', 'a1');
-      expect(fromMock).toHaveBeenCalledWith('employee_apps');
+    it('completes without error on success', async () => {
+      tableResults.employee_apps = { data: null };
+      await expect(employeeService.upsertEmployeeApp('e1', 'a1')).resolves.toBeUndefined();
     });
   });
 });

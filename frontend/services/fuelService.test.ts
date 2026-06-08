@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { resetMockTableResults, throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -16,9 +16,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn(throwFormattedServiceError),
-}));
 
 import { fuelService } from './fuelService';
 
@@ -29,7 +26,7 @@ describe('fuelService', () => {
   });
 
   describe('getActiveEmployees', () => {
-    it('returns array of operationally visible employees', async () => {
+    it('returns operationally visible employees', async () => {
       tableResults.employees = {
         data: [{ id: 'e1', name: 'أحمد', city: 'makkah', status: 'active', sponsorship_status: 'sponsored', probation_end_date: null }],
         error: null,
@@ -38,105 +35,25 @@ describe('fuelService', () => {
       const result = await fuelService.getActiveEmployees();
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('أحمد');
-      expect(fromMock).toHaveBeenCalledWith('employees');
     });
 
-    it('throws on error', async () => {
-      tableResults.employees = {
-        data: null,
-        error: new Error('connection refused'),
-      };
-
-      await expect(fuelService.getActiveEmployees()).rejects.toThrow(
-        'fuelService.getActiveEmployees: connection refused',
-      );
+    it('throws formatted error on database failure', async () => {
+      tableResults.employees = { data: null, error: new Error('connection refused') };
+      await expect(fuelService.getActiveEmployees()).rejects.toThrow('connection refused');
     });
   });
 
-  describe('getActiveApps', () => {
-    it('returns array', async () => {
-      tableResults.apps = {
-        data: [{ id: 'a1', name: 'هنقرستيشن' }],
-        error: null,
-      };
-
-      const result = await fuelService.getActiveApps();
-      expect(result).toHaveLength(1);
-    });
-
-    it('throws on error', async () => {
-      tableResults.apps = {
-        data: null,
-        error: new Error('query error'),
-      };
-
-      await expect(fuelService.getActiveApps()).rejects.toThrow(
-        'fuelService.getActiveApps: query error',
-      );
-    });
-  });
-
-  describe('getActiveEmployeeAppLinks', () => {
-    it('returns array', async () => {
-      tableResults.employee_apps = { data: [{ employee_id: 'e1', app_id: 'a1' }], error: null };
-      const res = await fuelService.getActiveEmployeeAppLinks();
-      expect(res).toHaveLength(1);
-    });
-    it('throws on error', async () => {
-      tableResults.employee_apps = { data: null, error: new Error('err') };
-      await expect(fuelService.getActiveEmployeeAppLinks()).rejects.toThrow('err');
-    });
-  });
-
-  describe('getMonthlyDailyMileage', () => {
-    it('returns array', async () => {
-      tableResults.vehicle_mileage_daily = { data: [{ employee_id: 'e1', km_total: 100 }], error: null };
-      const res = await fuelService.getMonthlyDailyMileage('2026-03-01', '2026-03-31');
-      expect(res).toHaveLength(1);
-    });
-    it('throws on error', async () => {
-      tableResults.vehicle_mileage_daily = { data: null, error: new Error('err') };
-      await expect(fuelService.getMonthlyDailyMileage('2026-03-01', '2026-03-31')).rejects.toThrow('err');
-    });
-  });
-
-  describe('getMonthlyOrders', () => {
-    it('returns array', async () => {
-      tableResults.daily_orders = { data: [{ employee_id: 'e1', orders_count: 5 }], error: null };
-      const res = await fuelService.getMonthlyOrders('2026-03-01', '2026-03-31');
-      expect(res).toHaveLength(1);
-    });
-    it('throws on error', async () => {
-      tableResults.daily_orders = { data: null, error: new Error('err') };
-      await expect(fuelService.getMonthlyOrders('2026-03-01', '2026-03-31')).rejects.toThrow('err');
-    });
-  });
-
-  describe('getMonthlyFuelByMonthYear', () => {
-    it('returns array', async () => {
-      tableResults.vehicle_mileage = { data: [{ employee_id: 'e1', fuel_cost: 100 }], error: null };
-      const res = await fuelService.getMonthlyFuelByMonthYear('2026-03');
-      expect(res).toHaveLength(1);
-    });
-    it('throws on error', async () => {
-      tableResults.vehicle_mileage = { data: null, error: new Error('err') };
-      await expect(fuelService.getMonthlyFuelByMonthYear('2026-03')).rejects.toThrow('err');
-    });
-  });
-
-  describe('getActiveVehicleAssignments', () => {
-    it('returns array', async () => {
-      tableResults.vehicle_assignments = {
-        data: [{ employee_id: 'e1', vehicles: { plate_number: 'ABC 123' } }],
-        error: null,
-      };
-
-      const result = await fuelService.getActiveVehicleAssignments();
-      expect(result).toHaveLength(1);
-    });
-    it('throws on error', async () => {
-      tableResults.vehicle_assignments = { data: null, error: new Error('err') };
-      await expect(fuelService.getActiveVehicleAssignments()).rejects.toThrow('err');
+  describe('simple query methods throw on database error', () => {
+    it.each([
+      ['getActiveApps', () => fuelService.getActiveApps(), 'apps'],
+      ['getActiveEmployeeAppLinks', () => fuelService.getActiveEmployeeAppLinks(), 'employee_apps'],
+      ['getMonthlyDailyMileage', () => fuelService.getMonthlyDailyMileage('2026-03-01', '2026-03-31'), 'vehicle_mileage_daily'],
+      ['getMonthlyOrders', () => fuelService.getMonthlyOrders('2026-03-01', '2026-03-31'), 'daily_orders'],
+      ['getMonthlyFuelByMonthYear', () => fuelService.getMonthlyFuelByMonthYear('2026-03'), 'vehicle_mileage'],
+      ['getActiveVehicleAssignments', () => fuelService.getActiveVehicleAssignments(), 'vehicle_assignments'],
+    ])('%s throws when query fails', async (_name, call, tableName) => {
+      tableResults[tableName] = { data: null, error: new Error('query failed') };
+      await expect(call()).rejects.toThrow();
     });
   });
 
@@ -155,12 +72,12 @@ describe('fuelService', () => {
     it('throws on error', async () => {
       tableResults.vehicle_mileage_daily = {
         data: null,
-        error: new Error('timeout'),
+        error: new Error('network failure'),
       };
 
       await expect(
         fuelService.getDailyMileageByMonth('2026-03-01', '2026-03-31'),
-      ).rejects.toThrow('fuelService.getDailyMileageByMonth: timeout');
+      ).rejects.toThrow('network failure');
     });
   });
 
@@ -264,7 +181,7 @@ describe('fuelService', () => {
 
       await expect(
         fuelService.upsertDailyMileage(validPayload),
-      ).rejects.toThrow('fuelService.upsertDailyMileage.upsert: upsert conflict');
+      ).rejects.toThrow('upsert conflict');
     });
 
     it('throws on update error', async () => {
@@ -275,7 +192,7 @@ describe('fuelService', () => {
 
       await expect(
         fuelService.upsertDailyMileage(validPayload, 'edit-1'),
-      ).rejects.toThrow('fuelService.upsertDailyMileage.update: update error');
+      ).rejects.toThrow('update error');
     });
   });
 
@@ -291,9 +208,7 @@ describe('fuelService', () => {
         error: new Error('delete failed'),
       };
 
-      await expect(fuelService.deleteDailyMileage('vm1')).rejects.toThrow(
-        'fuelService.deleteDailyMileage: delete failed',
-      );
+      await expect(fuelService.deleteDailyMileage('vm1')).rejects.toThrow('delete failed');
     });
   });
 

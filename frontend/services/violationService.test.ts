@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { formatServiceError, resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -14,9 +14,6 @@ vi.mock('@services/supabase/client', () => ({
   supabase: { from: fromMock },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn(formatServiceError),
-}));
 
 import { violationService } from './violationService';
 
@@ -41,7 +38,7 @@ describe('violationService', () => {
 
     it('throws on Supabase error', async () => {
       tableResults.external_deductions = { data: null, error: new Error('rls') };
-      await expect(violationService.getViolations()).rejects.toThrow('violationService.getViolations: rls');
+      await expect(violationService.getViolations()).rejects.toThrow('rls');
     });
   });
 
@@ -58,8 +55,8 @@ describe('violationService', () => {
     });
 
     it('throws on Supabase error', async () => {
-      tableResults.vehicles = { data: null, error: new Error('timeout') };
-      await expect(violationService.findVehiclesByPlateQuery('x')).rejects.toThrow('violationService.findVehiclesByPlateQuery: timeout');
+      tableResults.vehicles = { data: null, error: new Error('conn refused') };
+      await expect(violationService.findVehiclesByPlateQuery('x')).rejects.toThrow('conn refused');
     });
   });
 
@@ -111,7 +108,7 @@ describe('violationService', () => {
 
     it('throws on Supabase error', async () => {
       tableResults.external_deductions = { data: null, error: new Error('fk') };
-      await expect(violationService.deleteViolation('d1')).rejects.toThrow('violationService.deleteViolation: fk');
+      await expect(violationService.deleteViolation('d1')).rejects.toThrow('fk');
     });
   });
 

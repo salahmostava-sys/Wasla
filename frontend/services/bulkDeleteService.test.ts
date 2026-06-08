@@ -23,12 +23,6 @@ vi.mock('@services/supabase/client', () => ({
   supabase: { from: fromMock },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  toServiceError: vi.fn((error: unknown, context: string) => {
-    const msg = error instanceof Error ? error.message : String(error);
-    return new Error(`${context}: ${msg}`);
-  }),
-}));
 
 import { bulkDeleteService } from './bulkDeleteService';
 
@@ -54,7 +48,7 @@ describe('bulkDeleteService', () => {
       fromMock.mockReturnValue(makeDeleteBuilder({ error: new Error('db error'), count: null }));
       await expect(
         bulkDeleteService.deleteEmployeeMonth('emp-1', '2026-03'),
-      ).rejects.toThrow('bulkDeleteService.deleteEmployeeMonth: db error');
+      ).rejects.toThrow('db error');
     });
 
     it('builds correct date range for month 2026-02', async () => {
@@ -90,7 +84,7 @@ describe('bulkDeleteService', () => {
       fromMock.mockReturnValue(makeDeleteBuilder({ error: new Error('denied'), count: null }));
       await expect(
         bulkDeleteService.deleteEmployeeAppMonth('emp-2', 'app-1', '2026-04'),
-      ).rejects.toThrow('bulkDeleteService.deleteEmployeeAppMonth: denied');
+      ).rejects.toThrow('denied');
     });
   });
 
@@ -107,10 +101,8 @@ describe('bulkDeleteService', () => {
     });
 
     it('throws on error', async () => {
-      fromMock.mockReturnValue(makeDeleteBuilder({ error: new Error('timeout'), count: null }));
-      await expect(bulkDeleteService.deleteAppMonth('app-5', '2026-06')).rejects.toThrow(
-        'bulkDeleteService.deleteAppMonth: timeout',
-      );
+      fromMock.mockReturnValue(makeDeleteBuilder({ error: new Error('conn refused'), count: null }));
+      await expect(bulkDeleteService.deleteAppMonth('app-5', '2026-06')).rejects.toThrow('conn refused');
     });
   });
 
@@ -131,9 +123,7 @@ describe('bulkDeleteService', () => {
 
     it('throws on error', async () => {
       fromMock.mockReturnValue(makeDeleteBuilder({ error: new Error('lock'), count: null }));
-      await expect(bulkDeleteService.deleteDay('2026-03-15')).rejects.toThrow(
-        'bulkDeleteService.deleteDay: lock',
-      );
+      await expect(bulkDeleteService.deleteDay('2026-03-15')).rejects.toThrow('lock');
     });
   });
 });

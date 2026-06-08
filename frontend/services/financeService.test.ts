@@ -15,12 +15,6 @@ vi.mock('@services/supabase/client', () => ({
   supabase: { from: fromMock },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn((error: unknown, context: string) => {
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
-}));
 
 import { financeService } from './financeService';
 
@@ -59,7 +53,7 @@ describe('financeService', () => {
 
     it('throws on error', async () => {
       tableResults.finance_transactions = { data: null, error: new Error('DB error') };
-      await expect(financeService.getByMonth('2026-04')).rejects.toThrow('financeService.getByMonth');
+      await expect(financeService.getByMonth('2026-04')).rejects.toThrow('DB error');
     });
   });
 
@@ -103,9 +97,7 @@ describe('financeService', () => {
 
     it('throws when getByMonth fails', async () => {
       tableResults.finance_transactions = { data: null, error: new Error('conn lost') };
-      await expect(financeService.getMonthlySummary('2026-04')).rejects.toThrow(
-        'financeService.getByMonth: conn lost',
-      );
+      await expect(financeService.getMonthlySummary('2026-04')).rejects.toThrow('conn lost');
     });
   });
 
@@ -146,7 +138,7 @@ describe('financeService', () => {
       tableResults.finance_transactions = { data: null, error: new Error('constraint violation') };
       await expect(
         financeService.create({ type: 'expense', category: 'وقود', amount: 200, month_year: '2026-04', date: '2026-04-10' }),
-      ).rejects.toThrow('financeService.create: constraint violation');
+      ).rejects.toThrow('constraint violation');
     });
   });
 
@@ -159,9 +151,7 @@ describe('financeService', () => {
 
     it('throws on update error', async () => {
       tableResults.finance_transactions = { data: null, error: new Error('locked row') };
-      await expect(financeService.update('tx-1', { amount: 0 })).rejects.toThrow(
-        'financeService.update: locked row',
-      );
+      await expect(financeService.update('tx-1', { amount: 0 })).rejects.toThrow('locked row');
     });
   });
 
@@ -173,8 +163,8 @@ describe('financeService', () => {
     });
 
     it('throws on error', async () => {
-      tableResults.finance_transactions = { data: null, error: new Error('permission denied') };
-      await expect(financeService.delete('tx-1')).rejects.toThrow('financeService.delete');
+      tableResults.finance_transactions = { data: null, error: new Error('access denied') };
+      await expect(financeService.delete('tx-1')).rejects.toThrow('access denied');
     });
   });
 });

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { resetMockTableResults, throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock, rpcMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -18,9 +18,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn(throwFormattedServiceError),
-}));
 
 import attendanceService from './attendanceService';
 
@@ -83,7 +80,7 @@ describe('attendanceService', () => {
         return createQueryBuilder(tableResults[table] ?? { data: null, error: null });
       });
 
-      await expect(attendanceService.getDailyAttendanceBase()).rejects.toThrow('attendanceService.getDailyAttendanceBase.employeesFallback: fallback error');
+      await expect(attendanceService.getDailyAttendanceBase()).rejects.toThrow('fallback error');
     });
 
     it('throws if apps query fails', async () => {
@@ -156,7 +153,7 @@ describe('attendanceService', () => {
     it('throws when query fails', async () => {
       tableResults.attendance = { data: null, error: new Error('query failed') };
       await expect(attendanceService.getAttendanceStatusRange('2026-03-01', '2026-03-31'))
-        .rejects.toThrow('attendanceService.getAttendanceStatusRange: query failed');
+        .rejects.toThrow('query failed');
     });
   });
 

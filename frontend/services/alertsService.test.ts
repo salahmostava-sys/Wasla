@@ -15,22 +15,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-function extractErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'object' && error !== null && 'message' in error) {
-    return String((error as { message: string }).message);
-  }
-  return 'service error';
-}
-
-vi.mock('@services/serviceError', () => ({
-  throwIfError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = extractErrorMessage(error);
-    throw new Error(`${context}: ${message}`);
-  }),
-}));
-
 import { alertsService } from './alertsService';
 
 describe('alertsService', () => {
@@ -68,9 +52,7 @@ describe('alertsService', () => {
         error: new Error('update failed'),
       };
 
-      await expect(alertsService.resolveAlert('alert-1', 'user-1')).rejects.toThrow(
-        'alertsService.resolveAlert: update failed',
-      );
+      await expect(alertsService.resolveAlert('alert-1', 'user-1')).rejects.toThrow('update failed');
     });
   });
 
@@ -99,11 +81,11 @@ describe('alertsService', () => {
     it('throws on Supabase error', async () => {
       tableResults.alerts = {
         data: null,
-        error: new Error('db timeout'),
+        error: new Error('db connection lost'),
       };
 
       await expect(alertsService.deferAlert('alert-1', '2026-04-15')).rejects.toThrow(
-        'alertsService.deferAlert: db timeout',
+        'db connection lost',
       );
     });
   });

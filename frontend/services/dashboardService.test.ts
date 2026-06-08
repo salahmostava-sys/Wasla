@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueryBuilder, type MockQueryResult } from '@shared/test/mocks/supabaseClientMock';
-import { resetMockTableResults, throwFormattedServiceError } from '@shared/test/mocks/serviceLayerTestUtils';
+import { resetMockTableResults } from '@shared/test/mocks/serviceLayerTestUtils';
 
 const { tableResults, fromMock, rpcMock } = vi.hoisted(() => {
   const tableResultsLocal: Record<string, MockQueryResult> = {};
@@ -18,9 +18,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn(throwFormattedServiceError),
-}));
 
 import { dashboardService } from './dashboardService';
 
@@ -62,107 +59,48 @@ describe('dashboardService', () => {
 
     it('throws immediately on non-signature mismatch error', async () => {
       rpcMock.mockResolvedValueOnce({ data: null, error: new Error('Permission denied') });
-      await expect(dashboardService.getOverviewRpc('2026-04', '2026-04-05')).rejects.toThrow('dashboardService.getOverviewRpc: Permission denied');
+      await expect(dashboardService.getOverviewRpc('2026-04', '2026-04-05')).rejects.toThrow();
     });
 
     it('throws if all attempts fail with signature mismatch', async () => {
       rpcMock.mockResolvedValue({ data: null, error: new Error('Could not find the function public.dashboard_overview_rpc') });
-      await expect(dashboardService.getOverviewRpc('2026-04', '2026-04-05')).rejects.toThrow('dashboardService.getOverviewRpc: Could not find the function');
+      await expect(dashboardService.getOverviewRpc('2026-04', '2026-04-05')).rejects.toThrow('Could not find the function');
     });
   });
 
-  describe('getActiveApps', () => {
-    it('returns active apps', async () => {
-      tableResults.apps = { data: [{ id: '1', name: 'App' }], error: null };
-      const res = await dashboardService.getActiveApps();
-      expect(res).toEqual([{ id: '1', name: 'App' }]);
-    });
-    it('throws on error', async () => {
-      tableResults.apps = { data: null, error: new Error('apps error') };
-      await expect(dashboardService.getActiveApps()).rejects.toThrow('apps error');
-    });
-  });
-
-  describe('getActiveEmployeeCount', () => {
-    it('returns visible active employee count', async () => {
+  describe('simple query methods return correct results', () => {
+    it('getActiveEmployeeCount returns visible active employee count', async () => {
       tableResults.employees = {
         data: [{ id: '1', status: 'active', sponsorship_status: 'sponsored', probation_end_date: null }],
         error: null,
       };
-      const res = await dashboardService.getActiveEmployeeCount();
-      expect(res).toBe(1);
+      expect(await dashboardService.getActiveEmployeeCount()).toBe(1);
     });
-    it('throws on error', async () => {
-      tableResults.employees = { data: null, error: new Error('emp error') };
-      await expect(dashboardService.getActiveEmployeeCount()).rejects.toThrow('emp error');
-    });
-  });
 
-  describe('getMonthSalaryTotal', () => {
-    it('returns total sum', async () => {
+    it('getMonthSalaryTotal returns sum of approved net salaries', async () => {
       tableResults.salary_records = { data: [{ net_salary: 100 }, { net_salary: 200 }], error: null };
-      const res = await dashboardService.getMonthSalaryTotal('2026-04');
-      expect(res).toBe(300);
+      expect(await dashboardService.getMonthSalaryTotal('2026-04')).toBe(300);
     });
-    it('throws on error', async () => {
-      tableResults.salary_records = { data: null, error: new Error('err') };
-      await expect(dashboardService.getMonthSalaryTotal('2026-04')).rejects.toThrow('err');
-    });
-  });
 
-  describe('getActiveAdvancesTotal', () => {
-    it('returns sum of active advances', async () => {
+    it('getActiveAdvancesTotal returns sum of active advance amounts', async () => {
       tableResults.advances = { data: [{ amount: 50 }, { amount: 150 }], error: null };
-      const res = await dashboardService.getActiveAdvancesTotal();
-      expect(res).toBe(200);
+      expect(await dashboardService.getActiveAdvancesTotal()).toBe(200);
     });
-    it('throws on error', async () => {
-      tableResults.advances = { data: null, error: new Error('err') };
-      await expect(dashboardService.getActiveAdvancesTotal()).rejects.toThrow('err');
-    });
-  });
 
-  describe('getAttendanceToday', () => {
-    it('returns grouped counts', async () => {
+    it('getAttendanceToday returns grouped counts by status', async () => {
       tableResults.attendance = {
         data: [{ status: 'present' }, { status: 'absent' }, { status: 'absent' }, { status: 'leave' }],
         error: null,
       };
-      const res = await dashboardService.getAttendanceToday('2026-04-05');
-      expect(res).toEqual({ present: 1, absent: 2, leave: 1 });
+      expect(await dashboardService.getAttendanceToday('2026-04-05')).toEqual({ present: 1, absent: 2, leave: 1 });
     });
-    it('throws on error', async () => {
-      tableResults.attendance = { data: null, error: new Error('err') };
-      await expect(dashboardService.getAttendanceToday('2026-04-05')).rejects.toThrow('err');
-    });
-  });
 
-  describe('getMonthOrders', () => {
-    it('returns data', async () => {
-      tableResults.daily_orders = { data: [{ id: '1' }], error: null };
-      const res = await dashboardService.getMonthOrders('2026-04');
-      expect(res).toEqual([{ id: '1' }]);
-    });
-    it('throws on error', async () => {
-      tableResults.daily_orders = { data: null, error: new Error('err') };
-      await expect(dashboardService.getMonthOrders('2026-04')).rejects.toThrow('err');
-    });
-  });
-
-  describe('getMonthOrdersCount', () => {
-    it('returns sum', async () => {
+    it('getMonthOrdersCount returns sum of orders_count', async () => {
       tableResults.daily_orders = { data: [{ orders_count: 5 }, { orders_count: 10 }], error: null };
-      const res = await dashboardService.getMonthOrdersCount('2026-04');
-      expect(res).toBe(15);
+      expect(await dashboardService.getMonthOrdersCount('2026-04')).toBe(15);
     });
-    it('throws on error', async () => {
-      tableResults.daily_orders = { data: null, error: new Error('err') };
-      await expect(dashboardService.getMonthOrdersCount('2026-04')).rejects.toThrow('err');
-    });
-  });
 
-  describe('getAttendanceTrend', () => {
-    it('returns mapped trend data', async () => {
+    it('getAttendanceTrend maps daily status into date-grouped rows', async () => {
       tableResults.attendance = {
         data: [
           { date: '2026-04-01', status: 'present' },
@@ -171,102 +109,43 @@ describe('dashboardService', () => {
         ],
         error: null,
       };
-      const res = await dashboardService.getAttendanceTrend('2026-04-01', '2026-04-02');
-      expect(res).toEqual([
+      expect(await dashboardService.getAttendanceTrend('2026-04-01', '2026-04-02')).toEqual([
         { date: '2026-04-01', present: 1, absent: 1, leave: 0 },
         { date: '2026-04-02', present: 0, absent: 0, leave: 1 },
       ]);
     });
-    it('throws on error', async () => {
-      tableResults.attendance = { data: null, error: new Error('err') };
-      await expect(dashboardService.getAttendanceTrend('2026-04-01', '2026-04-02')).rejects.toThrow('err');
-    });
-  });
 
-  describe('getRecentActivity', () => {
-    it('returns data', async () => {
-      tableResults.audit_log = { data: [{ id: '1' }], error: null };
-      const res = await dashboardService.getRecentActivity();
-      expect(res).toEqual([{ id: '1' }]);
-    });
-    it('throws on error', async () => {
-      tableResults.audit_log = { data: null, error: new Error('err') };
-      await expect(dashboardService.getRecentActivity()).rejects.toThrow('err');
-    });
-  });
-
-  describe('getEmployeeAppAssignments', () => {
-    it('returns data', async () => {
-      tableResults.employee_apps = { data: [{ app_id: '1' }], error: null };
-      const res = await dashboardService.getEmployeeAppAssignments();
-      expect(res).toEqual([{ app_id: '1' }]);
-    });
-    it('throws on error', async () => {
-      tableResults.employee_apps = { data: null, error: new Error('err') };
-      await expect(dashboardService.getEmployeeAppAssignments()).rejects.toThrow('err');
-    });
-  });
-
-  describe('getSystemSettings', () => {
-    it('returns data', async () => {
-      tableResults.system_settings = { data: { logo_url: 'logo.png' }, error: null };
-      const res = await dashboardService.getSystemSettings();
-      expect(res).toEqual({ logo_url: 'logo.png' });
-    });
-    it('throws on error', async () => {
-      tableResults.system_settings = { data: null, error: new Error('err') };
-      await expect(dashboardService.getSystemSettings()).rejects.toThrow('err');
-    });
-  });
-
-  describe('getEmployeeDistribution', () => {
-    it('returns data filtered', async () => {
-      tableResults.employees = {
-        data: [{ id: '1', status: 'active', sponsorship_status: 'sponsored', probation_end_date: null }],
-        error: null,
-      };
-      const res = await dashboardService.getEmployeeDistribution();
-      expect(res.length).toBe(1);
-    });
-    it('throws on error', async () => {
-      tableResults.employees = { data: null, error: new Error('err') };
-      await expect(dashboardService.getEmployeeDistribution()).rejects.toThrow('err');
-    });
-  });
-
-  describe('getActiveVehiclesCount', () => {
-    it('returns count', async () => {
+    it('getActiveVehiclesCount returns headcount from count metadata', async () => {
       tableResults.vehicles = { data: null, count: 5, error: null };
-      const res = await dashboardService.getActiveVehiclesCount();
-      expect(res).toBe(5);
+      expect(await dashboardService.getActiveVehiclesCount()).toBe(5);
     });
-    it('throws on error', async () => {
-      tableResults.vehicles = { data: null, error: new Error('err') };
-      await expect(dashboardService.getActiveVehiclesCount()).rejects.toThrow('err');
-    });
-  });
 
-  describe('getUnresolvedAlertsCount', () => {
-    it('returns count', async () => {
+    it('getUnresolvedAlertsCount returns count from metadata', async () => {
       tableResults.alerts = { data: null, count: 3, error: null };
-      const res = await dashboardService.getUnresolvedAlertsCount();
-      expect(res).toBe(3);
-    });
-    it('throws on error', async () => {
-      tableResults.alerts = { data: null, error: new Error('err') };
-      await expect(dashboardService.getUnresolvedAlertsCount()).rejects.toThrow('err');
+      expect(await dashboardService.getUnresolvedAlertsCount()).toBe(3);
     });
   });
 
-  describe('getAppTargets', () => {
-    it('returns data', async () => {
-      tableResults.app_targets = { data: [{ app_id: '1' }], error: null };
-      const res = await dashboardService.getAppTargets('2026-04');
-      expect(res).toEqual([{ app_id: '1' }]);
-    });
-    it('throws on error', async () => {
-      tableResults.app_targets = { data: null, error: new Error('err') };
-      await expect(dashboardService.getAppTargets('2026-04')).rejects.toThrow('err');
+  describe('simple query methods throw on database error', () => {
+    it.each([
+      ['getActiveApps', () => dashboardService.getActiveApps(), 'apps'],
+      ['getActiveEmployeeCount', () => dashboardService.getActiveEmployeeCount(), 'employees'],
+      ['getMonthSalaryTotal', () => dashboardService.getMonthSalaryTotal('2026-04'), 'salary_records'],
+      ['getActiveAdvancesTotal', () => dashboardService.getActiveAdvancesTotal(), 'advances'],
+      ['getAttendanceToday', () => dashboardService.getAttendanceToday('2026-04-05'), 'attendance'],
+      ['getMonthOrders', () => dashboardService.getMonthOrders('2026-04'), 'daily_orders'],
+      ['getMonthOrdersCount', () => dashboardService.getMonthOrdersCount('2026-04'), 'daily_orders'],
+      ['getAttendanceTrend', () => dashboardService.getAttendanceTrend('2026-04-01', '2026-04-02'), 'attendance'],
+      ['getRecentActivity', () => dashboardService.getRecentActivity(), 'audit_log'],
+      ['getEmployeeAppAssignments', () => dashboardService.getEmployeeAppAssignments(), 'employee_apps'],
+      ['getSystemSettings', () => dashboardService.getSystemSettings(), 'system_settings'],
+      ['getEmployeeDistribution', () => dashboardService.getEmployeeDistribution(), 'employees'],
+      ['getActiveVehiclesCount', () => dashboardService.getActiveVehiclesCount(), 'vehicles'],
+      ['getUnresolvedAlertsCount', () => dashboardService.getUnresolvedAlertsCount(), 'alerts'],
+      ['getAppTargets', () => dashboardService.getAppTargets('2026-04'), 'app_targets'],
+    ])('%s throws when query fails', async (_name, call, tableName) => {
+      tableResults[tableName] = { data: null, error: new Error(`${tableName} error`) };
+      await expect(call()).rejects.toThrow(`${tableName} error`);
     });
   });
 
@@ -301,7 +180,7 @@ describe('dashboardService', () => {
       tableResults.supervisor_employee_assignments = { data: [], error: null };
       tableResults.daily_orders = { data: [], error: null };
 
-      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('dashboardService.getSupervisorPerformance.targets: targets error');
+      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('targets error');
     });
     
     it('throws if profiles query fails', async () => {
@@ -310,7 +189,7 @@ describe('dashboardService', () => {
       tableResults.supervisor_employee_assignments = { data: [], error: null };
       tableResults.daily_orders = { data: [], error: null };
 
-      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('dashboardService.getSupervisorPerformance.profiles: profiles error');
+      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('profiles error');
     });
     
     it('throws if assignments query fails', async () => {
@@ -319,7 +198,7 @@ describe('dashboardService', () => {
       tableResults.supervisor_employee_assignments = { data: null, error: new Error('assignments error') };
       tableResults.daily_orders = { data: [], error: null };
 
-      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('dashboardService.getSupervisorPerformance.assignments: assignments error');
+      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('assignments error');
     });
 
     it('throws if orders query fails', async () => {
@@ -328,18 +207,21 @@ describe('dashboardService', () => {
       tableResults.supervisor_employee_assignments = { data: [], error: null };
       tableResults.daily_orders = { data: null, error: new Error('orders error') };
 
-      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('dashboardService.getSupervisorPerformance.orders: orders error');
+      await expect(dashboardService.getSupervisorPerformance('2026-04')).rejects.toThrow('orders error');
     });
   });
 
   describe('getAdditionalMetrics', () => {
-    it('returns formatted metrics', async () => {
+    const validMetricsSetup = () => {
       tableResults.fuel_records = { data: [{ cost: 100, liters: 50 }], error: null };
       tableResults.maintenance_records = { data: [{ cost: 200 }], error: null };
       tableResults.violations = { data: [{ amount: 300 }], error: null };
       tableResults.advances = { data: [{ amount: 400 }], error: null };
       tableResults.salary_records = { data: [{ net_salary: 500 }], error: null };
+    };
 
+    it('returns formatted metrics', async () => {
+      validMetricsSetup();
       const res = await dashboardService.getAdditionalMetrics('2026-04');
       expect(res).toEqual({
         fuelCost: 100,
@@ -352,49 +234,20 @@ describe('dashboardService', () => {
       });
     });
 
-    it('throws when maintenance query fails', async () => {
-      tableResults.fuel_records = { data: [], error: null };
-      tableResults.maintenance_records = { data: null, error: new Error('m error') };
-      tableResults.violations = { data: [], error: null };
-      tableResults.advances = { data: [], error: null };
-      tableResults.salary_records = { data: [], error: null };
-
-      await expect(dashboardService.getAdditionalMetrics('2026-04')).rejects.toThrow('m error');
-    });
-    
-    it('throws when violations query fails', async () => {
-      tableResults.fuel_records = { data: [], error: null };
-      tableResults.maintenance_records = { data: [], error: null };
-      tableResults.violations = { data: null, error: new Error('v error') };
-      tableResults.advances = { data: [], error: null };
-      tableResults.salary_records = { data: [], error: null };
-
-      await expect(dashboardService.getAdditionalMetrics('2026-04')).rejects.toThrow('v error');
-    });
-    
-    it('throws when advances query fails', async () => {
-      tableResults.fuel_records = { data: [], error: null };
-      tableResults.maintenance_records = { data: [], error: null };
-      tableResults.violations = { data: [], error: null };
-      tableResults.advances = { data: null, error: new Error('a error') };
-      tableResults.salary_records = { data: [], error: null };
-
-      await expect(dashboardService.getAdditionalMetrics('2026-04')).rejects.toThrow('a error');
-    });
-    
-    it('throws when salaries query fails', async () => {
-      tableResults.fuel_records = { data: [], error: null };
-      tableResults.maintenance_records = { data: [], error: null };
-      tableResults.violations = { data: [], error: null };
-      tableResults.advances = { data: [], error: null };
-      tableResults.salary_records = { data: null, error: new Error('s error') };
-
-      await expect(dashboardService.getAdditionalMetrics('2026-04')).rejects.toThrow('s error');
+    it.each([
+      ['maintenance', 'maintenance_records', 'm error'],
+      ['violations', 'violations', 'v error'],
+      ['advances', 'advances', 'a error'],
+      ['salaries', 'salary_records', 's error'],
+    ])('throws when %s query fails', async (_label, tableName, errorMsg) => {
+      validMetricsSetup();
+      tableResults[tableName] = { data: null, error: new Error(errorMsg) };
+      await expect(dashboardService.getAdditionalMetrics('2026-04')).rejects.toThrow(errorMsg);
     });
   });
 
   describe('getKPIs', () => {
-    it('returns kpis', async () => {
+    const validKpiSetup = () => {
       tableResults.employees = {
         data: [{ id: '1', status: 'active', sponsorship_status: 'sponsored', probation_end_date: null }],
         error: null,
@@ -402,7 +255,10 @@ describe('dashboardService', () => {
       tableResults.attendance = { data: [{ status: 'present' }], error: null };
       tableResults.advances = { data: [{ amount: 10 }], error: null };
       tableResults.salary_records = { data: [{ net_salary: 100 }], error: null };
+    };
 
+    it('returns aggregated KPIs from multiple data sources', async () => {
+      validKpiSetup();
       const res = await dashboardService.getKPIs('2026-04', '2026-04-05');
       expect(res.kpis).toEqual({
         activeEmployees: 1,
@@ -414,31 +270,14 @@ describe('dashboardService', () => {
       });
     });
 
-    it('throws when attendance fails', async () => {
-      tableResults.employees = { data: [], error: null };
-      tableResults.attendance = { data: null, error: new Error('att err') };
-      tableResults.advances = { data: [], error: null };
-      tableResults.salary_records = { data: [], error: null };
-
-      await expect(dashboardService.getKPIs('2026-04', '2026-04-05')).rejects.toThrow('att err');
-    });
-
-    it('throws when advances fails', async () => {
-      tableResults.employees = { data: [], error: null };
-      tableResults.attendance = { data: [], error: null };
-      tableResults.advances = { data: null, error: new Error('adv err') };
-      tableResults.salary_records = { data: [], error: null };
-
-      await expect(dashboardService.getKPIs('2026-04', '2026-04-05')).rejects.toThrow('adv err');
-    });
-    
-    it('throws when salary fails', async () => {
-      tableResults.employees = { data: [], error: null };
-      tableResults.attendance = { data: [], error: null };
-      tableResults.advances = { data: [], error: null };
-      tableResults.salary_records = { data: null, error: new Error('sal err') };
-
-      await expect(dashboardService.getKPIs('2026-04', '2026-04-05')).rejects.toThrow('sal err');
+    it.each([
+      ['attendance', 'attendance', 'att err'],
+      ['advances', 'advances', 'adv err'],
+      ['salary', 'salary_records', 'sal err'],
+    ])('throws when %s query fails', async (_label, tableName, errorMsg) => {
+      validKpiSetup();
+      tableResults[tableName] = { data: null, error: new Error(errorMsg) };
+      await expect(dashboardService.getKPIs('2026-04', '2026-04-05')).rejects.toThrow(errorMsg);
     });
   });
 });

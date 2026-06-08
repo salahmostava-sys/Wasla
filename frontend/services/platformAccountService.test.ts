@@ -10,13 +10,6 @@ vi.mock('@services/supabase/client', () => ({
   },
 }));
 
-vi.mock('@services/serviceError', () => ({
-  handleSupabaseError: vi.fn((error: unknown, context: string) => {
-    if (!error) return;
-    const message = error instanceof Error ? error.message : 'service error';
-    throw new Error(`${context}: ${message}`);
-  }),
-}));
 
 vi.mock('@shared/lib/employeeVisibility', () => ({
   filterOperationallyVisibleEmployees: vi.fn((emps: unknown[]) => emps),
