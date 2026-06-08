@@ -114,7 +114,7 @@ describe('attendanceService', () => {
   });
 
   describe('checkIn', () => {
-    it('calls rpc', async () => {
+    it('returns check-in result', async () => {
       rpcMock.mockResolvedValue({ data: { success: true }, error: null });
       const res = await attendanceService.checkIn('emp-1');
       expect(res).toEqual({ success: true });
@@ -127,7 +127,7 @@ describe('attendanceService', () => {
   });
 
   describe('checkOut', () => {
-    it('calls rpc', async () => {
+    it('returns check-out result', async () => {
       rpcMock.mockResolvedValue({ data: { success: true }, error: null });
       const res = await attendanceService.checkOut('emp-1');
       expect(res).toEqual({ success: true });

@@ -185,7 +185,7 @@ describe('salaryService', () => {
   });
 
   describe('calculateSalaryForEmployeeMonth', () => {
-    it('calls the edge function', async () => {
+    it('returns salary calculation for employee month', async () => {
       getSessionMock.mockResolvedValue({ data: { session: { access_token: 'fake-token' } } });
       invokeMock.mockResolvedValue({ data: { net_salary: 1000 }, error: null });
 
@@ -211,7 +211,7 @@ describe('salaryService', () => {
   });
 
   describe('calculateSalaryForMonth', () => {
-    it('calls edge function', async () => {
+    it('returns monthly salary calculation', async () => {
       getSessionMock.mockResolvedValue({ data: { session: { access_token: 'tk' } } });
       invokeMock.mockResolvedValue({ data: { success: true }, error: null });
       const res = await salaryService.calculateSalaryForMonth({ monthYear: '2024-05', paymentMethod: 'bank' });
@@ -223,7 +223,7 @@ describe('salaryService', () => {
   });
 
   describe('getSalaryPreviewForMonth', () => {
-    it('calls edge function', async () => {
+    it('returns salary preview data', async () => {
       getSessionMock.mockResolvedValue({ data: { session: { access_token: 'tk' } } });
       invokeMock.mockResolvedValue({ data: [{ eId: 'e1' }], error: null });
       const res = await salaryService.getSalaryPreviewForMonth('2024-05');

@@ -184,7 +184,7 @@ describe('settingsHubService', () => {
   });
 
   describe('updatePassword', () => {
-    it('calls authService', async () => {
+    it('delegates password update to auth service', async () => {
       await settingsHubService.updatePassword('password');
       expect(updatePasswordMock).toHaveBeenCalledWith('password');
     });

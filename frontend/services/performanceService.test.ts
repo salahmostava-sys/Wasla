@@ -113,7 +113,7 @@ describe('performanceService', () => {
   });
 
   describe('captureSalaryMonthSnapshot', () => {
-    it('forwards salary snapshot capture to the backend rpc', async () => {
+    it('captures salary month snapshot', async () => {
       rpcMock.mockResolvedValueOnce({
         data: { month_year: '2026-04', records_count: 3 },
         error: null,
