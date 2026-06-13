@@ -29,18 +29,17 @@ describe('vehicleService', () => {
     tableMocks = {};
     fromMock.mockImplementation((table: string) => {
       const mockObj = tableMocks[table] ?? { data: null, error: null };
-      return {
-        select: vi.fn().mockReturnThis(),
-        insert: vi.fn().mockReturnThis(),
-        update: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        is: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue(mockObj),
-        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
-      };
+      const p: any = Promise.resolve(mockObj);
+              p.select = vi.fn().mockReturnValue(p);
+              p.insert = vi.fn().mockReturnValue(p);
+              p.update = vi.fn().mockReturnValue(p);
+              p.delete = vi.fn().mockReturnValue(p);
+              p.eq = vi.fn().mockReturnValue(p);
+              p.is = vi.fn().mockReturnValue(p);
+              p.order = vi.fn().mockReturnValue(p);
+              p.limit = vi.fn().mockReturnValue(p);
+              p.single = vi.fn().mockResolvedValue(mockObj);
+              return p;
     });
   });
 
@@ -67,11 +66,10 @@ describe('vehicleService', () => {
              limit: vi.fn().mockResolvedValue({ data: [{ id: 'v1' }], error: null })
            };
         }
-        return {
-           select: vi.fn().mockReturnThis(),
-           is: vi.fn().mockReturnThis(),
-           then: (resolve: any) => Promise.resolve({ data: [{ vehicle_id: 'v1', employees: { name: 'emp' } }], error: null }).then(resolve)
-        };
+        const p: any = Promise.resolve({ data: [{ vehicle_id: 'v1', employees: { name: 'emp' } }], error: null });
+                p.select = vi.fn().mockReturnValue(p);
+                p.is = vi.fn().mockReturnValue(p);
+                return p;
       });
       const res = await vehicleService.getAllWithCurrentRider();
       expect(res).toEqual([{ id: 'v1', current_rider: 'emp' }]);

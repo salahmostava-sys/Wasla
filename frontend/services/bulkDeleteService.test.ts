@@ -4,17 +4,13 @@ type DeleteResult = { error: unknown; count: number | null };
 
 function makeDeleteBuilder(result: DeleteResult) {
   const settled = Promise.resolve(result);
-  const b = {
-    delete: vi.fn(() => b),
-    eq: vi.fn(() => b),
-    gte: vi.fn(() => b),
-    lte: vi.fn(() => b),
-    in: vi.fn(() => b),
-    then: settled.then.bind(settled),
-    catch: settled.catch.bind(settled),
-    finally: settled.finally.bind(settled),
-  };
-  return b;
+  const p: any = Promise.resolve(result);
+    p.delete = vi.fn(() => p);
+    p.eq = vi.fn(() => p);
+    p.gte = vi.fn(() => p);
+    p.lte = vi.fn(() => p);
+    p.in = vi.fn(() => p);
+    return p;
 }
 
 const { fromMock } = vi.hoisted(() => ({ fromMock: vi.fn() }));

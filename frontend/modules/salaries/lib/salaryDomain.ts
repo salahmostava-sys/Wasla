@@ -114,7 +114,7 @@ const valuesMatch = (left: unknown, right: unknown) => {
     // FIX #3: Sort keys before stringify to prevent false dirty-flag from key ordering.
     // JSON.stringify({ a: 1, b: 2 }) !== JSON.stringify({ b: 2, a: 1 }) without sorting.
     const sortKeys = (v: object): string =>
-      JSON.stringify(v, Object.keys(v).sort());
+      JSON.stringify(v, Object.keys(v).sort((a, b) => a.localeCompare(b)));
     return sortKeys(left) === sortKeys(right);
   }
   return false;

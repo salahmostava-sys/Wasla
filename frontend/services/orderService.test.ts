@@ -8,38 +8,21 @@ const { fromMock, upsertMock, rpcMock, tableResults, getUserMock } = vi.hoisted(
     tableResults: tableResultsLocal,
     fromMock: vi.fn((table: string) => {
       const result = tableResultsLocal[table] ?? { data: null, error: null };
-      const chainObj = {
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        gte: vi.fn().mockReturnThis(),
-        lte: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        range: vi.fn().mockReturnThis(),
-        ilike: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn().mockReturnValue(Promise.resolve(result)),
-        single: vi.fn().mockReturnValue(Promise.resolve(result)),
-        then: (resolve: any) => Promise.resolve(result).then(resolve),
-      };
-      const queryBuilder = {
-        ...chainObj,
-        upsert: vi.fn((...args: any[]) => {
-          const val = upsertMockLocal(...args);
-          if (val !== undefined) {
-             if (val instanceof Promise) {
-               const prom = val as any;
-               prom.select = () => prom;
-               prom.single = () => prom;
-               return prom;
-             }
-             return val;
-          }
-          return chainObj;
-        }),
-      };
-      return queryBuilder;
+      const p: any = Promise.resolve(result);
+    p.select = vi.fn().mockReturnValue(p);
+    p.eq = vi.fn().mockReturnValue(p);
+    p.in = vi.fn().mockReturnValue(p);
+    p.gte = vi.fn().mockReturnValue(p);
+    p.lte = vi.fn().mockReturnValue(p);
+    p.order = vi.fn().mockReturnValue(p);
+    p.limit = vi.fn().mockReturnValue(p);
+    p.range = vi.fn().mockReturnValue(p);
+    p.ilike = vi.fn().mockReturnValue(p);
+    p.delete = vi.fn().mockReturnValue(p);
+    p.maybeSingle = vi.fn().mockReturnValue(Promise.resolve(result));
+    p.single = vi.fn().mockReturnValue(Promise.resolve(result));
+    p.upsert = vi.fn((...args: any[]) => {;
+    return p;
     }),
     upsertMock: upsertMockLocal,
     rpcMock: vi.fn(),

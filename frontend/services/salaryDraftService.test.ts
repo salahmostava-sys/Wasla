@@ -7,17 +7,13 @@ type QueryResult = {
 
 function createTrackedBuilder(result: QueryResult) {
   const settled = Promise.resolve(result);
-  const builder = {
-    select: vi.fn(() => builder),
-    upsert: vi.fn(() => builder),
-    delete: vi.fn(() => builder),
-    eq: vi.fn(() => builder),
-    in: vi.fn(() => builder),
-    then: settled.then.bind(settled),
-    catch: settled.catch.bind(settled),
-    finally: settled.finally.bind(settled),
-  };
-  return builder;
+  const p: any = Promise.resolve(result);
+    p.select = vi.fn(() => puilder);
+    p.upsert = vi.fn(() => puilder);
+    p.delete = vi.fn(() => puilder);
+    p.eq = vi.fn(() => puilder);
+    p.in = vi.fn(() => puilder);
+    return p;
 }
 
 const { fromMock, getUserMock, channelMock } = vi.hoisted(() => {

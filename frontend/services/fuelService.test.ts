@@ -103,27 +103,21 @@ describe('fuelService', () => {
     it('collects all pages and returns combined row set', async () => {
       // Page 1: full chunk of 2 rows (count=3 signals more data)
       const page1Builder = (() => {
-        const result = Promise.resolve({ data: [{ id: '1' }, { id: '2' }], error: null, count: 3 });
-        const b: any = {
-          select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(),
-          gte: vi.fn().mockReturnThis(), lte: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(), range: vi.fn().mockReturnThis(),
-          ilike: vi.fn().mockReturnThis(),
-          then: (res: any) => result.then(res),
-        };
-        return b;
+        const p: any = Promise.resolve({ data: [{ id: '1' }, { id: '2' }], error: null, count: 3 });
+        p.select = vi.fn().mockReturnValue(p); p.eq = vi.fn().mockReturnValue(p);
+        p.gte = vi.fn().mockReturnValue(p); p.lte = vi.fn().mockReturnValue(p);
+        p.order = vi.fn().mockReturnValue(p); p.range = vi.fn().mockReturnValue(p);
+        p.ilike = vi.fn().mockReturnValue(p);
+        return p;
       })();
       // Page 2: partial chunk (< chunkSize) so pagination stops
       const page2Builder = (() => {
-        const result = Promise.resolve({ data: [{ id: '3' }], error: null, count: 3 });
-        const b: any = {
-          select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(),
-          gte: vi.fn().mockReturnThis(), lte: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(), range: vi.fn().mockReturnThis(),
-          ilike: vi.fn().mockReturnThis(),
-          then: (res: any) => result.then(res),
-        };
-        return b;
+        const p: any = Promise.resolve({ data: [{ id: '3' }], error: null, count: 3 });
+        p.select = vi.fn().mockReturnValue(p); p.eq = vi.fn().mockReturnValue(p);
+        p.gte = vi.fn().mockReturnValue(p); p.lte = vi.fn().mockReturnValue(p);
+        p.order = vi.fn().mockReturnValue(p); p.range = vi.fn().mockReturnValue(p);
+        p.ilike = vi.fn().mockReturnValue(p);
+        return p;
       })();
 
       fromMock

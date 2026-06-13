@@ -33,24 +33,23 @@ describe('salaryService', () => {
     tableMocks = {};
     fromMock.mockImplementation((table: string) => {
       const mockObj = tableMocks[table] ?? { data: null, error: null };
-      return {
-        select: vi.fn().mockReturnThis(),
-        insert: vi.fn().mockReturnThis(),
-        update: vi.fn().mockReturnThis(),
-        upsert: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        or: vi.fn().mockReturnThis(),
-        gte: vi.fn().mockReturnThis(),
-        lte: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        range: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue(mockObj),
-        maybeSingle: vi.fn().mockResolvedValue(mockObj),
-        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
-      };
+      const p: any = Promise.resolve(mockObj);
+              p.select = vi.fn().mockReturnValue(p);
+              p.insert = vi.fn().mockReturnValue(p);
+              p.update = vi.fn().mockReturnValue(p);
+              p.upsert = vi.fn().mockReturnValue(p);
+              p.delete = vi.fn().mockReturnValue(p);
+              p.eq = vi.fn().mockReturnValue(p);
+              p.in = vi.fn().mockReturnValue(p);
+              p.or = vi.fn().mockReturnValue(p);
+              p.gte = vi.fn().mockReturnValue(p);
+              p.lte = vi.fn().mockReturnValue(p);
+              p.order = vi.fn().mockReturnValue(p);
+              p.limit = vi.fn().mockReturnValue(p);
+              p.range = vi.fn().mockReturnValue(p);
+              p.single = vi.fn().mockResolvedValue(mockObj);
+              p.maybeSingle = vi.fn().mockResolvedValue(mockObj);
+              return p;
     });
   });
 
@@ -242,14 +241,13 @@ describe('salaryService', () => {
   describe('getPagedByMonth', () => {
     it('returns paged records', async () => {
       fromMock.mockImplementation(() => {
-        return {
-          select: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(),
-          range: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
-          or: vi.fn().mockReturnThis(),
-          then: (resolve: any) => Promise.resolve({ data: [{ id: '1' }], count: 1, error: null }).then(resolve)
-        };
+        const p: any = Promise.resolve({ data: [{ id: '1' }], count: 1, error: null });
+                p.select = vi.fn().mockReturnValue(p);
+                p.order = vi.fn().mockReturnValue(p);
+                p.range = vi.fn().mockReturnValue(p);
+                p.eq = vi.fn().mockReturnValue(p);
+                p.or = vi.fn().mockReturnValue(p);
+                return p;
       });
       const res = await salaryService.getPagedByMonth({ monthYear: '2026-03', page: 1, pageSize: 10, filters: { branch: 'makkah', search: 'x', approved: 'approved' } });
       expect(res.rows).toHaveLength(1);
@@ -260,18 +258,15 @@ describe('salaryService', () => {
     it('fetches chunked records', async () => {
       let callCount = 0;
       fromMock.mockImplementation(() => {
-        return {
-          select: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(),
-          range: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
-          or: vi.fn().mockReturnThis(),
-          then: (resolve: any) => {
-            callCount++;
-            const data = callCount === 1 ? [{ id: '1' }, { id: '2' }] : [];
-            return Promise.resolve({ data, count: 2, error: null }).then(resolve);
-          }
-        };
+        const p: any = Promise.resolve({ data, count: 2, error: null });
+                p.select = vi.fn().mockReturnValue(p);
+                p.order = vi.fn().mockReturnValue(p);
+                p.range = vi.fn().mockReturnValue(p);
+                p.eq = vi.fn().mockReturnValue(p);
+                p.or = vi.fn().mockReturnValue(p);
+                p.const data = callCount === 1 ? [{ id = '1' }, { id: '2' }] : [];;
+                p.return Promise.resolve({ data, count = 2, error: null }).then(resolve);;
+                return p;
       });
       const res = await salaryService.exportMonth({ monthYear: '2026-03', chunkSize: 2, maxRows: 4 });
       expect(res).toHaveLength(2);

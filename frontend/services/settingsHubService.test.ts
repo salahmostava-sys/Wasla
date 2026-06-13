@@ -40,22 +40,21 @@ describe('settingsHubService', () => {
     tableMocks = {};
     fromMock.mockImplementation((table: string) => {
       const mockObj = tableMocks[table] ?? { data: null, error: null };
-      return {
-        select: vi.fn().mockReturnThis(),
-        insert: vi.fn().mockReturnThis(),
-        update: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        not: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        or: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        range: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn().mockResolvedValue(mockObj),
-        single: vi.fn().mockResolvedValue(mockObj),
-        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
-      };
+      const p: any = Promise.resolve(mockObj);
+              p.select = vi.fn().mockReturnValue(p);
+              p.insert = vi.fn().mockReturnValue(p);
+              p.update = vi.fn().mockReturnValue(p);
+              p.delete = vi.fn().mockReturnValue(p);
+              p.eq = vi.fn().mockReturnValue(p);
+              p.not = vi.fn().mockReturnValue(p);
+              p.in = vi.fn().mockReturnValue(p);
+              p.or = vi.fn().mockReturnValue(p);
+              p.order = vi.fn().mockReturnValue(p);
+              p.limit = vi.fn().mockReturnValue(p);
+              p.range = vi.fn().mockReturnValue(p);
+              p.maybeSingle = vi.fn().mockResolvedValue(mockObj);
+              p.single = vi.fn().mockResolvedValue(mockObj);
+              return p;
     });
   });
 
@@ -81,14 +80,13 @@ describe('settingsHubService', () => {
   describe('getAuditLogs', () => {
     it('returns audit logs', async () => {
       fromMock.mockImplementation(() => {
-        return {
-          select: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(),
-          range: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
-          or: vi.fn().mockReturnThis(),
-          then: (resolve: any) => Promise.resolve({ data: [{ id: 1 }], count: 1, error: null }).then(resolve)
-        };
+        const p: any = Promise.resolve({ data: [{ id: 1 }], count: 1, error: null });
+                p.select = vi.fn().mockReturnValue(p);
+                p.order = vi.fn().mockReturnValue(p);
+                p.range = vi.fn().mockReturnValue(p);
+                p.eq = vi.fn().mockReturnValue(p);
+                p.or = vi.fn().mockReturnValue(p);
+                return p;
       });
       const res = await settingsHubService.getAuditLogs(0, 10, 'INSERT', 'employees', 'test', 'user-1');
       expect(res.rows).toHaveLength(1);

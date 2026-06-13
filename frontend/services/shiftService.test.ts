@@ -21,20 +21,19 @@ describe('shiftService', () => {
     tableMocks = {};
     fromMock.mockImplementation((table: string) => {
       const mockObj = tableMocks[table] ?? { data: null, error: null };
-      return {
-        select: vi.fn().mockReturnThis(),
-        insert: vi.fn().mockReturnThis(),
-        update: vi.fn().mockReturnThis(),
-        upsert: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        gte: vi.fn().mockReturnThis(),
-        lte: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue(mockObj),
-        then: (resolve: any) => Promise.resolve(mockObj).then(resolve),
-      };
+      const p: any = Promise.resolve(mockObj);
+              p.select = vi.fn().mockReturnValue(p);
+              p.insert = vi.fn().mockReturnValue(p);
+              p.update = vi.fn().mockReturnValue(p);
+              p.upsert = vi.fn().mockReturnValue(p);
+              p.delete = vi.fn().mockReturnValue(p);
+              p.eq = vi.fn().mockReturnValue(p);
+              p.gte = vi.fn().mockReturnValue(p);
+              p.lte = vi.fn().mockReturnValue(p);
+              p.order = vi.fn().mockReturnValue(p);
+              p.limit = vi.fn().mockReturnValue(p);
+              p.single = vi.fn().mockResolvedValue(mockObj);
+              return p;
     });
   });
 
