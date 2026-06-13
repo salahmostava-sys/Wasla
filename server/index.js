@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import { salaryEngineHandler, adminUpdateUserHandler, groqChatHandler, aiChatHandler } from './lib/handlers.js';
 
 const app = express();
@@ -23,12 +24,23 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow server-to-server calls (no Origin header) and listed origins
     if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error(`CORS: origin '${origin}' not in ALLOWED_ORIGINS`));
+    // FIX #10: Return false (silent deny) instead of throwing an Error.
+    // callback(new Error(...)) causes Express to emit a 500 with stack trace in logs.
+    // The browser will see a network error, which is the correct CORS behavior.
+    return callback(null, false);
   },
   credentials: true,
   allowedHeaders: ['Authorization', 'Content-Type', 'x-client-info', 'apikey'],
 }));
-app.use(express.json({ limit: '2mb' }));
+// FIX #11: helmet sets secure HTTP headers: X-Frame-Options, X-Content-Type-Options,
+// Referrer-Policy, Strict-Transport-Security, and basic CSP.
+// This protects against clickjacking, MIME-sniffing, and XSS reflected attacks.
+app.use(helmet());
+// FIX #12: 2mb is too large for most endpoints (salary IDs, chat fields).
+// Reduced to 256kb globally; AI endpoints override this per-route.
+// This prevents memory exhaustion from large payloads before auth is checked.
+app.use(express.json({ limit: '256kb' }));
+
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
@@ -39,11 +51,12 @@ app.post('/api/functions/salary-engine', salaryEngineHandler);
 // ── Admin Update User (replaces admin-update-user edge function) ──────────────
 app.post('/api/functions/admin-update-user', adminUpdateUserHandler);
 
-// ── Groq Chat (replaces groq-chat edge function) ──────────────────────────────
-app.post('/api/functions/groq-chat', groqChatHandler);
+// ── Groq Chat (replaces groq-chat edge function) — larger body for AI payloads ──
+app.post('/api/functions/groq-chat', express.json({ limit: '2mb' }), groqChatHandler);
 
-// ── AI Chat (replaces ai-chat edge function) ──────────────────────────────────
-app.post('/api/functions/ai-chat', aiChatHandler);
+// ── AI Chat (replaces ai-chat edge function) — larger body for AI payloads ──────
+app.post('/api/functions/ai-chat', express.json({ limit: '2mb' }), aiChatHandler);
+
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 

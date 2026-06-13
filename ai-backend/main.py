@@ -23,7 +23,6 @@ import os
 import time
 import hashlib
 import threading
-from collections import defaultdict
 
 from fastapi import FastAPI, Depends, Request, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -73,7 +72,10 @@ if _ENV == "production" and not AI_INTERNAL_KEY:
 
 _rate_lock = threading.Lock()
 # { ip_hash: (window_start_ts, request_count) }
-_rate_store: dict[str, tuple[float, int]] = defaultdict(lambda: (0.0, 0))
+# FIX #14: Use plain dict with .get() instead of defaultdict.
+# defaultdict auto-creates an entry on any key read, causing unbounded memory growth
+# (every unique IP hash creates a permanent entry even if it never exceeds the limit).
+_rate_store: dict[str, tuple[float, int]] = {}
 _last_rate_cleanup = 0.0
 
 
@@ -88,7 +90,10 @@ def _get_client_ip(request: Request) -> str:
         if forwarded_for:
             parts = [p.strip() for p in forwarded_for.split(",") if p.strip()]
             if parts:
-                return parts[-1]
+                # FIX #13: The LEFTMOST entry is the real client IP.
+                # Each proxy appends to the RIGHT, so parts[-1] gives the last proxy's IP.
+                # RFC 7239 / de-facto standard: take parts[0] for the originating client.
+                return parts[0]
     return peer
 
 
@@ -119,7 +124,9 @@ def check_rate_limit(request: Request) -> None:
     now = time.monotonic()
     with _rate_lock:
         _cleanup_rate_store(now)
-        window_start, count = _rate_store[ip_key]
+        # FIX #14: Use .get() with default instead of defaultdict subscript.
+        # defaultdict[key] creates a new entry even for read-only access.
+        window_start, count = _rate_store.get(ip_key, (0.0, 0))
         if now - window_start >= RATE_LIMIT_WINDOW_SECS:
             # New window
             _rate_store[ip_key] = (now, 1)
@@ -325,11 +332,23 @@ class AnomalyDetectionRequest(BaseModel):
     employee_id: str = Field(..., max_length=200)
     employee_name: str = Field(..., max_length=200)
     current_salary: float = Field(..., ge=0, le=1_000_000)
-    expected_salary_range: tuple[float, float] = Field(..., description="(min, max) expected salary")
+    # FIX #16: JSON has no tuple type — Pydantic v2 may silently drop/truncate values.
+    # Using two explicit fields is safer, self-documenting, and enables proper validation.
+    expected_salary_min: float = Field(..., ge=0, description="Minimum expected salary")
+    expected_salary_max: float = Field(..., ge=0, description="Maximum expected salary")
     monthly_orders: int = Field(..., ge=0, le=100_000)
     previous_month_orders: int = Field(..., ge=0, le=100_000)
     deductions: float = Field(0, ge=0, le=1_000_000)
     deduction_reasons: list[str] = Field(default_factory=list, max_length=50)
+
+    def model_post_init(self, __context: object) -> None:
+        # FIX #16: Validate that min <= max to catch inverted ranges early.
+        if self.expected_salary_min > self.expected_salary_max:
+            raise ValueError(
+                f"expected_salary_min ({self.expected_salary_min}) must be "
+                f"<= expected_salary_max ({self.expected_salary_max})"
+            )
+
 
 
 class Anomaly(BaseModel):

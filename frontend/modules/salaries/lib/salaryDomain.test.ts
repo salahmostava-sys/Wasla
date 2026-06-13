@@ -587,3 +587,176 @@ describe('salaryDomain prepareSalaryState', () => {
     expect(state.appsWithoutScheme).toEqual([]);
   });
 });
+
+// ─── FIX REGRESSION TESTS ────────────────────────────────────────────────────
+
+import { buildFuelCostMap } from './salaryDomain';
+
+describe('buildFuelCostMap — FIX #2: NaN guard', () => {
+  it('treats null fuel_cost as 0 and does not produce NaN', () => {
+    const map = buildFuelCostMap([
+      { employee_id: 'emp-1', fuel_cost: null as unknown as number },
+      { employee_id: 'emp-1', fuel_cost: 50 },
+    ]);
+    expect(Number.isNaN(map['emp-1'])).toBe(false);
+    expect(map['emp-1']).toBe(50);
+  });
+
+  it('treats empty-string fuel_cost as 0', () => {
+    const map = buildFuelCostMap([
+      { employee_id: 'emp-2', fuel_cost: '' as unknown as number },
+    ]);
+    expect(Number.isNaN(map['emp-2'])).toBe(false);
+    expect(map['emp-2']).toBe(0);
+  });
+
+  it('treats undefined fuel_cost as 0', () => {
+    const map = buildFuelCostMap([
+      { employee_id: 'emp-3', fuel_cost: undefined as unknown as number },
+    ]);
+    expect(Number.isNaN(map['emp-3'])).toBe(false);
+    expect(map['emp-3']).toBe(0);
+  });
+
+  it('accumulates numeric fuel_cost values correctly', () => {
+    const map = buildFuelCostMap([
+      { employee_id: 'emp-4', fuel_cost: 25 },
+      { employee_id: 'emp-4', fuel_cost: 75.5 },
+    ]);
+    expect(map['emp-4']).toBeCloseTo(100.5);
+  });
+});
+
+describe('buildSavedMap — FIX #5: ?? preserves explicit 0', () => {
+  it('preserves net_salary of 0 (should NOT be treated as falsy)', () => {
+    const map = buildSavedMap([
+      { employee_id: 'emp-1', is_approved: true, net_salary: 0 } as any,
+    ]);
+    expect(map['emp-1'].net_salary).toBe(0);
+  });
+
+  it('preserves advance_deduction of 0', () => {
+    const map = buildSavedMap([
+      { employee_id: 'emp-2', is_approved: false, advance_deduction: 0 } as any,
+    ]);
+    expect(map['emp-2'].advance_deduction).toBe(0);
+  });
+
+  it('converts null fields to 0', () => {
+    const map = buildSavedMap([
+      { employee_id: 'emp-3', is_approved: false, net_salary: null } as any,
+    ]);
+    expect(map['emp-3'].net_salary).toBe(0);
+  });
+});
+
+describe('buildSalaryRows — FIX #1: [object Object] guard', () => {
+  const baseParams = {
+    selectedMonth: '2026-05',
+    platformNames: [],
+    appNameToId: {},
+    appWorkTypeMap: {},
+    rulesMap: {},
+    appSchemeMap: {},
+    ordMap: {},
+    attendanceDaysMap: {},
+    savedMap: {},
+    previewMap: {},
+    advInstIds: {},
+    deductedInstIds: {},
+    advRemainingMap: {},
+    fuelCostMap: {},
+  };
+
+  it('produces a safe string for employeeName when Supabase returns an embedded object', () => {
+    const rows = buildSalaryRows({
+      ...baseParams,
+      employees: [
+        {
+          id: 'emp-1',
+          // Simulate Supabase JOIN returning an object instead of string
+          name: { id: 'some-uuid', name: 'أحمد' } as unknown as string,
+          job_title: 'مندوب توصيل',
+          national_id: '1234567890',
+        },
+      ],
+    });
+    expect(rows[0].employeeName).not.toBe('[object Object]');
+    expect(rows[0].employeeName).toBe(''); // safeStr returns fallback ''
+  });
+
+  it('produces fallback jobTitle when Supabase returns an embedded object', () => {
+    const rows = buildSalaryRows({
+      ...baseParams,
+      employees: [
+        {
+          id: 'emp-2',
+          name: 'علي',
+          job_title: { id: 'jt-uuid', title: 'Driver' } as unknown as string,
+          national_id: '9876543210',
+        },
+      ],
+    });
+    expect(rows[0].jobTitle).not.toBe('[object Object]');
+    expect(rows[0].jobTitle).toBe('مندوب توصيل'); // safeStr fallback
+  });
+
+  it('produces a safe nationalId fallback when value is an object', () => {
+    const rows = buildSalaryRows({
+      ...baseParams,
+      employees: [
+        {
+          id: 'emp-3',
+          name: 'محمد',
+          job_title: 'مدير',
+          national_id: { id: 'nid-uuid' } as unknown as string,
+        },
+      ],
+    });
+    expect(rows[0].nationalId).not.toBe('[object Object]');
+    expect(rows[0].nationalId).toBe('•'); // safeStr fallback
+  });
+});
+
+describe('buildSalaryRows — FIX #4: platformSalaries stores raw float', () => {
+  it('stores the raw salary float without Math.round', () => {
+    const rows = buildSalaryRows({
+      selectedMonth: '2026-05',
+      platformNames: ['Keeta'],
+      appNameToId: { Keeta: 'keeta-id' },
+      appWorkTypeMap: { Keeta: 'orders' },
+      rulesMap: {},
+      appSchemeMap: {},
+      ordMap: {},
+      attendanceDaysMap: {},
+      savedMap: {},
+      previewMap: {
+        'emp-1': {
+          base_salary: 0,
+          advance_deduction: 0,
+          external_deduction: 0,
+          total_shift_days: 0,
+          platform_breakdown: {
+            Keeta: {
+              appName: 'Keeta',
+              workType: 'orders',
+              calculationMethod: 'orders',
+              ordersCount: 451,
+              shiftDays: 0,
+              salary: 2505.5, // Non-integer — must NOT be rounded at storage time
+            },
+          },
+        },
+      },
+      advInstIds: {},
+      deductedInstIds: {},
+      advRemainingMap: {},
+      fuelCostMap: {},
+      employees: [{ id: 'emp-1', name: 'Test', job_title: 'Driver', national_id: '123' }],
+    });
+
+    // Must remain 2505.5, not 2506 (Math.round would give 2506)
+    expect(rows[0].platformSalaries['Keeta']).toBe(2505.5);
+  });
+});
+

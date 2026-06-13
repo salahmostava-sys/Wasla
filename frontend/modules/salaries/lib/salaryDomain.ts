@@ -16,6 +16,7 @@ import {
   toCityArabicLabel,
 } from '@modules/salaries/model/salaryUtils';
 import { logError } from '@shared/lib/logger';
+import { safeStr } from '@shared/lib/utils';
 import type { SlipLanguage } from '@shared/lib/salarySlipTranslations';
 import type {
   AppWithSchemeRow,
@@ -110,7 +111,11 @@ const valuesMatch = (left: unknown, right: unknown) => {
     typeof left === 'object' &&
     typeof right === 'object'
   ) {
-    return JSON.stringify(left) === JSON.stringify(right);
+    // FIX #3: Sort keys before stringify to prevent false dirty-flag from key ordering.
+    // JSON.stringify({ a: 1, b: 2 }) !== JSON.stringify({ b: 2, a: 1 }) without sorting.
+    const sortKeys = (v: object): string =>
+      JSON.stringify(v, Object.keys(v as Record<string, unknown>).sort());
+    return sortKeys(left as object) === sortKeys(right as object);
   }
   return false;
 };
@@ -126,13 +131,16 @@ export const buildSavedMap = (savedRecords: Array<{ employee_id: string } & Save
   savedRecords?.forEach((r) => {
     savedMap[r.employee_id] = {
       is_approved: r.is_approved,
-      net_salary: Number(r.net_salary || 0),
-      base_salary: Number(r.base_salary || 0),
-      allowances: Number(r.allowances || 0),
-      attendance_deduction: Number(r.attendance_deduction || 0),
-      advance_deduction: Number(r.advance_deduction || 0),
-      external_deduction: Number(r.external_deduction || 0),
-      manual_deduction: Number(r.manual_deduction || 0),
+      // FIX #5: Use ?? instead of || to correctly preserve legitimate 0 values.
+      // || treats 0 as falsy, which would incorrectly replace a real 0 with 0 anyway
+      // but masks future bugs where negative values or strings are involved.
+      net_salary: Number(r.net_salary ?? 0),
+      base_salary: Number(r.base_salary ?? 0),
+      allowances: Number(r.allowances ?? 0),
+      attendance_deduction: Number(r.attendance_deduction ?? 0),
+      advance_deduction: Number(r.advance_deduction ?? 0),
+      external_deduction: Number(r.external_deduction ?? 0),
+      manual_deduction: Number(r.manual_deduction ?? 0),
       payment_method: r.payment_method ?? null,
       sheet_snapshot: r.sheet_snapshot ?? null,
     };
@@ -206,7 +214,10 @@ export const buildFuelCostMap = (rows: Array<{ employee_id: string; fuel_cost: n
   rows?.forEach((r) => {
     const employeeId = r.employee_id ? String(r.employee_id) : '';
     if (!employeeId) return;
-    fuelCostMap[employeeId] = (fuelCostMap[employeeId] || 0) + Number(r.fuel_cost);
+    // FIX #2: `Number(null)` → 0, but `Number('')` → 0 and `Number(undefined)` → NaN.
+    // The `|| 0` after Number() catches NaN (since NaN is falsy) and propagates a safe 0
+    // instead of silently corrupting the entire row's salary with NaN arithmetic.
+    fuelCostMap[employeeId] = (fuelCostMap[employeeId] || 0) + (Number(r.fuel_cost) || 0);
   });
   return fuelCostMap;
 };
@@ -381,7 +392,10 @@ function buildEmployeeSalaryRow(
     if (previewMetric) {
       platformMetrics[platformName] = previewMetric;
       platformOrders[platformName] = getPrimaryPlatformActivityCount(previewMetric);
-      platformSalaries[platformName] = Math.round(previewMetric.salary);
+      // FIX #4: Store the raw float — do NOT round per-platform here.
+      // Rounding at cell level causes banker's-rounding drift: sum of rounded values
+      // may differ from the server's total. Round only in the display formatter.
+      platformSalaries[platformName] = previewMetric.salary;
       continue;
     }
 
@@ -413,9 +427,12 @@ function buildEmployeeSalaryRow(
   const baseRow: SalaryRow = {
     id: `${employeeId}-${selectedMonth}`,
     employeeId,
-    employeeName: emp.name ? String(emp.name) : '',
-    jobTitle: String(emp.job_title || 'مندوب توصيل'),
-    nationalId: String(emp.national_id || '•'),
+    // FIX #1: Use safeStr() instead of String() to guard against Supabase JOIN
+    // returning an object (e.g. { id, name }) instead of a plain string.
+    // String(object) → "[object Object]" which corrupts salary slips.
+    employeeName: safeStr(emp.name),
+    jobTitle: safeStr(emp.job_title, 'مندوب توصيل'),
+    nationalId: safeStr(emp.national_id, '•'),
     city: toCityArabicLabel(rawCity),
     cityKey,
     bankAccount: emp.iban ? String(emp.iban).slice(-6) : '',
