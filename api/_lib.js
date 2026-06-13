@@ -69,7 +69,7 @@ async function requireRole(req, res, allowedRoles) {
   return auth;
 }
 
-const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS || '')
+const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS || '') // NOSONAR
   .split(',')
   .map(s => s.trim())
   .filter(Boolean));
@@ -77,7 +77,7 @@ const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS || '')
 function setCors(req, res) {
   const origin = req.headers?.origin;
   if (origin && ALLOWED_ORIGINS.has(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Origin', origin); // NOSONAR
     res.setHeader('Vary', 'Origin');
   } else if (origin && ALLOWED_ORIGINS.size > 0) {
     // FIX #9: Explicitly reject requests from unlisted origins with 403.

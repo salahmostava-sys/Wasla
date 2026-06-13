@@ -23,6 +23,13 @@ from sklearn.linear_model import LinearRegression
 # ─── Shared helpers ───────────────────────────────────────────────────────────
 
 
+def _prepare_time_df(rows: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(rows)
+    if not df.empty and "date" in df.columns:
+        df["date"] = pd.to_datetime(df["date"])
+    return df
+
+
 def _classify_trend(pct: float) -> str:
     """Classify a percentage change as up / stable / down."""
     if pct > 5:
@@ -57,8 +64,15 @@ def _half_trend_pct(series: pd.Series) -> float:
 def predict_orders(rows: list[dict], forecast_days: int = 7) -> dict:
     """Train on daily order totals, predict the next N days."""
     forecast_days = min(max(int(forecast_days), 1), 90)
-    df = pd.DataFrame(rows)
-    df["date"] = pd.to_datetime(df["date"])
+    df = _prepare_time_df(rows)
+    if df.empty or "date" not in df.columns:
+        return {
+            "daily_forecast": [],
+            "monthly_total_predicted": 0.0,
+            "trend": "stable",
+            "trend_percent": 0.0,
+            "confidence": "low",
+        }
     daily = df.groupby("date")["orders"].sum().reset_index().sort_values("date")
     daily["day_idx"] = range(len(daily))
 
@@ -114,8 +128,9 @@ def predict_orders(rows: list[dict], forecast_days: int = 7) -> dict:
 
 def find_best_driver(rows: list[dict], top_n: int = 5) -> dict:
     """Rank drivers by total orders, daily avg, trend, and consistency."""
-    df = pd.DataFrame(rows)
-    df["date"] = pd.to_datetime(df["date"])
+    df = _prepare_time_df(rows)
+    if df.empty or "date" not in df.columns:
+        return {"drivers": []}
 
     # Filter rows with driver info
     df = df.dropna(subset=["employee_id"])
@@ -159,8 +174,9 @@ def find_best_driver(rows: list[dict], top_n: int = 5) -> dict:
 
 def rank_platforms(rows: list[dict]) -> dict:
     """Rank delivery platforms by volume, share, and growth."""
-    df = pd.DataFrame(rows)
-    df["date"] = pd.to_datetime(df["date"])
+    df = _prepare_time_df(rows)
+    if df.empty or "date" not in df.columns:
+        return {"platforms": []}
 
     df = df.dropna(subset=["app_name"])
     if df.empty:
@@ -238,8 +254,9 @@ def _detect_driver_alerts(
 
 def generate_smart_alerts(rows: list[dict], thresholds: dict) -> dict:
     """Detect anomalies and generate operational alerts."""
-    df = pd.DataFrame(rows)
-    df["date"] = pd.to_datetime(df["date"])
+    df = _prepare_time_df(rows)
+    if df.empty or "date" not in df.columns:
+        return {"alerts": []}
     daily = df.groupby("date")["orders"].sum().sort_index()
 
     alerts = []
@@ -437,6 +454,16 @@ def rank_employees(employees: list[dict], top_n: int = 5) -> dict:
 # ─── 8. Anomaly Detection ─────────────────────────────────────────────────────
 
 
+def _build_anomaly(a_type: str, severity: str, message: str, value: float, threshold: float, recommendation: str, risk: int) -> tuple[dict, int]:
+    return {
+        "type": a_type,
+        "severity": severity,
+        "message": message,
+        "value": value,
+        "threshold": threshold,
+        "recommendation": recommendation,
+    }, risk
+
 def _detect_salary_anomaly(employee_name: str, current_salary: float, expected_range: tuple) -> tuple[dict | None, int]:
     """Return (anomaly_dict, risk_score) if salary is below expected, else (None, 0)."""
     min_expected, _max_expected = expected_range
@@ -450,14 +477,10 @@ def _detect_salary_anomaly(employee_name: str, current_salary: float, expected_r
         severity, risk_score = "warning", 25
     else:
         severity, risk_score = "info", 10
-    return {
-        "type": "low_salary",
-        "severity": severity,
-        "message": f"راتب {employee_name} أقل من المتوقع بـ {shortfall_pct:.1f}% ({shortfall:.0f} ر.س)",
-        "value": current_salary,
-        "threshold": min_expected,
-        "recommendation": "مراجعة سكيمة الراتب أو عدد الطلبات المنجزة",
-    }, risk_score
+    return _build_anomaly(
+        "low_salary", severity, f"راتب {employee_name} أقل من المتوقع بـ {shortfall_pct:.1f}% ({shortfall:.0f} ر.س)",
+        current_salary, min_expected, "مراجعة سكيمة الراتب أو عدد الطلبات المنجزة", risk_score
+    )
 
 
 def _detect_order_anomaly(employee_name: str, monthly_orders: int, previous_month_orders: int) -> tuple[dict | None, int]:
@@ -473,14 +496,10 @@ def _detect_order_anomaly(employee_name: str, monthly_orders: int, previous_mont
         severity, risk_score = "warning", 15
     else:
         return None, 0
-    return {
-        "type": "order_drop",
-        "severity": severity,
-        "message": f"انخفاض حاد في طلبات {employee_name} بنسبة {abs(change_pct):.1f}% عن الشهر الماضي",
-        "value": monthly_orders,
-        "threshold": previous_month_orders,
-        "recommendation": "التحقق من الحالة الصحية أو مشاكل التوصيل",
-    }, risk_score
+    return _build_anomaly(
+        "order_drop", severity, f"انخفاض حاد في طلبات {employee_name} بنسبة {abs(change_pct):.1f}% عن الشهر الماضي",
+        monthly_orders, previous_month_orders, "التحقق من الحالة الصحية أو مشاكل التوصيل", risk_score
+    )
 
 
 def _detect_deduction_anomaly(employee_name: str, current_salary: float, deductions: float) -> tuple[dict | None, int]:
@@ -496,14 +515,10 @@ def _detect_deduction_anomaly(employee_name: str, current_salary: float, deducti
         severity, risk_score = "info", 10
     else:
         return None, 0
-    return {
-        "type": "high_deductions",
-        "severity": severity,
-        "message": f"خصومات مرتفعة على {employee_name}: {deduction_pct:.1f}% من الراتب ({deductions:.0f} ر.س)",
-        "value": deductions,
-        "threshold": (current_salary + deductions) * 0.1,
-        "recommendation": "مراجعة أسباب الخصومات وإمكانية تصحيح الأخطاء",
-    }, risk_score
+    return _build_anomaly(
+        "high_deductions", severity, f"خصومات مرتفعة على {employee_name}: {deduction_pct:.1f}% من الراتب ({deductions:.0f} ر.س)",
+        deductions, (current_salary + deductions) * 0.1, "مراجعة أسباب الخصومات وإمكانية تصحيح الأخطاء", risk_score
+    )
 
 
 def _classify_risk_level(score: int) -> str:

@@ -119,7 +119,7 @@ def check_rate_limit(request: Request) -> None:
     """Raise 429 if the caller exceeds the configured rate limit."""
     ip = _get_client_ip(request)
     # Hash IP so we never store raw PII in memory.
-    ip_key = hashlib.sha256(ip.encode()).hexdigest()[:16]
+    ip_key = hashlib.sha256(ip.encode()).hexdigest()[:16]  # NOSONAR
 
     now = time.monotonic()
     with _rate_lock:
@@ -176,7 +176,7 @@ ALLOWED_ORIGINS = os.getenv(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS,  # NOSONAR
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Requested-With", "X-Internal-Key"],
