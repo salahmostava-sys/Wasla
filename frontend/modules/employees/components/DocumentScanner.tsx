@@ -34,6 +34,8 @@ interface ScannedIqamaFields {
 }
 
 interface ScannedLicenseFields {
+  name?: string;
+  nameEn?: string;
   license_number?: string;
   license_expiry?: string;
   license_class?: string;
@@ -59,6 +61,8 @@ const IQAMA_FIELD_LABELS: Record<string, string> = {
 };
 
 const LICENSE_FIELD_LABELS: Record<string, string> = {
+  name: 'الاسم بالعربي',
+  nameEn: 'الاسم بالإنجليزي',
   license_number: 'رقم الرخصة',
   license_expiry: 'تاريخ انتهاء الرخصة',
   license_class: 'فئة الرخصة',
@@ -79,6 +83,8 @@ function mapIqamaToEmployee(data: IqamaData): ScannedIqamaFields {
 
 function mapLicenseToEmployee(data: LicenseData): ScannedLicenseFields {
   return {
+    ...(data.name && { name: data.name }),
+    ...(data.nameEn && { nameEn: data.nameEn }),
     ...(data.licenseNumber && { license_number: data.licenseNumber }),
     ...(data.expiryDate && { license_expiry: data.expiryDate }),
     ...(data.licenseClass && { license_class: data.licenseClass }),
