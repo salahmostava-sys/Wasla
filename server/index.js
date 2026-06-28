@@ -13,9 +13,12 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPA
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const AI_INTERNAL_KEY = process.env.AI_INTERNAL_KEY;
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 // Allowed CORS origins — comma-separated list via env var
+const defaultOrigins = IS_PRODUCTION ? '' : 'http://localhost:5173,http://localhost:5000,http://localhost:3000';
 const ALLOWED_ORIGINS = new Set((
-  process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:5000,http://localhost:3000' // NOSONAR
+  process.env.ALLOWED_ORIGINS || defaultOrigins // NOSONAR
 )
   .split(',')
   .map((o) => o.trim())
@@ -68,9 +71,11 @@ app.post('/api/functions/groq-chat', express.json({ limit: '2mb' }), groqChatHan
 app.post('/api/functions/ai-chat', express.json({ limit: '2mb' }), aiChatHandler);
 
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-
 // ── Startup checks ────────────────────────────────────────────────────────────
+if (IS_PRODUCTION && ALLOWED_ORIGINS.size === 0) {
+  console.error('[server] FATAL: ALLOWED_ORIGINS must be set in production');
+  process.exit(1);
+}
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('[server] FATAL: SUPABASE_URL and SUPABASE_ANON_KEY (or VITE_SUPABASE_PUBLISHABLE_KEY) must be set.');
   process.exit(1);

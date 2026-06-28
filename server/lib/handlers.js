@@ -22,6 +22,8 @@ const {
 
 // ─── Rate Limiting Helper ───────────────────────────────────────────────────
 
+const fallbackRateLimits = new Map();
+
 async function checkRateLimit(supabaseClient, userId, action, limit, windowSeconds) {
   const key = `${action}_${userId}`;
   const { data, error } = await supabaseClient.rpc('enforce_rate_limit', {
@@ -30,8 +32,20 @@ async function checkRateLimit(supabaseClient, userId, action, limit, windowSecon
     p_window_seconds: windowSeconds
   });
   if (error) {
-    logError('Rate limit check failed', { error: error.message, action, user_id: userId });
-    return { allowed: true }; // Fail-open so we don't block legit traffic if RPC has issues
+    logError('Rate limit check failed, using in-memory fallback', { error: error.message, action, user_id: userId });
+    
+    const now = Date.now();
+    let record = fallbackRateLimits.get(key);
+    
+    if (!record || now > record.resetTime) {
+      record = { count: 0, resetTime: now + windowSeconds * 1000 };
+    }
+    
+    record.count += 1;
+    fallbackRateLimits.set(key, record);
+    
+    const allowed = record.count <= limit;
+    return { allowed, remaining: Math.max(0, limit - record.count) };
   }
   return data?.[0] ?? { allowed: true };
 }

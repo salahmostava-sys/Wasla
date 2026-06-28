@@ -39,10 +39,10 @@ export function getCorsHeaders(requestOrigin: string | null): Record<string, str
   // allowed origin. Never echo back an unlisted origin.
   const origin = (requestOrigin && isOriginAllowed(requestOrigin))
     ? requestOrigin
-    : allowedOrigins[0] ?? 'http://localhost:5173';
+    : null;
 
   return {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': origin as string,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Max-Age': '600',
@@ -53,6 +53,9 @@ export function getCorsHeaders(requestOrigin: string | null): Record<string, str
 }
 
 export function handleCorsPreflight(requestOrigin: string | null): Response {
+  if (!requestOrigin || !isOriginAllowed(requestOrigin)) {
+    return new Response(null, { status: 403 });
+  }
   const headers = getCorsHeaders(requestOrigin);
   return new Response(null, { 
     headers,
