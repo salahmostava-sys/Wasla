@@ -163,7 +163,7 @@ function extractNamesFromLines(lines: string[], result: { name?: string; nameEn?
     if (englishNameIdx > 0) {
       const possibleArName = lines[englishNameIdx - 1];
       if (!EXCLUDED_AR_WORDS.some(w => possibleArName.includes(w))) {
-        result.name = possibleArName.replace(/[A-Za-z0-9=_\-]/g, '').replace(/\s+/g, ' ').trim();
+        result.name = possibleArName.replace(/[A-Za-z0-9=_-]/g, '').replace(/\s+/g, ' ').trim();
       }
     }
   }
@@ -175,7 +175,7 @@ function extractNamesFromLines(lines: string[], result: { name?: string; nameEn?
       !EXCLUDED_AR_WORDS.some(w => line.includes(w))
     );
     if (arabicNameLine) {
-      result.name = arabicNameLine.replace(/[A-Za-z0-9=_\-]/g, '').replace(/\s+/g, ' ').trim();
+      result.name = arabicNameLine.replace(/[A-Za-z0-9=_-]/g, '').replace(/\s+/g, ' ').trim();
     }
   }
 }
