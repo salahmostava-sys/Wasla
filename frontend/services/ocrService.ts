@@ -76,8 +76,9 @@ export async function extractTextFromImage(
     await worker.terminate();
     return data.text;
   } catch (err: any) {
+    const errString = err ? JSON.stringify(err, Object.getOwnPropertyNames(err)) : String(err);
     console.error('OCR Error Details:', err);
-    throw new Error(err?.message || typeof err === 'string' ? err : 'حدث خطأ غير معروف في Tesseract');
+    throw new Error(`Tesseract Error: ${errString}`);
   }
 }
 
