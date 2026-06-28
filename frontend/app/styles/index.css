@@ -8,8 +8,8 @@
 @layer base {
   :root {
     /* Typography tokens (shared across app) */
-    --font-sans: 'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Droid Arabic Kufi', sans-serif;
-    --font-ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+    --font-sans: 'Tajawal', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+    --font-ar: 'Tajawal', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
 
     /* ─── High-End Editorial Dashboard — Light Palette ─────────── */
 

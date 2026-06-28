@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['"IBM Plex Sans Arabic"', 'sans-serif'],
-        arabic: ['"IBM Plex Sans Arabic"', 'sans-serif'],
+        sans: ['Tajawal', '"IBM Plex Sans Arabic"', 'sans-serif'],
+        arabic: ['Tajawal', '"IBM Plex Sans Arabic"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
