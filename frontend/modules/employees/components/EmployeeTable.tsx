@@ -318,7 +318,7 @@ function renderPlatformAppsCell(ctx: CellContext): React.ReactNode {
       {permissions.can_edit ? (
         <PlatformAppsEditor employeeId={emp.id} employeeName={emp.name} currentApps={emp.platform_apps || []} availableApps={availableApps} onSuccess={refetchEmployees} />
       ) : (
-        <div className="flex max-w-[200px] flex-wrap justify-center gap-1">
+        <div className="flex items-center justify-center gap-1 whitespace-nowrap">
           {emp.platform_apps?.length
             ? emp.platform_apps.map((app) => (
                 <span key={app.id} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
@@ -755,7 +755,7 @@ function EmployeeDetailedTableInner({
   return (
     <div className="ta-table-wrap">
       <div className="overflow-x-auto">
-        <table className="w-full text-center align-middle" ref={tableRef}>
+        <table className="w-full text-center align-middle whitespace-nowrap" ref={tableRef}>
           <thead className="bg-yellow-400">
             <tr className="ta-thead">
               {activeCols.map((col) => {

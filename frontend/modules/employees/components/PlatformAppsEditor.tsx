@@ -87,7 +87,7 @@ export function PlatformAppsEditor({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex max-w-[200px] flex-wrap justify-center gap-1 transition-opacity hover:opacity-80">
+        <button className="flex items-center justify-center gap-1 whitespace-nowrap transition-opacity hover:opacity-80">
           {currentApps.length > 0 ? (
             currentApps.map(app => (
               <span
