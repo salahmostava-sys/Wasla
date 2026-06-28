@@ -2,11 +2,12 @@
  * Salary Service — Salary calculations, records, and scheme management.
  *
  * Calculation flow:
- *   Frontend → Edge Function (salary-engine) → PostgreSQL RPC → salary_records upsert
+ *   Frontend → Express Server (/api/functions/salary-engine) → PostgreSQL RPC → salary_records upsert
  *
  * Also handles: salary record CRUD, salary schemes, pricing rules, app targets.
  */
 import { supabase } from '@services/supabase/client';
+import { callServerFunction } from '@services/serverFunction';
 import { isEmployeeIdUuid, isValidSalaryMonthYear } from '@shared/lib/salaryValidation';
 import { handleSupabaseError } from '@services/serviceError';
 import { sanitizeLikeQuery } from '@shared/lib/security';
@@ -350,28 +351,25 @@ export const salaryService = {
     if (!isEmployeeIdUuid(employeeId) || !isValidSalaryMonthYear(monthYear)) {
       handleSupabaseError(new Error('Invalid employee_id or month_year'), 'salaryService.calculateSalaryForEmployeeMonth');
     }
-    const { data: session } = await supabase.auth.getSession();
-    const token = session.session?.access_token;
-    if (!token) handleSupabaseError(new Error('Not authenticated'), 'salaryService.calculateSalaryForEmployeeMonth');
-    const { data, error } = await supabase.functions.invoke('salary-engine', {
-      body: { mode: 'employee', employee_id: employeeId, month_year: monthYear, payment_method: paymentMethod, manual_deduction: manualDeduction, manual_deduction_note: manualDeductionNote },
+    return callServerFunction('salary-engine', {
+      mode: 'employee',
+      employee_id: employeeId,
+      month_year: monthYear,
+      payment_method: paymentMethod,
+      manual_deduction: manualDeduction,
+      manual_deduction_note: manualDeductionNote,
     });
-    if (error) handleSupabaseError(error, 'salaryService.calculateSalaryForEmployeeMonth');
-    return data;
   },
 
   calculateSalaryForMonth: async ({ monthYear, paymentMethod = 'cash' }: SalaryRpcParams) => {
     if (!isValidSalaryMonthYear(monthYear)) {
       handleSupabaseError(new Error('Invalid month_year'), 'salaryService.calculateSalaryForMonth');
     }
-    const { data: session } = await supabase.auth.getSession();
-    const token = session.session?.access_token;
-    if (!token) handleSupabaseError(new Error('Not authenticated'), 'salaryService.calculateSalaryForMonth');
-    const { data, error } = await supabase.functions.invoke('salary-engine', {
-      body: { mode: 'month', month_year: monthYear, payment_method: paymentMethod },
+    return callServerFunction('salary-engine', {
+      mode: 'month',
+      month_year: monthYear,
+      payment_method: paymentMethod,
     });
-    if (error) handleSupabaseError(error, 'salaryService.calculateSalaryForMonth');
-    return data;
   },
 
   getSalaryPreviewForMonth: async (monthYear: string) => {
@@ -380,15 +378,13 @@ export const salaryService = {
       return [] as SalaryPreviewRow[];
     }
 
-    // --- Try server route first ---
+    // --- Try Express server first ---
     try {
-      const { data, error } = await supabase.functions.invoke('salary-engine', {
-        body: { mode: 'month_preview', month_year: my },
+      const data = await callServerFunction<SalaryPreviewRow[]>('salary-engine', {
+        mode: 'month_preview',
+        month_year: my,
       });
-      if (!error && data) {
-        return (data as SalaryPreviewRow[]) || [];
-      }
-      logError('salary-engine edge function failed, falling back to RPC', { error: error?.message || String(error) });
+      if (data) return data || [];
     } catch (err) {
       logError('salary-engine server route threw, falling back to RPC', {
         error: err instanceof Error ? err.message : String(err),

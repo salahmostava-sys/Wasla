@@ -1,11 +1,11 @@
 import { supabase } from "./supabase/client";
+import { callServerFunction } from "@services/serverFunction";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { throwIfError } from "./serviceError";
 
 /**
- * Wrapper around fetch() for internal /api/functions/* calls.
- * Detects unreachable server (non-JSON proxy error) and throws a clear Arabic message
- * instead of leaking internal English fallback strings like "deleteManagedUser failed".
+ * Wrapper around callServerFunction() for internal /api/functions/admin-update-user calls.
+ * Detects unreachable server and throws a clear Arabic message.
  */
 async function callAdminApi(
   token: string,
@@ -17,28 +17,21 @@ async function callAdminApi<T>(
   expectData: true
 ): Promise<T>;
 async function callAdminApi<T = void>(
-  token: string,
+  _token: string,
   body: Record<string, unknown>,
   expectData?: boolean
 ): Promise<T | void> {
   try {
-    const { data: edgeData, error: edgeError } = await supabase.functions.invoke("admin-update-user", {
-      body,
-    });
-    
-    if (edgeError) {
-      if (edgeError.message?.includes("Failed to fetch") || edgeError.message?.includes("NetworkError")) {
-        throw new Error("الخادم غير متاح حالياً. يرجى الانتظار لحظة والمحاولة مجدداً.");
-      }
-      throw new Error(edgeError.message || "تعذر الاتصال بالخادم. يرجى التحقق من أن الخادم يعمل والمحاولة مجدداً.");
-    }
-    
+    const data = await callServerFunction<T>('admin-update-user', body);
     if (expectData) {
-      return edgeData as T;
+      return data;
     }
   } catch (error) {
-    if (error instanceof Error && error.message !== "تعذر الاتصال بالخادم. يرجى التحقق من أن الخادم يعمل والمحاولة مجدداً.") {
-      throw error;
+    if (error instanceof Error) {
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('fetch')) {
+        throw new Error("الخادم غير متاح حالياً. يرجى الانتظار لحظة والمحاولة مجدداً.");
+      }
+      throw new Error(error.message || "تعذر الاتصال بالخادم. يرجى التحقق من أن الخادم يعمل والمحاولة مجدداً.");
     }
     throw new Error("تعذر الاتصال بالخادم. يرجى التحقق من أن الخادم يعمل والمحاولة مجدداً.");
   }

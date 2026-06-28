@@ -142,7 +142,9 @@ export async function exportSlipToBlob(html: string, _filename: string): Promise
     }
 
     iframeDoc.open();
-    iframeDoc.write(html);
+    // Sanitize HTML to prevent XSS before injecting into iframe
+    const cleanHtml = DOMPurify.sanitize(html);
+    iframeDoc.write(cleanHtml);
     iframeDoc.close();
 
     iframe.addEventListener('load', async () => {

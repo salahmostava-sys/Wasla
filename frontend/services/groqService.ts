@@ -1,8 +1,5 @@
-/**
- * Groq AI Service — proxied through the Express server.
- * The API key is stored server-side only (never exposed to browser).
- */
 import { supabase } from '@services/supabase/client';
+import { callServerFunction } from '@services/serverFunction';
 
 let _configured: boolean | null = null;
 
@@ -11,25 +8,14 @@ export interface GroqMessage {
   content: string;
 }
 
-async function getAuthHeader(): Promise<string | null> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? `Bearer ${token}` : null;
-}
-
 async function callGroqServer(messages: GroqMessage[]): Promise<string> {
-  const { data: sessionData } = await supabase.auth.getSession();
-  if (!sessionData.session?.access_token) throw new Error('Not authenticated');
+  const response = await callServerFunction<{ message?: string; error?: string }>('groq-chat', { messages });
 
-  const { data, error } = await supabase.functions.invoke('groq-chat', {
-    body: { messages },
-  });
-
-  if (error || data?.error) {
-    throw new Error(error?.message || data?.error || 'groq-chat server error');
+  if (response?.error) {
+    throw new Error(response.error);
   }
 
-  return data?.message ?? '';
+  return response?.message ?? '';
 }
 
 export const groqService = {
@@ -41,12 +27,10 @@ export const groqService = {
   checkConfiguration: async (): Promise<boolean> => {
     if (_configured !== null) return _configured;
     try {
-      const authHeader = await getAuthHeader();
-      if (!authHeader) { _configured = false; return false; }
-      const { data, error } = await supabase.functions.invoke('groq-chat', {
-        body: { messages: [{ role: 'user', content: 'ping' }] },
+      await callServerFunction('groq-chat', {
+        messages: [{ role: 'user', content: 'ping' }],
       });
-      _configured = !error && !data?.error;
+      _configured = true;
     } catch {
       _configured = false;
     }

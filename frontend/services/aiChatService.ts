@@ -1,4 +1,4 @@
-import { supabase } from '@services/supabase/client';
+import { callServerFunction } from '@services/serverFunction';
 import { toServiceError } from '@services/serviceError';
 
 export interface AiChatMessage {
@@ -11,29 +11,21 @@ type AiChatResponse = {
   error?: string;
 };
 
-async function getAuthHeader(): Promise<string | null> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? `Bearer ${token}` : null;
-}
-
 export const aiChatService = {
   sendMessage: async (messages: AiChatMessage[]): Promise<string> => {
-    const authHeader = await getAuthHeader();
-    if (!authHeader) {
-      throw toServiceError(new Error('Not authenticated'), 'aiChatService.sendMessage');
+    try {
+      const data = await callServerFunction<AiChatResponse>('ai-chat', { messages });
+
+      if (data?.error) {
+        throw toServiceError(new Error(data.error), 'aiChatService.sendMessage');
+      }
+
+      return data?.message ?? 'لا يوجد رد';
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('Not authenticated')) {
+        throw toServiceError(err, 'aiChatService.sendMessage');
+      }
+      throw err;
     }
-
-    const { data, error } = await supabase.functions.invoke('ai-chat', {
-      body: { messages },
-    });
-
-    if (error) {
-      const msg = error.message ?? 'عذرًا، حدث خطأ في الاتصال. حاول مرة أخرى.';
-      throw toServiceError(new Error(msg), 'aiChatService.sendMessage');
-    }
-
-    const aiData = data as AiChatResponse;
-    return aiData?.message ?? aiData?.error ?? 'لا يوجد رد';
   },
 };
