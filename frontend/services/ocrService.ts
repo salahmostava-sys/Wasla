@@ -64,6 +64,10 @@ export async function extractTextFromImage(
 ): Promise<string> {
   try {
     const worker = await Tesseract.createWorker('ara+eng', 1, {
+      workerPath: '/worker.min.js',
+      corePath: '/tesseract-core.wasm.js',
+      langPath: '/',
+      gzip: false,
       logger: (m: { status: string; progress: number }) => {
         if (onProgress) {
           onProgress({ status: m.status, progress: m.progress ?? 0 });
