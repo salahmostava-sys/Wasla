@@ -68,6 +68,7 @@ export async function extractTextFromImage(
       corePath: '/tesseract-core.wasm.js',
       langPath: '/',
       gzip: false,
+      workerBlobURL: false,
       logger: (m: { status: string; progress: number }) => {
         if (onProgress) {
           onProgress({ status: m.status, progress: m.progress ?? 0 });
