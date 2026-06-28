@@ -38,9 +38,6 @@ const AppSettingsPage = lazy(() => import("@modules/apps/pages/AppSettingsPage")
 const Alerts = lazy(() => import("@modules/pages/Alerts"));
 const SettingsHub = lazy(() => import("@modules/pages/SettingsHub"));
 const ViolationResolverPage = lazy(() => import("@modules/violations/pages/ViolationResolverPage"));
-const LeavesPage = lazy(() => import("@modules/leaves/pages/LeavesPage"));
-const DocumentsPage = lazy(() => import("@modules/documents/pages/DocumentsPage"));
-const PerformanceReviewsPage = lazy(() => import("@modules/performance/pages/PerformanceReviewsPage"));
 const FinancePage = lazy(() => import("@modules/finance/pages/FinancePage"));
 const Motorcycles = lazy(() => import("@modules/pages/Motorcycles"));
 const VehicleAssignment = lazy(() => import("@modules/pages/VehicleAssignment"));
@@ -143,9 +140,6 @@ const router = createBrowserRouter([
           { path: "maintenance", element: <PageGuard pageKey="maintenance"><MaintenancePage /></PageGuard> },
           { path: "apps", element: <PageGuard pageKey="apps"><Apps /></PageGuard> },
           { path: "apps/settings", element: <PageGuard pageKey="apps"><AppSettingsPage /></PageGuard> },
-          { path: "leaves", element: <PageGuard pageKey="leaves"><LeavesPage /></PageGuard> },
-          { path: "documents", element: <PageGuard pageKey="documents"><DocumentsPage /></PageGuard> },
-          { path: "performance-reviews", element: <PageGuard pageKey="performance_reviews"><PerformanceReviewsPage /></PageGuard> },
           { path: "alerts", element: <PageGuard pageKey="alerts"><Alerts /></PageGuard> },
           { path: "employee-tiers", element: <PageGuard pageKey="employee_tiers"><EmployeeTiers /></PageGuard> },
           {
