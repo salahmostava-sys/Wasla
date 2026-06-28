@@ -102,16 +102,24 @@ export function parseIqamaData(rawText: string): IqamaData {
   const text = normalizeArabicNumerals(rawText);
   const result: IqamaData = {};
 
-  // 1. رقم الإقامة (10 أرقام تبدأ بـ 2)
+  // 1. تنظيف النص من المسافات واستبدال الحروف التي يقرؤها OCR بشكل خاطئ (مثل O لـ 0، l لـ 1)
   const textNoSpaces = text.replace(/\s+/g, '');
-  const iqamaMatch = textNoSpaces.match(/2\d{9}/);
+  const possibleNumberText = textNoSpaces
+    .replace(/[Oo]/g, '0')
+    .replace(/[lI|]/g, '1')
+    .replace(/[Zz]/g, '2')
+    .replace(/[Ss]/g, '5')
+    .replace(/[Bb]/g, '8');
+
+  // 2. رقم الإقامة (10 أرقام تبدأ بـ 2)
+  const iqamaMatch = possibleNumberText.match(/2\d{9}/);
   if (iqamaMatch) {
     result.iqamaNumber = iqamaMatch[0];
   }
 
-  // 2. التواريخ — أول تاريخ = تاريخ الميلاد، آخر تاريخ = انتهاء الصلاحية
+  // 3. التواريخ — أول تاريخ = تاريخ الميلاد، آخر تاريخ = انتهاء الصلاحية
   const dateRegex = /(\d{2}[/\-.]\d{2}[/\-.]\d{4}|\d{4}[/\-.]\d{2}[/\-.]\d{2}|\d{4}[/\-.]\d{2})/g;
-  const dateMatches = [...textNoSpaces.matchAll(dateRegex)].map(m => m[1]);
+  const dateMatches = [...possibleNumberText.matchAll(dateRegex)].map(m => m[1]);
   if (dateMatches.length >= 1) {
     result.dateOfBirth = normalizeDateStr(dateMatches[0]);
   }
@@ -189,16 +197,24 @@ export function parseLicenseData(rawText: string): LicenseData {
   const text = normalizeArabicNumerals(rawText);
   const result: LicenseData = {};
 
-  // 1. رقم الرخصة: عادةً 10 أرقام
+  // 1. تنظيف النص لاستخراج الأرقام (معالجة أخطاء OCR الشائعة مثل O لـ 0)
   const textNoSpaces = text.replace(/\s+/g, '');
-  const licenseNumMatch = textNoSpaces.match(/2\d{9}/) || textNoSpaces.match(/\d{10}/);
+  const possibleNumberText = textNoSpaces
+    .replace(/[Oo]/g, '0')
+    .replace(/[lI|]/g, '1')
+    .replace(/[Zz]/g, '2')
+    .replace(/[Ss]/g, '5')
+    .replace(/[Bb]/g, '8');
+
+  // 2. رقم الرخصة: عادةً 10 أرقام
+  const licenseNumMatch = possibleNumberText.match(/2\d{9}/) || possibleNumberText.match(/\d{10}/);
   if (licenseNumMatch) {
     result.licenseNumber = licenseNumMatch[0];
   }
 
-  // 2. التواريخ — آخر تاريخ = انتهاء الصلاحية
+  // 3. التواريخ — آخر تاريخ = انتهاء الصلاحية
   const dateRegex = /(\d{2}[/\-.]\d{2}[/\-.]\d{4}|\d{4}[/\-.]\d{2}[/\-.]\d{2}|\d{4}[/\-.]\d{2})/g;
-  const dateMatches = [...textNoSpaces.matchAll(dateRegex)].map(m => m[1]);
+  const dateMatches = [...possibleNumberText.matchAll(dateRegex)].map(m => m[1]);
   if (dateMatches.length > 0) {
     result.expiryDate = normalizeDateStr(dateMatches[dateMatches.length - 1]);
   }
