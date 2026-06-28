@@ -6,7 +6,7 @@ const shouldAssertAuthenticatedDashboard = !!email && !!password;
 
 test.describe('صفحة الموظفين (Employees)', () => {
   test('يجب أن تعرض صفحة الموظفين الأساسية والتبويبات', async ({ page }) => {
-    test.skip(!shouldAssertAuthenticatedDashboard, 'Requires authenticated session');
+    test.skip(!shouldAssertAuthenticatedDashboard, 'Requires authenticated session'); // NOSONAR
 
     // Navigate to employees page
     await page.goto('/employees');

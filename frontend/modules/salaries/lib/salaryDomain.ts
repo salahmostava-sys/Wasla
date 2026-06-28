@@ -186,7 +186,7 @@ const normalizePreviewPlatformBreakdown = (value: unknown) => {
 export const buildPreviewMap = (previewData: Array<Record<string, unknown>> | null | undefined) => {
   const previewMap: Record<string, PreviewMapEntry> = {};
   (previewData || []).forEach((row) => {
-    const employeeId = row.employee_id ? String(row.employee_id) : '';
+    const employeeId = (typeof row.employee_id === 'string' || typeof row.employee_id === 'number') && row.employee_id ? String(row.employee_id) : '';
     if (!employeeId) return;
     previewMap[employeeId] = {
       base_salary: Number(row.base_salary || 0),
@@ -366,20 +366,25 @@ const resolvePlatformPreviewMetric = ({
   return previewMetric ?? null;
 };
 
-function buildEmployeeSalaryRow(
-  emp: Record<string, unknown>,
-  selectedMonth: string,
-  platformNames: string[],
-  appWorkTypeMap: Record<string, WorkType>,
-  empOrders: Record<string, number>,
-  attendanceDays: number,
-  saved: SavedSalaryRecord | undefined,
-  preview: PreviewMapEntry,
-  pendingInstallmentIds: string[],
-  deductedInstallmentIds: string[],
-  advRemaining: number,
-  fuelCost: number,
-): SalaryRow {
+function buildEmployeeSalaryRow(params: {
+  emp: Record<string, unknown>;
+  selectedMonth: string;
+  platformNames: string[];
+  appWorkTypeMap: Record<string, WorkType>;
+  empOrders: Record<string, number>;
+  attendanceDays: number;
+  saved: SavedSalaryRecord | undefined;
+  preview: PreviewMapEntry;
+  pendingInstallmentIds: string[];
+  deductedInstallmentIds: string[];
+  advRemaining: number;
+  fuelCost: number;
+}): SalaryRow {
+  const {
+    emp, selectedMonth, platformNames, appWorkTypeMap, empOrders,
+    attendanceDays, saved, preview, pendingInstallmentIds,
+    deductedInstallmentIds, advRemaining, fuelCost
+  } = params;
   const employeeId = String(emp.id);
 
   const platformOrders: Record<string, number> = {};
@@ -533,20 +538,20 @@ export const buildSalaryRows = ({
     };
 
     newRows.push(
-      buildEmployeeSalaryRow(
+      buildEmployeeSalaryRow({
         emp,
         selectedMonth,
         platformNames,
         appWorkTypeMap,
         empOrders,
         attendanceDays,
-        savedMap[employeeId],
+        saved: savedMap[employeeId],
         preview,
-        advInstIds[employeeId] || [],
-        deductedInstIds[employeeId] || [],
-        advRemainingMap[employeeId] || 0,
-        fuelCostMap[employeeId] || 0,
-      )
+        pendingInstallmentIds: advInstIds[employeeId] || [],
+        deductedInstallmentIds: deductedInstIds[employeeId] || [],
+        advRemaining: advRemainingMap[employeeId] || 0,
+        fuelCost: fuelCostMap[employeeId] || 0,
+      })
     );
   }
 

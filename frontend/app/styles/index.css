@@ -356,14 +356,14 @@
   .badge-urgent {
     @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full;
     background: rgba(153, 27, 27, 0.15);
-    color: #6b1010;
+    color: #4a0b0b;
     font-weight: 600;
   }
 
   .badge-warning {
     @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full;
     background: rgba(146, 64, 14, 0.15);
-    color: #6b2c06;
+    color: #4f2004;
     font-weight: 600;
   }
 
