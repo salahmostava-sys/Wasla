@@ -53,15 +53,15 @@ export const AdvanceTable = ({
   setDeleteEmployeeAdvancesId,
 }: Readonly<AdvanceTableProps>) => {
   if (loading) {
-    return <div className="bg-card rounded-xl border border-border/50 p-8 text-center text-muted-foreground animate-pulse">جارٍ التحميل...</div>;
+    return <div className="bg-card border border-border/50 p-8 text-center text-muted-foreground animate-pulse rounded-2xl">جارٍ التحميل...</div>;
   }
   if (filtered.length === 0) {
-    return <div className="text-center py-16 text-muted-foreground bg-card rounded-xl border border-border/50">لا توجد سلف مطابقة</div>;
+    return <div className="text-center py-16 text-muted-foreground bg-card border border-border/50 rounded-2xl">لا توجد سلف مطابقة</div>;
   }
   const colCount = permissions.can_edit ? 7 : 6;
   const dr = filters.date_range ?? ['', ''];
   return (
-    <div className="bg-card rounded-xl shadow-card overflow-hidden">
+    <div className="bg-card shadow-card overflow-hidden rounded-2xl">
       <div className="overflow-x-auto">
         <table ref={tableRef} className="w-full text-sm">
           <thead>

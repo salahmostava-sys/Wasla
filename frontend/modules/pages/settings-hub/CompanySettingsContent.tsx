@@ -113,7 +113,7 @@ export default function CompanySettingsContent() {
       />
 
       {/* Names */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 space-y-4">
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           اسم المؤسسة
         </p>
@@ -134,7 +134,7 @@ export default function CompanySettingsContent() {
       </div>
 
       {/* Registration Numbers */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 space-y-4">
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           الأرقام الرسمية
         </p>

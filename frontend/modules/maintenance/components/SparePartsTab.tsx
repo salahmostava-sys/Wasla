@@ -168,15 +168,15 @@ export function SparePartsTab() {
   return (
     <div className="space-y-4" dir="rtl">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="border bg-card p-4 shadow-sm rounded-2xl">
           <div className="text-xs text-muted-foreground">?????? ?????</div>
           <div className="text-2xl font-bold">{summary.count}</div>
         </div>
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="border bg-card p-4 shadow-sm rounded-2xl">
           <div className="text-xs text-muted-foreground">??? ??? ????</div>
           <div className="text-2xl font-bold text-destructive">{summary.low}</div>
         </div>
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="border bg-card p-4 shadow-sm rounded-2xl">
           <div className="text-xs text-muted-foreground">???? ??????? (???????)</div>
           <div className="text-2xl font-bold">
             {summary.stockValue.toLocaleString('ar-SA', { maximumFractionDigits: 0 })} ?.?
@@ -208,7 +208,7 @@ export function SparePartsTab() {
         </p>
       )}
 
-      <div className="bg-card rounded-xl shadow-card overflow-hidden border border-border/50">
+      <div className="bg-card shadow-card overflow-hidden border border-border/50 rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px] text-sm">
             <thead className="bg-muted/40">

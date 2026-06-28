@@ -251,7 +251,7 @@ const EmployeeSelect = ({
         <ChevronsUpDown size={12} className="text-muted-foreground flex-shrink-0" />
       </button>
       {open && (
-        <div className="absolute z-50 top-full mt-1 w-56 bg-popover border border-border rounded-lg shadow-card overflow-hidden">
+        <div className="absolute z-50 top-full mt-1 w-56 bg-popover border border-border shadow-card overflow-hidden rounded-2xl">
           <div className="p-1.5 border-b border-border">
             <Input value={q} onChange={e => setQ(e.target.value)} placeholder="بحث..." className="h-7 text-xs" autoFocus />
           </div>
@@ -751,7 +751,7 @@ const EmployeeTiers = () => {
           { label: 'غير مسلّمة', val: notDelivered, icon: <AlertTriangle size={17} className="text-muted-foreground" />, bg: 'bg-muted', color: 'text-muted-foreground' },
           { label: 'تجديد قريب (≤30 يوم)', val: renewingSoon, icon: <Calendar size={17} className="text-warning" />, bg: 'bg-warning/10', color: 'text-warning' },
         ].map(s => (
-          <div key={s.label} className="bg-card border border-border/50 rounded-xl p-4 flex items-center justify-between">
+          <div key={s.label} className="bg-card border border-border/50 p-4 flex items-center justify-between rounded-2xl">
             <div>
               <p className="text-xs text-muted-foreground">{s.label}</p>
               <p className={`text-2xl font-bold mt-0.5 ${s.color}`}>{s.val}</p>
@@ -789,7 +789,7 @@ const EmployeeTiers = () => {
       </div>
 
       {/* Table — يملأ المساحة المتبقية من ارتفاع الصفحة */}
-      <div className="flex-1 flex flex-col min-h-0 w-full bg-card border border-border/50 rounded-xl shadow-sm">
+      <div className="flex-1 flex flex-col min-h-0 w-full bg-card border border-border/50 shadow-sm rounded-2xl">
         {loading ? (
           <div className="flex-1 min-h-[12rem] flex items-center justify-center text-muted-foreground gap-2">
             <Loader2 size={18} className="animate-spin" /> جارٍ التحميل...

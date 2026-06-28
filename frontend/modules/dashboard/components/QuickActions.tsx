@@ -103,7 +103,7 @@ export function QuickActions({ actions = DEFAULT_QUICK_ACTIONS, className }: Rea
                 'hover:shadow-card-hover hover:scale-[1.02] active:scale-[0.98]'
               )}
             >
-              <div className="p-2 rounded-lg bg-card/50">
+              <div className="p-2 bg-card/50 rounded-2xl">
                 {action.icon}
               </div>
               <span className="text-xs font-semibold text-center">{action.label}</span>

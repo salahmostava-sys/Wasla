@@ -125,11 +125,11 @@ export function MaintenanceLogsTab() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-xl border bg-card/80 p-4 shadow-sm">
+        <div className="border bg-card/80 p-4 shadow-sm rounded-2xl">
           <div className="text-xs text-muted-foreground">سجلات مطابقة للتصفية</div>
           <div className="text-2xl font-bold tabular-nums">{filteredTotals.count}</div>
         </div>
-        <div className="rounded-xl border bg-card/80 p-4 shadow-sm sm:col-span-2">
+        <div className="border bg-card/80 p-4 shadow-sm sm:col-span-2 rounded-2xl">
           <div className="text-xs text-muted-foreground">مجموع التكلفة (للسجلات المصفاة)</div>
           <div className="text-2xl font-bold tabular-nums text-primary">
             {filteredTotals.totalCost.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
@@ -177,7 +177,7 @@ export function MaintenanceLogsTab() {
         </CollapsibleContent>
       </Collapsible>
 
-      <div className="bg-card rounded-xl shadow-card overflow-hidden border border-border/50">
+      <div className="bg-card shadow-card overflow-hidden border border-border/50 rounded-2xl">
         <div className="overflow-x-auto w-full">
           <table className="w-full min-w-[960px] text-sm">
             <thead className="bg-muted/40">

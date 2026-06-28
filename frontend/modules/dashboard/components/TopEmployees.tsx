@@ -14,7 +14,7 @@ export function TopEmployees(props: Readonly<{
 }>) {
   const { loading, topNInput, setTopNInput, handleTopNBlur, topRidersOverall, topRidersPerApp, bottomRidersPerApp, atRiskRiders } = props;
   return (
-    <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
       <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
         <div>
           <h3 className="text-sm font-bold text-foreground">أفضل وأضعف المناديب</h3>

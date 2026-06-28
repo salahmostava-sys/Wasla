@@ -155,7 +155,7 @@ function PerformanceAlerts({ alerts }: Readonly<{ alerts: PerformanceAlert[] }>)
         {alerts.slice(0, 8).map((a) => (
           <div
             key={a.id}
-            className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 text-sm"
+            className="flex flex-wrap items-center gap-2 border border-border/60 bg-card px-3 py-2 text-sm rounded-2xl"
           >
             <Badge variant={SEVERITY_BADGE[a.severity]}>
               {SEVERITY_LABELS[a.severity]}
@@ -277,7 +277,7 @@ function AiAnalyticsForecastSection({
     );
   }
   return (
-    <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card p-4">
+    <div className="flex flex-wrap items-center gap-4 -2xl border border-border bg-card p-4 rounded-2xl">
       <div className="flex items-center gap-2 text-foreground">
         <TrendingUp className="h-5 w-5 text-primary" />
         <span className="font-semibold">تنبؤ الطلبات للشهر القادم:</span>

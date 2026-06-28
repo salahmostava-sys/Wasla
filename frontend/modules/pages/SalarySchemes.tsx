@@ -575,11 +575,11 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
 
       {loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[1,2,3,4].map(i => <div key={`scheme-card-skeleton-${i}`} className="bg-card rounded-xl border border-border/50 p-5 h-48 animate-pulse" />)}
+          {[1,2,3,4].map(i => <div key={`scheme-card-skeleton-${i}`} className="bg-card border border-border/50 p-5 h-48 animate-pulse rounded-2xl" />)}
         </div>
       )}
       {!loading && schemeDataError && (
-        <div className="bg-card rounded-xl border border-destructive/30 p-8 text-center">
+        <div className="bg-card border border-destructive/30 p-8 text-center rounded-2xl">
           <Settings size={40} className="mx-auto text-destructive mb-3" />
           <p className="text-destructive font-medium">تعذر تحميل البيانات</p>
           <p className="text-muted-foreground text-sm mt-1">
@@ -591,7 +591,7 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
         </div>
       )}
       {!loading && !schemeDataError && schemes.length === 0 && (
-        <div className="bg-card rounded-xl border border-dashed border-border p-16 text-center">
+        <div className="bg-card border border-dashed border-border p-16 text-center rounded-2xl">
           <Settings size={40} className="mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground">
             {perms.can_edit ? 'لا توجد سكيمات بعد — أضف سكيمة جديدة' : 'لا توجد سكيمات متاحة'}
@@ -772,7 +772,7 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
                       >
                         مثال: 300×3 / 400×4 / 449×5 / ثابت 2500 / +زيادة
                       </Button>
-                      <Button size="sm" variant="outline" onClick={addTier} className="gap-1 h-7 text-xs">
+                      <Button size="sm" variant="default" onClick={addTier} className="gap-1 h-7 text-xs">
                         <Plus size={12} /> إضافة شريحة
                       </Button>
                     </div>

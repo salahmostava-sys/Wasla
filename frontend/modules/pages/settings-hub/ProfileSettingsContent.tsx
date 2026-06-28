@@ -208,7 +208,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       )}
 
       {/* Avatar */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 space-y-4">
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           الصورة الشخصية
         </p>
@@ -225,7 +225,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="absolute bottom-0 end-0 w-7 h-7 rounded-full text-white flex items-center justify-center shadow-card transition-opacity hover:opacity-90"
+              className="absolute bottom-0 end-0 w-7 h-7 -full text-white flex items-center justify-center shadow-card transition-opacity hover:opacity-90 rounded-2xl"
               style={{ background: 'linear-gradient(135deg, #2642e6, #465fff)' }}
             >
               <Camera size={12} />
@@ -246,7 +246,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       </div>
 
       {/* Personal Info */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 space-y-4">
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           المعلومات الشخصية
         </p>
@@ -275,7 +275,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       </div>
 
       {/* Change Password */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 space-y-4">
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           تغيير كلمة المرور
         </p>

@@ -208,10 +208,10 @@ function LoginBrandingPanel({
             <img
               src={brandLogoSrc(settings.logo_url, settings.updated_at)}
               alt=""
-              className="w-16 h-16 rounded-2xl object-contain bg-white/10 backdrop-blur-sm p-2.5 ring-1 ring-white/20 shadow-card"
+              className="w-16 h-16 -2xl object-contain bg-white/10 backdrop-blur-sm p-2.5 ring-1 ring-white/20 shadow-card rounded-2xl"
             />
           ) : (
-            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative">
+            <div className="w-16 h-16 -2xl bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-2xl">
               <span className="material-symbols-outlined text-4xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
               <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30" />
             </div>
@@ -359,7 +359,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
           <img
             src={brandLogoSrc(settings.logo_url, settings.updated_at)}
             alt=""
-            className="w-16 h-16 rounded-2xl object-contain shadow-card border border-border bg-card p-1 mb-3"
+            className="w-16 h-16 -2xl object-contain shadow-card border border-border bg-card p-1 mb-3 rounded-2xl"
           />
         ) : (
           <div className="w-16 h-16 rounded-2xl mb-3 flex items-center justify-center shadow-brand" style={{ background: 'linear-gradient(225deg, #00288e, #1e40af)' }}>
@@ -516,7 +516,7 @@ const Login = () => {
       />
 
       {/* Security badge */}
-      <div className="fixed bottom-6 left-6 hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-card border border-border/40">
+      <div className="fixed bottom-6 left-6 hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-4 -full shadow-card border border-border/40 rounded-2xl">
         <span className="material-symbols-outlined text-emerald-500 text-lg">verified_user</span>
         <span className="text-xs font-semibold text-muted-foreground">اتصال آمن ومحمي</span>
       </div>

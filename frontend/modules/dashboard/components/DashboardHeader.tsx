@@ -91,7 +91,7 @@ export function DashboardHeader({
             <Link
               key={shortcut.to}
               to={shortcut.to}
-              className="rounded-lg border border-border/70 bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-muted/60"
+              className="border border-border/70 bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-muted/60 rounded-2xl"
             >
               {shortcut.label}
             </Link>

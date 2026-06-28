@@ -113,7 +113,7 @@ export function PerformanceDetailedTable({
   ];
 
   return (
-    <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
       {/* Header */}
       <div className="px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         <div>

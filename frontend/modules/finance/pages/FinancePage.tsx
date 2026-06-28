@@ -59,7 +59,7 @@ function SmartRecommendations({
   const profitMargin = revenue > 0 ? ((balance / revenue) * 100).toFixed(0) : '0';
 
   return (
-    <div className="bg-card rounded-2xl shadow-card p-5 border border-primary/20">
+    <div className="bg-card -2xl shadow-card p-5 border border-primary/20 rounded-2xl">
       <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
         💡 توصيات ذكية
       </h3>
@@ -322,7 +322,7 @@ export default function FinancePage() {
 
       {/* ── Summary ────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-card rounded-2xl shadow-card p-5 flex items-center gap-4">
+        <div className="bg-card -2xl shadow-card p-5 flex items-center gap-4 rounded-2xl">
           <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center"><TrendingUp size={22} className="text-emerald-600" /></div>
           <div>
             <p className="text-[11px] text-muted-foreground">الإيرادات</p>
@@ -330,7 +330,7 @@ export default function FinancePage() {
             <p className="text-[10px] text-muted-foreground">{revenueItems.length} عملية</p>
           </div>
         </div>
-        <div className="bg-card rounded-2xl shadow-card p-5 flex items-center gap-4">
+        <div className="bg-card -2xl shadow-card p-5 flex items-center gap-4 rounded-2xl">
           <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center"><TrendingDown size={22} className="text-rose-500" /></div>
           <div>
             <p className="text-[11px] text-muted-foreground">المصاريف</p>
@@ -356,7 +356,7 @@ export default function FinancePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── REVENUES ─────────────────────────────────── */}
-        <div className="bg-card rounded-2xl shadow-card overflow-hidden border border-emerald-200/50 dark:border-emerald-800/30">
+        <div className="bg-card -2xl shadow-card overflow-hidden border border-emerald-200/50 dark:border-emerald-800/30 rounded-2xl">
           <div className="px-4 py-3 border-b border-border/50 bg-emerald-50/50 dark:bg-emerald-950/20 flex items-center justify-between">
             <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400">💰 الإيرادات</h3>
             <span className="text-xs text-emerald-600 font-bold">{revenue.toLocaleString('en-US')} ر.س</span>
@@ -372,7 +372,7 @@ export default function FinancePage() {
         </div>
 
         {/* ── EXPENSES ─────────────────────────────────── */}
-        <div className="bg-card rounded-2xl shadow-card overflow-hidden border border-rose-200/50 dark:border-rose-800/30">
+        <div className="bg-card -2xl shadow-card overflow-hidden border border-rose-200/50 dark:border-rose-800/30 rounded-2xl">
           <div className="px-4 py-3 border-b border-border/50 bg-rose-50/50 dark:bg-rose-950/20 flex items-center justify-between">
             <h3 className="text-sm font-bold text-rose-600 dark:text-rose-400">💸 المصاريف</h3>
             <span className="text-xs text-rose-500 font-bold">{expenses.toLocaleString('en-US')} ر.س</span>

@@ -25,7 +25,7 @@ type StatsCardsProps = Readonly<{
 function StatCard(props: Readonly<{ label: string; value: string | number; icon: LucideIcon; sub?: string; trend?: { value: number; positive: boolean }; loading: boolean }>) {
   const { label, value, icon: Icon, sub, trend, loading } = props;
   return (
-    <div className="bg-card rounded-2xl p-4 shadow-card flex flex-col gap-3 hover:shadow-card-hover transition-shadow">
+    <div className="bg-card -2xl p-4 shadow-card flex flex-col gap-3 hover:shadow-card-hover transition-shadow rounded-2xl">
       {loading ? (
         <>
           <div className="h-9 w-9 rounded-xl bg-muted/40 animate-pulse" />

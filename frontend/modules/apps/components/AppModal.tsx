@@ -54,8 +54,8 @@ export const AppModal = ({ app, saving, onClose, onSave }: Readonly<AppModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border/50 bg-card shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-6 py-4">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto -2xl border border-border/50 bg-card shadow-2xl rounded-2xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-6 py-4 rounded-2xl">
           <h2 className="text-lg font-bold text-foreground">
             {isEdit ? 'تعديل التطبيق' : 'إضافة تطبيق جديد'}
           </h2>
@@ -187,7 +187,7 @@ export const AppModal = ({ app, saving, onClose, onSave }: Readonly<AppModalProp
               />
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 size="sm"
                 onClick={addColumn}
                 disabled={!newColumnLabel.trim()}
@@ -200,7 +200,7 @@ export const AppModal = ({ app, saving, onClose, onSave }: Readonly<AppModalProp
           </div>
         </div>
 
-        <div className="sticky bottom-0 flex items-center justify-between border-t border-border bg-card px-6 py-4">
+        <div className="sticky bottom-0 flex items-center justify-between border-t border-border bg-card px-6 py-4 rounded-2xl">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             إلغاء
           </Button>

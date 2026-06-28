@@ -198,7 +198,7 @@ const Advances = () => {
           { label: 'إجمالي المسدّد', value: `${grandTotals.totalPaid.toLocaleString('en-US')} ر.س`, color: 'text-success' },
           { label: 'إجمالي المتبقي', value: `${grandTotals.remaining.toLocaleString('en-US')} ر.س`, color: 'text-destructive' },
         ].map(s => (
-          <div key={s.label} className="bg-card rounded-xl border border-border/50 p-4">
+          <div key={s.label} className="bg-card border border-border/50 p-4 rounded-2xl">
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className={`text-xl font-bold mt-1 ${s.color}`}>{s.value}</p>
           </div>
@@ -225,7 +225,7 @@ const Advances = () => {
           </div>
           <div className="space-y-2">
             {abscondedWithDebt.map(emp => (
-              <div key={emp.id} className="flex items-center justify-between gap-3 bg-card rounded-lg px-3 py-2 border border-border/50">
+              <div key={emp.id} className="flex items-center justify-between gap-3 bg-card px-3 py-2 border border-border/50 rounded-2xl">
                 <div className="flex items-center gap-2">
                   <span className="badge-urgent text-xs">هارب</span>
                   <span className="text-sm font-medium text-foreground">{emp.name}</span>

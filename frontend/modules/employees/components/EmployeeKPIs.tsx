@@ -233,7 +233,7 @@ export function EmployeeKPIs({ allEmployees }: Readonly<Props>) {
 
 function Section({ title, icon, children }: Readonly<{ title: string; icon: React.ReactNode; children: React.ReactNode }>) {
   return (
-    <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+    <div className="border bg-card shadow-sm overflow-hidden rounded-2xl">
       <div className="flex items-center gap-2 px-4 py-3 border-b bg-muted/30">
         <span className="text-muted-foreground">{icon}</span>
         <h3 className="font-semibold text-sm text-foreground">{title}</h3>

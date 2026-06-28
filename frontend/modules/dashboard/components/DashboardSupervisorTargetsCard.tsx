@@ -17,7 +17,7 @@ export function DashboardSupervisorTargetsCard({ loading, rows }: Readonly<Props
   const totalPct = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
 
   return (
-    <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
           <h3 className="text-sm font-bold text-foreground">أداء تارجت المشرفين</h3>

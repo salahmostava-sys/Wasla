@@ -83,9 +83,9 @@ export function AIRecommendationsSection({
   if (recommendations.length === 0) return null;
 
   return (
-    <div className="bg-card rounded-2xl p-5 shadow-card">
+    <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
       <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-card shadow-card">
+        <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-card shadow-card rounded-2xl">
           <Lightbulb size={18} />
         </div>
         <div>

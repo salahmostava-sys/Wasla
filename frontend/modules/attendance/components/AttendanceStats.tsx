@@ -88,7 +88,7 @@ const AttendanceStats = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-border/50 bg-card p-4">
+      <div className="border border-border/50 bg-card p-4 rounded-2xl">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="space-y-1 min-w-0">
             <h2 className="text-base font-semibold text-foreground leading-tight">ملخص الحضور الشهري</h2>
@@ -115,7 +115,7 @@ const AttendanceStats = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
           const count = totals[key];
           const pct = totalRecorded > 0 ? Math.round((count / totalRecorded) * 100) : 0;
           return (
-            <div key={key} className="bg-card border border-border/50 rounded-xl p-3 flex flex-col gap-1">
+            <div key={key} className="bg-card border border-border/50 p-3 flex flex-col gap-1 rounded-2xl">
               <div className="flex items-center gap-1.5">
                 <span
                   className="w-2.5 h-2.5 rounded-full flex-shrink-0"

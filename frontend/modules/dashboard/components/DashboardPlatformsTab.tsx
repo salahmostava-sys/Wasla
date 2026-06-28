@@ -64,7 +64,7 @@ function PlatformCard(props: Readonly<{
   const achievementCapped = Math.min(targetAchievementPct, 100);
 
   return (
-    <div className="bg-card rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-shadow duration-200 border border-border/40">
+    <div className="bg-card -2xl p-5 shadow-card hover:shadow-card-hover transition-shadow duration-200 border border-border/40 rounded-2xl">
       <div className="flex items-center justify-between gap-2 mb-4">
         <span
           className="text-sm font-bold px-3 py-1.5 rounded-xl"
@@ -195,7 +195,7 @@ export function DashboardPlatformsTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card rounded-2xl h-48 animate-pulse shadow-card" />
+          <div key={index} className="bg-card -2xl h-48 animate-pulse shadow-card rounded-2xl" />
         ))}
       </div>
     );
@@ -205,7 +205,7 @@ export function DashboardPlatformsTab(props: Readonly<{
     <div className="space-y-6">
       {/* ── Summary Stats ────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-card rounded-2xl p-4 shadow-card">
+        <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
               <Package size={16} />
@@ -214,7 +214,7 @@ export function DashboardPlatformsTab(props: Readonly<{
           <p className="text-2xl font-black text-foreground">{platforms.length}</p>
           <p className="text-xs text-muted-foreground mt-1">منصة نشطة</p>
         </div>
-        <div className="bg-card rounded-2xl p-4 shadow-card">
+        <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
               <TrendingUp size={16} />
@@ -223,7 +223,7 @@ export function DashboardPlatformsTab(props: Readonly<{
           <p className="text-2xl font-black text-foreground">{totals.orders.toLocaleString('en-US')}</p>
           <p className="text-xs text-muted-foreground mt-1">إجمالي الطلبات</p>
         </div>
-        <div className="bg-card rounded-2xl p-4 shadow-card">
+        <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
               <Users size={16} />
@@ -232,7 +232,7 @@ export function DashboardPlatformsTab(props: Readonly<{
           <p className="text-2xl font-black text-foreground">{totals.riders.toLocaleString('en-US')}</p>
           <p className="text-xs text-muted-foreground mt-1">إجمالي المناديب</p>
         </div>
-        <div className="bg-card rounded-2xl p-4 shadow-card">
+        <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
               <Target size={16} />
@@ -262,7 +262,7 @@ export function DashboardPlatformsTab(props: Readonly<{
 
       {/* ── Comparison Chart ─────────────────────────────────────────── */}
       {chartData.length > 0 && (
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-foreground">مقارنة الشهر الحالي بالسابق</h3>
             <p className="text-[11px] text-muted-foreground mt-1">طلبات كل منصة مقارنة بالشهر الماضي</p>
@@ -289,7 +289,7 @@ export function DashboardPlatformsTab(props: Readonly<{
       )}
 
       {/* ── Comparison Table ──────────────────────────────────────────── */}
-      <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+      <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
         <div className="px-5 py-4 border-b border-border/50">
           <h3 className="text-sm font-bold text-foreground">جدول مقارنة المنصات</h3>
           <p className="text-[11px] text-muted-foreground mt-1">اضغط على رأس العمود للترتيب</p>

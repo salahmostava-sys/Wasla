@@ -79,13 +79,13 @@ function SettingsContentFallback() {
     <div className="space-y-5 animate-pulse">
       <div className="h-7 w-56 rounded-xl bg-muted/40" />
       <div className="h-4 w-80 max-w-full rounded-lg bg-muted/30" />
-      <div className="rounded-2xl border border-border/50 bg-card p-5 space-y-4">
+      <div className="-2xl border border-border/50 bg-card p-5 space-y-4 rounded-2xl">
         <div className="h-4 w-32 rounded bg-muted/40" />
         {SECTION_SKELETON_KEYS.map((key) => (
           <div key={key} className="h-11 rounded-xl bg-muted/40" />
         ))}
       </div>
-      <div className="rounded-2xl border border-border/50 bg-card p-5 space-y-4">
+      <div className="-2xl border border-border/50 bg-card p-5 space-y-4 rounded-2xl">
         <div className="h-4 w-40 rounded bg-muted/40" />
         <div className="h-32 rounded-xl bg-muted/30" />
       </div>

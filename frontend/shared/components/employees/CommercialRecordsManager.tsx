@@ -176,7 +176,7 @@ export function CommercialRecordsManager({
                   return (
                     <div
                       key={record.id}
-                      className="rounded-xl border border-border/60 bg-card px-4 py-3"
+                      className="border border-border/60 bg-card px-4 py-3 rounded-2xl"
                     >
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0 flex-1">
@@ -280,7 +280,7 @@ export function CommercialRecordsManager({
                 {records.map((record) => (
                   <div
                     key={`${record.source}-${record.id ?? record.name}`}
-                    className="rounded-xl border border-border/60 bg-card px-4 py-3"
+                    className="border border-border/60 bg-card px-4 py-3 rounded-2xl"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">

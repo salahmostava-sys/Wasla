@@ -44,7 +44,7 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border/50 p-3 shadow-sm">
+    <div className="bg-card border border-border/50 p-3 shadow-sm rounded-2xl">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
           <h3 className="text-sm font-bold text-foreground">آخر عمليات الاستيراد</h3>
@@ -63,7 +63,7 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
               key={batch.id}
               className="rounded-lg border border-border/50 overflow-hidden"
             >
-              <div className="px-3 py-2 flex flex-wrap items-center justify-between gap-2 bg-card">
+              <div className="px-3 py-2 flex flex-wrap items-center justify-between gap-2 bg-card rounded-2xl">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-bold text-foreground">{batch.file_name || 'بدون اسم ملف'}</span>

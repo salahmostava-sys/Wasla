@@ -12,7 +12,7 @@ export function AttendanceChart(props: Readonly<{
   const { loading, kpis, attendanceWeek } = props;
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-2xl shadow-card p-5">
+      <div className="bg-card -2xl shadow-card p-5 rounded-2xl">
         <h3 className="text-sm font-bold mb-1">الحضور اليوم</h3>
         <p className="text-[11px] text-muted-foreground/80 mb-3">{format(new Date(), 'EEEE، d MMMM yyyy', { locale: ar })}</p>
         {loading ? (
@@ -28,7 +28,7 @@ export function AttendanceChart(props: Readonly<{
         )}
       </div>
 
-      <div className="bg-card rounded-2xl shadow-card p-5">
+      <div className="bg-card -2xl shadow-card p-5 rounded-2xl">
         <h3 className="text-sm font-bold mb-1">الحضور — آخر 7 أيام</h3>
         <p className="text-[11px] text-muted-foreground/80 mb-3">حاضر / متأخر / غائب / إجازة / مريض</p>
         {attendanceWeek.length === 0 ? (

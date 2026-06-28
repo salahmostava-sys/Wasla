@@ -394,13 +394,13 @@ const Alerts = () => {
   let alertsContent = null;
   if (alertsQuery.isLoading) {
     alertsContent = (
-      <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
+      <div className="bg-card border border-border/50 p-12 text-center rounded-2xl">
         <p className="text-muted-foreground">جارٍ تحميل التنبيهات...</p>
       </div>
     );
   } else if (filtered.length === 0) {
     alertsContent = (
-      <div className="bg-card rounded-xl border border-border/50 p-12 text-center">
+      <div className="bg-card border border-border/50 p-12 text-center rounded-2xl">
         <CheckCircle size={40} className="mx-auto text-success mb-3" />
         <p className="text-muted-foreground">لا توجد تنبيهات مفعّلة</p>
         <p className="text-xs text-muted-foreground mt-1">جميع المستندات سارية المفعول ✅.</p>
@@ -492,7 +492,7 @@ const Alerts = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <button
-          className="stat-card text-right w-full border-r-4 border-r-destructive cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          className="stat-card text-right w-full border-r-4 border-r-destructive cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'urgent' ? 'all' : 'urgent')}
         >
           <p className="text-sm text-muted-foreground">عاجل</p>
@@ -500,7 +500,7 @@ const Alerts = () => {
           <p className="text-xs text-muted-foreground mt-1">يتطلب تدخل فوري</p>
         </button>
         <button
-          className="stat-card text-right w-full border-r-4 border-r-warning cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          className="stat-card text-right w-full border-r-4 border-r-warning cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'warning' ? 'all' : 'warning')}
         >
           <p className="text-sm text-muted-foreground">تحذير</p>
@@ -508,21 +508,21 @@ const Alerts = () => {
           <p className="text-xs text-muted-foreground mt-1">خلال 30-60 يوم</p>
         </button>
         <button
-          className="stat-card text-right w-full border-r-4 border-r-info cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          className="stat-card text-right w-full border-r-4 border-r-info cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'info' ? 'all' : 'info')}
         >
           <p className="text-sm text-muted-foreground">معلومات</p>
           <p className="text-3xl font-bold text-info mt-1">{infoCount}</p>
           <p className="text-xs text-muted-foreground mt-1">للعلم</p>
         </button>
-        <div className="stat-card border-r-4 border-r-success">
+        <div className="stat-card border-r-4 border-r-success rounded-2xl">
           <p className="text-sm text-muted-foreground">تم حسمها</p>
           <p className="text-3xl font-bold text-success mt-1">{resolved.length}</p>
           <p className="text-xs text-muted-foreground mt-1">تنبيهات محسومة</p>
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border/50 p-3 space-y-2">
+      <div className="bg-card border border-border/50 p-3 space-y-2 rounded-2xl">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

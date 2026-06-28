@@ -58,7 +58,7 @@ export default function ViolationSearchTab({
   return (
     <>
       {/* ── Search Card ── */}
-      <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="bg-card border border-border -2xl p-4 shadow-sm space-y-3 rounded-2xl">
         <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <Search size={15} className="text-primary" /> بيانات الاستعلام
         </h2>
@@ -84,7 +84,7 @@ export default function ViolationSearchTab({
             />
             {/* Suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-card border border-border rounded-xl shadow-card overflow-hidden">
+              <div className="absolute z-50 top-full mt-1 w-full bg-card border border-border shadow-card overflow-hidden rounded-2xl">
                 {suggestions.map(v => (
                   <button
                     key={v.id}
@@ -187,7 +187,7 @@ export default function ViolationSearchTab({
 
       {/* ── No Vehicle Found ── */}
       {noVehicle && (
-        <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-2">
+        <div className="bg-card border border-border -2xl p-6 text-center space-y-2 rounded-2xl">
           <XCircle className="mx-auto text-muted-foreground" size={36} />
           <p className="font-semibold text-foreground">لم يتم العثور على المركبة</p>
           <p className="text-sm text-muted-foreground">
@@ -198,7 +198,7 @@ export default function ViolationSearchTab({
 
       {/* ── No Assignment Found ── */}
       {results !== null && results.length === 0 && !noVehicle && (
-        <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-2">
+        <div className="bg-card border border-border -2xl p-6 text-center space-y-2 rounded-2xl">
           <AlertTriangle className="mx-auto text-warning" size={36} />
           <p className="font-semibold text-foreground">لا يوجد سائق مسؤول في هذا التوقيت</p>
           <p className="text-sm text-muted-foreground">
@@ -209,7 +209,7 @@ export default function ViolationSearchTab({
 
       {/* ── Results Table ── */}
       {results && results.length > 0 && (
-        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border -2xl shadow-sm overflow-hidden rounded-2xl">
           <div className="px-5 py-3 border-b border-border flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-foreground">
               نتائج الاستعلام · {results.length} سجل

@@ -39,7 +39,7 @@ export function MonthSummaryStats(props: Readonly<Props>) {
   return (
     <div>
       <div className="flex flex-wrap gap-2">
-        <div className="bg-card border border-primary/30 rounded-lg px-3 py-2 flex items-center gap-3">
+        <div className="bg-card border border-primary/30 px-3 py-2 flex items-center gap-3 rounded-2xl">
           <TrendingUp size={14} className="text-primary shrink-0" />
           <div>
             <p className="text-sm font-bold text-foreground leading-tight">{grandTotal.toLocaleString('en-US')} <span className="text-xs font-normal text-muted-foreground">طلب</span></p>
@@ -57,7 +57,7 @@ export function MonthSummaryStats(props: Readonly<Props>) {
           return (
             <div
               key={app.id}
-              className="bg-card border border-border/50 rounded-lg px-3 py-2 flex items-center gap-3 hover:border-border transition-colors"
+              className="bg-card border border-border/50 px-3 py-2 flex items-center gap-3 hover:border-border transition-colors rounded-2xl"
             >
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0"

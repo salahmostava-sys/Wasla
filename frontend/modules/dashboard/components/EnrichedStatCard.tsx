@@ -45,7 +45,7 @@ export function EnrichedStatCard({
 
   return (
     <div
-      className="bg-card rounded-2xl p-4 shadow-card hover:shadow-card-hover transition-all duration-300 relative overflow-hidden group"
+      className="bg-card -2xl p-4 shadow-card hover:shadow-card-hover transition-all duration-300 relative overflow-hidden group rounded-2xl"
       style={borderAccent ? { borderBottom: `3px solid ${borderAccent}` } : undefined}
     >
       {/* Subtle background shimmer on hover */}

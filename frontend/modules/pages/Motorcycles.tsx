@@ -547,7 +547,7 @@ const Motorcycles = () => {
           { label: 'في الصيانة', value: stats.maintenance, icon: '🔧', cls: 'text-yellow-600' },
           { label: 'أعطال', value: stats.breakdown, icon: '⚠️', cls: 'text-destructive' },
         ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4">
+          <div key={s.label} className="bg-card border border-border p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">{s.icon}</span>
               <span className="text-xs text-muted-foreground">{s.label}</span>

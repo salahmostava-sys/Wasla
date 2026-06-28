@@ -108,7 +108,7 @@ export function GlobalTableFilters({
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-card p-4">
+    <div className="bg-card -2xl shadow-card p-4 rounded-2xl">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">الفلاتر</span>

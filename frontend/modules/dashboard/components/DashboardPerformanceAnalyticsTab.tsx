@@ -26,7 +26,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card rounded-2xl h-80 animate-pulse shadow-card" />
+          <div key={index} className="bg-card -2xl h-80 animate-pulse shadow-card rounded-2xl" />
         ))}
       </div>
     );
@@ -44,7 +44,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-foreground">اتجاه الأداء الشهري</h3>
             <p className="text-[11px] text-muted-foreground mt-1">إجمالي الطلبات ومتوسط كل مندوب خلال آخر 6 أشهر</p>
@@ -66,7 +66,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-foreground">اتجاه الطلبات اليومي</h3>
             <p className="text-[11px] text-muted-foreground mt-1">قراءة سريعة لزخم الشهر الحالي يومًا بيوم</p>
@@ -90,7 +90,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.3fr,0.7fr] gap-4">
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-foreground">مقارنة المنصات</h3>
             <p className="text-[11px] text-muted-foreground mt-1">من الأكثر نموًا ومن يتراجع هذا الشهر</p>
@@ -121,7 +121,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
           </div>
         </div>
 
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-foreground">توزيع الأداء</h3>
             <p className="text-[11px] text-muted-foreground mt-1">الفريق الحالي حسب مستوى الأداء</p>

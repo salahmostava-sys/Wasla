@@ -461,7 +461,7 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
               {/* Action buttons inside modal header */}
               {canEdit && !isWrittenOff && (
                 <div className="flex items-center gap-2 me-8">
-                  <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5" onClick={() => setShowInlineAdd(true)}>
+                  <Button size="sm" variant="default" className="h-7 text-xs gap-1.5" onClick={() => setShowInlineAdd(true)}>
                     <Plus size={12} /> إضافة
                   </Button>
                   {empAdvances.length > 0 && onEditAdvance && (

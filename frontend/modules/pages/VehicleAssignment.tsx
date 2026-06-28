@@ -398,7 +398,7 @@ const VehicleAssignment = () => {
           { label: 'تم الإعادة',        value: stats.returned, icon: '✅', cls: 'text-success'    },
           { label: 'مركبات فاضية',      value: stats.free,     icon: '🏍️', cls: 'text-success'    },
         ].map(s => (
-          <div key={s.label} className="bg-card border border-border rounded-xl p-4">
+          <div key={s.label} className="bg-card border border-border p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">{s.icon}</span>
               <span className="text-xs text-muted-foreground">{s.label}</span>

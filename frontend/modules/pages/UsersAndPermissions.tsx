@@ -339,7 +339,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
   if (authLoading) {
     return (
-      <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl">
         جاري التحقق من الجلسة...
       </div>
     );
@@ -359,7 +359,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
   if (loading) {
     return (
-      <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl">
         جاري تحميل المستخدمين والصلاحيات...
       </div>
     );
@@ -468,7 +468,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
         <TabsContent value="permissions">
           {canEdit && rows.length > 0 ? (
-            <div className="space-y-3 rounded-xl border bg-card p-4">
+            <div className="space-y-3 border bg-card p-4 rounded-2xl">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div className="space-y-1">
                   <h3 className="text-base font-semibold">صلاحيات الصفحات (مخصصة للمستخدم)</h3>
@@ -550,7 +550,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
               )}
             </div>
           ) : (
-            <div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+            <div className="border bg-card p-4 text-sm text-muted-foreground rounded-2xl">
               لا توجد صلاحيات مخصصة متاحة للعرض حالياً.
             </div>
           )}

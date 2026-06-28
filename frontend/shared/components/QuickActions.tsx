@@ -44,7 +44,7 @@ export function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+    <div className="-2xl border border-border/60 bg-card p-4 shadow-sm rounded-2xl">
       <h3 className="mb-3 text-sm font-semibold text-foreground">⚡ إجراءات سريعة</h3>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {ACTIONS.map((action) => (

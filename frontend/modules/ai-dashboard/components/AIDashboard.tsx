@@ -126,7 +126,7 @@ function renderBestEmployeesContent(
         {bestEmployees.employees.slice(0, 5).map((emp, idx) => (
           <div
             key={emp.employee_id}
-            className="flex items-center gap-2 rounded-lg border border-border/60 bg-card px-2 py-1.5 text-xs"
+            className="flex items-center gap-2 border border-border/60 bg-card px-2 py-1.5 text-xs rounded-2xl"
           >
             <span className="w-4 font-bold text-muted-foreground tabular-nums">{idx + 1}</span>
             <span className="flex-1 truncate font-medium">{emp.employee_name}</span>

@@ -34,7 +34,7 @@ const LazyDashboardRankingTab = lazy(loadRankingTab);
 const LazyDashboardPlatformsTab = lazy(loadPlatformsTab);
 
 function TabFallback() {
-  return <div className="bg-card rounded-2xl h-80 animate-pulse shadow-card" />;
+  return <div className="bg-card -2xl h-80 animate-pulse shadow-card rounded-2xl" />;
 }
 
 export default function DashboardPerformancePage() {

@@ -60,12 +60,12 @@ export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) 
   };
 
   if (performanceQuery.isLoading) {
-    return <div className="bg-card rounded-2xl h-72 animate-pulse shadow-card" />;
+    return <div className="bg-card -2xl h-72 animate-pulse shadow-card rounded-2xl" />;
   }
 
   if (performanceQuery.isError || !performanceQuery.data) {
     return (
-      <div className="bg-card rounded-2xl border border-border/60 p-6 text-sm text-muted-foreground">
+      <div className="bg-card -2xl border border-border/60 p-6 text-sm text-muted-foreground rounded-2xl">
         تعذر تحميل تحليل الأداء.
       </div>
     );
@@ -77,7 +77,7 @@ export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) 
       <RiderProfilePerformanceCard data={performanceQuery.data} />
 
       {/* ── Targets Form ── */}
-      <div className="bg-card rounded-2xl p-5 shadow-card md:max-w-md">
+      <div className="bg-card -2xl p-5 shadow-card md:max-w-md rounded-2xl">
         <h3 className="text-sm font-bold text-foreground mb-4">إعدادات الأهداف</h3>
         <div className="space-y-3">
           <div>

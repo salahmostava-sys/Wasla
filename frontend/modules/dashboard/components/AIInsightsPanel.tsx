@@ -36,11 +36,11 @@ export function AIInsightsPanel({ insights }: Readonly<AIInsightsPanelProps>) {
     : insights.insights.slice(0, 4);
 
   return (
-    <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white shadow-card shadow-card">
+          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white shadow-card shadow-card rounded-2xl">
             <Brain size={18} />
           </div>
           <div>

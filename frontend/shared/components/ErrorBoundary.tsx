@@ -36,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
       String(this.state.error);
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-        <div className="max-w-2xl w-full bg-card border border-border rounded-2xl shadow-card p-6 space-y-3">
+        <div className="max-w-2xl w-full bg-card border border-border -2xl shadow-card p-6 space-y-3 rounded-2xl">
           <h1 className="text-lg font-bold">حدث خطأ أثناء تشغيل الصفحة</h1>
           <p className="text-sm text-muted-foreground">
             لو الشاشة كانت بيضاء، صوّر هذه الرسالة وأرسلها لنا.

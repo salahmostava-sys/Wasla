@@ -34,7 +34,7 @@ export function FuelMonthlyTable(props: Readonly<{
 }>) {
   const { tableRef, bodyRows } = props;
   return (
-    <div className="bg-card rounded-xl shadow-card overflow-hidden">
+    <div className="bg-card shadow-card overflow-hidden rounded-2xl">
       <div className="overflow-x-auto w-full">
         <table ref={tableRef} className="w-full min-w-[800px] text-sm">
           <thead>
@@ -433,7 +433,7 @@ export function FuelDailyDetailedView(props: Readonly<{
       </div>
 
       {/* Riders + expandable daily + bottom inline add */}
-      <div className="bg-card rounded-xl shadow-card overflow-hidden border border-border/50">
+      <div className="bg-card shadow-card overflow-hidden border border-border/50 rounded-2xl">
         <div className="px-4 py-2 border-b border-border/50 bg-muted/20 text-xs text-muted-foreground">
           مناديب المنصة المختارة (يشمل أي مندوب لديه طلبات هذا الشهر) — اضغط السهم لعرض السجلات اليومية وإضافة إدخال من الصف السفلي.
         </div>

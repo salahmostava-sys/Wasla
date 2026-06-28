@@ -267,7 +267,7 @@ export default function ProjectSettings() {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Project Name */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 shadow-sm">
+      <div className="bg-card border border-border/50 p-5 shadow-sm rounded-2xl">
         <ProjectSettingsSectionHeader icon={<Building2 size={14} />} title={t(isRTL, 'اسم المشروع', 'Project Name')} />
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -288,7 +288,7 @@ export default function ProjectSettings() {
       </div>
 
       {/* Logo */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 shadow-sm">
+      <div className="bg-card border border-border/50 p-5 shadow-sm rounded-2xl">
         <ProjectSettingsSectionHeader icon={<Upload size={14} />} title={t(isRTL, 'شعار المشروع', 'Project Logo')} />
         <div className="flex items-center gap-4">
           {logoPreview ? (
@@ -337,7 +337,7 @@ export default function ProjectSettings() {
       </div>
 
       {/* Language & Theme */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 shadow-sm">
+      <div className="bg-card border border-border/50 p-5 shadow-sm rounded-2xl">
         <ProjectSettingsSectionHeader icon={<Globe size={14} />} title={t(isRTL, 'اللغة والمظهر', 'Language & Theme')} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -357,7 +357,7 @@ export default function ProjectSettings() {
       </div>
 
       {/* Alert Settings */}
-      <div className="bg-card rounded-xl border border-border/50 p-5 shadow-sm">
+      <div className="bg-card border border-border/50 p-5 shadow-sm rounded-2xl">
         <ProjectSettingsSectionHeader icon={<Bell size={14} />} title={t(isRTL, 'إعدادات التنبيهات', 'Alert Settings')} />
         <div className="flex items-center gap-4">
           <div className="flex-1">
@@ -384,7 +384,7 @@ export default function ProjectSettings() {
 
       {/* Backup Section (Admin only) */}
       {isAdmin && (
-        <div className="bg-card rounded-xl border border-border/50 p-5 shadow-sm">
+        <div className="bg-card border border-border/50 p-5 shadow-sm rounded-2xl">
           <ProjectSettingsSectionHeader icon={<Database size={14} />} title={t(isRTL, 'النسخ الاحتياطي', 'Backup')} />
           <div className="flex items-start gap-4">
             <div className="flex-1">

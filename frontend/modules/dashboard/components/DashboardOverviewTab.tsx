@@ -22,7 +22,7 @@ function SectionPlaceholder({
   rows?: number;
 }>) {
   return (
-    <div className="bg-card rounded-2xl shadow-card p-5">
+    <div className="bg-card -2xl shadow-card p-5 rounded-2xl">
       <div className="flex items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-bold text-foreground">{title}</h3>
         <div className="h-4 w-24 rounded bg-muted/40 animate-pulse" />

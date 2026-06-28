@@ -396,7 +396,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   if (loadingData) {
     // Skeleton — shows column structure while loading so the page doesn't feel empty
     return (
-      <div className="rounded-xl shadow-card bg-card overflow-hidden">
+      <div className="shadow-card bg-card overflow-hidden rounded-2xl">
         <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40">
           <div className="h-3 w-32 rounded bg-muted animate-pulse" />
           <div className="h-3 w-24 rounded bg-muted animate-pulse" />
@@ -423,7 +423,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   if (!loadingData && filtered.length === 0) {
     const isEmpty = rows.length === 0;
     return (
-      <div className="rounded-xl shadow-card bg-card h-48 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+      <div className="shadow-card bg-card h-48 flex flex-col items-center justify-center gap-2 text-muted-foreground rounded-2xl">
         <span className="text-2xl">{isEmpty ? '📭' : '🔍'}</span>
         <p className="text-sm">
           {isEmpty
@@ -435,7 +435,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   }
 
   return (
-    <div className="rounded-xl shadow-card bg-card overflow-hidden">
+    <div className="shadow-card bg-card overflow-hidden rounded-2xl">
       {/* Scroll container — useVirtualizer reads its scrollTop */}
       {/* contain:layout paint — isolates repaints without breaking sticky positioning */}
       <div ref={scrollContainerRef} className="overflow-auto" style={{ maxHeight: '75vh', contain: 'layout paint' }}>

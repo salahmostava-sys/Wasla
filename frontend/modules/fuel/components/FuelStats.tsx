@@ -4,7 +4,7 @@ import { TrendingUp, Fuel, DollarSign, Package, Calendar } from 'lucide-react';
 function StatCard(props: Readonly<{ icon: React.ReactNode; label: string; value: string; sub?: string }>) {
   const { icon, label, value, sub } = props;
   return (
-    <div className="bg-card rounded-xl shadow-card p-5 flex items-center gap-4">
+    <div className="bg-card shadow-card p-5 flex items-center gap-4 rounded-2xl">
       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">{icon}</div>
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>

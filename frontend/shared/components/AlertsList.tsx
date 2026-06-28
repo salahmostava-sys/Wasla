@@ -111,10 +111,10 @@ export function AlertsList() {
   }
 
   return (
-    <div className="chart-card animate-fade-in">
-      <div className="chart-card-header">
+    <div className="chart-card animate-fade-in rounded-2xl">
+      <div className="chart-card-header rounded-2xl">
         <div className="flex items-center gap-2">
-          <h3 className="chart-card-title">التنبيهات العاجلة</h3>
+          <h3 className="chart-card-title rounded-2xl">التنبيهات العاجلة</h3>
           {alerts.length > 0 && (
             <span className="w-5 h-5 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
               {alerts.length}

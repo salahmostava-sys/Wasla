@@ -147,7 +147,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
   if (!profile || !analysis) {
     return (
-      <div className="bg-card rounded-2xl p-6 shadow-card text-center text-sm text-muted-foreground">
+      <div className="bg-card -2xl p-6 shadow-card text-center text-sm text-muted-foreground rounded-2xl">
         لا توجد بيانات أداء كافية
       </div>
     );
@@ -158,7 +158,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
   return (
     <div className="space-y-4">
       {/* ── Header + Score ─────────────────────────────────────────── */}
-      <div className="bg-card rounded-2xl p-5 shadow-card">
+      <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-foreground">{profile.employeeName}</h2>
@@ -183,7 +183,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* ── الأداء الحالي ──────────────────────────────────── */}
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-3">
             <Target size={16} className="text-foreground" />
             <h3 className="text-sm font-bold text-foreground">الأداء الحالي</h3>
@@ -209,7 +209,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
         </div>
 
         {/* ── المقارنة ──────────────────────────────────────── */}
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-3">
             <Calendar size={16} className="text-foreground" />
             <h3 className="text-sm font-bold text-foreground">مقارنة الأداء</h3>
@@ -243,7 +243,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* ── تحليل AI ─────────────────────────────────────── */}
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-3">
             <Award size={16} className="text-violet-600" />
             <h3 className="text-sm font-bold text-foreground">تحليل ذكي</h3>
@@ -271,7 +271,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
         </div>
 
         {/* ── Finance ──────────────────────────────────────── */}
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign size={16} className="text-foreground" />
             <h3 className="text-sm font-bold text-foreground">المالية</h3>
@@ -308,7 +308,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
       {/* ── Target Progress ──────────────────────────────────── */}
       {summary.monthlyTargetOrders > 0 && (
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-3">
             <Target size={16} className="text-foreground" />
             <h3 className="text-sm font-bold text-foreground">تحقيق الهدف</h3>
@@ -323,7 +323,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
       {/* ── Last 3 Months Trend ──────────────────────────────── */}
       {lastThreeMonths.length > 0 && (
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <h3 className="text-sm font-bold text-foreground mb-3">آخر 3 شهور</h3>
           {lastThreeMonths.map((m) => (
             <MonthRow
@@ -340,7 +340,7 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
 
       {/* ── Platform Breakdown ───────────────────────────────── */}
       {platformBreakdown.length > 0 && (
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <h3 className="text-sm font-bold text-foreground mb-3">توزيع المنصات</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {platformBreakdown.map((pb) => (

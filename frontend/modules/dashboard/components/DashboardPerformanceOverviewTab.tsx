@@ -85,7 +85,7 @@ function ComparisonCard(props: Readonly<{
   const { title, currentValue, previousValue, change, hint } = props;
   const positive = change >= 0;
   return (
-    <div className="bg-card rounded-2xl p-4 shadow-card space-y-3">
+    <div className="bg-card -2xl p-4 shadow-card space-y-3 rounded-2xl">
       <div>
         <p className="text-sm font-bold text-foreground">{title}</p>
         <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>
@@ -116,7 +116,7 @@ function AppCard(props: Readonly<{
 }>) {
   const { appName, orders, riders, targetOrders, targetAchievementPct, growthPct, brandColor, textColor } = props;
   return (
-    <div className="bg-card rounded-2xl p-4 shadow-card">
+    <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
       <div className="flex items-center justify-between gap-2 mb-3">
         <span
           className="text-xs font-bold px-2.5 py-1 rounded-lg"
@@ -178,7 +178,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {Array.from({ length: 8 }, (_, index) => (
-          <div key={index} className="bg-card rounded-2xl h-32 animate-pulse shadow-card" />
+          <div key={index} className="bg-card -2xl h-32 animate-pulse shadow-card rounded-2xl" />
         ))}
       </div>
     );
@@ -255,7 +255,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
             change={comparison.week.growthPct}
             hint="قراءة سريعة لتغيّر الزخم"
           />
-          <div className="bg-card rounded-2xl p-4 shadow-card">
+          <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
             <p className="text-sm font-bold text-foreground">توزيع الأداء</p>
             <div className="space-y-3 mt-4">
               {(['excellent', 'good', 'average', 'weak'] as const).map((tier) => {
@@ -281,7 +281,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 
       {/* ── Platform Performance ──────────────────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-[1.4fr,0.8fr] gap-4">
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <h3 className="text-sm font-bold text-foreground">أداء المنصات</h3>
@@ -297,7 +297,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         </div>
 
         <div className="space-y-4">
-          <div className="bg-card rounded-2xl p-5 shadow-card">
+          <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
             <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
             <div className="space-y-3">
               {ordersByCity.map((row) => (
@@ -309,7 +309,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl p-5 shadow-card">
+          <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
             <h3 className="text-sm font-bold text-foreground mb-4">ملخص سريع</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -339,7 +339,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
       <AIRecommendationsSection recommendations={aiInsights.recommendations} />
 
       {/* ── Smart Alerts ─────────────────────────────────────────────────── */}
-      <div className="bg-card rounded-2xl p-5 shadow-card">
+      <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm font-bold text-foreground">التنبيهات الذكية</h3>

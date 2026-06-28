@@ -295,7 +295,7 @@ function SpreadsheetView({
         <tbody className="divide-y divide-border/30">
           {monthly.map((row) => (
             <tr key={row.employee_id} className="hover:bg-muted/20">
-              <td className="ta-td font-medium sticky right-0 bg-card border-r border-border/40">{row.employee_name}</td>
+              <td className="ta-td font-medium sticky right-0 bg-card border-r border-border/40 rounded-2xl">{row.employee_name}</td>
               {days.map((d) => {
                 const km = kmByEmpDay[row.employee_id]?.[d];
                 return (

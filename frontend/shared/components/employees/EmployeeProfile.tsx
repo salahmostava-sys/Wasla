@@ -286,7 +286,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+      <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
         <div className="flex items-start gap-5 flex-wrap">
           <div className="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
             {personalPhotoSigned && (
@@ -350,7 +350,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 1: Basic Data */}
         <TabsContent value="basic">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">البيانات الأساسية</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <InfoField label="الاسم الكامل" value={employee.name} />
@@ -455,7 +455,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 2: Documents — uses Signed URLs for private bucket */}
         <TabsContent value="docs">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">الوثائق والتواريخ</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {employee.residency_expiry && (
@@ -511,7 +511,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 3: Salary */}
         <TabsContent value="salary">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">الراتب</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <InfoField label="نوع الراتب" value={employee.salary_type === 'orders' ? 'طلبات (Orders)' : 'دوام ثابت (Shift)'} />
@@ -524,7 +524,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 4: Apps */}
         <TabsContent value="apps">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">التطبيقات المرتبطة</h3>
             {loading && <p className="text-muted-foreground text-sm">جارٍ التحميل...</p>}
             {!loading && employeeApps.length === 0 && (
@@ -555,7 +555,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 5: Advances */}
         <TabsContent value="advances">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">السلف</h3>
             {loading && <p className="text-muted-foreground text-sm">جارٍ التحميل...</p>}
             {!loading && advances.length === 0 && (
@@ -627,7 +627,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 6: Attendance */}
         <TabsContent value="attendance">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-5">سجل الحضور</h3>
             <p className="text-muted-foreground text-sm">يمكن مراجعة سجل الحضور من صفحة الحضور والانصراف</p>
           </div>
@@ -635,7 +635,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 7: Salaries — enhanced with totals */}
         <TabsContent value="salaries">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-1">الرواتب الشهرية</h3>
             <p className="text-xs text-muted-foreground mb-5">تفصيل الراتب المدفوع لكل شهر</p>
             {loading && <p className="text-muted-foreground text-sm">جارٍ التحميل...</p>}
@@ -730,7 +730,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
         {/* Tab 8: Monthly Orders */}
         <TabsContent value="orders">
-          <div className="bg-card rounded-xl border border-border/50 shadow-sm p-6">
+          <div className="bg-card border border-border/50 shadow-sm p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-1">الطلبات الشهرية</h3>
             <p className="text-xs text-muted-foreground mb-5">إجمالي الطلبات المنجزة لكل شهر مع التفصيل</p>
             {loading && <p className="text-muted-foreground text-sm">جارٍ التحميل...</p>}

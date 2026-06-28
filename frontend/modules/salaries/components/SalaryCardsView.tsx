@@ -25,7 +25,7 @@ export function SalaryCardsView(props: Readonly<SalaryCardsViewProps>) {
       {loadingData && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {SALARY_CARD_SKELETON_KEYS.map((skeletonKey) => (
-            <div key={skeletonKey} className="bg-card border border-border/50 rounded-xl p-4 space-y-2 animate-pulse">
+            <div key={skeletonKey} className="bg-card border border-border/50 p-4 space-y-2 animate-pulse rounded-2xl">
               <div className="h-4 bg-muted rounded w-3/4" />
               <div className="h-3 bg-muted rounded w-1/2" />
               <div className="h-8 bg-muted rounded mt-3" />
@@ -44,7 +44,7 @@ export function SalaryCardsView(props: Readonly<SalaryCardsViewProps>) {
             const c = computeRow(r);
             const needsApproval = r.status === 'pending' || !!r.isDirty;
             return (
-              <div key={r.id} className="bg-card border border-border/50 rounded-xl p-4 hover:shadow-card-hover transition-shadow flex flex-col gap-3">
+              <div key={r.id} className="bg-card border border-border/50 p-4 hover:shadow-card-hover transition-shadow flex flex-col gap-3 rounded-2xl">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold flex-shrink-0">
                     {r.employeeName.slice(0, 1)}

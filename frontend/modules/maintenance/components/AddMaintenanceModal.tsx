@@ -245,7 +245,7 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
           <div className="border rounded-lg p-3 space-y-2">
             <div className="flex items-center justify-between">
               <Label>قطع الغيار المستخدمة</Label>
-              <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addRow}>
+              <Button type="button" variant="default" size="sm" className="gap-1" onClick={addRow}>
                 <Plus size={14} /> إضافة قطعة
               </Button>
             </div>

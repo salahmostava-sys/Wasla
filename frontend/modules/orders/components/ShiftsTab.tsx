@@ -466,7 +466,7 @@ export function ShiftsTab({
       </div>
 
       {/* Grid */}
-      <div className="bg-card rounded-xl shadow-card overflow-x-auto w-full">
+      <div className="bg-card shadow-card overflow-x-auto w-full rounded-2xl">
         {loading ? (
           <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground">
             <Loader2 size={20} className="animate-spin" /> جاري التحميل...

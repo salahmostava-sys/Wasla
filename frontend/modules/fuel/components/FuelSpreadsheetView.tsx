@@ -69,7 +69,7 @@ function SpreadsheetStat(props: Readonly<{
 }>) {
   const { icon, label, value, sub, accent } = props;
   return (
-    <div className="bg-card rounded-xl shadow-card p-4 flex items-center gap-3">
+    <div className="bg-card shadow-card p-4 flex items-center gap-3 rounded-2xl">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${accent ?? 'bg-primary/10 text-primary'}`}>
         {icon}
       </div>
@@ -91,7 +91,7 @@ function CellDetailPopover(props: Readonly<{
   const { popover, onClose } = props;
   return (
     <dialog
-      className="relative bg-card rounded-2xl shadow-xl border border-border p-5 min-w-[300px] max-w-[380px] space-y-4"
+      className="relative bg-card -2xl shadow-xl border border-border p-5 min-w-[300px] max-w-[380px] space-y-4 rounded-2xl"
       open
     >
       <div className="absolute inset-0 bg-black/20" onClick={onClose} aria-hidden="true" />
@@ -288,10 +288,10 @@ export default function FuelSpreadsheetView(props: Readonly<{
       <div className="space-y-4">
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="bg-card rounded-xl h-20 animate-pulse shadow-card" />
+            <div key={i} className="bg-card h-20 animate-pulse shadow-card rounded-2xl" />
           ))}
         </div>
-        <div className="bg-card rounded-xl h-96 animate-pulse shadow-card" />
+        <div className="bg-card h-96 animate-pulse shadow-card rounded-2xl" />
       </div>
     );
   }
@@ -351,13 +351,13 @@ export default function FuelSpreadsheetView(props: Readonly<{
 
       {/* ── Spreadsheet Grid ──────────────────────────────────────── */}
       {riders.length === 0 ? (
-        <div className="bg-card rounded-xl shadow-card p-12 text-center">
+        <div className="bg-card shadow-card p-12 text-center rounded-2xl">
           <span className="text-4xl">📊</span>
           <p className="font-medium text-foreground mt-3">لا يوجد مناديب</p>
           <p className="text-xs text-muted-foreground mt-1">غيّر المنصة أو البحث</p>
         </div>
       ) : (
-        <div className="bg-card rounded-xl shadow-card overflow-hidden border border-border/50">
+        <div className="bg-card shadow-card overflow-hidden border border-border/50 rounded-2xl">
           <div className="overflow-auto max-h-[75vh]">
             <table className="text-[10px] border-collapse w-max">
               {/* ── Header: 2 rows (weekday + day number) ───── */}
@@ -406,7 +406,7 @@ export default function FuelSpreadsheetView(props: Readonly<{
                 {riderRows.map((row) => (
                   <tr key={row.employee.id} className="border-b border-border/20 hover:bg-muted/5">
                     {/* ── Sticky rider name ────────────────────── */}
-                    <td className="ta-td sticky right-0 z-10 bg-card border-l border-border/50 min-w-[170px]">
+                    <td className="ta-td sticky right-0 z-10 bg-card border-l border-border/50 min-w-[170px] rounded-2xl">
                       <div className="flex items-center gap-2">
                         {row.employee.personal_photo_url && (
                           <img

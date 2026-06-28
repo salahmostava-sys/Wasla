@@ -92,7 +92,7 @@ function DashboardAnalyticsCard({
   children,
 }: Readonly<DashboardAnalyticsCardProps>) {
   return (
-    <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
       <div
         className="flex items-center justify-between px-5 py-4"
         style={{ borderBottom: '1px solid hsl(var(--border))' }}
@@ -321,7 +321,7 @@ export function DashboardAnalyticsTab() {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl p-5 shadow-card">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2">
             <Target size={16} />
             <span className="text-xs font-semibold opacity-80">الإسقاط المتوقع للشهر</span>
@@ -335,7 +335,7 @@ export function DashboardAnalyticsTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2 text-muted-foreground/80">
             <BarChart2 size={16} />
             <span className="text-xs font-semibold">متوسط الطلبات/مندوب</span>
@@ -347,7 +347,7 @@ export function DashboardAnalyticsTab() {
           </div>
         </div>
 
-        <div className="bg-card rounded-2xl p-5 shadow-card">
+        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
           <div className="flex items-center gap-2 mb-2 text-muted-foreground/80">
             <Activity size={16} />
             <span className="text-xs font-semibold">حالة الأداء</span>

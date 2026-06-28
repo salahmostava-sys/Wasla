@@ -65,7 +65,7 @@ export function PrintReport({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Print Header - visible in both screen and print */}
-      <div className="print-header bg-card rounded-xl border border-border/50 p-6 shadow-sm">
+      <div className="print-header bg-card border border-border/50 p-6 shadow-sm rounded-2xl">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
             {/* Logo for print */}

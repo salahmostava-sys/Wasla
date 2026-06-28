@@ -18,7 +18,7 @@ export const MonthSummaryTab = React.memo(() => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5">
+        <div className="inline-flex items-center gap-2 border border-border bg-card px-3 py-1.5 rounded-2xl">
           <TrendingUp size={14} className="text-primary" />
           <span className="text-sm font-semibold text-foreground">ملخص الشهر</span>
         </div>
@@ -51,7 +51,7 @@ export const MonthSummaryTab = React.memo(() => {
         isMonthLocked={m.isMonthLocked}
       />
 
-      <div className="bg-card rounded-xl shadow-card overflow-hidden">
+      <div className="bg-card shadow-card overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
           <OrdersSummaryTable
             loading={m.loading}

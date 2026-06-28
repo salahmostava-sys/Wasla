@@ -42,10 +42,10 @@ const ViolationResolverPage = () => {
 
       <div className="max-w-5xl space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <div className="rounded-lg border bg-card p-3 text-sm">إجمالي المخالفات: <span className="font-bold">{v.violationStats.total}</span></div>
-          <div className="rounded-lg border bg-card p-3 text-sm">قيد المراجعة: <span className="font-bold">{v.violationStats.pending}</span></div>
-          <div className="rounded-lg border bg-card p-3 text-sm">موافَق: <span className="font-bold">{v.violationStats.approved}</span></div>
-          <div className="rounded-lg border bg-card p-3 text-sm">محوّل لسلفة: <span className="font-bold">{v.violationStats.converted}</span></div>
+          <div className="border bg-card p-3 text-sm rounded-2xl">إجمالي المخالفات: <span className="font-bold">{v.violationStats.total}</span></div>
+          <div className="border bg-card p-3 text-sm rounded-2xl">قيد المراجعة: <span className="font-bold">{v.violationStats.pending}</span></div>
+          <div className="border bg-card p-3 text-sm rounded-2xl">موافَق: <span className="font-bold">{v.violationStats.approved}</span></div>
+          <div className="border bg-card p-3 text-sm rounded-2xl">محوّل لسلفة: <span className="font-bold">{v.violationStats.converted}</span></div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +96,7 @@ const ViolationResolverPage = () => {
 
         {/* ── Violations Management ── */}
         {v.activeTab === 'saved' && (
-        <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border/50 -2xl shadow-sm overflow-hidden rounded-2xl">
           <div className="px-5 py-3 border-b border-border/50 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-sm font-semibold text-foreground">

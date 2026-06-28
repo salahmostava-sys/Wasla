@@ -8,7 +8,7 @@ interface AppsPageHeaderProps {
 
 export const AppsPageHeader = ({ canEdit, onAdd }: Readonly<AppsPageHeaderProps>) => {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 -2xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between rounded-2xl">
       <div>
         <nav className="mb-1 flex items-center gap-1 text-xs text-muted-foreground/80">
           <span>الرئيسية</span>
