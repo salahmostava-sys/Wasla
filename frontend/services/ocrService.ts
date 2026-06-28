@@ -35,10 +35,10 @@ export interface OcrProgress {
 // ─── أنماط regex للبيانات السعودية ───────────────────────────────────────────
 
 /** رقم الإقامة: 10 أرقام تبدأ بـ 2 */
-const IQAMA_NUMBER_RE = /\b(2\d{9})\b/g;
+const IQAMA_NUMBER_RE = /(?:^|\D)(2\d{9})(?:\D|$)/g;
 
-/** تاريخ هجري أو ميلادي بأشكاله الشائعة */
-const DATE_RE = new RegExp('\\b(\\d{2}[/\\-.]\\d{2}[/\\-.]\\d{4}|\\d{4}[/\\-.]\\d{2}[/\\-.]\\d{2}|\\d{4}[/\\-.]\\d{2})\\b', 'g');
+/** تاريخ هجري أو ميلادي بأشكاله الشائعة (مع تسامح مع المسافات) */
+const DATE_RE = new RegExp('\\b(\\d{2}\\s*[/\\-.]\\s*\\d{2}\\s*[/\\-.]\\s*\\d{4}|\\d{4}\\s*[/\\-.]\\s*\\d{2}\\s*[/\\-.]\\s*\\d{2}|\\d{4}\\s*[/\\-.]\\s*\\d{2})\\b', 'g');
 
 /** الجنسيات العربية الشائعة في الإقامات السعودية */
 const KNOWN_NATIONALITIES = [
@@ -109,7 +109,7 @@ export function parseIqamaData(rawText: string): IqamaData {
   }
 
   // 2. التواريخ — أول تاريخ = تاريخ الميلاد، آخر تاريخ = انتهاء الصلاحية
-  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1]);
+  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1].replace(/\s+/g, ''));
   if (dateMatches.length >= 1) {
     result.dateOfBirth = normalizeDateStr(dateMatches[0]);
   }
@@ -193,8 +193,8 @@ export function parseLicenseData(rawText: string): LicenseData {
   }
 
   // 2. التواريخ — آخر تاريخ = انتهاء الصلاحية
-  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1]);
-  if (dateMatches.length >= 1) {
+  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1].replace(/\s+/g, ''));
+  if (dateMatches.length > 0) {
     result.expiryDate = normalizeDateStr(dateMatches[dateMatches.length - 1]);
   }
 
