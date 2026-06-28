@@ -24,13 +24,17 @@ BEGIN
         new_with_check := pol.with_check;
         
         IF new_qual IS NOT NULL THEN
-            new_qual := replace(new_qual, 'auth.uid()', '(select auth.uid())');
-            new_qual := replace(new_qual, '(select (select auth.uid()))', '(select auth.uid())');
+            -- Disabled: changing auth.uid() to (select auth.uid()) causes infinite recursion in this schema
+            -- new_qual := replace(new_qual, 'auth.uid()', '(select auth.uid())');
+            -- new_qual := replace(new_qual, '(select (select auth.uid()))', '(select auth.uid())');
+            NULL;
         END IF;
 
         IF new_with_check IS NOT NULL THEN
-            new_with_check := replace(new_with_check, 'auth.uid()', '(select auth.uid())');
-            new_with_check := replace(new_with_check, '(select (select auth.uid()))', '(select auth.uid())');
+            -- Disabled: changing auth.uid() to (select auth.uid()) causes infinite recursion in this schema
+            -- new_with_check := replace(new_with_check, 'auth.uid()', '(select auth.uid())');
+            -- new_with_check := replace(new_with_check, '(select (select auth.uid()))', '(select auth.uid())');
+            NULL;
         END IF;
         
         alter_stmt := format('ALTER POLICY %I ON %I.%I ', pol.policyname, pol.schemaname, pol.tablename);
