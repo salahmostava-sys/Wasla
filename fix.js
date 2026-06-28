@@ -2,7 +2,7 @@ const fs = require('node:fs');
 
 let c = fs.readFileSync('frontend/shared/components/settings/ProjectSettings.tsx', 'utf8');
 
-c = c.replace(
+c = c.replaceAll(
   "import type React from 'react';",
   "import type React from 'react';\nconst t = (isRTL: boolean, ar: string, en: string) => isRTL ? ar : en;"
 );
