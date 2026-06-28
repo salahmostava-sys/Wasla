@@ -1,4 +1,4 @@
-﻿import type React from 'react';
+import type React from 'react';
 import { Suspense, lazy, useEffect, useRef, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { Search, Plus, FolderOpen, Edit, Trash2, Bike } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
@@ -57,7 +57,7 @@ const SmartStatusBadge = ({ status, rider }: { status: VehicleStatus; rider?: st
   return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{statusLabels[status] || status}</span>;
 };
 
-const typeLabels: Record<string, string> = { motorcycle: 'موتوسيكل', car: 'سيارة' };
+const typeLabels: Record<string, string> = { motorcycle: 'دباب', car: 'سيارة' };
 
 const ALL_STATUSES: VehicleStatus[] = ['active', 'maintenance', 'breakdown', 'rental', 'inactive', 'ended'];
 
@@ -125,6 +125,7 @@ const parseVehicleType = (v: unknown): 'motorcycle' | 'car' => {
   if (
     s === 'motorcycle'
     || raw === 'موتوسيكل'
+    || raw === 'دباب'
     || raw === 'دراجة'
     || raw === 'موتور'
     || s === 'bike'
@@ -468,7 +469,7 @@ const Motorcycles = () => {
     const table = tableRef.current;
     if (!table) return;
     printHtmlTable(table, {
-      title: 'بيانات الموتوسيكلات',
+      title: 'بيانات الدبابات',
       subtitle: `المجموع: ${filtered.length} مركبة — ${new Date().toLocaleDateString('ar-SA')}`,
     });
   };
@@ -498,9 +499,9 @@ const Motorcycles = () => {
           <nav className="page-breadcrumb">
             <span>العمليات</span>
             <span className="page-breadcrumb-sep">/</span>
-            <span className="text-foreground font-medium">بيانات الموتوسيكلات</span>
+            <span className="text-foreground font-medium">بيانات الدبابات</span>
           </nav>
-          <h1 className="page-title">بيانات الموتوسيكلات</h1>
+          <h1 className="page-title">بيانات الدبابات</h1>
         </div>
         <div className="flex gap-2">
           <input ref={importRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
@@ -574,7 +575,7 @@ const Motorcycles = () => {
           <SelectTrigger className="w-28 h-9"><SelectValue placeholder="النوع" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">الكل</SelectItem>
-            <SelectItem value="motorcycle">موتوسيكل</SelectItem>
+            <SelectItem value="motorcycle">دباب</SelectItem>
             <SelectItem value="car">سيارة</SelectItem>
           </SelectContent>
         </Select>
@@ -677,7 +678,7 @@ const Motorcycles = () => {
                       <span className="text-sm text-muted-foreground font-mono whitespace-normal break-all leading-tight" dir="ltr">{v.plate_number_en || '—'}</span>
                     </td>
                     <td className="ta-td align-top whitespace-normal break-words">
-                      <span className="text-sm text-muted-foreground whitespace-normal break-words leading-tight">{v.type === 'motorcycle' ? '🏍️' : '🚗'} {typeLabels[v.type]}</span>
+                      <span className="text-sm text-muted-foreground whitespace-normal break-words leading-tight">{typeLabels[v.type]}</span>
                     </td>
                     <td className="ta-td text-foreground align-top whitespace-normal break-words leading-tight">{v.brand || '—'}</td>
                     <td className="ta-td text-foreground align-top whitespace-normal break-words leading-tight">{v.model || '—'}</td>

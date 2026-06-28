@@ -368,7 +368,7 @@ const VehicleAssignment = () => {
               <DropdownMenuItem onClick={async () => {
                 const rows = filtered.map(a => ({
                   'المركبة': a.vehicles?.plate_number ?? '',
-                  'النوع': a.vehicles?.type === 'motorcycle' ? 'موتوسيكل' : 'سيارة',
+                  'النوع': a.vehicles?.type === 'motorcycle' ? 'دباب' : 'سيارة',
                   'المندوب': a.employees?.name ?? '',
                   'تاريخ الاستلام': a.start_at ? format(new Date(a.start_at), 'yyyy-MM-dd HH:mm') : '',
                   'تاريخ الإعادة': a.returned_at ? format(new Date(a.returned_at), 'yyyy-MM-dd HH:mm') : '',

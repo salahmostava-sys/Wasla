@@ -29,7 +29,7 @@ export const statusLabels: Record<VehicleStatus, string> = {
 };
 
 export const typeLabels: Record<Vehicle['type'], string> = {
-  motorcycle: 'موتوسيكل',
+  motorcycle: 'دباب',
   car: 'سيارة',
 };
 

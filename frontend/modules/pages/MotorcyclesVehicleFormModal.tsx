@@ -161,7 +161,7 @@ export function VehicleFormModal({ open, onClose, onSaved, editVehicle }: Readon
             <Select value={form.type} onValueChange={(value) => setForm((previous) => ({ ...previous, type: value as 'motorcycle' | 'car' }))}>
               <SelectTrigger id="vehicle-type"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="motorcycle">موتوسيكل</SelectItem>
+                <SelectItem value="motorcycle">دباب</SelectItem>
                 <SelectItem value="car">سيارة</SelectItem>
               </SelectContent>
             </Select>

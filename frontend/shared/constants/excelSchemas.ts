@@ -1,4 +1,4 @@
-﻿export const EMPLOYEE_IMPORT_COLUMNS = [
+export const EMPLOYEE_IMPORT_COLUMNS = [
   { key: 'name', label: 'الاسم' },
   { key: 'name_en', label: 'الاسم (إنجليزي)' },
   { key: 'national_id', label: 'رقم الهوية' },
@@ -22,7 +22,7 @@
   { key: 'status', label: 'الحالة (active/inactive/ended)' },
 ] as const;
 
-/** ترتيب مطابق لجدول «بيانات الموتوسيكلات» (للتصدير/القالب/الاستيراد) — آخر عمود للقراءة فقط عند التصدير */
+/** ترتيب مطابق لجدول «بيانات الدبابات» (للتصدير/القالب/الاستيراد) — آخر عمود للقراءة فقط عند التصدير */
 export const MOTORCYCLE_IO_COLUMNS = [
   { key: 'plate_number', label: 'رقم اللوحة ar' },
   { key: 'plate_number_en', label: 'رقم اللوحة en' },
