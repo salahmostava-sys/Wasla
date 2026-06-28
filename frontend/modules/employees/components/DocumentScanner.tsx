@@ -168,7 +168,7 @@ export function DocumentScanner({ employeeId, employeeName, onSaved }: Readonly<
     const file = e.target.files?.[0];
     if (!file) return;
     setSelectedFile(file);
-    void processImage(file, mode);
+    processImage(file, mode).catch(console.error);
     // reset input so same file can be re-selected
     e.target.value = '';
   };

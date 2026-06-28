@@ -85,6 +85,7 @@ describe('authService', () => {
     it('ignores session missing error', async () => {
       signOutMock.mockResolvedValue({ error: { message: 'session not found or missing' } });
       await authService.signOut(); // should not throw
+      expect(signOutMock).toHaveBeenCalled();
     });
     it('throws on other error', async () => {
       signOutMock.mockResolvedValue({ error: new Error('signOut err') });

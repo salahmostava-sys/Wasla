@@ -870,8 +870,8 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
               employeeId={employee.id}
               employeeName={employee.name}
               onSaved={() => {
-                void queryClient.invalidateQueries({ queryKey: ['employees'] });
-                void queryClient.invalidateQueries({ queryKey: ['employee-profile'] });
+                queryClient.invalidateQueries({ queryKey: ['employees'] }).catch(console.error);
+                queryClient.invalidateQueries({ queryKey: ['employee-profile'] }).catch(console.error);
               }}
             />
           </div>
