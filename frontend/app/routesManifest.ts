@@ -31,7 +31,7 @@ export const toPagePermissionKey = (permission?: string): string | undefined => 
 
 export const routesManifest: AppRouteManifestItem[] = [
   /** عرض البيانات والمؤشرات */
-  { id: 'dashboard', titleAr: 'الرئيسية', group: 'dashboard', path: '/', sidebar: true },
+  { id: 'dashboard', titleAr: 'لوحة التحكم', group: 'dashboard', path: '/', sidebar: true },
   { id: 'ai_analytics', titleAr: 'تحليلات ذكية', group: 'dashboard', path: '/ai-analytics', permission: routePermission('ai_analytics'), sidebar: false },
 
   { id: 'employees', titleAr: 'الموظفون', group: 'hr', path: '/employees', permission: routePermission('employees'), sidebar: true },

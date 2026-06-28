@@ -382,6 +382,22 @@ const AppSidebar = () => {
 
             const isOpen = sectionOpen[group.key] ?? true;
 
+            // مجموعة تحتوي على عنصر واحد فقط (مثل لوحة التحكم) — تُعرض مباشرةً بدون header قابل للطي
+            if (group.items.length === 1) {
+              return (
+                <div key={group.key} className={cn(groupIdx > 0 && 'mt-1')}>
+                  <SidebarNavLink
+                    key={group.items[0].path}
+                    item={group.items[0]}
+                    collapsed={collapsed}
+                    isRTL={isRTL}
+                    active={isActive(group.items[0].path)}
+                    onNavigate={close}
+                  />
+                </div>
+              );
+            }
+
             return (
               <Collapsible
                 key={group.key}
