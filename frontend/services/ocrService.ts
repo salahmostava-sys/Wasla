@@ -103,13 +103,15 @@ export function parseIqamaData(rawText: string): IqamaData {
   const result: IqamaData = {};
 
   // 1. رقم الإقامة (10 أرقام تبدأ بـ 2)
-  const iqamaMatch = [...text.matchAll(IQAMA_NUMBER_RE)];
-  if (iqamaMatch.length > 0) {
-    result.iqamaNumber = iqamaMatch[0][1];
+  const textNoSpaces = text.replace(/\s+/g, '');
+  const iqamaMatch = textNoSpaces.match(/2\d{9}/);
+  if (iqamaMatch) {
+    result.iqamaNumber = iqamaMatch[0];
   }
 
   // 2. التواريخ — أول تاريخ = تاريخ الميلاد، آخر تاريخ = انتهاء الصلاحية
-  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1].replace(/\s+/g, ''));
+  const dateRegex = /(\d{2}[/\-.]\d{2}[/\-.]\d{4}|\d{4}[/\-.]\d{2}[/\-.]\d{2}|\d{4}[/\-.]\d{2})/g;
+  const dateMatches = [...textNoSpaces.matchAll(dateRegex)].map(m => m[1]);
   if (dateMatches.length >= 1) {
     result.dateOfBirth = normalizeDateStr(dateMatches[0]);
   }
@@ -139,9 +141,10 @@ export function parseIqamaData(rawText: string): IqamaData {
     'LICENSE', 'DRIVING', 'IQAMA', 'ID', 'NUMBER', 'NAME', 'DATE', 'EXPIRY', 'BLOOD', 'TYPE'
   ];
 
-  // الاسم الإنجليزي: سطر يحتوي على أحرف لاتينية كبيرة فقط
+  // الاسم الإنجليزي: سطر يحتوي على أحرف لاتينية أساساً (مع تسامح مع الأرقام/الرموز بسبب أخطاء OCR)
   const englishNameIdx = lines.findIndex(line =>
-    /^[A-Z\s]{5,}$/.test(line) &&
+    /^[A-Za-z0-9\s.,-]{5,}$/.test(line) &&
+    /[A-Za-z]{3,}/.test(line) &&
     line.split(/\s+/).length >= 2 &&
     !KNOWN_NATIONALITIES.some(n => line.toUpperCase().includes(n.toUpperCase())) &&
     !EXCLUDED_EN_WORDS.some(w => line.toUpperCase().includes(w))
@@ -187,13 +190,15 @@ export function parseLicenseData(rawText: string): LicenseData {
   const result: LicenseData = {};
 
   // 1. رقم الرخصة: عادةً 10 أرقام
-  const licenseNumMatch = text.match(/\b(\d{10})\b/);
+  const textNoSpaces = text.replace(/\s+/g, '');
+  const licenseNumMatch = textNoSpaces.match(/2\d{9}/) || textNoSpaces.match(/\d{10}/);
   if (licenseNumMatch) {
-    result.licenseNumber = licenseNumMatch[1];
+    result.licenseNumber = licenseNumMatch[0];
   }
 
   // 2. التواريخ — آخر تاريخ = انتهاء الصلاحية
-  const dateMatches = [...text.matchAll(DATE_RE)].map(m => m[1].replace(/\s+/g, ''));
+  const dateRegex = /(\d{2}[/\-.]\d{2}[/\-.]\d{4}|\d{4}[/\-.]\d{2}[/\-.]\d{2}|\d{4}[/\-.]\d{2})/g;
+  const dateMatches = [...textNoSpaces.matchAll(dateRegex)].map(m => m[1]);
   if (dateMatches.length > 0) {
     result.expiryDate = normalizeDateStr(dateMatches[dateMatches.length - 1]);
   }
@@ -225,7 +230,8 @@ export function parseLicenseData(rawText: string): LicenseData {
   ];
 
   const englishNameIdx = lines.findIndex(line =>
-    /^[A-Z\s]{5,}$/.test(line) &&
+    /^[A-Za-z0-9\s.,-]{5,}$/.test(line) &&
+    /[A-Za-z]{3,}/.test(line) &&
     line.split(/\s+/).length >= 2 &&
     !KNOWN_NATIONALITIES.some(n => line.toUpperCase().includes(n.toUpperCase())) &&
     !EXCLUDED_EN_WORDS.some(w => line.toUpperCase().includes(w))
