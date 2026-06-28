@@ -1,5 +1,5 @@
-import * as XLSX from '@e965/xlsx';
-import type { WorkBook } from '@e965/xlsx';
+import * as XLSX from 'xlsx';
+import type { WorkBook } from 'xlsx';
 import { parseExcelDate } from '@shared/lib/excelDateParse';
 import { employeeService } from '@services/employeeService';
 import { EMPLOYEE_IMPORT_COLUMNS } from '@shared/constants/excelSchemas';

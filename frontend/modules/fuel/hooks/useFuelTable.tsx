@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import * as XLSX from '@e965/xlsx';
+import * as XLSX from 'xlsx';
 import { createDefaultGlobalFilters } from '@shared/components/table/GlobalTableFilters';
 import type { DailyRow, MonthlyRow } from '@modules/fuel/types/fuel.types';
 import { DAY_NAMES } from '@modules/fuel/types/fuel.types';

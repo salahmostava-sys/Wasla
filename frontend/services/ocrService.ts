@@ -8,8 +8,6 @@
  *
  * ملاحظة: تعمل المعالجة كلياً في المتصفح (client-side) دون رفع الصورة للخوادم.
  */
-import Tesseract from 'tesseract.js';
-
 // ─── أنواع البيانات المستخرجة ─────────────────────────────────────────────────
 
 export interface IqamaData {
@@ -57,6 +55,8 @@ export async function extractTextFromImage(
   onProgress?: (progress: OcrProgress) => void,
 ): Promise<string> {
   try {
+    const tesseractModule = await import('tesseract.js');
+    const Tesseract = tesseractModule.default || tesseractModule;
     const worker = await Tesseract.createWorker('ara+eng', 1, {
       workerPath: '/worker.min.js',
       corePath: '/tesseract-core.wasm.js',

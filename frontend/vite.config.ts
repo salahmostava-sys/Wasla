@@ -10,7 +10,7 @@ const isAnalyze = process.env.ANALYZE === 'true';
 function manualChunks(id: string): string | undefined {
   if (!id.includes('node_modules')) return undefined;
   if (id.includes('recharts')) return 'vendor-charts';
-  if (id.includes('@e965/xlsx')) return 'vendor-xlsx';
+  if (id.includes('xlsx')) return 'vendor-xlsx';
   if (id.includes('html2canvas')) return 'vendor-html2canvas';
   if (id.includes('jspdf') || id.includes('jspdf-autotable')) return 'vendor-jspdf';
   if (id.includes('jszip')) return 'vendor-jszip';

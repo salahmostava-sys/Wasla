@@ -1,4 +1,4 @@
-import * as XLSX from '@e965/xlsx';
+import * as XLSX from 'xlsx';
 
 const DD_MM_YYYY = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
 const YYYY_MM_DD = /^(\d{4})-(\d{2})-(\d{2})$/;

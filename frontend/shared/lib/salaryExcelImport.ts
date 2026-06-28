@@ -1,5 +1,5 @@
-import * as XLSX from '@e965/xlsx';
-import type { WorkBook } from '@e965/xlsx';
+import * as XLSX from 'xlsx';
+import type { WorkBook } from 'xlsx';
 import { isEmployeeIdUuid, isValidSalaryMonthYear, parseSalaryAmount } from '@shared/lib/salaryValidation';
 
 export const SALARY_IO_COLUMNS = [

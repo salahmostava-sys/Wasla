@@ -87,11 +87,19 @@ async function executeMonthMode(adminClient, payload) {
   return { status: 200, data };
 }
 
+import { LRUCache } from 'lru-cache';
+const previewCache = new LRUCache({ max: 500, ttl: 1000 * 60 * 5 }); // 5 minutes cache
+
 async function executeMonthPreviewMode(adminClient, payload) {
+  const cacheKey = payload.month_year;
+  if (previewCache.has(cacheKey)) {
+    return { status: 200, data: previewCache.get(cacheKey), cached: true };
+  }
   const { data, error } = await adminClient.rpc('preview_salary_for_month', {
     p_month_year: payload.month_year,
   });
   if (error) throw new Error(error.message);
+  previewCache.set(cacheKey, data);
   return { status: 200, data };
 }
 
