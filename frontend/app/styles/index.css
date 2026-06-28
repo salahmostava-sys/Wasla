@@ -267,28 +267,31 @@
   }
 
   .ta-th {
-    @apply px-4 py-2.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-center;
+    @apply px-2 py-2.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-center;
     color: var(--ds-on-surface-variant);
   }
 
   .ta-th-center {
-    @apply px-4 py-2.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-center;
+    @apply px-2 py-2.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-center;
     color: var(--ds-on-surface-variant);
   }
 
   .ta-tr {
-    border-bottom: 1px solid var(--ds-surface-container);
-    transition: background 120ms;
+    @apply transition-colors;
+    border-bottom: 1px solid var(--ds-border);
+  }
+  .ta-tr:last-child {
+    border-bottom: none;
   }
   .ta-tr:hover { background: var(--ds-surface-low); }
 
   .ta-td {
-    @apply px-4 py-2 text-sm text-center;
+    @apply px-2 py-2 text-sm text-center whitespace-nowrap;
     color: var(--ds-on-surface);
   }
 
   .ta-td-center {
-    @apply px-4 py-2 text-sm text-center;
+    @apply px-2 py-2 text-sm text-center whitespace-nowrap;
     color: var(--ds-on-surface);
   }
 

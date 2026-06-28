@@ -173,6 +173,14 @@ export function applyEmployeeFilters(rows: Employee[], colFilters: Record<string
 export function sortEmployees(rows: Employee[], sortField: string | null, sortDir: SortDir): Employee[] {
   if (!sortField || !sortDir) return rows;
   return [...rows].sort((a, b) => { // NOSONAR
+    // 1. Force inactive/ended/absconded/terminated to the bottom
+    const isAInactive = a.status !== 'active' || a.sponsorship_status === 'absconded' || a.sponsorship_status === 'terminated';
+    const isBInactive = b.status !== 'active' || b.sponsorship_status === 'absconded' || b.sponsorship_status === 'terminated';
+
+    if (isAInactive && !isBInactive) return 1; // A to bottom
+    if (!isAInactive && isBInactive) return -1; // B to bottom
+
+    // 2. Normal sort logic
     const [va, vb]: [string | number, string | number] = sortField === 'days_residency'
       ? [
         a.residency_expiry ? differenceInDays(parseISO(a.residency_expiry), new Date()) : -9999,

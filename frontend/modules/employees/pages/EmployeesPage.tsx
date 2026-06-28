@@ -16,6 +16,7 @@ import { usePermissions } from '@shared/hooks/usePermissions';
 import { usePagePresence } from '@shared/hooks/usePagePresence';
 import { PresenceAvatars } from '@shared/components/PresenceAvatars';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
+import { useRealtimePostgresChanges, REALTIME_TABLES_DASHBOARD } from '@shared/hooks/useRealtimePostgresChanges';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { isEmployeeVisibleInMonth } from '@shared/lib/employeeVisibility';
 import { getEmployeeCities, applyEmployeeFilters, sortEmployees } from '@modules/employees/model/employeeUtils';
@@ -106,7 +107,12 @@ const Employees = () => {
   } | null>(null);
   const [statusDate, setStatusDate] = useState<string>(todayISO());
   const [statusDateSaving, setStatusDateSaving] = useState(false);
+  const uploadIntervalRef = useRef<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
+
+  useRealtimePostgresChanges('employees-page-realtime', REALTIME_TABLES_DASHBOARD, () => {
+    refetchEmployees().catch(() => {});
+  });
 
   const syncSystemAfterEmployeeImport = useCallback(async () => {
     const shouldRefresh = (value: string) =>
@@ -122,16 +128,10 @@ const Employees = () => {
     await queryClient.refetchQueries({ predicate, type: 'active' });
   }, [queryClient]);
 
-  // Local state mirrors React Query data — kept intentionally because useEmployeeActions
-  // receives data/setData for optimistic inline edits (saveField, handleDelete, etc.)
-  // When filtering by absconded/terminated/ended statuses, show ALL employees (including hidden)
+  // Always use allEmployeesData to display all employees including absconded and terminated
   useEffect(() => {
-    const showHidden = colFilters.status === 'ended' ||
-      colFilters.sponsorship_status === 'absconded' ||
-      colFilters.sponsorship_status === 'terminated';
-    const source = showHidden ? (allEmployeesData) : (employeesData);
-    setData(source ?? []);
-  }, [employeesData, allEmployeesData, colFilters.status, colFilters.sponsorship_status]);
+    setData(allEmployeesData ?? []);
+  }, [allEmployeesData]);
 
   useEffect(() => {
     if (!employeesError) return;
