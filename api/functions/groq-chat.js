@@ -1,8 +1,7 @@
 const { ensurePostRequest } = require('../_lib');
-const { createRequire } = require('node:module');
-const { groqChatHandler } = createRequire(__dirname)('../../server/lib/handlers.js');
 
 module.exports = async function handler(req, res) {
   if (!ensurePostRequest(req, res)) return;
+  const { groqChatHandler } = await import('../../server/lib/handlers.js');
   return groqChatHandler(req, res);
 };

@@ -6,6 +6,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "pg-dump-restore-nodejs": "^0.0.10"
+    "pg-dump-restore-nodejs": "^0.0.10",
+    "@supabase/supabase-js": "^2.97.0"
   }
 }

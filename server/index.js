@@ -127,7 +127,7 @@ if (IS_PRODUCTION && !AI_INTERNAL_KEY) {
 
 app.listen(PORT, '0.0.0.0', () => { // NOSONAR - Server runs securely behind a TLS-terminating load balancer
   console.log(`[server] Muhimmat API server running on port ${PORT}`);
-  console.log(`[server] CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
+  console.log(`[server] CORS allowed origins: ${[...ALLOWED_ORIGINS].join(', ')}`);
   if (!SUPABASE_SERVICE_ROLE_KEY) console.warn('[server] WARNING: SUPABASE_SERVICE_ROLE_KEY not set — admin actions will fail');
   if (!process.env.GROQ_API_KEY) console.warn('[server] WARNING: GROQ_API_KEY not set — AI features disabled');
   if (!AI_INTERNAL_KEY) console.warn('[server] WARNING: AI_INTERNAL_KEY not set — set in production via env');

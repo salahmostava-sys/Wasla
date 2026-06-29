@@ -4,6 +4,11 @@
   "installCommand": "cd frontend && npm ci",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/functions/*.js": {
+      "includeFiles": "server/lib/**"
+    }
+  },
   "routes": [
     {
       "handle": "filesystem"
