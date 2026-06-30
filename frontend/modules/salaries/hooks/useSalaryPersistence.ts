@@ -261,12 +261,40 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
     [selectedMonth, toast, user, run, computeServerSalaryForPayment, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow],
   );
 
-  // â”€â”€ Mark as paid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const unapproveRow = useCallback(
+    async (id: string) => {
+      if (approvingRowId) return;
+
+      const row = await getLatestRow(id);
+      if (!row) return;
+
+      setApprovingRowId(id);
+      const success = await run(
+        async () => {
+          await salaryService.delete(row.id);
+          return true;
+        },
+        { errorTitle: 'تعذّر إلغاء الاعتماد' },
+      );
+      if (!success) {
+        setApprovingRowId(null);
+        return;
+      }
+
+      refreshMonthSnapshot();
+
+      updateRow(id, { status: 'pending', isDirty: true });
+      setApprovingRowId(null);
+      toast.success('✅ تم إلغاء الاعتماد');
+    },
+    [toast, run, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow],
+  );
+
+  // ── Mark as paid ────────────────────────────────────────────────────────────
 
   const markAsPaid = useCallback(
     async (row: SalaryRow) => {
       if (!isEmployeeIdUuid(row.employeeId) || !isValidSalaryMonthYear(selectedMonth)) {
-        toast.error('ØªØ¹Ø°Ù‘Ø± Ø§Ù„ØµØ±Ù', {
           description: 'Ù…Ø¹Ø±Ù Ø§Ù„Ù…ÙˆØ¸Ù Ø£Ùˆ Ø§Ù„Ø´Ù‡Ø± ØºÙŠØ± ØµØ§Ù„Ø­',
         });
         return;
@@ -488,6 +516,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
   return {
     updateRow,
     approveRow,
+    unapproveRow,
     approvingRowId,
     markAsPaid,
     approveAll,

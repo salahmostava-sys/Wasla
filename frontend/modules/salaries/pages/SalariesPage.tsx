@@ -415,6 +415,7 @@ const Salaries = () => {
           updateRow={actions.updateRow}
           updatePlatformOrders={actions.updatePlatformOrders}
           approveRow={actions.approveRow}
+          unapproveRow={actions.unapproveRow}
           approvingRowId={actions.approvingRowId}
           markAsPaid={actions.markAsPaid}
           markingPaid={markingPaid}

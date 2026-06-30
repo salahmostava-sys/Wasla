@@ -22,7 +22,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button } from '@shared/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@shared/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
-import { CheckCircle, Printer, AlertTriangle, Loader2 } from 'lucide-react';
+import { CheckCircle, Printer, AlertTriangle, Loader2, Undo } from 'lucide-react';
 import type { CustomColumn } from '@shared/hooks/useAppColors';
 import { SalarySortIcon } from '@modules/salaries/components/SalarySortIcon';
 import {
@@ -61,6 +61,7 @@ interface SalaryTableProps {
   updateRow: (id: string, patch: Partial<SalaryRow>) => void;
   updatePlatformOrders: (id: string, platform: string, value: number) => void;
   approveRow: (id: string) => void;
+  unapproveRow: (id: string) => void;
   approvingRowId: string | null;
   markAsPaid: (row: SalaryRow) => void;
   markingPaid: string | null;
@@ -92,6 +93,7 @@ const SalaryRowCells = memo(function SalaryRowCells({
   updateRow,
   updatePlatformOrders,
   approveRow,
+  unapproveRow,
   approvingRowId,
   markAsPaid,
   markingPaid,
@@ -115,6 +117,7 @@ const SalaryRowCells = memo(function SalaryRowCells({
   updateRow: SalaryTableProps['updateRow'];
   updatePlatformOrders: SalaryTableProps['updatePlatformOrders'];
   approveRow: SalaryTableProps['approveRow'];
+  unapproveRow: SalaryTableProps['unapproveRow'];
   approvingRowId: SalaryTableProps['approvingRowId'];
   markAsPaid: SalaryTableProps['markAsPaid'];
   markingPaid: SalaryTableProps['markingPaid'];
@@ -197,7 +200,6 @@ const SalaryRowCells = memo(function SalaryRowCells({
       </td>
       <td className={`${tdClass} bg-success/[0.04] border-l border-border/40`}><EditableCell value={r.incentives} onChange={v => updateRow(r.id, { incentives: v })} className="text-foreground" /></td>
       <td className={`${tdClass} bg-success/[0.04]`}><EditableCell value={r.sickAllowance} onChange={v => updateRow(r.id, { sickAllowance: v })} className="text-foreground" /></td>
-      <td className={`${tdClass} text-foreground font-semibold bg-success/[0.04]`}>{c.totalAdditions.toLocaleString('en-US')}</td>
       <td className={`${tdClass} font-bold text-foreground border-l border-border/40 bg-success/[0.06]`}>{c.totalWithSalary.toLocaleString('en-US')}</td>
       <td className={`${tdClass} border-l border-border/40 bg-destructive/[0.04]`}>
         <EditableCell value={r.advanceDeduction} onChange={v => updateRow(r.id, { advanceDeduction: v })} className="text-foreground" />
@@ -257,9 +259,14 @@ const SalaryRowCells = memo(function SalaryRowCells({
             </Button>
           )}
           {r.status === 'approved' && !r.isDirty && canEdit && (
-            <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 text-primary border-primary/40 hover:bg-primary/10" onClick={() => { markAsPaid(r); }} disabled={markingPaid === r.id}>
-              {markingPaid === r.id ? <Loader2 size={11} className="animate-spin" /> : <>✅ تم الصرف</>}
-            </Button>
+            <>
+              <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 text-primary border-primary/40 hover:bg-primary/10" onClick={() => { markAsPaid(r); }} disabled={markingPaid === r.id || approvingRowId === r.id}>
+                {markingPaid === r.id ? <Loader2 size={11} className="animate-spin" /> : <>✅ تم الصرف</>}
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1 text-warning border-warning/40 hover:bg-warning/10 px-2" onClick={() => unapproveRow(r.id)} disabled={approvingRowId === r.id || markingPaid === r.id} title="إلغاء الاعتماد">
+                {approvingRowId === r.id ? <Loader2 size={11} className="animate-spin" /> : <><Undo size={11} /> إلغاء الاعتماد</>}
+              </Button>
+            </>
           )}
           <Button size="sm" variant="outline" className="h-7 text-[11px] gap-1" onClick={() => setPayslipRow(r)}>
             <Printer size={11} /> كشف
@@ -275,7 +282,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   const {
     loadingData, rows, filtered, computeRow, platforms, platformColors,
     appCustomColumns, empPlatformScheme, sortField, sortDir, handleSort,
-    updateRow, updatePlatformOrders, approveRow, approvingRowId,
+    updateRow, updatePlatformOrders, approveRow, unapproveRow, approvingRowId,
     markAsPaid, markingPaid, editingCell, setEditingCell, setPayslipRow,
     persistEmployeeCity, persistEmployeePaymentMethod, employeeFieldSaving,
     openEmployeeDetail,
@@ -305,6 +312,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   const persistCityRef = useRef(persistEmployeeCity); persistCityRef.current = persistEmployeeCity;
   const persistPaymentRef = useRef(persistEmployeePaymentMethod); persistPaymentRef.current = persistEmployeePaymentMethod;
   const approveRowRef = useRef(approveRow); approveRowRef.current = approveRow;
+  const unapproveRowRef = useRef(unapproveRow); unapproveRowRef.current = unapproveRow;
   const markAsPaidRef = useRef(markAsPaid); markAsPaidRef.current = markAsPaid;
 
   const stableSetEditingCell = useCallback((...args: Parameters<typeof setEditingCell>) => setEditingCellRef.current(...args), []);
@@ -315,6 +323,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
   const stablePersistCity = useCallback((...args: Parameters<typeof persistEmployeeCity>) => persistCityRef.current(...args), []);
   const stablePersistPayment = useCallback((...args: Parameters<typeof persistEmployeePaymentMethod>) => persistPaymentRef.current(...args), []);
   const stableApproveRow = useCallback((...args: Parameters<typeof approveRow>) => approveRowRef.current(...args), []);
+  const stableUnapproveRow = useCallback((...args: Parameters<typeof unapproveRow>) => unapproveRowRef.current(...args), []);
   const stableMarkAsPaid = useCallback((...args: Parameters<typeof markAsPaid>) => markAsPaidRef.current(...args), []);
 
   // ── Custom columns ────────────────────────────────────────────────────────
@@ -438,8 +447,8 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
     <div className="shadow-card bg-card overflow-hidden rounded-2xl">
       {/* Scroll container — useVirtualizer reads its scrollTop */}
       {/* contain:layout paint — isolates repaints without breaking sticky positioning */}
-      <div ref={scrollContainerRef} className="overflow-auto" style={{ maxHeight: '75vh', contain: 'layout paint' }}>
-        <table className="text-sm border-collapse" style={{ minWidth: 1800 }}>
+      <div ref={scrollContainerRef} className="overflow-auto custom-scrollbar" style={{ maxHeight: '75vh', contain: 'layout paint' }}>
+        <table className="text-sm border-collapse w-full min-w-max">
           {/* ── Header — sticky at top ── */}
           {/* bg-card is solid (not opacity-based) so it covers rows scrolling beneath */}
           <thead className="sticky top-0 z-30" style={{ backgroundColor: 'hsl(var(--card))' }}>
@@ -452,8 +461,8 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                   المنصات (طلبات أو دوام / راتب، ونقر مزدوج لتعديل الطلبات في منصات الطلب فقط)
                 </th>
               )}
-              <th colSpan={2} className="ta-th text-primary border-b border-border/40 bg-primary/10 border-l">إجمالي النشاط + الراتب الأساسي</th>
-              <th colSpan={4} className="ta-th text-success border-b border-border/40 bg-success/10 border-l">✅ الإضافات</th>
+              <th colSpan={2} className="ta-th text-primary border-b border-border/40 bg-primary/10 border-l">إجمالي الطلبات + الراتب الأساسي</th>
+              <th colSpan={3} className="ta-th text-success border-b border-border/40 bg-success/10 border-l">✅ الإضافات</th>
               <th colSpan={dedColCount} className="ta-th text-destructive border-b border-border/40 bg-destructive/10 border-l">🔻 المستقطعات</th>
               <th colSpan={1} className="ta-th text-success border-b border-border/40 border-l" style={{ backgroundColor: 'hsl(var(--card))' }}>المستحق</th>
               <th colSpan={2} className="ta-th border-b border-border/40 border-l" style={{ backgroundColor: 'hsl(var(--card))' }}>معلومات الصرف</th>
@@ -496,12 +505,11 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                 );
               })}
               <th className="ta-th text-foreground border border-border/30 bg-primary/10 cursor-pointer select-none hover:brightness-95" onClick={() => handleSort('totalPlatformOrders')}>
-                إجمالي النشاط <SalarySortIcon field="totalPlatformOrders" sortField={sortField} sortDir={sortDir} />
+                إجمالي الطلبات <SalarySortIcon field="totalPlatformOrders" sortField={sortField} sortDir={sortDir} />
               </th>
               <th className={`${thBase} bg-primary/10`}>الراتب الأساسي</th>
               <th className={`${thBase} bg-success/5`}>حوافز</th>
               <th className={`${thBase} bg-success/5`}>إجازة مرضية</th>
-              <th className={`${thBase} bg-success/5`}>إجمالي الإضافات</th>
               <th className={`${thBase} bg-success/10 border-l border-border/40`}>الإجمالي مع الراتب</th>
               <th className={`${thBase} bg-destructive/5`}>سلف</th>
               <th className={`${thBase} bg-destructive/5`}>مخالفات</th>
@@ -559,6 +567,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                     updateRow={stableUpdateRow}
                     updatePlatformOrders={stableUpdatePlatformOrders}
                     approveRow={stableApproveRow}
+                    unapproveRow={stableUnapproveRow}
                     approvingRowId={approvingRowId}
                     markAsPaid={stableMarkAsPaid}
                     markingPaid={markingPaid}
@@ -625,7 +634,6 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
               <td className={`${tfClass} text-foreground border-l border-border/30`}>{totals.platformSalaries.toLocaleString('en-US')}</td>
               <td className={`${tfClass} text-foreground`}>{totals.incentives.toLocaleString('en-US')}</td>
               <td className={`${tfClass} text-foreground`}>{totals.sickAllowance.toLocaleString('en-US')}</td>
-              <td className={`${tfClass} text-foreground`}>{totals.totalAdditions.toLocaleString('en-US')}</td>
               <td className={`${tfClass} text-foreground border-l border-border/30`}>{totals.totalWithSalary.toLocaleString('en-US')}</td>
               <td className={`${tfClass} text-foreground`}>{totals.advance.toLocaleString('en-US')}</td>
               <td className={`${tfClass} text-foreground`}>{totals.violations.toLocaleString('en-US')}</td>
