@@ -4,7 +4,6 @@
 
 **Stack:** React 18 · TypeScript · Vite · Supabase · Express (Node.js) · FastAPI (Python) · TanStack Query · Tailwind CSS · shadcn/ui
 
-**Production:** [muhimat.vercel.app](https://muhimat.vercel.app)
 
 ---
 
