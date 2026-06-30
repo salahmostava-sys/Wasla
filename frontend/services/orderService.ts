@@ -484,7 +484,7 @@ export const orderService = {
       else offset += PAGE_SIZE;
     }
     
-    return allRows as OrderBaseEmployee[];
+    return allRows;
   },
 
   getActiveApps: async () => {
