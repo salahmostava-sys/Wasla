@@ -1,4 +1,4 @@
-import { Calendar, LayoutDashboard, LayoutGrid, Medal, TrendingUp } from 'lucide-react';
+import { Calendar, LayoutDashboard, Medal } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 

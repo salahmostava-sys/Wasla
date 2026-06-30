@@ -118,7 +118,6 @@ export const OrdersSummaryTable = React.memo(({
                 </div>
               </td>
               {apps.map((app) => {
-                const c = getAppColor(appColorsList, app.name);
                 const appTotal = dayArr.reduce((s, d) => s + (data[`${emp.id}::${app.id}::${d}`] ?? 0), 0);
                 return (
                   <td key={app.id} className="ta-td p-3 font-semibold border-l border-border/30 text-foreground">
@@ -151,7 +150,6 @@ export const OrdersSummaryTable = React.memo(({
               <span className="text-sm font-bold text-foreground">الإجمالي</span>
             </td>
             {apps.map((app) => {
-              const c = getAppColor(appColorsList, app.name);
               const total = appGrandTotal(app.id);
               return (
                 <td key={app.id} className="ta-td p-3 font-bold border-l border-border/40 text-foreground">

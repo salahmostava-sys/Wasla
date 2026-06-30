@@ -9,6 +9,12 @@ on:
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
+    # Self-hosted SonarQube scan. Disabled by default; enable by setting
+    # repository variable ENABLE_SONARQUBE=true (and SONAR_HOST_URL secret).
+    # SonarCloud analysis runs separately in the Build workflow.
+    if: ${{ vars.ENABLE_SONARQUBE == 'true' }}
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v4
         with:

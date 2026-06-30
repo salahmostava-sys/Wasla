@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Activity, BarChart3, Calendar, Grid3X3 } from 'lucide-react';
+import { Activity, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { FUEL_PAGE_MONTHS } from '@modules/fuel/lib/fuelMonthOptions';
 
@@ -14,8 +14,6 @@ type FuelPageHeaderProps = {
 };
 
 export function FuelPageHeader({
-  view,
-  onViewChange,
   selectedMonth,
   selectedYear,
   toolbarEnd,

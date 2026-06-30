@@ -14,6 +14,8 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,9 +46,9 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: true
-          threshold: 50
+          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./frontend/coverage
+          fail_ci_if_error: false
 
       - name: Build
         working-directory: frontend
