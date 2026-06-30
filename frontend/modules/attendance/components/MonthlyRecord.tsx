@@ -122,6 +122,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
   const monthStr = String(selectedMonth + 1).padStart(2, "0");
   const startDate = `${selectedYear}-${monthStr}-01`;
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+  const endDate = `${selectedYear}-${monthStr}-${String(daysInMonth).padStart(2, "0")}`;
   const daysArray = useMemo(() => Array.from({ length: daysInMonth }, (_, i) => i + 1), [daysInMonth]);
 
   const queryKey = ['attendance', 'monthly', uid, selectedYear, selectedMonth] as const;
