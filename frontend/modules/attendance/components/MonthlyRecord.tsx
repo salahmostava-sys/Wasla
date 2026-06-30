@@ -36,13 +36,13 @@ interface MonthlyRecordProps {
   selectedYear: number;
 }
 
-const STATUS_MAP: Record<AttendanceStatus, { color: string; label: string; dot: string; icon?: React.ReactNode }> = {
-  present: { color: 'text-green-600 bg-green-100/50', label: 'حضور', dot: 'bg-green-500', icon: <Check size={12}/> },
-  absent: { color: 'text-destructive bg-destructive/10', label: 'غياب', dot: 'bg-destructive', icon: <X size={12}/> },
-  leave: { color: 'text-yellow-600 bg-yellow-100/50', label: 'إجازة', dot: 'bg-yellow-500' },
-  sick: { color: 'text-purple-600 bg-purple-100/50', label: 'مريض', dot: 'bg-purple-500' },
-  late: { color: 'text-orange-600 bg-orange-100/50', label: 'متأخر', dot: 'bg-orange-500' },
-  none: { color: 'text-muted-foreground bg-transparent', label: 'غير محدد', dot: 'bg-transparent' }
+const STATUS_MAP: Record<AttendanceStatus, { color: string; label: string; char: string }> = {
+  present: { color: 'text-green-700 bg-green-100/50', label: 'حضور', char: 'ح' },
+  absent: { color: 'text-destructive bg-destructive/10', label: 'غياب', char: 'غ' },
+  leave: { color: 'text-yellow-700 bg-yellow-100/50', label: 'إجازة', char: 'ج' },
+  sick: { color: 'text-purple-700 bg-purple-100/50', label: 'مريض', char: 'م' },
+  late: { color: 'text-orange-700 bg-orange-100/50', label: 'متأخر', char: 'ت' },
+  none: { color: 'text-muted-foreground bg-transparent', label: 'غير محدد', char: '-' }
 };
 
 const CellEditorDialog = ({ 
@@ -207,8 +207,11 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                     {d}
                   </th>
                 ))}
-                <th className="p-3 min-w-[60px] text-center border-b border-border bg-green-500/10 text-green-700 dark:text-green-400 font-bold">ح</th>
-                <th className="p-3 min-w-[60px] text-center border-b border-border bg-destructive/10 text-destructive font-bold">غ</th>
+                <th className="p-3 min-w-[45px] text-center border-b border-border bg-green-500/10 text-green-700 dark:text-green-400 font-bold" title="حضور">ح</th>
+                <th className="p-3 min-w-[45px] text-center border-b border-border bg-destructive/10 text-destructive font-bold" title="غياب">غ</th>
+                <th className="p-3 min-w-[45px] text-center border-b border-border bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-bold" title="إجازة">ج</th>
+                <th className="p-3 min-w-[45px] text-center border-b border-border bg-purple-500/10 text-purple-700 dark:text-purple-400 font-bold" title="مريض">م</th>
+                <th className="p-3 min-w-[45px] text-center border-b border-border bg-orange-500/10 text-orange-700 dark:text-orange-400 font-bold" title="متأخر">ت</th>
               </tr>
             </thead>
             <tbody>
@@ -233,13 +236,9 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                           )}
                           title={`${row.name} - يوم ${d} - ${config.label}`}
                         >
-                          {status !== 'none' ? ( // NOSONAR
-                            <div className="flex flex-col items-center justify-center gap-0.5">
-                              {config.icon ? config.icon : <div className={cn("w-1.5 h-1.5 rounded-full", config.dot)} />}
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground/30">-</span>
-                          )}
+                          <span className={cn("font-bold text-xs", status === 'none' && "text-muted-foreground/30")}>
+                            {config.char}
+                          </span>
                           
                           {hasNote && (
                             <div className="absolute top-0.5 right-0.5 text-primary">
@@ -250,8 +249,11 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                       </td>
                     );
                   })}
-                  <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5">{row.summary.presentCount}</td>
-                  <td className="p-3 text-center border-b border-border font-bold text-destructive bg-destructive/5">{row.summary.absentCount}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5">{row.summary.presentCount || '-'}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-destructive bg-destructive/5">{row.summary.absentCount || '-'}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-yellow-600 bg-yellow-500/5">{row.summary.leaveCount || '-'}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-purple-600 bg-purple-500/5">{row.summary.sickCount || '-'}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-orange-600 bg-orange-500/5">{row.summary.lateCount || '-'}</td>
                 </tr>
               ))}
             </tbody>
