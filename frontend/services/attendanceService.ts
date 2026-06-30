@@ -4,52 +4,68 @@ import { filterEmployeesForAttendanceMonth, filterOperationallyVisibleEmployees 
 
 const attendanceService = {
   getDailyAttendanceBase: async () => {
-    const [employeesRes, appsRes, employeeAppsRes] = await Promise.all([
-      supabase
+    const PAGE_SIZE = 1000;
+    const allEmployees: any[] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const { data, error } = await supabase
         .from('employees')
-        .select('id, name, salary_type, job_title, sponsorship_status, probation_end_date')
-        .eq('status', 'active')
-        .order('name'),
-      supabase
-        .from('apps')
-        .select('id, name, logo_url')
-        .eq('is_active', true)
-        .order('name'),
-      supabase
-        .from('employee_apps')
-        .select('employee_id, app_id'),
-    ]);
+        .select('id, name, salary_type, job_title, sponsorship_status, probation_end_date, status')
+        .order('name')
+        .range(offset, offset + PAGE_SIZE - 1);
 
-    let employeeRows:
-      Array<{
-        id: string;
-        name: string;
-        salary_type?: string | null;
-        job_title?: string | null;
-        sponsorship_status?: string | null;
-        probation_end_date?: string | null;
-      }> = [];
-
-    if (employeesRes.error) {
-      const fallbackRes = await supabase
-        .from('employees')
-        .select('id, name, sponsorship_status, probation_end_date')
-        .eq('status', 'active')
-        .order('name');
-
-      if (fallbackRes.error) handleSupabaseError(fallbackRes.error, 'attendanceService.getDailyAttendanceBase.employeesFallback');
-      employeeRows = fallbackRes.data ?? [];
-    } else {
-      employeeRows = employeesRes.data ?? [];
+      if (error) {
+        // Fallback fields on error
+        const fallbackRes = await supabase
+          .from('employees')
+          .select('id, name, sponsorship_status, probation_end_date, status')
+          .order('name')
+          .range(offset, offset + PAGE_SIZE - 1);
+        if (fallbackRes.error) handleSupabaseError(fallbackRes.error, 'attendanceService.getDailyAttendanceBase.employeesFallback');
+        const rows = fallbackRes.data ?? [];
+        allEmployees.push(...rows);
+        if (rows.length < PAGE_SIZE) hasMore = false;
+        else offset += PAGE_SIZE;
+      } else {
+        const rows = data ?? [];
+        allEmployees.push(...rows);
+        if (rows.length < PAGE_SIZE) hasMore = false;
+        else offset += PAGE_SIZE;
+      }
     }
 
+    const appsRes = await supabase
+      .from('apps')
+      .select('id, name, logo_url')
+      .eq('is_active', true)
+      .order('name');
+
+    const allEmployeeApps: any[] = [];
+    let appLinksOffset = 0;
+    let hasMoreLinks = true;
+    while (hasMoreLinks) {
+      const { data, error } = await supabase
+        .from('employee_apps')
+        .select('employee_id, app_id')
+        .range(appLinksOffset, appLinksOffset + PAGE_SIZE - 1);
+      
+      if (error) handleSupabaseError(error, 'attendanceService.getDailyAttendanceBase.employeeApps');
+      const rows = data ?? [];
+      allEmployeeApps.push(...rows);
+      if (rows.length < PAGE_SIZE) hasMoreLinks = false;
+      else appLinksOffset += PAGE_SIZE;
+    }
+
+    let employeeRows = allEmployees;
+
     if (appsRes.error) handleSupabaseError(appsRes.error, 'attendanceService.getDailyAttendanceBase.apps');
-    if (employeeAppsRes.error) handleSupabaseError(employeeAppsRes.error, 'attendanceService.getDailyAttendanceBase.employeeApps');
 
     return {
       employees: employeeRows,
       apps: appsRes.data ?? [],
-      employeeApps: employeeAppsRes.data ?? [],
+      employeeApps: allEmployeeApps,
     };
   },
 

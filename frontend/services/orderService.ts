@@ -463,12 +463,28 @@ export const orderService = {
   },
 
   getBaseEmployees: async () => {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('id, name, city, salary_type, status, sponsorship_status, probation_end_date')
-      .order('name');
-    if (error) throw toServiceError(error, 'orderService.getBaseEmployees');
-    return (data || []) as OrderBaseEmployee[];
+    const PAGE_SIZE = 1000;
+    const allRows: any[] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('employees')
+        .select('id, name, city, salary_type, status, sponsorship_status, probation_end_date')
+        .order('name')
+        .range(offset, offset + PAGE_SIZE - 1);
+        
+      if (error) throw toServiceError(error, 'orderService.getBaseEmployees');
+      
+      const rows = data ?? [];
+      allRows.push(...rows);
+      
+      if (rows.length < PAGE_SIZE) hasMore = false;
+      else offset += PAGE_SIZE;
+    }
+    
+    return allRows as OrderBaseEmployee[];
   },
 
   getActiveApps: async () => {
