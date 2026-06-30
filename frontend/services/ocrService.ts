@@ -86,6 +86,25 @@ function normalizeArabicNumerals(text: string): string {
   return text.replace(/[٠١٢٣٤٥٦٧٨٩]/g, (d) => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]);
 }
 
+function cleanOcrNumbers(line: string): string {
+  return line.replace(/\s+/g, '')
+    .replace(/[Oo]/g, '0')
+    .replace(/[lI|]/g, '1')
+    .replace(/[Zz]/g, '2')
+    .replace(/[Ss]/g, '5')
+    .replace(/[Bb]/g, '8');
+}
+
+function extractDateFromLine(line: string): string | undefined {
+  const clean = cleanOcrNumbers(line);
+  const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
+  const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
+  if (dateMatches.length > 0) {
+    return normalizeDateStr(dateMatches[0]);
+  }
+  return undefined;
+}
+
 /**
  * يستخرج بيانات الإقامة السعودية من النص المستخرج.
  *
@@ -97,58 +116,31 @@ export function parseIqamaData(rawText: string): IqamaData {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const result: IqamaData = {};
 
-  // 1. رقم الإقامة (10 أرقام تبدأ بـ 2)
   const idLine = lines.find(line => 
     /(رقم|الهوية|القوبة|الاقامة|الإقامة|Number|ID)/gi.test(line) && /\d/.test(line)
   );
   if (idLine) {
-    const clean = idLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
+    const clean = cleanOcrNumbers(idLine);
     const match = /2\d{9}/.exec(clean) || /[12]\d{9}/.exec(clean) || /\d{10}/.exec(clean);
     if (match) result.iqamaNumber = match[0];
   }
 
-  // 2. تاريخ الانتهاء
   const expiryLine = lines.find(line => 
     /(الانتهاء|انتهاء|النتهاء|الانتها|Expiry|End|Valid)/gi.test(line) && /\d/.test(line)
   );
   if (expiryLine) {
-    const clean = expiryLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
-    const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
-    if (dateMatches.length > 0) {
-      result.expiryDate = normalizeDateStr(dateMatches[0]);
-    }
+    const date = extractDateFromLine(expiryLine);
+    if (date) result.expiryDate = date;
   }
 
-  // 3. تاريخ الميلاد
   const dobLine = lines.find(line => 
     /(الميلاد|المبلاد|ميلاد|مبلاد|الولادة|Birth|Eith)/gi.test(line) && /\d/.test(line)
   );
   if (dobLine) {
-    const clean = dobLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
-    const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
-    if (dateMatches.length > 0) {
-      result.dateOfBirth = normalizeDateStr(dateMatches[0]);
-    }
+    const date = extractDateFromLine(dobLine);
+    if (date) result.dateOfBirth = date;
   }
 
-  // 4. الجنسية
   const upperText = text.toUpperCase();
   for (const nat of KNOWN_NATIONALITIES) {
     if (upperText.includes(nat.toUpperCase())) {
@@ -216,65 +208,37 @@ export function parseLicenseData(rawText: string): LicenseData {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const result: LicenseData = {};
 
-  // 1. ID Number (licenseNumber)
   const idLine = lines.find(line => 
     /(رقم|الهوية|القوبة|الاقامة|الإقامة|Number|ID)/gi.test(line) && /\d/.test(line)
   );
   if (idLine) {
-    const clean = idLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
+    const clean = cleanOcrNumbers(idLine);
     const match = /[12]\d{9}/.exec(clean) || /\d{10}/.exec(clean);
     if (match) result.licenseNumber = match[0];
   }
 
-  // 2. Expiry Date
   const expiryLine = lines.find(line => 
     /(الانتهاء|انتهاء|النتهاء|الانتها|Expiry|End|Valid)/gi.test(line) && /\d/.test(line)
   );
   if (expiryLine) {
-    const clean = expiryLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
-    const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
-    if (dateMatches.length > 0) {
-      result.expiryDate = normalizeDateStr(dateMatches[0]);
-    }
+    const date = extractDateFromLine(expiryLine);
+    if (date) result.expiryDate = date;
   }
 
-  // 3. DOB
   const dobLine = lines.find(line => 
     /(الميلاد|المبلاد|ميلاد|مبلاد|الولادة|Birth|Eith)/gi.test(line) && /\d/.test(line)
   );
   if (dobLine) {
-    const clean = dobLine.replace(/\s+/g, '')
-      .replace(/[Oo]/g, '0')
-      .replace(/[lI|]/g, '1')
-      .replace(/[Zz]/g, '2')
-      .replace(/[Ss]/g, '5')
-      .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
-    const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
-    if (dateMatches.length > 0) {
-      result.dateOfBirth = normalizeDateStr(dateMatches[0]);
-    }
+    const date = extractDateFromLine(dobLine);
+    if (date) result.dateOfBirth = date;
   }
 
-  // 4. فئة الرخصة
   const classMatch = [...text.matchAll(LICENSE_CLASS_RE)];
   if (classMatch.length > 0) {
     const cls = classMatch[0][1] || classMatch[0][3];
     if (cls) result.licenseClass = cls.toUpperCase();
   }
 
-  // بديل: البحث عن كلمة "فئة" أو "Class"
   if (!result.licenseClass) {
     const classLine = /(?:فئة|Class)\s*(?:[:：]\s*)?([A-Zأ-ي])/i.exec(text);
     if (classLine) result.licenseClass = classLine[1].toUpperCase();
