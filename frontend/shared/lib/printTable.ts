@@ -5,6 +5,7 @@ export function printHtmlTable(
   table: HTMLTableElement,
   options: { title: string; subtitle?: string }
 ): void {
+  const { title, subtitle } = options;
   // Validate inputs
   if (!table || !(table instanceof HTMLTableElement)) {
     throw new Error('Invalid table element');

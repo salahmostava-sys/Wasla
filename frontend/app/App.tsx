@@ -130,7 +130,7 @@ const router = createBrowserRouter([
           { path: "attendance", element: <PageGuard pageKey="attendance"><Attendance /></PageGuard> },
           { path: "orders", element: <PageGuard pageKey="orders"><Orders /></PageGuard> },
           { path: "salaries", element: <PageGuard pageKey="salaries"><Salaries /></PageGuard> },
-          { path: "salary-schemes", element: <PageGuard pageKey="salary_schemes"><SalarySchemes /></PageGuard> },
+          { path: "salary-schemes", element: <Navigate to="/settings?tab=schemes" replace /> },
           { path: "advances", element: <PageGuard pageKey="advances"><Advances /></PageGuard> },
           { path: "finance", element: <PageGuard pageKey="finance"><FinancePage /></PageGuard> },
           { path: "motorcycles", element: <PageGuard pageKey="vehicles"><Motorcycles /></PageGuard> },

@@ -24,6 +24,10 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: TypeScript Check
+        working-directory: frontend
+        run: npm run typecheck
+
       - name: Lint (zero warnings)
         working-directory: frontend
         run: npm run lint:strict

@@ -10,6 +10,7 @@ import { useSignedUrl, extractStoragePath } from '@shared/hooks/useSignedUrl';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { useQueryErrorToast } from '@shared/hooks/useQueryErrorToast';
 import { useToast } from '@shared/hooks/use-toast';
+import { logError } from '@shared/lib/logger';
 import { employeeService } from '@services/employeeService';
 import { getEmployeeCities } from '@modules/employees/model/employeeUtils';
 import { cityLabel } from '@modules/employees/model/employeeCity';

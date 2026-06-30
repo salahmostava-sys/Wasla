@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Check, X, Loader2, Link2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, Loader2, Link2, Settings } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@shared/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
@@ -37,11 +37,7 @@ function getAppAssignmentLabel(schemeId: string | null | undefined, assignScheme
   return '';
 }
 
-interface SalarySchemesProps {
-  embedded?: boolean;
-}
-
-const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
+const SalarySchemes = () => {
   const { toast } = useToast();
   const { enabled, userId } = useAuthQueryGate();
   const { permissions: perms } = usePermissions('salary_schemes');
@@ -306,19 +302,10 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {embedded ? (
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">مخططات الرواتب</h2>
-            <p className="text-xs text-muted-foreground mt-1">إدارة الشرائح وربطها بالمنصات</p>
-          </div>
-        ) : (
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Settings size={24} /> إدارة السكيمات
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">شرائح الرواتب والمكافآت — السكيمة مرتبطة بالمنصة</p>
-          </div>
-        )}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">مخططات الرواتب</h2>
+          <p className="text-xs text-muted-foreground mt-1">إدارة الشرائح وربطها بالمنصات</p>
+        </div>
         {perms.can_edit && (
           <Button className="gap-2" onClick={openAdd}><Plus size={16} /> إضافة سكيمة</Button>
         )}

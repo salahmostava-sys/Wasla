@@ -39,6 +39,8 @@ import {
 import {
   AddEmployeeModalProps as Props,
   EmployeeDocUploadState,
+  STEPS,
+  UploadStatus
 } from './add-modal/addEmployee.types';
 import {
   employeeFormSchema,
@@ -136,7 +138,7 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
     logError('[AddEmployeeModal] could not parse residency_expiry', error, { level: 'warn' });
   });
 
-  const availableCityOptions = CITY_OPTIONS.filter(({ value }) => !selectedCities.includes(value));
+  const availableCityOptions = DEFAULT_EMPLOYEE_CITY_OPTIONS.filter(({ value }) => !selectedCities.includes(value));
 
   const validateStep = useCallback((s: number) => validateEmployeeStep(s, trigger), [trigger]);
 

@@ -65,6 +65,7 @@ export const salaryDraftService = {
     draftData: SalaryDraftPatch
   ): Promise<void> => {
     const userId = await getAuthenticatedUserId('salaryDraftService.saveDraft');
+    if (!userId) throw new Error('User not authenticated');
     const { error } = await supabase
       .from('salary_drafts')
       .upsert(
@@ -94,6 +95,7 @@ export const salaryDraftService = {
   ): Promise<void> => {
     // FIX Q1: accept pre-resolved userId to prevent double auth call from syncDraftsForMonth
     const userId = preResolvedUserId ?? await getAuthenticatedUserId('salaryDraftService.saveDraftsBatch');
+    if (!userId) throw new Error('User not authenticated');
 
     const records = Object.entries(drafts).map(([rowId, draftData]) => {
       const employeeId = rowIdToEmployeeId(rowId, monthYear);
@@ -132,6 +134,7 @@ export const salaryDraftService = {
     drafts: Record<string, SalaryDraftPatch>
   ): Promise<void> => {
     const userId = await getAuthenticatedUserId('salaryDraftService.syncDraftsForMonth');
+    if (!userId) throw new Error('User not authenticated');
     const desiredEmployeeIds = new Set(
       Object.keys(drafts).map((rowId) => rowIdToEmployeeId(rowId, monthYear))
     );
@@ -170,6 +173,7 @@ export const salaryDraftService = {
    */
   deleteDraft: async (monthYear: string, employeeId: string): Promise<void> => {
     const userId = await getAuthenticatedUserId('salaryDraftService.deleteDraft');
+    if (!userId) throw new Error('User not authenticated');
     const { error } = await supabase
       .from('salary_drafts')
       .delete()
@@ -185,6 +189,7 @@ export const salaryDraftService = {
    */
   clearDraftsForMonth: async (monthYear: string): Promise<void> => {
     const userId = await getAuthenticatedUserId('salaryDraftService.clearDraftsForMonth');
+    if (!userId) throw new Error('User not authenticated');
     const { error } = await supabase
       .from('salary_drafts')
       .delete()

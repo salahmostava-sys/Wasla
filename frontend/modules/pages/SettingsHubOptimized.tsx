@@ -23,7 +23,7 @@ import {
 import { useLanguage } from '@app/providers/LanguageContext';
 import { cn } from '@shared/lib/utils';
 
-type TabKey = 'general' | 'company' | 'users' | 'activity' | 'profile';
+type TabKey = 'general' | 'company' | 'schemes' | 'users' | 'activity' | 'profile';
 
 type Tab = {
   key: TabKey;
@@ -39,6 +39,7 @@ type TabModule = {
 const TABS: Tab[] = [
   { key: 'general', labelAr: 'إعدادات النظام', labelEn: 'System Settings', icon: Settings2 },
   { key: 'company', labelAr: 'بيانات المنشأة', labelEn: 'Organization Info', icon: Building2 },
+  { key: 'schemes', labelAr: 'مخططات الرواتب', labelEn: 'Salary Schemes', icon: Wallet },
   { key: 'users', labelAr: 'المستخدمون والصلاحيات', labelEn: 'Users & Permissions', icon: Users },
   { key: 'activity', labelAr: 'سجل النشاطات', labelEn: 'Activity Log', icon: History },
   { key: 'profile', labelAr: 'الملف الشخصي', labelEn: 'My Profile', icon: User },
@@ -47,6 +48,7 @@ const TABS: Tab[] = [
 const TAB_TITLES: Record<TabKey, { ar: string; en: string }> = {
   general: { ar: 'إعدادات النظام', en: 'System Settings' },
   company: { ar: 'بيانات المنشأة', en: 'Organization Info' },
+  schemes: { ar: 'مخططات الرواتب', en: 'Salary Schemes' },
   users: { ar: 'المستخدمون والصلاحيات', en: 'Users & Permissions' },
   activity: { ar: 'سجل النشاطات', en: 'Activity Log' },
   profile: { ar: 'الملف الشخصي', en: 'My Profile' },
@@ -55,6 +57,7 @@ const TAB_TITLES: Record<TabKey, { ar: string; en: string }> = {
 const tabLoaders: Record<TabKey, () => Promise<TabModule>> = {
   general: () => import('./settings-hub/GeneralSettingsContent'),
   company: () => import('./settings-hub/CompanySettingsContent'),
+  schemes: () => import('./SalarySchemes') as Promise<TabModule>,
   users: () => import('./settings-hub/UsersContent'),
   activity: () => import('./settings-hub/ActivityLogContent'),
   profile: () => import('./settings-hub/ProfileSettingsContent'),
@@ -63,6 +66,7 @@ const tabLoaders: Record<TabKey, () => Promise<TabModule>> = {
 const tabComponents: Record<TabKey, LazyExoticComponent<ComponentType>> = {
   general: lazy(tabLoaders.general),
   company: lazy(tabLoaders.company),
+  schemes: lazy(tabLoaders.schemes),
   users: lazy(tabLoaders.users),
   activity: lazy(tabLoaders.activity),
   profile: lazy(tabLoaders.profile),

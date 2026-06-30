@@ -33,7 +33,7 @@ jobs:
 
       - name: TypeScript check
         working-directory: frontend
-        run: npx tsc --noEmit --skipLibCheck
+        run: npm run typecheck
 
       - name: Lint (strict – zero warnings)
         working-directory: frontend
