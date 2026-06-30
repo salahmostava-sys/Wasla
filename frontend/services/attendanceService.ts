@@ -5,7 +5,8 @@ import { filterEmployeesForAttendanceMonth, filterOperationallyVisibleEmployees 
 const attendanceService = {
   getDailyAttendanceBase: async () => {
     const PAGE_SIZE = 1000;
-    const allEmployees: any[] = [];
+    type EmployeeRow = { id: string; name: string; salary_type: string | null; job_title: string | null; sponsorship_status: string | null; probation_end_date: string | null; status: string | null };
+    const allEmployees: EmployeeRow[] = [];
     let offset = 0;
     let hasMore = true;
 
@@ -42,7 +43,8 @@ const attendanceService = {
       .eq('is_active', true)
       .order('name');
 
-    const allEmployeeApps: any[] = [];
+    type EmployeeAppRow = { employee_id: string; app_id: string };
+    const allEmployeeApps: EmployeeAppRow[] = [];
     let appLinksOffset = 0;
     let hasMoreLinks = true;
     while (hasMoreLinks) {
@@ -58,7 +60,7 @@ const attendanceService = {
       else appLinksOffset += PAGE_SIZE;
     }
 
-    let employeeRows = allEmployees;
+    const employeeRows = allEmployees;
 
     if (appsRes.error) handleSupabaseError(appsRes.error, 'attendanceService.getDailyAttendanceBase.apps');
 
