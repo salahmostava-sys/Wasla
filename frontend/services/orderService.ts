@@ -201,6 +201,7 @@ export const orderService = {
         .select('employee_id, app_id, orders_count, apps(name, id)')
         .gte('date', from)
         .lte('date', to)
+        .order('employee_id')
         .range(offset, offset + PAGE_SIZE - 1);
       if (error) throw toServiceError(error, 'orderService.getSalaryContextOrdersByMonth');
       const rows = (data ?? []) as OrderSalaryContextRow[];

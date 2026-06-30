@@ -52,7 +52,7 @@ export interface SalaryDataResult extends PreparedSalaryState {
   previewBackendError: string | null;
 }
 
-const PHASE1_TIMEOUT_MS = 12_000;
+const PHASE1_TIMEOUT_MS = 45_000;
 
 const EMPTY_STATE: PreparedSalaryState = {
   appNameToId: {},
