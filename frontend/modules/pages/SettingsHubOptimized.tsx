@@ -23,7 +23,7 @@ import {
 import { useLanguage } from '@app/providers/LanguageContext';
 import { cn } from '@shared/lib/utils';
 
-type TabKey = 'general' | 'company' | 'users' | 'schemes' | 'activity' | 'profile';
+type TabKey = 'general' | 'company' | 'users' | 'activity' | 'profile';
 
 type Tab = {
   key: TabKey;
@@ -40,7 +40,6 @@ const TABS: Tab[] = [
   { key: 'general', labelAr: 'إعدادات النظام', labelEn: 'System Settings', icon: Settings2 },
   { key: 'company', labelAr: 'بيانات المنشأة', labelEn: 'Organization Info', icon: Building2 },
   { key: 'users', labelAr: 'المستخدمون والصلاحيات', labelEn: 'Users & Permissions', icon: Users },
-  { key: 'schemes', labelAr: 'مخططات الرواتب', labelEn: 'Salary Schemes', icon: Wallet },
   { key: 'activity', labelAr: 'سجل النشاطات', labelEn: 'Activity Log', icon: History },
   { key: 'profile', labelAr: 'الملف الشخصي', labelEn: 'My Profile', icon: User },
 ];
@@ -49,7 +48,6 @@ const TAB_TITLES: Record<TabKey, { ar: string; en: string }> = {
   general: { ar: 'إعدادات النظام', en: 'System Settings' },
   company: { ar: 'بيانات المنشأة', en: 'Organization Info' },
   users: { ar: 'المستخدمون والصلاحيات', en: 'Users & Permissions' },
-  schemes: { ar: 'مخططات الرواتب', en: 'Salary Schemes' },
   activity: { ar: 'سجل النشاطات', en: 'Activity Log' },
   profile: { ar: 'الملف الشخصي', en: 'My Profile' },
 };
@@ -58,7 +56,6 @@ const tabLoaders: Record<TabKey, () => Promise<TabModule>> = {
   general: () => import('./settings-hub/GeneralSettingsContent'),
   company: () => import('./settings-hub/CompanySettingsContent'),
   users: () => import('./settings-hub/UsersContent'),
-  schemes: () => import('./settings-hub/SchemesContent'),
   activity: () => import('./settings-hub/ActivityLogContent'),
   profile: () => import('./settings-hub/ProfileSettingsContent'),
 };
@@ -67,7 +64,6 @@ const tabComponents: Record<TabKey, LazyExoticComponent<ComponentType>> = {
   general: lazy(tabLoaders.general),
   company: lazy(tabLoaders.company),
   users: lazy(tabLoaders.users),
-  schemes: lazy(tabLoaders.schemes),
   activity: lazy(tabLoaders.activity),
   profile: lazy(tabLoaders.profile),
 };

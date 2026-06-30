@@ -350,7 +350,7 @@ const Salaries = () => {
       <SalarySchemeSelector
         appsWithoutScheme={salaryMeta.appsWithoutScheme}
         appsWithoutPricingRulesDeduped={appsWithoutPricingRulesDeduped}
-        onOpenSettings={() => navigate('/settings/schemes')}
+        onOpenSettings={() => navigate('/salary-schemes')}
       />
 
       <SalaryActionsBar

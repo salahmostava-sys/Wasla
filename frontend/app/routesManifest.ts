@@ -48,6 +48,7 @@ export const routesManifest: AppRouteManifestItem[] = [
   { id: 'platform_accounts', titleAr: 'حسابات المنصات', group: 'operations', path: '/platform-accounts', permission: routePermission('platform_accounts'), sidebar: true },
 
   { id: 'salaries', titleAr: 'الرواتب', group: 'finance', path: '/salaries', permission: routePermission('salaries'), sidebar: true },
+  { id: 'salary_schemes', titleAr: 'مخططات الرواتب', group: 'finance', path: '/salary-schemes', permission: routePermission('salary_schemes'), sidebar: true },
   { id: 'advances', titleAr: 'السلف', group: 'finance', path: '/advances', permission: routePermission('advances'), sidebar: true },
   { id: 'finance', titleAr: 'المصاريف والإيرادات', group: 'finance', path: '/finance', permission: routePermission('finance'), sidebar: true },
 

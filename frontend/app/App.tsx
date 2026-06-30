@@ -30,6 +30,7 @@ const Employees = lazy(() => import("@modules/employees/pages/EmployeesPage"));
 const Attendance = lazy(() => import("@modules/pages/Attendance"));
 const Orders = lazy(() => import("@modules/orders/pages/OrdersPage"));
 const Salaries = lazy(() => import("@modules/salaries/pages/SalariesPage"));
+const SalarySchemes = lazy(() => import("@modules/pages/SalarySchemes"));
 const Advances = lazy(() => import("@modules/advances/pages/AdvancesPage"));
 const FuelPage = lazy(() => import("@modules/fuel/pages/FuelPage"));
 const MaintenancePage = lazy(() => import("@modules/maintenance/pages/MaintenancePage"));
@@ -129,6 +130,7 @@ const router = createBrowserRouter([
           { path: "attendance", element: <PageGuard pageKey="attendance"><Attendance /></PageGuard> },
           { path: "orders", element: <PageGuard pageKey="orders"><Orders /></PageGuard> },
           { path: "salaries", element: <PageGuard pageKey="salaries"><Salaries /></PageGuard> },
+          { path: "salary-schemes", element: <PageGuard pageKey="salary_schemes"><SalarySchemes /></PageGuard> },
           { path: "advances", element: <PageGuard pageKey="advances"><Advances /></PageGuard> },
           { path: "finance", element: <PageGuard pageKey="finance"><FinancePage /></PageGuard> },
           { path: "motorcycles", element: <PageGuard pageKey="vehicles"><Motorcycles /></PageGuard> },
@@ -151,7 +153,7 @@ const router = createBrowserRouter([
           { path: "profile-page", element: <Navigate to="/profile" replace /> },
           { path: "settings", element: <PageGuard pageKey="settings"><SettingsHub /></PageGuard> },
           { path: "settings/general", element: <Navigate to="/settings?tab=general" replace /> },
-          { path: "settings/schemes", element: <Navigate to="/settings?tab=schemes" replace /> },
+          { path: "settings/schemes", element: <Navigate to="/salary-schemes" replace /> },
           { path: "settings/users", element: <Navigate to="/settings?tab=users" replace /> },
           { path: "settings/permissions", element: <Navigate to="/settings?tab=users" replace /> },
           { path: "settings/profile", element: <Navigate to="/profile" replace /> },
