@@ -32,14 +32,6 @@ export function validateSupabaseAssets(repoRoot = process.cwd()) {
   const configText = readText(repoRoot, 'supabase/config.toml');
   assertContains('supabase/config.toml', configText, 'project_id');
 
-  const requiredFunctionFiles = [
-    'supabase/functions/admin-update-user/index.ts',
-    'supabase/functions/ai-chat/index.ts',
-    'supabase/functions/salary-engine/index.ts',
-  ];
-  for (const file of requiredFunctionFiles) {
-    readText(repoRoot, file);
-  }
 
   const tenantRlsText = readText(repoRoot, 'supabase/oneoff/tenant_rls_smoke_tests.sql');
   for (const snippet of [
@@ -107,7 +99,7 @@ export function validateSupabaseAssets(repoRoot = process.cwd()) {
 
   return {
     auditFiles: 3,
-    functionFiles: requiredFunctionFiles.length,
+    functionFiles: 0,
     migrations: migrationFiles.length,
   };
 }

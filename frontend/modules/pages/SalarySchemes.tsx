@@ -26,8 +26,8 @@ import {
   buildMonthsOfYear,
   clampSnapshotYear,
   tierTypeLabels,
-} from './components/schemes/SchemeSnapshotPinPanel';
-import { SchemeFormModal } from './components/schemes/SchemeFormModal';
+} from '../salaries/components/schemes/SchemeSnapshotPinPanel';
+import { SchemeFormModal } from '../salaries/components/schemes/SchemeFormModal';
 
 const currentMonth = format(new Date(), 'yyyy-MM');
 

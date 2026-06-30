@@ -58,7 +58,7 @@ describe('security/sanitize', () => {
       const obj = { items: ['a', 'b', 'c'] };
       const result = sanitizeObjectForLog(obj) as Record<string, unknown>;
       expect(Array.isArray(result.items)).toBe(true);
-      expect((result.items as string[]).length).toBe(3);
+      expect((result.items as string[])).toHaveLength(3);
     });
 
     it('should limit array size', () => {

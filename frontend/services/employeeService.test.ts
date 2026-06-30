@@ -64,7 +64,7 @@ describe('employeeService', () => {
         .mockImplementationOnce(() => createQueryBuilder({ data: Array(100).fill({ id: '1' }), error: null }))
         .mockImplementationOnce(() => createQueryBuilder({ data: [{ id: '101' }], error: null }));
       const res = await employeeService.exportEmployees({ chunkSize: 100 });
-      expect(res.length).toBe(101);
+      expect(res).toHaveLength(101);
     });
   });
 
@@ -88,7 +88,7 @@ describe('employeeService', () => {
     it('paginates salary context', async () => {
       tableResults.employees = { data: [{ id: 'e1' }] };
       const res = await employeeService.getActiveForSalaryContext();
-      expect(res.length).toBe(1);
+      expect(res).toHaveLength(1);
     });
   });
 

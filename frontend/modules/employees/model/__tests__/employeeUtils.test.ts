@@ -104,19 +104,19 @@ describe('employeeUtils', () => {
 
     it('should filter by name', () => {
       const result = applyEmployeeFilters(employees, { name: 'محمد' });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].name).toBe('محمد أحمد');
     });
 
     it('should filter by status', () => {
       const result = applyEmployeeFilters(employees, { status: 'active' });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].status).toBe('active');
     });
 
     it('should filter by city', () => {
       const result = applyEmployeeFilters(employees, { city: 'jeddah' });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].id).toBe('2');
     });
 
@@ -125,23 +125,23 @@ describe('employeeUtils', () => {
         status: 'active',
         city: 'makkah',
       });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
       expect(result[0].id).toBe('1');
     });
 
     it('should return all when no filters', () => {
       const result = applyEmployeeFilters(employees, {});
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
     });
 
     it('should filter by phone', () => {
       const result = applyEmployeeFilters(employees, { phone: '0501234567' });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
     });
 
     it('should filter by national_id', () => {
       const result = applyEmployeeFilters(employees, { national_id: '1234567890' });
-      expect(result.length).toBe(1);
+      expect(result).toHaveLength(1);
     });
   });
 
