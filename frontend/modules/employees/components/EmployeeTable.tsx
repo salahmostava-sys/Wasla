@@ -283,17 +283,17 @@ function EmployeeDetailedTableInner({
             )}
             {!loading &&
               !hasNoPaginatedRows &&
-              paginated.map((emp, idx) => {
-                const res = calcResidency(emp.residency_expiry);
-                const daysColor = dayColorByThreshold(res.days);
-                const globalIdx = (page - 1) * pageSize + idx + 1;
-                const presenceUser = presenceActiveRows?.get(emp.id);
+              paginated.map((employee, rowIndex) => {
+                const residencyStatus = calcResidency(employee.residency_expiry);
+                const daysColor = dayColorByThreshold(residencyStatus.days);
+                const globalIdx = (page - 1) * pageSize + rowIndex + 1;
+                const presenceUser = presenceActiveRows?.get(employee.id);
                 return (
                   <tr
-                    key={emp.id}
+                    key={employee.id}
                     className={`border-b border-border/30 hover:bg-muted/20 transition-colors relative ${presenceUser ? 'ring-1 ring-inset' : ''}`}
                     style={presenceUser ? { '--ring-color': presenceUser.color, ringColor: presenceUser.color } as React.CSSProperties : undefined}
-                    onFocusCapture={() => onRowEditStart?.(emp.id)}
+                    onFocusCapture={() => onRowEditStart?.(employee.id)}
                     onBlurCapture={(e) => {
                       // Only fire onRowEditEnd if focus left the row entirely
                       if (!e.currentTarget.contains(e.relatedTarget)) {
@@ -303,10 +303,10 @@ function EmployeeDetailedTableInner({
                   >
                     {activeCols.map((col, colIdx) => {
                       return renderEmployeeCell({
-                        col, colIdx, emp,
+                        col, colIdx, emp: employee,
                         globalIdx,
                         presenceUser,
-                        res, daysColor,
+                        res: residencyStatus, daysColor,
                         permissions,
                         availableApps,
                         cityOptions,
