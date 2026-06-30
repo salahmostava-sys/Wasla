@@ -1,5 +1,6 @@
 ﻿import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { PerformanceDashboardResponse, PerformanceRankingEntry } from '@services/performanceService';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
@@ -73,7 +74,7 @@ export function DashboardRankingTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card -2xl h-96 animate-pulse shadow-card rounded-2xl" />
+          <Skeleton key={index}  className="bg-card -2xl h-96 shadow-card rounded-2xl" />
         ))}
       </div>
     );

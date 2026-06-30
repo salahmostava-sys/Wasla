@@ -30,6 +30,7 @@ import {
   monthLabel,
 } from '../salaries/components/schemes/SchemeSnapshotPinPanel';
 import { SchemeFormModal } from '../salaries/components/schemes/SchemeFormModal';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 const currentMonth = format(new Date(), 'yyyy-MM');
 
@@ -315,7 +316,7 @@ const SalarySchemes = () => {
 
       {loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[1,2,3,4].map(i => <div key={`scheme-card-skeleton-${i}`} className="bg-card border border-border/50 p-5 h-48 animate-pulse rounded-2xl" />)}
+          {[1,2,3,4].map(i => <Skeleton key={`scheme-card-skeleton-${i}`}  className="bg-card border border-border/50 p-5 h-48 rounded-2xl" />)}
         </div>
       )}
       {!loading && schemeDataError && (

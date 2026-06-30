@@ -295,18 +295,18 @@ export default function ActivityLogContent() {
     <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* Section header */}
-      <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--ds-surface-container)' }}>
+      <div className="flex items-center gap-3 pb-4 border-b border-border" >
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(38,66,230,0.08)', color: '#2642e6' }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary"
+          
         >
           <Activity size={20} />
         </div>
         <div>
-          <h2 className="text-lg font-bold" style={{ color: 'var(--ds-on-surface)' }}>
+          <h2 className="text-lg font-bold text-foreground" >
             سجل النشاطات
           </h2>
-          <p className="text-xs" style={{ color: 'var(--ds-on-surface-variant)' }}>
+          <p className="text-xs text-muted-foreground" >
             {`${totalCount.toLocaleString('ar-EG')} سجل محفوظ`}
           </p>
         </div>
@@ -329,8 +329,8 @@ export default function ActivityLogContent() {
 
       {/* Filters */}
       <div
-        className="rounded-xl p-3 flex flex-wrap items-center gap-3"
-        style={{ background: 'var(--ds-surface-low)' }}
+        className="rounded-xl p-3 flex flex-wrap items-center gap-3 bg-muted"
+        
       >
         {/* Search */}
         <div className="relative flex-1 min-w-[180px]">
@@ -398,27 +398,27 @@ export default function ActivityLogContent() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>
+      <div className="rounded-xl overflow-hidden shadow-card" >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: 'var(--ds-surface-low)', borderBottom: '1px solid var(--ds-surface-container)' }}>
+              <tr className="bg-muted border-b border-border" >
                 {['التاريخ والوقت', 'المستخدم', 'العملية', 'الوحدة', 'التفاصيل'].map((h, i) => (
-                  <th
+                  <th className="text-muted-foreground"
                     key={h}
                     className={`p-3 text-xs font-semibold whitespace-nowrap text-start ${i === 4 ? 'hidden lg:table-cell' : ''}`}
-                    style={{ color: 'var(--ds-on-surface-variant)' }}
+                    
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody style={{ background: 'var(--ds-surface-lowest)' }}>
+            <tbody className="bg-background" >
 
               {/* Loading skeletons */}
               {loading && SKELETON_ROWS.map((k) => (
-                <tr key={k} style={{ borderBottom: '1px solid var(--ds-surface-container)' }}>
+                <tr className="border-b border-border" key={k} >
                   <td className="p-3"><Skeleton className="h-4 w-28" /></td>
                   <td className="p-3"><Skeleton className="h-4 w-32" /></td>
                   <td className="p-3"><Skeleton className="h-5 w-14 rounded-full" /></td>
@@ -431,8 +431,8 @@ export default function ActivityLogContent() {
               {!loading && logs.length === 0 && (
                 <tr>
                   <td colSpan={5} className="ta-td p-12">
-                    <Activity size={32} className="mx-auto mb-3 opacity-20" style={{ color: 'var(--ds-on-surface-variant)' }} />
-                    <p className="text-sm" style={{ color: 'var(--ds-on-surface-variant)' }}>لا توجد سجلات</p>
+                    <Activity size={32} className="mx-auto mb-3 opacity-20 text-muted-foreground"  />
+                    <p className="text-sm text-muted-foreground" >لا توجد سجلات</p>
                   </td>
                 </tr>
               )}
@@ -441,11 +441,8 @@ export default function ActivityLogContent() {
               {!loading && logs.map(log => (
                 <Fragment key={log.id}>
                   <tr
-                    style={{
-                      borderBottom: expandedId === log.id ? 'none' : '1px solid var(--ds-surface-container)',
-                    }}
-                    className={`transition-colors hover:bg-[var(--ds-surface-low)]
-                      ${expandedId === log.id ? 'bg-[var(--ds-surface-low)]' : ''}
+                    className={`transition-colors hover:bg-muted
+                      ${expandedId === log.id ? 'bg-muted border-b-0' : 'border-b border-border'}
                       ${hasPayload(log) ? 'cursor-pointer' : ''}`}
                     onClick={() => {
                       if (!hasPayload(log)) return;
@@ -454,10 +451,10 @@ export default function ActivityLogContent() {
                   >
                     {/* Date / Time */}
                     <td className="ta-td p-3">
-                      <p className="text-xs font-medium" style={{ color: 'var(--ds-on-surface)' }} dir="ltr">
+                      <p className="text-xs font-medium text-foreground"  dir="ltr">
                         {format(new Date(log.created_at), 'yyyy-MM-dd')}
                       </p>
-                      <p className="text-[10px]" style={{ color: 'var(--ds-on-surface-variant)' }} dir="ltr">
+                      <p className="text-[10px] text-muted-foreground"  dir="ltr">
                         {format(new Date(log.created_at), 'HH:mm:ss')}
                       </p>
                     </td>
@@ -468,17 +465,17 @@ export default function ActivityLogContent() {
                         /* Known user with profile */
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                            style={{ background: 'rgba(38,66,230,0.10)', color: '#2642e6' }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 bg-primary/10 text-primary"
+                            
                           >
                             {avatarChar(log.profile)}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-semibold truncate max-w-[120px]" style={{ color: 'var(--ds-on-surface)' }}>
+                            <p className="text-xs font-semibold truncate max-w-[120px] text-foreground" >
                               {displayName(log.profile)}
                             </p>
                             {log.profile.email && (
-                              <p className="text-[10px] truncate max-w-[120px]" style={{ color: 'var(--ds-on-surface-variant)' }} dir="ltr">
+                              <p className="text-[10px] truncate max-w-[120px] text-muted-foreground"  dir="ltr">
                                 {log.profile.email}
                               </p>
                             )}
@@ -488,14 +485,14 @@ export default function ActivityLogContent() {
                         /* user_id exists but no matching profile (deleted user) */
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ background: 'rgba(120,120,120,0.10)', color: '#888' }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 bg-muted text-muted-foreground"
+                            
                           >
                             <User size={12} />
                           </div>
                           <div>
-                            <p className="text-xs" style={{ color: 'var(--ds-on-surface)' }}>مستخدم محذوف</p>
-                            <p className="text-[9px] font-mono" style={{ color: 'var(--ds-on-surface-variant)' }}>
+                            <p className="text-xs text-foreground" >مستخدم محذوف</p>
+                            <p className="text-[9px] font-mono text-muted-foreground" >
                               {log.user_id.slice(0, 8)}…
                             </p>
                           </div>
@@ -504,12 +501,12 @@ export default function ActivityLogContent() {
                         /* No user_id at all — system trigger */
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] flex-shrink-0"
-                            style={{ background: 'rgba(0,0,0,0.06)', color: '#666' }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] flex-shrink-0 bg-muted/60 text-muted-foreground"
+                            
                           >
                             ⚙️
                           </div>
-                          <span className="text-xs" style={{ color: 'var(--ds-on-surface-variant)' }}>
+                          <span className="text-xs text-muted-foreground" >
                             النظام
                           </span>
                         </div>
@@ -527,10 +524,10 @@ export default function ActivityLogContent() {
 
                     {/* Table / Module */}
                     <td className="p-3">
-                      <span className="text-xs font-medium" style={{ color: 'var(--ds-on-surface)' }}>
+                      <span className="text-xs font-medium text-foreground" >
                         {getTableLabel(log.table_name)}
                       </span>
-                      <p className="text-[10px] font-mono opacity-50" style={{ color: 'var(--ds-on-surface-variant)' }}>
+                      <p className="text-[10px] font-mono opacity-50 text-muted-foreground" >
                         {log.table_name}
                       </p>
                     </td>
@@ -539,15 +536,15 @@ export default function ActivityLogContent() {
                     <td className="p-3 hidden lg:table-cell max-w-xs">
                       <div className="flex items-start gap-1.5">
                         {hasPayload(log) && (
-                          <span className="flex-shrink-0 mt-0.5" style={{ color: 'var(--ds-on-surface-variant)' }}>
+                          <span className="flex-shrink-0 mt-0.5 text-muted-foreground" >
                             {expandedId === log.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                           </span>
                         )}
                         <div className="min-w-0 flex-1">
                           {(log.new_value || log.old_value) && (
                             <p
-                              className="text-[10px] font-mono truncate max-w-[220px]"
-                              style={{ color: 'var(--ds-on-surface-variant)' }}
+                              className="text-[10px] font-mono truncate max-w-[220px] text-muted-foreground"
+                              
                               title={buildChangeSummary(log)}
                             >
                               {buildChangeSummary(log) || '—'}
@@ -565,13 +562,13 @@ export default function ActivityLogContent() {
 
                   {/* Expanded payload */}
                   {expandedId === log.id && (
-                    <tr style={{ borderBottom: '1px solid var(--ds-surface-container)' }}>
-                      <td colSpan={5} className="p-0" style={{ background: 'var(--ds-surface-lowest)' }}>
-                        <div className="p-4 border-t" style={{ borderColor: 'var(--ds-surface-container)' }}>
+                    <tr className="border-b border-border" >
+                      <td colSpan={5} className="p-0 bg-background" >
+                        <div className="p-4 border-t border-border" >
 
                           {/* Header: who did what */}
-                          <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: 'var(--ds-on-surface-variant)' }}>
-                            <span className="font-semibold" style={{ color: 'var(--ds-on-surface)' }}>
+                          <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground" >
+                            <span className="font-semibold text-foreground" >
                               {resolveUserLabel(log.profile, log.user_id)}
                             </span>
                             <span>قام بـ</span>
@@ -579,7 +576,7 @@ export default function ActivityLogContent() {
                               {getActionLabel(log.action)}
                             </span>
                             <span>في</span>
-                            <span className="font-semibold" style={{ color: 'var(--ds-on-surface)' }}>
+                            <span className="font-semibold text-foreground" >
                               {getTableLabel(log.table_name)}
                             </span>
                             <span className="opacity-50 ms-1" dir="ltr">
@@ -590,32 +587,24 @@ export default function ActivityLogContent() {
                           {log.action === 'UPDATE' && (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                               <div>
-                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1" style={{ color: 'var(--ds-on-surface)' }}>
+                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
                                   <span className="text-rose-500">●</span> قبل التعديل
                                 </p>
                                 <pre
-                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all"
-                                  style={{
-                                    background: 'var(--ds-surface-low)',
-                                    border: '1px solid var(--ds-surface-container)',
-                                    color: 'var(--ds-on-surface-variant)',
-                                  }}
+                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
+                                  
                                   dir="ltr"
                                 >
                                   {formatJson(log.old_value)}
                                 </pre>
                               </div>
                               <div>
-                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1" style={{ color: 'var(--ds-on-surface)' }}>
+                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
                                   <span className="text-emerald-500">●</span> بعد التعديل
                                 </p>
                                 <pre
-                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all"
-                                  style={{
-                                    background: 'var(--ds-surface-low)',
-                                    border: '1px solid var(--ds-surface-container)',
-                                    color: 'var(--ds-on-surface-variant)',
-                                  }}
+                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
+                                  
                                   dir="ltr"
                                 >
                                   {formatJson(log.new_value)}
@@ -626,16 +615,12 @@ export default function ActivityLogContent() {
 
                           {log.action === 'INSERT' && (
                             <div>
-                              <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1" style={{ color: 'var(--ds-on-surface)' }}>
+                              <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
                                 <span className="text-emerald-500">●</span> البيانات المضافة
                               </p>
                               <pre
-                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all"
-                                style={{
-                                  background: 'var(--ds-surface-low)',
-                                  border: '1px solid var(--ds-surface-container)',
-                                  color: 'var(--ds-on-surface-variant)',
-                                }}
+                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
+                                
                                 dir="ltr"
                               >
                                 {formatJson(log.new_value)}
@@ -645,16 +630,12 @@ export default function ActivityLogContent() {
 
                           {log.action === 'DELETE' && (
                             <div>
-                              <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1" style={{ color: 'var(--ds-on-surface)' }}>
+                              <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
                                 <span className="text-rose-500">●</span> البيانات المحذوفة
                               </p>
                               <pre
-                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all"
-                                style={{
-                                  background: 'var(--ds-surface-low)',
-                                  border: '1px solid var(--ds-surface-container)',
-                                  color: 'var(--ds-on-surface-variant)',
-                                }}
+                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
+                                
                                 dir="ltr"
                               >
                                 {formatJson(log.old_value)}
@@ -674,13 +655,10 @@ export default function ActivityLogContent() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div
-            className="px-4 py-3 flex items-center justify-between"
-            style={{
-              borderTop: '1px solid var(--ds-surface-container)',
-              background: 'var(--ds-surface-low)',
-            }}
+            className="px-4 py-3 flex items-center justify-between border-t border-border bg-muted"
+            
           >
-            <p className="text-xs" style={{ color: 'var(--ds-on-surface-variant)' }}>
+            <p className="text-xs text-muted-foreground" >
               {`${(page * PAGE_SIZE + 1).toLocaleString('ar-EG')}–${Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString('ar-EG')} من ${totalCount.toLocaleString('ar-EG')}`}
             </p>
             <div className="flex items-center gap-1">
@@ -688,18 +666,18 @@ export default function ActivityLogContent() {
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}
                 className="h-7 w-7 flex items-center justify-center rounded-lg disabled:opacity-40 hover:bg-muted transition-colors"
-                style={{ border: '1px solid var(--ds-outline-variant)' }}
+                classNameToAdd="border border-border"
               >
                 {isRTL ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
               </button>
-              <span className="text-xs px-2" style={{ color: 'var(--ds-on-surface-variant)' }}>
+              <span className="text-xs px-2 text-muted-foreground" >
                 {page + 1} / {totalPages}
               </span>
               <button
                 onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                 disabled={page >= totalPages - 1}
                 className="h-7 w-7 flex items-center justify-center rounded-lg disabled:opacity-40 hover:bg-muted transition-colors"
-                style={{ border: '1px solid var(--ds-outline-variant)' }}
+                classNameToAdd="border border-border"
               >
                 {isRTL ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
               </button>

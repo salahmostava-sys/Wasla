@@ -475,10 +475,10 @@ export function ShiftsTab({
           <table ref={tableRef} className="border-collapse text-[11px] leading-tight w-full" style={{ minWidth: `${36 + 132 + days * 44 + 80}px` }}>
             <thead className="sticky top-0 z-20">
               <tr className="bg-muted border-b-2 border-border">
-                <th className="ta-th sticky right-0 z-[32] bg-muted px-0.5 border-l border-border" style={{ minWidth: 36, width: 36 }}>
+                <th className="ta-th sticky right-0 z-40 bg-muted px-0.5 border-l border-border" style={{ minWidth: 36, width: 36 }}>
                   #
                 </th>
-                <th className="ta-th sticky z-[31] bg-muted text-start px-1.5 text-foreground border-l-2 border-border" style={{ right: 36, minWidth: 132 }}>
+                <th className="ta-th sticky z-30 bg-muted text-start px-1.5 text-foreground border-l-2 border-border" style={{ right: 36, minWidth: 132 }}>
                   الموظف
                 </th>
                 {dayArr.map((d) => {
@@ -518,13 +518,13 @@ export function ShiftsTab({
                   return (
                     <tr key={emp.id} className="border-b border-border/40">
                       <td
-                        className="ta-td sticky right-0 z-[12] px-0.5 border-l border-border tabular-nums text-muted-foreground font-medium"
+                        className="ta-td sticky right-0 z-20 px-0.5 border-l border-border tabular-nums text-muted-foreground font-medium"
                         style={{ backgroundColor: rowBg, minWidth: 36, width: 36 }}
                       >
                         {idx + 1}
                       </td>
                       <td
-                        className="ta-td sticky z-[11] px-1.5 border-l-2 border-border"
+                        className="ta-td sticky z-10 px-1.5 border-l-2 border-border"
                         style={{ backgroundColor: rowBg, right: 36, minWidth: 132 }}
                       >
                         <span className="font-medium text-foreground truncate max-w-[7.5rem] block" title={emp.name}>
@@ -617,10 +617,10 @@ export function ShiftsTab({
               {/* Totals row */}
               {filteredEmployees.length > 0 && (
                 <tr className="border-t-2 border-border font-semibold">
-                  <td className="ta-td sticky right-0 z-[12] px-0.5 border-l border-border text-muted-foreground bg-muted" style={{ minWidth: 36, width: 36 }}>
+                  <td className="ta-td sticky right-0 z-20 px-0.5 border-l border-border text-muted-foreground bg-muted" style={{ minWidth: 36, width: 36 }}>
                     —
                   </td>
-                  <td className="ta-td sticky z-[11] px-1.5 font-bold border-l-2 border-border text-foreground bg-muted" style={{ right: 36, minWidth: 132 }}>
+                  <td className="ta-td sticky z-10 px-1.5 font-bold border-l-2 border-border text-foreground bg-muted" style={{ right: 36, minWidth: 132 }}>
                     الإجمالي
                   </td>
                   {dayArr.map((d) => {

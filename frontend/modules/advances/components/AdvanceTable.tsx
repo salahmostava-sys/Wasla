@@ -1,9 +1,10 @@
-﻿import React, { type RefObject } from 'react';
+import React, { type RefObject } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import type { FilterState } from '@shared/hooks/useAdvancedFilter';
 import type { Advance, EmployeeSummary } from '@modules/advances/types/advance.types';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 const SortIcon = ({ field, sortField, sortDir }: Readonly<{ field: string; sortField: string | null; sortDir: 'asc' | 'desc' }>) => {
   if (sortField !== field) return <span className="text-muted-foreground/40 text-[10px] ms-0.5">⇅</span>;
@@ -53,7 +54,13 @@ export const AdvanceTable = ({
   setDeleteEmployeeAdvancesId,
 }: Readonly<AdvanceTableProps>) => {
   if (loading) {
-    return <div className="bg-card border border-border/50 p-8 text-center text-muted-foreground animate-pulse rounded-2xl">جارٍ التحميل...</div>;
+    return (
+      <div className="bg-card border border-border/50 p-8 rounded-2xl flex flex-col gap-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
   }
   if (filtered.length === 0) {
     return <div className="text-center py-16 text-muted-foreground bg-card border border-border/50 rounded-2xl">لا توجد سلف مطابقة</div>;

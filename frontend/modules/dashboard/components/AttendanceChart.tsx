@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 type AttendanceWeekRow = { day: string; present: number; absent: number; leave: number; sick: number; late: number };
 
@@ -16,7 +17,7 @@ export function AttendanceChart(props: Readonly<{
         <h3 className="text-sm font-bold mb-1">الحضور اليوم</h3>
         <p className="text-[11px] text-muted-foreground/80 mb-3">{format(new Date(), 'EEEE، d MMMM yyyy', { locale: ar })}</p>
         {loading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">{['a1', 'a2', 'a3', 'a4', 'a5'].map((k) => <div key={k} className="h-16 bg-muted/40 rounded-xl animate-pulse" />)}</div>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">{['a1', 'a2', 'a3', 'a4', 'a5'].map((k) => <Skeleton key={k}  className="h-16 bg-muted/40 rounded-xl" />)}</div>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
             <div className="rounded-xl bg-emerald-50 p-4 text-center"><p className="text-2xl font-black text-emerald-700">{kpis.presentToday}</p><p className="text-[10px] font-semibold text-emerald-600 mt-1">حاضر</p></div>

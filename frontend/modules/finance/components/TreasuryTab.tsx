@@ -200,7 +200,7 @@ export function TreasuryTab() {
 
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">المبلغ</label>
-                <Input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" dir="ltr" className="text-end font-bold" />
+                <Input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="text-end font-bold" />
               </div>
 
               <div>

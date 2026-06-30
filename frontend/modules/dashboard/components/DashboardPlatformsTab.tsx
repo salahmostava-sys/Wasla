@@ -17,6 +17,7 @@ import {
 import { ArrowUpRight, ArrowDownRight, Target, TrendingUp, Users, Package } from 'lucide-react';
 
 import type { PerformanceDashboardResponse } from '@services/performanceService';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 type SortKey =
   | 'appName'
@@ -195,7 +196,7 @@ export function DashboardPlatformsTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card -2xl h-48 animate-pulse shadow-card rounded-2xl" />
+          <Skeleton key={index}  className="bg-card -2xl h-48 shadow-card rounded-2xl" />
         ))}
       </div>
     );

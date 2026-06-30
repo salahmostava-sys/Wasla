@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@shared/lib/utils";
 import { toast } from "@shared/components/ui/sonner";
 import { TOAST_SUCCESS_ACTION, TOAST_SUCCESS_EDIT } from "@shared/lib/toastMessages";
+import { Skeleton } from '@shared/components/ui/skeleton';
 import { useLanguage } from "@app/providers/LanguageContext";
 import { usePermissions } from "@shared/hooks/usePermissions";
 import { authQueryUserId, useAuthQueryGate } from "@shared/hooks/useAuthQueryGate";
@@ -266,7 +267,7 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
       <tr key={row.id} className="ta-tr">
         {row.cells.map((cellId) => (
           <td key={cellId} className="ta-td">
-            <div className="h-4 bg-muted rounded animate-pulse" />
+            <Skeleton className="h-4 w-full bg-muted/60" />
           </td>
         ))}
       </tr>

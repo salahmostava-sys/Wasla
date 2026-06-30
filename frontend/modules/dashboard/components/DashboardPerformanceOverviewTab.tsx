@@ -31,6 +31,7 @@ import { EnrichedStatCard } from './EnrichedStatCard';
 import { AIInsightsPanel } from './AIInsightsPanel';
 import { AIRecommendationsSection } from './AIRecommendationsSection';
 import { PerformanceDetailedTable } from './PerformanceDetailedTable';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 function formatPercent(value: number) {
   const rounded = Number.isFinite(value) ? value : 0;
@@ -178,7 +179,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {Array.from({ length: 8 }, (_, index) => (
-          <div key={index} className="bg-card -2xl h-32 animate-pulse shadow-card rounded-2xl" />
+          <Skeleton key={index}  className="bg-card -2xl h-32 shadow-card rounded-2xl" />
         ))}
       </div>
     );

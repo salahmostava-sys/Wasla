@@ -15,7 +15,7 @@ export function PresenceRowIndicator({ user }: Readonly<Props>) {
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[5] rounded-sm border-2 transition-all"
+      className="pointer-events-none absolute inset-0 z-10 rounded-sm border-2 transition-all"
       style={{ borderColor: user.color }}
     >
       <span

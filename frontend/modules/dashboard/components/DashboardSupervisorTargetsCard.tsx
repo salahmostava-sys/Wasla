@@ -1,4 +1,5 @@
 import type { SupervisorPerformanceRow } from '@services/dashboardService';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 type Props = {
   loading: boolean;
@@ -30,7 +31,7 @@ export function DashboardSupervisorTargetsCard({ loading, rows }: Readonly<Props
         {loading && (
           <div className="space-y-2">
             {['r1', 'r2', 'r3'].map((k) => (
-              <div key={k} className="h-10 rounded-lg bg-muted/40 animate-pulse" />
+              <Skeleton key={k}  className="h-10 rounded-lg bg-muted/40" />
             ))}
           </div>
         )}

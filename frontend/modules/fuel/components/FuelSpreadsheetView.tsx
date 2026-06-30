@@ -13,6 +13,7 @@ import { ar } from 'date-fns/locale';
 import { Users, Calendar, TrendingUp, Fuel, BarChart3, Package } from 'lucide-react';
 
 import type { DailyRow, Employee } from '@modules/fuel/types/fuel.types';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
@@ -288,10 +289,10 @@ export default function FuelSpreadsheetView(props: Readonly<{
       <div className="space-y-4">
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="bg-card h-20 animate-pulse shadow-card rounded-2xl" />
+            <Skeleton key={i}  className="bg-card h-20 shadow-card rounded-2xl" />
           ))}
         </div>
-        <div className="bg-card h-96 animate-pulse shadow-card rounded-2xl" />
+        <Skeleton  className="bg-card h-96 shadow-card rounded-2xl" />
       </div>
     );
   }

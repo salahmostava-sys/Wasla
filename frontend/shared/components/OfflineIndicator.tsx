@@ -55,7 +55,7 @@ export function OfflineIndicator() {
       role="alert"
       aria-live="assertive"
       className={cn(
-        'offline-banner fixed top-0 left-0 right-0 z-[9999] flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold shadow-card transition-all duration-500 ease-out',
+        'offline-banner fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold shadow-card transition-all duration-500 ease-out',
         isOffline
           ? 'animate-in slide-in-from-top bg-destructive text-destructive-foreground'
           : 'animate-in slide-in-from-top bg-emerald-600 text-white',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { getAppColor, type AppColorData } from '@shared/hooks/useAppColors';
 import { ColorBadge } from '@shared/components/ui/ColorBadge';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 /** Performance level based on daily average orders. */
 type PerfLevel = { label: string; color: string; bg: string };
@@ -99,7 +100,7 @@ export const OrdersSummaryTable = React.memo(({
                 {Array.from({ length: apps.length + 5 }, (_, j) => ({ id: `skeleton-cell-${row.id}-${j}` }))
                   .map((cell) => (
                     <td key={cell.id} className="p-3">
-                      <div className="h-4 bg-muted rounded animate-pulse" />
+                      <Skeleton  className="h-4 bg-muted rounded" />
                     </td>
                   ))}
               </tr>

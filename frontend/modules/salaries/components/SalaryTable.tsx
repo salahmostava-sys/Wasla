@@ -34,6 +34,7 @@ import { OrderDetailsModal } from '@modules/salaries/components/OrderDetailsModa
 import { shortEmployeeName } from '@modules/salaries/lib/salaryConstants';
 import type { SalaryRow, SchemeData, SortDir } from '@modules/salaries/types/salary.types';
 import { getSalaryRowActivityTotals, hasPlatformActivity } from '@modules/salaries/model/salaryUtils';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 // ── Style constants ───────────────────────────────────────────────────────────
 const thFrozenBase = "px-3 py-2 text-xs font-semibold text-muted-foreground whitespace-nowrap border border-border/40 bg-card text-start sticky z-20";
@@ -407,18 +408,18 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
     return (
       <div className="shadow-card bg-card overflow-hidden rounded-2xl">
         <div className="flex items-center gap-3 px-6 py-4 border-b border-border/40">
-          <div className="h-3 w-32 rounded bg-muted animate-pulse" />
-          <div className="h-3 w-24 rounded bg-muted animate-pulse" />
-          <div className="h-3 w-20 rounded bg-muted animate-pulse" />
+          <Skeleton  className="h-3 w-32 rounded bg-muted" />
+          <Skeleton  className="h-3 w-24 rounded bg-muted" />
+          <Skeleton  className="h-3 w-20 rounded bg-muted" />
         </div>
         <div className="divide-y divide-border/30">
           {Array.from({ length: 8 }, (_, i) => (
             <div key={i} className="flex items-center gap-3 px-6 py-3">
-              <div className="h-3 w-6 rounded bg-muted/60 animate-pulse" />
-              <div className="h-3 w-28 rounded bg-muted/60 animate-pulse" />
-              <div className="h-3 w-20 rounded bg-muted/50 animate-pulse" />
-              <div className="h-3 w-16 rounded bg-muted/50 animate-pulse" />
-              <div className="h-3 w-16 rounded bg-muted/40 animate-pulse flex-1" />
+              <Skeleton  className="h-3 w-6 rounded bg-muted/60" />
+              <Skeleton  className="h-3 w-28 rounded bg-muted/60" />
+              <Skeleton  className="h-3 w-20 rounded bg-muted/50" />
+              <Skeleton  className="h-3 w-16 rounded bg-muted/50" />
+              <Skeleton  className="h-3 w-16 rounded bg-muted/40 flex-1" />
             </div>
           ))}
         </div>

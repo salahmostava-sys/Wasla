@@ -12,6 +12,7 @@ import {
   type DashboardPerformanceTabKey,
 } from '@modules/dashboard/components/DashboardPerformanceHeader';
 import { DashboardPerformanceOverviewTab } from '@modules/dashboard/components/DashboardPerformanceOverviewTab';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 
 const loadAnalyticsTab = () =>
@@ -34,7 +35,7 @@ const LazyDashboardRankingTab = lazy(loadRankingTab);
 const LazyDashboardPlatformsTab = lazy(loadPlatformsTab);
 
 function TabFallback() {
-  return <div className="bg-card h-80 animate-pulse shadow-card rounded-2xl" />;
+  return <Skeleton  className="bg-card h-80 shadow-card rounded-2xl" />;
 }
 
 export default function DashboardPerformancePage() {

@@ -27,6 +27,7 @@ import type {
   DailyExpandedArgs,
 } from '@modules/fuel/types/fuel.types';
 import { MONTHLY_SKELETON_ROWS } from '@modules/fuel/types/fuel.types';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 export function FuelMonthlyTable(props: Readonly<{
   tableRef: React.RefObject<HTMLTableElement | null>;
@@ -61,7 +62,7 @@ const renderMonthlyLoadingRows = (): React.ReactNode =>
   MONTHLY_SKELETON_ROWS.map((rowKey) => (
     <tr key={`fuel-monthly-skeleton-row-${rowKey}`} className="border-b border-border/30">
       {Array.from({ length: 9 }).map((_, j) => (
-        <td key={`fuel-monthly-skeleton-cell-${rowKey}-${j}`} className="ta-td"><div className="h-4 bg-muted/60 rounded animate-pulse" /></td>
+        <td key={`fuel-monthly-skeleton-cell-${rowKey}-${j}`} className="ta-td"><Skeleton  className="h-4 bg-muted/60 rounded" /></td>
       ))}
     </tr>
   ));

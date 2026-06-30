@@ -1,4 +1,5 @@
 ﻿import { Users, UserCheck, Package, Award, Bike, Bell, ArrowUpRight, ArrowDownRight, Fuel, Wrench, type LucideIcon } from 'lucide-react';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 type StatsCardsProps = Readonly<{
   loading: boolean;
@@ -28,9 +29,9 @@ function StatCard(props: Readonly<{ label: string; value: string | number; icon:
     <div className="bg-card -2xl p-4 shadow-card flex flex-col gap-3 hover:shadow-card-hover transition-shadow rounded-2xl">
       {loading ? (
         <>
-          <div className="h-9 w-9 rounded-xl bg-muted/40 animate-pulse" />
-          <div className="h-7 w-20 bg-muted/40 animate-pulse rounded-lg" />
-          <div className="h-3 w-28 bg-muted/40 animate-pulse rounded" />
+          <Skeleton  className="h-9 w-9 rounded-xl bg-muted/40" />
+          <Skeleton  className="h-7 w-20 bg-muted/40 rounded-lg" />
+          <Skeleton  className="h-3 w-28 bg-muted/40 rounded" />
         </>
       ) : (
         <>

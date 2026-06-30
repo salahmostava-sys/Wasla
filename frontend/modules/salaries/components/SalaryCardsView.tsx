@@ -1,8 +1,9 @@
-﻿import type React from 'react';
+import type React from 'react';
 import { Button } from '@shared/components/ui/button';
 import { CheckCircle, Printer } from 'lucide-react';
 import { statusLabels, statusStyles, SALARY_CARD_SKELETON_KEYS } from '@modules/salaries/lib/salaryConstants';
 import type { SalaryRow } from '@modules/salaries/types/salary.types';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 interface SalaryCardsViewProps {
   loadingData: boolean;
@@ -25,11 +26,11 @@ export function SalaryCardsView(props: Readonly<SalaryCardsViewProps>) {
       {loadingData && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {SALARY_CARD_SKELETON_KEYS.map((skeletonKey) => (
-            <div key={skeletonKey} className="bg-card border border-border/50 p-4 space-y-2 animate-pulse rounded-2xl">
-              <div className="h-4 bg-muted rounded w-3/4" />
-              <div className="h-3 bg-muted rounded w-1/2" />
-              <div className="h-8 bg-muted rounded mt-3" />
-            </div>
+            <Skeleton key={skeletonKey} className="bg-card border border-border/50 p-4 space-y-2 rounded-2xl">
+              <Skeleton className="h-4 w-3/4 bg-muted/60" />
+              <Skeleton className="h-3 w-1/2 bg-muted/60" />
+              <Skeleton className="h-8 mt-3 bg-muted/60" />
+            </Skeleton>
           ))}
         </div>
       )}

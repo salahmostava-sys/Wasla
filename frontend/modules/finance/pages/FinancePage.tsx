@@ -174,7 +174,7 @@ function TransactionTable(props: Readonly<TransactionTableProps>) {
                   {editingId === t.id && editField === 'amount' ? (
                     <Input autoFocus type="number" min="0" value={editText} onChange={e => setEditText(e.target.value)}
                       onBlur={() => { saveEdit(t.id); }} onKeyDown={handleKeyDown}
-                      className="h-7 text-sm text-center font-bold" dir="ltr" />
+                      className="h-7 text-sm text-center font-bold" />
                   ) : (
                     <button type="button" className={t.is_auto ? '' : 'cursor-pointer hover:opacity-70'} onClick={() => { if (!t.is_auto) startEdit(t.id, 'amount', String(t.amount)); }} disabled={t.is_auto}>
                       {t.amount.toLocaleString('en-US')}
@@ -206,7 +206,7 @@ function TransactionTable(props: Readonly<TransactionTableProps>) {
         )}
         <tr className={`border-t-2 ${rowBorder}`}>
           <td className="ta-td">
-            <Input type="number" min="0" step="0.01" placeholder="0" value={newItem.amount} onChange={e => setNewItem(r => ({ ...r, amount: e.target.value }))} className="h-9 text-sm text-center font-bold w-full" dir="ltr" />
+            <Input type="number" min="0" step="0.01" placeholder="0" value={newItem.amount} onChange={e => setNewItem(r => ({ ...r, amount: e.target.value }))} className="h-9 text-sm text-center font-bold w-full" />
           </td>
           <td className="ta-td">
             <Input placeholder={descPlaceholder} value={newItem.description} onChange={e => setNewItem(r => ({ ...r, description: e.target.value }))} className="h-9 text-sm w-full" dir="rtl" />

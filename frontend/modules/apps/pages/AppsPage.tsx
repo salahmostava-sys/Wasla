@@ -19,6 +19,7 @@ import { AppModal } from '@modules/apps/components/AppModal';
 import { AppsPageHeader } from '@modules/apps/components/AppsPageHeader';
 import { useAppsPage } from '@modules/apps/hooks/useAppsPage';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 const AppsPage = () => {
   const {
@@ -77,7 +78,7 @@ const AppsPage = () => {
         {appsLoading && (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
             {[1, 2, 3, 4, 5].map((item) => (
-              <div key={item} className="h-40 animate-pulse rounded-2xl bg-muted/40" />
+              <Skeleton key={item}  className="h-40 rounded-2xl bg-muted/40" />
             ))}
           </div>
         )}

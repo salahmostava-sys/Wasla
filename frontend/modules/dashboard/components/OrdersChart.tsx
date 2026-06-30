@@ -1,4 +1,5 @@
-﻿type OrdersByAppRow = {
+import { Skeleton } from '@shared/components/ui/skeleton';
+type OrdersByAppRow = {
   app: string;
   orders: number;
   target: number;
@@ -24,7 +25,7 @@ export function OrdersChart(props: Readonly<{
         <p className="text-xs text-muted-foreground/80 mb-2">طلبات كل منصة على حدة — مع نسبة تحقيق الهدف</p>
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {['o1', 'o2', 'o3', 'o4'].map((k) => <div key={k} className="h-28 bg-muted/40 rounded-xl animate-pulse" />)}
+            {['o1', 'o2', 'o3', 'o4'].map((k) => <Skeleton key={k}  className="h-28 bg-muted/40 rounded-xl" />)}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

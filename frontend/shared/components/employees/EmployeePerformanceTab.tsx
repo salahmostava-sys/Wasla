@@ -10,6 +10,7 @@ import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { getErrorMessage } from '@services/serviceError';
 import { RiderProfilePerformanceCard } from '@modules/dashboard/components/RiderProfilePerformanceCard';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) {
   const { employeeId } = props;
@@ -60,7 +61,7 @@ export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) 
   };
 
   if (performanceQuery.isLoading) {
-    return <div className="bg-card -2xl h-72 animate-pulse shadow-card rounded-2xl" />;
+    return <Skeleton  className="bg-card -2xl h-72 shadow-card rounded-2xl" />;
   }
 
   if (performanceQuery.isError || !performanceQuery.data) {

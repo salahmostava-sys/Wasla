@@ -11,6 +11,7 @@
 } from 'recharts';
 
 import type { PerformanceDashboardResponse } from '@services/performanceService';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 function monthLabel(monthYear: string) {
   const [year, month] = monthYear.split('-');
@@ -26,7 +27,7 @@ export function DashboardPerformanceAnalyticsTab(props: Readonly<{
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card -2xl h-80 animate-pulse shadow-card rounded-2xl" />
+          <Skeleton key={index}  className="bg-card -2xl h-80 shadow-card rounded-2xl" />
         ))}
       </div>
     );

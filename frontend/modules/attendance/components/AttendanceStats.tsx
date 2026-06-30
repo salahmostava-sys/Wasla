@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import attendanceService from '@services/attendanceService';
 import { logError } from '@shared/lib/logger';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 interface Props {
   selectedMonth: number;
@@ -76,10 +77,10 @@ const AttendanceStats = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-14 bg-muted/40 rounded-xl animate-pulse" />
+        <Skeleton  className="h-14 bg-muted/40 rounded-xl" />
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {SKELETON_KEYS.map((k) => (
-            <div key={k} className="h-20 bg-muted/40 rounded-xl animate-pulse" />
+            <Skeleton key={k}  className="h-20 bg-muted/40 rounded-xl" />
           ))}
         </div>
       </div>

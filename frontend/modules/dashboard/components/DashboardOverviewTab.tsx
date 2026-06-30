@@ -6,6 +6,7 @@ import { OrdersChart } from '@modules/dashboard/components/OrdersChart';
 import { StatsCards } from '@modules/dashboard/components/StatsCards';
 import { TopEmployees } from '@modules/dashboard/components/TopEmployees';
 import type { AtRiskRider } from '@modules/dashboard/hooks/useDashboard';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 const loadAttendanceChart = () =>
   import('@modules/dashboard/components/AttendanceChart').then((module) => ({
@@ -25,12 +26,12 @@ function SectionPlaceholder({
     <div className="bg-card -2xl shadow-card p-5 rounded-2xl">
       <div className="flex items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-bold text-foreground">{title}</h3>
-        <div className="h-4 w-24 rounded bg-muted/40 animate-pulse" />
+        <Skeleton  className="h-4 w-24 rounded bg-muted/40" />
       </div>
 
       <div className="space-y-3">
         {Array.from({ length: rows }, (_, index) => (
-          <div key={`${title}-${index + 1}`} className="h-14 rounded-xl bg-muted/40 animate-pulse" />
+          <Skeleton key={`${title}-${index + 1}`}  className="h-14 rounded-xl bg-muted/40" />
         ))}
       </div>
     </div>
