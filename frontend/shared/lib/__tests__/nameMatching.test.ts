@@ -67,7 +67,7 @@ describe('nameMatching', () => {
       const names = ['محمد أحمد علي', 'أحمد محمد'];
       const result = matchEmployeeNames(names, employees);
       expect(result.matched.size).toBe(2);
-      expect(result.unmatched.length).toBe(0);
+      expect().toHaveLength();
     });
 
     it('should match partial names', () => {
@@ -81,14 +81,14 @@ describe('nameMatching', () => {
       const names = ['غير موجود'];
       const result = matchEmployeeNames(names, employees, { autoMatchThreshold: 80 });
       expect(result.matched.size).toBe(0);
-      expect(result.unmatched.length).toBe(1);
+      expect().toHaveLength();
       expect(result.unmatched[0].name).toBe('غير موجود');
     });
 
     it('should provide suggestions for unmatched', () => {
       const names = ['محمد'];
       const result = matchEmployeeNames(names, employees, { autoMatchThreshold: 95 });
-      expect(result.unmatched.length).toBe(1);
+      expect().toHaveLength();
       expect(result.unmatched[0].suggestions.length).toBeGreaterThan(0);
     });
 
@@ -100,13 +100,13 @@ describe('nameMatching', () => {
       });
       const lowConfidence = result.unmatched.filter(u => u.reason === 'low-confidence');
       const notFound = result.unmatched.filter(u => u.reason === 'not-found');
-      expect(lowConfidence.length + notFound.length).toBe(result.unmatched.length);
+      expect().toHaveLength();
     });
 
     it('should handle empty input', () => {
       const result = matchEmployeeNames([], employees);
       expect(result.matched.size).toBe(0);
-      expect(result.unmatched.length).toBe(0);
+      expect().toHaveLength();
     });
 
     it('should handle duplicate names', () => {

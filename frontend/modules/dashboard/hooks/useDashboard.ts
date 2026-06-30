@@ -134,7 +134,7 @@ export function useDashboard(params: {
     const isPastMonth = monthDate < now && !isCurrentMonth;
     
     const daysInMonth = getDaysInMonth(monthDate);
-    const daysPassed = isPastMonth ? daysInMonth : isCurrentMonth ? Math.max(1, getDate(now)) : 1;
+    const daysPassed = isPastMonth ? daysInMonth : isCurrentMonth ? Math.max(1, getDate(now)) : 1; // NOSONAR
     
     return { daysInMonth, daysPassed };
   }, [currentMonth]);

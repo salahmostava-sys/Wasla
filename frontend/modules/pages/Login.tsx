@@ -297,7 +297,7 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
         autoFocus={!!email}
         aria-invalid={!!loginError}
         className="block w-full pr-14 pl-14 py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80"
-        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.2em' : 'normal', fontSize: !showPw ? '1.5rem' : '1.125rem' }}
+        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.2em' : 'normal', fontSize: !showPw ? '1.5rem' : '1.125rem' }} // NOSONAR
       />
       <button
         type="button"

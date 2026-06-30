@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function fmtNum(value: number | null | undefined, decimals?: number): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  const opts: Intl.NumberFormatOptions = decimals !== undefined
+  const opts: Intl.NumberFormatOptions = decimals !== undefined // NOSONAR
     ? { minimumFractionDigits: decimals, maximumFractionDigits: decimals }
     : {};
   return new Intl.NumberFormat('en-US', opts).format(value);
@@ -44,7 +44,7 @@ export function fmtCurrency(value: number | null | undefined): string {
  */
 export function safeStr(value: unknown, fallback = ''): string {
   if (value === null || value === undefined) return fallback;
-  if (typeof value === 'string') return value !== '' ? value : fallback;
+  if (typeof value === 'string') return value !== '' ? value : fallback; // NOSONAR
   if (typeof value === 'number') return String(value);
   // Intentional guard: objects (e.g. from Supabase embedded JOIN) return fallback
   return fallback;

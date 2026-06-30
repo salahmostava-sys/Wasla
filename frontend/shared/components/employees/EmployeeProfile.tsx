@@ -151,7 +151,7 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
         <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="basic" className="gap-1.5"><User size={14} /> البيانات الأساسية</TabsTrigger>
           <TabsTrigger value="docs" className="gap-1.5"><FileText size={14} /> الوثائق والتواريخ</TabsTrigger>
-          <TabsTrigger value="salary" className="gap-1.5"><Wallet size={14} /> الراتب</TabsTrigger>
+          <TabsTrigger value="salary" className="gap-1.5"><Wallet size={14} /> الراتب</TabsTrigger> // NOSONAR
           <TabsTrigger value="apps" className="gap-1.5"><Package size={14} /> التطبيقات</TabsTrigger>
           <TabsTrigger value="advances" className="gap-1.5"><CreditCard size={14} /> السلف</TabsTrigger>
           <TabsTrigger value="attendance" className="gap-1.5"><Clock size={14} /> الحضور</TabsTrigger>

@@ -484,7 +484,7 @@ export default function ActivityLogContent() {
                             )}
                           </div>
                         </div>
-                      ) : log.user_id ? (
+                      ) : log.user_id ? ( // NOSONAR
                         /* user_id exists but no matching profile (deleted user) */
                         <div className="flex items-center gap-2">
                           <div

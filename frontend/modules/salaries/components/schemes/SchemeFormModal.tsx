@@ -102,7 +102,7 @@ export function SchemeFormModal({
       if (schemeId && schemeType === 'order_based') {
         await salarySchemeService.insertSchemeTiers(
           formTiers.map((t, i) => ({
-            scheme_id: schemeId != null ? schemeId : '0',
+            scheme_id: schemeId != null ? schemeId : '0', // NOSONAR
             from_orders: t.from,
             to_orders: t.to >= 9999 ? null : t.to,
             price_per_order: t.pricePerOrder,

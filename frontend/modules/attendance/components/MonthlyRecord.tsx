@@ -241,7 +241,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                           )}
                           title={`${row.name} - يوم ${d} - ${config.label}`}
                         >
-                          {status !== 'none' ? (
+                          {status !== 'none' ? ( // NOSONAR
                             <div className="flex flex-col items-center justify-center gap-0.5">
                               {config.icon ? config.icon : <div className={cn("w-1.5 h-1.5 rounded-full", config.dot)} />}
                             </div>

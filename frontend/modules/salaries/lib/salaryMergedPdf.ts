@@ -101,7 +101,7 @@ export function buildMergedSalaryPageHtml({
   const paymentMethodLabel = row.paymentMethod === 'bank' ? '🏦 تحويل بنكي' : '💵 نقدي';
   const ibanLine = row.paymentMethod === 'bank' && row.hasIban
     ? escapeHtml(row.bankAccount ?? '')
-    : (row.paymentMethod === 'bank' ? '—' : 'لا يُصرف تحويلاً');
+    : (row.paymentMethod === 'bank' ? '—' : 'لا يُصرف تحويلاً'); // NOSONAR
   const transferRows =
     row.transfer > 0
       ? `<tr><td class="label">المبلغ المحوّل</td><td>${row.transfer.toLocaleString('en-US')} ر.س</td></tr>

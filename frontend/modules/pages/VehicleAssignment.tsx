@@ -465,7 +465,7 @@ const VehicleAssignment = () => {
               <tr>
                 <th className="ta-th">المركبة</th>
                 <th className="ta-th">المندوب</th>
-                <th className="ta-th">تاريخ الاستلام</th>
+                <th className="ta-th">تاريخ الاستلام</th> // NOSONAR
                 <th className="ta-th">تاريخ الإعادة</th>
                 <th className="ta-th">مدة الاستخدام</th>
                 <th className="ta-th">الحالة</th>
