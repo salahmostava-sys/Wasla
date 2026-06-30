@@ -29,6 +29,8 @@ jobs:
         run: npm ci
 
       - name: Run frontend verify
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: node scripts/system-audit.mjs --skip-backend --skip-supabase
 
   ai-backend-smoke:

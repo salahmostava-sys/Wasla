@@ -9,6 +9,11 @@ on:
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
+    # Self-hosted SonarQube scan. Only runs when SONAR_HOST_URL secret is set,
+    # so it does not fail the pipeline when only SonarCloud (Build workflow) is used.
+    if: ${{ vars.ENABLE_SONARQUBE == 'true' }}
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v4
         with:
