@@ -25,51 +25,52 @@ export const employeeActivityService = {
   getMonthlyActiveEmployeeIds: async (monthKey: string): Promise<MonthlyActiveEmployeeIdsResult> => {
     const { start, end } = monthStartEnd(monthKey);
 
-    const [ordersRes, shiftsRes, attendanceRes, salariesRes] = await Promise.all([
-      supabase
-        .from('daily_orders')
-        .select('employee_id')
-        .gte('date', start)
-        .lte('date', end),
-      supabase
-        .from('daily_shifts')
-        .select('employee_id')
-        .gte('date', start)
-        .lte('date', end),
-      supabase
-        .from('attendance')
-        .select('employee_id')
-        .gte('date', start)
-        .lte('date', end),
-      supabase
-        .from('salary_records')
-        .select('employee_id')
-        .eq('month_year', monthKey),
-    ]);
+    const PAGE_SIZE = 1000;
 
-    if (ordersRes.error) handleSupabaseError(ordersRes.error, 'employeeActivityService.getMonthlyActiveEmployeeIds.orders');
-    if (shiftsRes.error) handleSupabaseError(shiftsRes.error, 'employeeActivityService.getMonthlyActiveEmployeeIds.shifts');
-    if (attendanceRes.error) handleSupabaseError(attendanceRes.error, 'employeeActivityService.getMonthlyActiveEmployeeIds.attendance');
-    if (salariesRes.error) handleSupabaseError(salariesRes.error, 'employeeActivityService.getMonthlyActiveEmployeeIds.salaries');
+    const fetchAllIds = async (table: string, dateCol: string, isEq = false) => {
+      const allRows: { employee_id: string }[] = [];
+      let offset = 0;
+      let hasMore = true;
+      while (hasMore) {
+        let q = supabase.from(table).select('employee_id');
+        if (isEq) q = q.eq(dateCol, monthKey);
+        else q = q.gte(dateCol, start).lte(dateCol, end);
+        
+        const { data, error } = await q.range(offset, offset + PAGE_SIZE - 1);
+        if (error) handleSupabaseError(error, `employeeActivityService.getMonthlyActiveEmployeeIds.${table}`);
+        const rows = data ?? [];
+        allRows.push(...rows);
+        if (rows.length < PAGE_SIZE) hasMore = false;
+        else offset += PAGE_SIZE;
+      }
+      return allRows;
+    };
+
+    const [ordersData, shiftsData, attendanceData, salariesData] = await Promise.all([
+      fetchAllIds('daily_orders', 'date'),
+      fetchAllIds('daily_shifts', 'date'),
+      fetchAllIds('attendance', 'date'),
+      fetchAllIds('salary_records', 'month_year', true),
+    ]);
 
     const employeeIds = new Set<string>();
     const orderEmployeeIds = new Set<string>();
 
-    (ordersRes.data ?? []).forEach((row) => {
+    ordersData.forEach((row) => {
       if (!row.employee_id) return;
       employeeIds.add(row.employee_id);
       orderEmployeeIds.add(row.employee_id);
     });
 
-    (shiftsRes.data ?? []).forEach((row) => {
+    shiftsData.forEach((row) => {
       if (row.employee_id) employeeIds.add(row.employee_id);
     });
 
-    (attendanceRes.data ?? []).forEach((row) => {
+    attendanceData.forEach((row) => {
       if (row.employee_id) employeeIds.add(row.employee_id);
     });
 
-    (salariesRes.data ?? []).forEach((row) => {
+    salariesData.forEach((row) => {
       if (row.employee_id) employeeIds.add(row.employee_id);
     });
 
