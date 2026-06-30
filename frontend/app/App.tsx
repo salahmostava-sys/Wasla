@@ -40,7 +40,6 @@ const Alerts = lazy(() => import("@modules/pages/Alerts"));
 const SettingsHub = lazy(() => import("@modules/pages/SettingsHub"));
 const ViolationResolverPage = lazy(() => import("@modules/violations/pages/ViolationResolverPage"));
 const FinancePage = lazy(() => import("@modules/finance/pages/FinancePage"));
-const WalletPage = lazy(() => import("@modules/wallet/pages/WalletPage"));
 const Motorcycles = lazy(() => import("@modules/pages/Motorcycles"));
 const VehicleAssignment = lazy(() => import("@modules/pages/VehicleAssignment"));
 const EmployeeTiers = lazy(() => import("@modules/pages/EmployeeTiers"));
@@ -133,7 +132,6 @@ const router = createBrowserRouter([
           { path: "salaries", element: <PageGuard pageKey="salaries"><Salaries /></PageGuard> },
           { path: "salary-schemes", element: <Navigate to="/settings?tab=schemes" replace /> },
           { path: "advances", element: <PageGuard pageKey="advances"><Advances /></PageGuard> },
-          { path: "wallet", element: <PageGuard pageKey="finance"><WalletPage /></PageGuard> },
           { path: "finance", element: <PageGuard pageKey="finance"><FinancePage /></PageGuard> },
           { path: "motorcycles", element: <PageGuard pageKey="vehicles"><Motorcycles /></PageGuard> },
           {

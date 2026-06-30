@@ -50,7 +50,6 @@ export const routesManifest: AppRouteManifestItem[] = [
   { id: 'salaries', titleAr: 'الرواتب', group: 'finance', path: '/salaries', permission: routePermission('salaries'), sidebar: true },
   { id: 'salary_schemes', titleAr: 'مخططات الرواتب', group: 'finance', path: '/settings?tab=schemes', permission: routePermission('salary_schemes'), sidebar: false },
   { id: 'advances', titleAr: 'السلف', group: 'finance', path: '/advances', permission: routePermission('advances'), sidebar: true },
-  { id: 'wallet', titleAr: 'المحفظة', group: 'finance', path: '/wallet', permission: routePermission('finance'), sidebar: true },
   { id: 'finance', titleAr: 'المصاريف والإيرادات', group: 'finance', path: '/finance', permission: routePermission('finance'), sidebar: true },
 
   /** المركبات والحركة والصيانة */

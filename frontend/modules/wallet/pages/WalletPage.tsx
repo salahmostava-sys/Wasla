@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Wallet, Loader2, ArrowUpRight, ArrowDownRight, History } from 'lucide-react';
+import { Loader2, ArrowUpRight, ArrowDownRight, History } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useLanguage } from '@app/providers/LanguageContext';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
@@ -39,22 +39,6 @@ const WalletPage = () => {
 
   return (
     <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <nav className="page-breadcrumb">
-            <span>الرئيسية</span>
-            <span className="page-breadcrumb-sep">/</span>
-            <span>الماليات</span>
-            <span className="page-breadcrumb-sep">/</span>
-            <span>المحفظة</span>
-          </nav>
-          <h1 className="page-title flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-primary" />
-            المحفظة (عهد المناديب)
-          </h1>
-        </div>
-      </div>
-
       <div className="bg-card border border-border shadow-sm rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center p-12">

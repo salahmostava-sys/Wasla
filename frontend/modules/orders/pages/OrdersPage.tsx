@@ -59,8 +59,13 @@ const ShiftsTabWrapper = lazy(() =>
     default: module.ShiftsTabWrapper,
   })),
 );
+const WalletTab = lazy(() =>
+  import('@modules/wallet/pages/WalletPage').then((module) => ({
+    default: module.default,
+  })),
+);
 
-const ORDER_TABS = ['grid', 'shifts', 'summary'] as const;
+const ORDER_TABS = ['grid', 'shifts', 'summary', 'wallet'] as const;
 type OrderTab = (typeof ORDER_TABS)[number];
 
 const isOrderTab = (v: string | null): v is OrderTab =>
@@ -134,6 +139,7 @@ const OrdersPage = () => {
               { value: 'grid', label: '📦 الطلبات', selectLabel: 'الطلبات' },
               { value: 'shifts', label: '⏰ الدوام', selectLabel: 'الدوام' },
               { value: 'summary', label: '📊 ملخص الشهر', selectLabel: 'ملخص الشهر' },
+              { value: 'wallet', label: '💼 المحفظة', selectLabel: 'المحفظة' },
             ]}
           />
           <TabsContent value="grid" className="mt-2 outline-none">
@@ -149,6 +155,11 @@ const OrdersPage = () => {
           <TabsContent value="summary" className="mt-2 overflow-x-auto outline-none">
             <Suspense fallback={<TabLoader />}>
               <MonthSummaryTab />
+            </Suspense>
+          </TabsContent>
+          <TabsContent value="wallet" className="mt-2 outline-none">
+            <Suspense fallback={<TabLoader />}>
+              <WalletTab />
             </Suspense>
           </TabsContent>
         </Tabs>
