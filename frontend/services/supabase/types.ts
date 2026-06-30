@@ -329,6 +329,7 @@ export type Database = {
           custom_columns: Json | null
           id: string
           is_active: boolean
+          is_archived: boolean
           logo_url: string | null
           name: string
           name_en: string | null
