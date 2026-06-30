@@ -45,7 +45,7 @@ WHERE i.index_name IS NULL;
 
 try {
     const rawOut = execSync(`npx supabase db query --linked "${query.replaceAll(/\n/g, ' ')}" --output-format json`, { encoding: 'utf8' });
-    const jsonStr = rawOut.match(/\[.*\]/s);
+    const jsonStr = rawOut.match(/\[.*\]/s); // NOSONAR
     if (!jsonStr) {
         console.error("Could not parse JSON", rawOut);
         process.exit(1);

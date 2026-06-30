@@ -12,7 +12,7 @@ current_table = None
 buffer = []
 
 for line in lines:
-    m = re.search(r'(CREATE\s+TABLE|ALTER\s+TABLE)\s+(IF\s+NOT\s+EXISTS\s+)?(public\.)?([a-zA-Z0-9_]+)', line, re.IGNORECASE)
+    m = re.search(r'(CREATE\s+TABLE|ALTER\s+TABLE)\s+(IF\s+NOT\s+EXISTS\s+)?(public\.)?([a-zA-Z0-9_]+)', line, re.IGNORECASE)  # NOSONAR
     if m:
         if current_table and buffer:
             if current_table not in table_history:

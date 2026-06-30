@@ -548,6 +548,14 @@ export function ShiftsTab({
                             className={getShiftCellClassName(isToday, isWeekend, isEditing, canEdit)}
                             style={{ minWidth: 44 }}
                             onClick={() => { if (!isEditing) handleCellClick(emp.id, d); }}
+                            role="button"
+                            tabIndex={canEdit && !isEditing ? 0 : undefined}
+                            onKeyDown={(e) => {
+                              if (canEdit && !isEditing && (e.key === 'Enter' || e.key === ' ')) {
+                                e.preventDefault();
+                                handleCellClick(emp.id, d);
+                              }
+                            }}
                           >
                             {isEditing ? (
                               <select

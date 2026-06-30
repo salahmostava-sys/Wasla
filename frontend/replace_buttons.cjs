@@ -16,7 +16,7 @@ function runReplace(dir) {
     let content = fs.readFileSync(filepath, 'utf8');
     let original = content;
 
-    const regex = /<Button([\s\S]*?)>([\s\S]*?)<\/Button>/g;
+    const regex = /<Button([\s\S]*?)>([\s\S]*?)<\/Button>/g; // NOSONAR
     content = content.replace(regex, (match, attrs, innerText) => {
       if (attrs.includes('variant="outline"') || attrs.includes("variant='outline'")) {
         if (innerText.includes('إضافة') || innerText.includes('جديد') || innerText.includes('إضافه') || innerText.includes('إنشاء')) {

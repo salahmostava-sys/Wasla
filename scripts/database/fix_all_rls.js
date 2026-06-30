@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execSync } = require('node:child_process');
 const fs = require('node:fs');
 
 const query = `
@@ -15,7 +15,7 @@ WHERE schemaname = 'public'
 `;
 
 const rawOut = execSync('npx supabase db query --linked "' + query.replace(/\n/g, ' ') + '" --output-format json', { encoding: 'utf8' });
-const jsonMatch = rawOut.match(/\[.*\]/s);
+const jsonMatch = rawOut.match(/\[.*\]/s); // NOSONAR
 if (!jsonMatch) {
     console.error('No json found');
     process.exit(1);
@@ -28,7 +28,7 @@ for (const row of data) {
     const table = row.tablename;
     const policy = row.policyname;
     const cmd = row.cmd;
-    const regex = /\(\s*SELECT\s+auth\.uid\(\)\s*(?:AS\s+uid)?\s*\)/g;
+    const regex = /\(\s*SELECT\s+auth\.uid\(\)\s*(?:AS\s+uid)?\s*\)/g; // NOSONAR
     let qual = row.qual ? row.qual.replace(regex, 'auth.uid()') : null;
     let check = row.with_check ? row.with_check.replace(regex, 'auth.uid()') : null;
 

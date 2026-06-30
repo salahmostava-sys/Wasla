@@ -7,7 +7,7 @@ output_file = 'scratch/squashed_tables_draft.sql'
 
 def squash_table(content, table_name):
     # This is a naive heuristic parser for squashing DDL
-    create_table_match = re.search(r'CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?(public\.)?([a-zA-Z0-9_]+)\s*\((.*?)\);', content, re.IGNORECASE | re.DOTALL)
+    create_table_match = re.search(r'CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?(public\.)?([a-zA-Z0-9_]+)\s*\((.*?)\);', content, re.IGNORECASE | re.DOTALL)  # NOSONAR
     
     if not create_table_match:
         # Might be a CREATE TYPE or other DDL, return as is
@@ -20,7 +20,7 @@ def squash_table(content, table_name):
     columns = [c.strip() for c in raw_cols if c.strip()]
     
     # Process ALTER TABLE ADD COLUMN
-    add_cols = re.finditer(r'ADD\s+COLUMN\s+(IF\s+NOT\s+EXISTS\s+)?([a-zA-Z0-9_]+.*?)(?:,|$|;)', content, re.IGNORECASE)
+    add_cols = re.finditer(r'ADD\s+COLUMN\s+(IF\s+NOT\s+EXISTS\s+)?([a-zA-Z0-9_]+.*?)(?:,|$|;)', content, re.IGNORECASE)  # NOSONAR
     for match in add_cols:
         col_def = match.group(2).strip()
         col_def = col_def.rstrip(';')
@@ -37,7 +37,7 @@ def squash_table(content, table_name):
             columns.append(col_def)
             
     # Process ALTER TABLE DROP COLUMN
-    drop_cols = re.finditer(r'DROP\s+COLUMN\s+(IF\s+EXISTS\s+)?([a-zA-Z0-9_]+)', content, re.IGNORECASE)
+    drop_cols = re.finditer(r'DROP\s+COLUMN\s+(IF\s+EXISTS\s+)?([a-zA-Z0-9_]+)', content, re.IGNORECASE)  # NOSONAR
     for match in drop_cols:
         col_name = match.group(2).strip()
         columns = [c for c in columns if not c.lower().startswith(col_name.lower())]

@@ -21,7 +21,7 @@ export const TemporalProvider = ({ children }: { children: ReactNode }) => {
   // Always start with current month on fresh page load.
   // Use sessionStorage to persist selection within the same browser session
   // (navigating between pages keeps the month), but resets when opening new tab/window.
-  const [selectedMonth, setSelectedMonthRaw] = useState(() => {
+  const [selectedMonth, setSelectedMonth] = useState(() => {
     try {
       const saved = sessionStorage.getItem('global_selected_month');
       // Validate before trusting the stored value — corrupt/stale data falls back to current month
@@ -32,10 +32,10 @@ export const TemporalProvider = ({ children }: { children: ReactNode }) => {
     }
   });
 
-  const setSelectedMonth = (month: string) => {
+  const changeSelectedMonth = (month: string) => {
     // Guard against invalid month strings before storing or updating state
     if (!isValidMonthString(month)) return;
-    setSelectedMonthRaw(month);
+    setSelectedMonth(month);
     try {
       sessionStorage.setItem('global_selected_month', month);
     } catch {
@@ -48,10 +48,10 @@ export const TemporalProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('global_selected_month');
   }, []);
 
-  const contextValue = useMemo<TemporalContextType>(() => ({
-    selectedMonth,
-    setSelectedMonth,
-  }), [selectedMonth]);
+  const contextValue = useMemo<TemporalContextType>(
+    () => ({ selectedMonth, setSelectedMonth: changeSelectedMonth }),
+    [selectedMonth]
+  );
 
   return (
     <TemporalContext.Provider value={contextValue}>

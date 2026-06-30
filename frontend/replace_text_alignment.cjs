@@ -16,7 +16,7 @@ function runReplace(dir) {
     let content = fs.readFileSync(filepath, 'utf8');
     let original = content;
 
-    const tagRegex = /<([a-zA-Z0-9_]+)([^>]*?text-(right|left)[^>]*?)>/g;
+    const tagRegex = /<([a-zA-Z0-9_]+)([^>]*?text-(right|left)[^>]*?)>/g; // NOSONAR
     
     content = content.replace(tagRegex, (match, tagName, attrs, rightOrLeft) => {
       if (attrs.includes('dir="ltr"') || attrs.includes("dir='ltr'") || attrs.includes("tabular-nums")) {

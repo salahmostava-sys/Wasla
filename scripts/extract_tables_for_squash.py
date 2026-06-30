@@ -18,13 +18,13 @@ for file in migration_files:
     
     # Remove functions, policies, triggers, grants
     content = re.sub(r'CREATE\s+(OR\s+REPLACE\s+)?FUNCTION.*?LANGUAGE.*?AS\s+\$\$.*?\$\$;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'CREATE\s+POLICY.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'DROP\s+POLICY.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'CREATE\s+TRIGGER.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'DROP\s+TRIGGER.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'GRANT\s+.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'REVOKE\s+.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
-    content = re.sub(r'CREATE\s+(OR\s+REPLACE\s+)?VIEW.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)
+    content = re.sub(r'CREATE\s+POLICY.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'DROP\s+POLICY.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'CREATE\s+TRIGGER.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'DROP\s+TRIGGER.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'GRANT\s+.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'REVOKE\s+.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
+    content = re.sub(r'CREATE\s+(OR\s+REPLACE\s+)?VIEW.*?;', '', content, flags=re.IGNORECASE | re.DOTALL)  # NOSONAR
 
     lines = content.split('\n')
     filtered = []

@@ -13,11 +13,22 @@ export function printHtmlTable(
     throw new Error('Title is required');
   }
   
-  const printWindow = globalThis.open('', '_blank');
-  if (!printWindow) return;
-  
-  const { title, subtitle } = options;
-  const doc = printWindow.document;
+  // Create a hidden iframe
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = 'none';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) {
+    document.body.removeChild(iframe);
+    throw new Error('Failed to create print iframe');
+  }
+
   doc.open();
   doc.close();
   doc.documentElement.lang = 'ar';
@@ -65,8 +76,23 @@ export function printHtmlTable(
 
   body.appendChild(table.cloneNode(true));
 
-  printWindow.onload = () => {
-    printWindow.print();
-    printWindow.onafterprint = () => printWindow.close();
-  };
+  // Print using the iframe's content window
+  const contentWindow = iframe.contentWindow;
+  if (contentWindow) {
+    contentWindow.focus();
+    // Use setTimeout to ensure styles are applied and table is fully rendered
+    setTimeout(() => {
+      contentWindow.print();
+      // Clean up after print dialog is closed
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 500);
+    }, 200);
+  } else {
+    if (document.body.contains(iframe)) {
+      document.body.removeChild(iframe);
+    }
+  }
 }

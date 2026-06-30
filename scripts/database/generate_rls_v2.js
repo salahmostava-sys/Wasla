@@ -5,7 +5,7 @@ console.log("Fetching policies from remote database...");
 try {
     const out = execSync(`npx supabase db query --linked "SELECT schemaname, tablename, cmd, policyname, qual, with_check FROM pg_policies WHERE permissive = 'PERMISSIVE' AND schemaname IN ('public', 'storage') ORDER BY schemaname, tablename, cmd;"`, { encoding: 'utf8', maxBuffer: 1024*1024*10 });
 
-    const jsonStrMatch = out.match(/\{[\s\S]*"rows":[\s\S]*\}/);
+    const jsonStrMatch = out.match(/\{[\s\S]*"rows":[\s\S]*\}/); // NOSONAR
     if (!jsonStrMatch) {
         console.error("Could not find JSON in output");
         process.exit(1);

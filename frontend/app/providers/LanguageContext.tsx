@@ -13,7 +13,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType>({} as LanguageContextType);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLangState] = useState<Lang>(() => {
+  const [lang, setLang] = useState<Lang>(() => {
     return (localStorage.getItem('app-lang') as Lang) || 'ar';
   });
 
@@ -27,7 +27,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('app-lang', lang);
   }, [lang, isRTL]);
 
-  const value = useMemo<LanguageContextType>(() => ({ lang, isRTL, setLang: setLangState }), [lang, isRTL]);
+  const value = useMemo<LanguageContextType>(() => ({ lang, isRTL, setLang }), [lang, isRTL]);
 
   return (
     <DirectionProvider dir={isRTL ? 'rtl' : 'ltr'}>

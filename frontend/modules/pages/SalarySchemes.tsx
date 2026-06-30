@@ -1,30 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Settings, Plus, Pencil, Trash2, Check, X, Pin, Loader2, Lock, Link2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, Loader2, Link2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { Input } from '@shared/components/ui/input';
-import { Label } from '@shared/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@shared/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
-import { Switch } from '@shared/components/ui/switch';
 import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { format } from 'date-fns';
 import { appService } from '@services/appService';
 import { salarySchemeService } from '@services/salarySchemeService';
-import { cn } from '@shared/lib/utils';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { defaultQueryRetry } from '@shared/lib/query';
 import { getErrorMessage } from '@services/serviceError';
 
 import {
-  TierType,
   Tier,
-  SchemeType,
   Scheme,
   Snapshot,
   AppItem,
-  SalarySchemeTierRow
+  SalarySchemeTierRow,
+  TierType
 } from '../types/scheme.ui.types';
 import {
   SchemeSnapshotPinPanel,
@@ -53,7 +48,7 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
   const uid = authQueryUserId(userId);
   const queryClient = useQueryClient();
   const [schemes, setSchemes] = useState<Scheme[]>([]);
-  const [tiers, setTiersMap] = useState<Record<string, Tier[]>>({});
+  const [tiers, setTiers] = useState<Record<string, Tier[]>>({});
   const [snapshots, setSnapshots] = useState<Record<string, Snapshot[]>>({});
   const [apps, setApps] = useState<AppItem[]>([]);
   const {
@@ -124,7 +119,7 @@ const SalarySchemes = ({ embedded = false }: Readonly<SalarySchemesProps>) => {
     if (!schemeData) return;
     setSchemes(schemeData.schemes);
     setApps(schemeData.apps);
-    setTiersMap(schemeData.tiersMap);
+    setTiers(schemeData.tiersMap);
     setSnapshots(schemeData.snapshotsMap);
   }, [schemeData]);
 

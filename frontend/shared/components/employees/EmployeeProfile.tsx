@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, User, FileText, Wallet, CreditCard, Clock, Package, DollarSign, ExternalLink, Loader2, ChevronDown, ChevronUp, TrendingUp, ScanLine } from 'lucide-react';
@@ -24,222 +25,32 @@ import { EmployeePerformanceTab } from '@shared/components/employees/EmployeePer
 import { DocumentScanner } from '@modules/employees/components/DocumentScanner';
 import { getErrorMessage } from '@services/serviceError';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface Employee {
-  id: string;
-  name: string;
-  job_title?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  national_id?: string | null;
-  iban?: string | null;
-  bank_account_number?: string | null;
-  city?: string | null;
-  cities?: string[] | null;
-  join_date?: string | null;
-  dob?: string | null;
-  birth_date?: string | null;
-  residency_expiry?: string | null;
-  health_insurance_expiry?: string | null;
-  license_expiry?: string | null;
-  license_status?: string | null;
-  sponsorship_status?: string | null;
-  probation_end_date?: string | null;
-  nationality?: string | null;
-  preferred_language?: string | null;
-  commercial_record?: string | null;
-  id_photo_url?: string | null;
-  iqama_photo_url?: string | null;
-  license_photo_url?: string | null;
-  personal_photo_url?: string | null;
-  status: string;
-  salary_type: string;
-  base_salary: number;
-}
-
-type Advance = EmployeeProfileAdvance;
-
-type SalaryRecord = EmployeeProfileSalaryRecord;
-type EmployeeApp = EmployeeProfileApp;
-type DailyOrder = EmployeeProfileDailyOrder;
-
-interface MonthlyOrders {
-  month: string;           // YYYY-MM
-  label: string;           // e.g. "يناير 2025"
-  total: number;
-  byApp: { appName: string; color?: string; count: number }[];
-  days: DailyOrder[];
-}
-
-interface Props {
-  employee: Employee;
-  onBack: () => void;
-}
-
-function employeeCitySummary(employee: Pick<Employee, 'cities' | 'city'>): string {
-  const values = getEmployeeCities(employee);
-  if (values.length === 0) return EMPTY_DATA_PLACEHOLDER;
-  return values.map((value) => cityLabel(value, value)).join('، ');
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const statusLabels: Record<string, string> = {
-  active: 'نشط', inactive: 'موقوف', ended: 'منتهي',
-};
-const statusStyles: Record<string, string> = {
-  active: 'badge-success', inactive: 'badge-warning', ended: 'badge-urgent',
-};
-
-const advanceStatusLabel: Record<string, string> = {
-  active: 'نشطة', completed: 'مكتملة', paused: 'موقوفة',
-};
-const advanceStatusStyle: Record<string, string> = {
-  active: 'badge-warning', completed: 'badge-success', paused: 'badge-info',
-};
-
-const installmentStatusStyle: Record<string, string> = {
-  deducted: 'badge-success', pending: 'badge-warning', deferred: 'bg-muted text-muted-foreground text-xs font-medium px-2.5 py-0.5 rounded-full',
-};
-const installmentStatusLabel: Record<string, string> = {
-  deducted: 'مخصوم', pending: 'معلّق', deferred: 'مؤجل',
-};
-const salaryTypeBadgeClass = (salaryType: string) => (salaryType === 'orders' ? 'badge-info' : 'badge-success');
-const salaryTypeLabel = (salaryType: string) => (salaryType === 'orders' ? 'طلبات' : 'دوام');
-
-function residencyHeaderUrgencyClass(days: number): string {
-  if (days < 30) return 'text-destructive';
-  if (days < 60) return 'text-warning';
-  return 'text-success';
-}
-
-function residencyExpiryTextClass(residencyDays: number | null): string {
-  if (residencyDays === null) return 'text-foreground';
-  if (residencyDays < 30) return 'text-destructive';
-  if (residencyDays < 60) return 'text-warning';
-  return 'text-foreground';
-}
-
-function healthInsuranceExpiryTextClass(hiDays: number): string {
-  if (hiDays < 0) return 'text-destructive';
-  if (hiDays < 30) return 'text-destructive';
-  if (hiDays < 60) return 'text-warning';
-  return 'text-foreground';
-}
-
-function isImageDocument(path?: string | null) {
-  const normalized = (path ?? '').toLowerCase();
-  return ['.jpg', '.jpeg', '.png', '.webp'].some((ext) => normalized.endsWith(ext));
-}
-
-// ─── Secure Document Thumbnail ────────────────────────────────────────────────
-// Uses signed URLs for private employee-documents bucket
-const SecureDocThumb = ({
-  storagePath, label,
-}: { storagePath: string | null | undefined; label: string }) => {
-  const path = extractStoragePath(storagePath);
-  const signedUrl = useSignedUrl('employee-documents', path);
-
-  if (!path) return null;
-
-  return (
-    <div className="flex flex-col items-center gap-1">
-      {signedUrl && isImageDocument(path) ? (
-        <a href={signedUrl} target="_blank" rel="noreferrer" className="group">
-          <img
-            src={signedUrl}
-            className="w-20 h-20 object-cover rounded-lg border border-border group-hover:opacity-80 transition-opacity"
-            alt={label}
-          />
-        </a>
-      ) : signedUrl ? (
-        <a
-          href={signedUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="w-20 h-20 rounded-lg border border-border bg-muted flex items-center justify-center text-2xl"
-        >
-          📄
-        </a>
-      ) : (
-        <div className="w-20 h-20 rounded-lg border border-border bg-muted flex items-center justify-center">
-          <Loader2 size={16} className="animate-spin text-muted-foreground" />
-        </div>
-      )}
-      <p className="text-xs text-center text-muted-foreground">{label}</p>
-      {signedUrl && (
-        <a
-          href={signedUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
-        >
-          <ExternalLink size={9} /> فتح
-        </a>
-      )}
-    </div>
-  );
-};
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-const MONTH_LABELS: Record<string, string> = {
-  '01': 'يناير', '02': 'فبراير', '03': 'مارس', '04': 'أبريل',
-  '05': 'مايو', '06': 'يونيو', '07': 'يوليو', '08': 'أغسطس',
-  '09': 'سبتمبر', '10': 'أكتوبر', '11': 'نوفمبر', '12': 'ديسمبر',
-};
-
-function monthLabel(ym: string) {
-  const [year, month] = ym.split('-');
-  return `${MONTH_LABELS[month] || month} ${year}`;
-}
-
-function groupOrdersByMonth(orders: DailyOrder[]): MonthlyOrders[] {
-  const map: Record<string, MonthlyOrders> = {};
-  for (const o of orders) {
-    const month = o.date.slice(0, 7);
-    if (!map[month]) {
-      map[month] = { month, label: monthLabel(month), total: 0, byApp: [], days: [] };
-    }
-    map[month].total += o.orders_count;
-    map[month].days.push(o);
-    const appName = o.apps?.name || o.app_id;
-    const existing = map[month].byApp.find(a => a.appName === appName);
-    if (existing) {
-      existing.count += o.orders_count;
-    } else {
-      map[month].byApp.push({ appName, color: o.apps?.brand_color || undefined, count: o.orders_count });
-    }
-  }
-  return Object.values(map).sort((a, b) => b.month.localeCompare(a.month));
-}
-
-// قائمة الجنسيات الشائعة
-const NATIONALITIES = [
-  'سعودي',
-  'مصري',
-  'سوداني',
-  'يمني',
-  'سوري',
-  'أردني',
-  'فلسطيني',
-  'لبناني',
-  'عراقي',
-  'باكستاني',
-  'هندي',
-  'بنغلاديشي',
-  'فلبيني',
-  'إندونيسي',
-  'نيبالي',
-  'سريلانكي',
-  'إثيوبي',
-  'إريتري',
-  'صومالي',
-  'تشادي',
-  'نيجيري',
-  'غاني',
-  'كيني',
-  'أوغندي',
-  'تنزاني',
-];
+import {
+  Advance,
+  DailyOrder,
+  Employee,
+  EmployeeApp,
+  EmployeeProfileProps as Props,
+  SalaryRecord,
+} from './profile/employeeProfile.types';
+import {
+  advanceStatusLabel,
+  advanceStatusStyle,
+  employeeCitySummary,
+  groupOrdersByMonth,
+  healthInsuranceExpiryTextClass,
+  installmentStatusLabel,
+  installmentStatusStyle,
+  monthLabel,
+  NATIONALITIES,
+  residencyExpiryTextClass,
+  residencyHeaderUrgencyClass,
+  salaryTypeBadgeClass,
+  salaryTypeLabel,
+  statusLabels,
+  statusStyles,
+} from './profile/employeeProfile.utils';
+import { SecureDocThumb } from './profile/EmployeeProfileComponents';
 
 const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
   const { enabled, userId } = useAuthQueryGate();

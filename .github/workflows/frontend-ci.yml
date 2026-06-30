@@ -27,3 +27,11 @@ jobs:
       - name: Lint (zero warnings)
         working-directory: frontend
         run: npm run lint:strict
+
+      - name: Install Playwright Browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps
+
+      - name: Run E2E & Accessibility Tests (axe-core)
+        working-directory: frontend
+        run: npm run test:e2e

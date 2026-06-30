@@ -108,7 +108,7 @@ export function parseIqamaData(rawText: string): IqamaData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const match = clean.match(/2\d{9}/) || clean.match(/[12]\d{9}/) || clean.match(/\d{10}/);
+    const match = /2\d{9}/.exec(clean) || /[12]\d{9}/.exec(clean) || /\d{10}/.exec(clean);
     if (match) result.iqamaNumber = match[0];
   }
 
@@ -123,7 +123,7 @@ export function parseIqamaData(rawText: string): IqamaData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|\d{4}[/.-]\d{1,2})/g;
+    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
     const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
     if (dateMatches.length > 0) {
       result.expiryDate = normalizeDateStr(dateMatches[0]);
@@ -141,7 +141,7 @@ export function parseIqamaData(rawText: string): IqamaData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|\d{4}[/.-]\d{1,2})/g;
+    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
     const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
     if (dateMatches.length > 0) {
       result.dateOfBirth = normalizeDateStr(dateMatches[0]);
@@ -227,7 +227,7 @@ export function parseLicenseData(rawText: string): LicenseData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const match = clean.match(/[12]\d{9}/) || clean.match(/\d{10}/);
+    const match = /[12]\d{9}/.exec(clean) || /\d{10}/.exec(clean);
     if (match) result.licenseNumber = match[0];
   }
 
@@ -242,7 +242,7 @@ export function parseLicenseData(rawText: string): LicenseData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|\d{4}[/.-]\d{1,2})/g;
+    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
     const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
     if (dateMatches.length > 0) {
       result.expiryDate = normalizeDateStr(dateMatches[0]);
@@ -260,7 +260,7 @@ export function parseLicenseData(rawText: string): LicenseData {
       .replace(/[Zz]/g, '2')
       .replace(/[Ss]/g, '5')
       .replace(/[Bb]/g, '8');
-    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|\d{4}[/.-]\d{1,2})/g;
+    const dateRegex = /(\d{1,2}[/.-]\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2})/g;
     const dateMatches = [...clean.matchAll(dateRegex)].map(m => m[1]);
     if (dateMatches.length > 0) {
       result.dateOfBirth = normalizeDateStr(dateMatches[0]);
@@ -276,7 +276,7 @@ export function parseLicenseData(rawText: string): LicenseData {
 
   // بديل: البحث عن كلمة "فئة" أو "Class"
   if (!result.licenseClass) {
-    const classLine = text.match(/(?:فئة|Class)\s*[:：]?\s*([A-Zأ-ي])/i);
+    const classLine = /(?:فئة|Class)\s*(?:[:：]\s*)?([A-Zأ-ي])/i.exec(text);
     if (classLine) result.licenseClass = classLine[1].toUpperCase();
   }
 
@@ -292,11 +292,11 @@ function normalizeDateStr(raw: string): string {
   const parts = raw.split(/[/\-.]/);
   if (parts.length === 3) {
     const [a, b, c] = parts;
-    if (c && c.length === 4) {
+    if (c?.length === 4) {
       // DD/MM/YYYY
       return `${c}-${b.padStart(2, '0')}-${a.padStart(2, '0')}`;
     }
-    if (a && a.length === 4) {
+    if (a?.length === 4) {
       // YYYY/MM/DD
       return `${a}-${b.padStart(2, '0')}-${c.padStart(2, '0')}`;
     }

@@ -106,34 +106,44 @@ const AssignmentFormModal = ({
         <div className="space-y-3">
           {/* Vehicle selector — ONLY free (active + no current assignment) vehicles */}
           <div>
-            <label htmlFor="vehicle-select" className="text-sm font-medium mb-1 block">
-              المركبة *
-              <span className="text-xs text-muted-foreground font-normal ms-2">
-                (المركبات الفاضية فقط — {freeVehicles.length} متاحة)
-              </span>
-            </label>
             {freeVehicles.length === 0 ? (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive flex items-center gap-2">
-                <AlertCircle size={16} />
-                لا توجد مركبات متاحة — كل المركبات النشطة مرتبطة بمناديب أو في صيانة/إيجار
-              </div>
+              <>
+                <div className="text-sm font-medium mb-1 block">
+                  المركبة *
+                  <span className="text-xs text-muted-foreground font-normal ms-2">
+                    (المركبات الفاضية فقط — 0 متاحة)
+                  </span>
+                </div>
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive flex items-center gap-2">
+                  <AlertCircle size={16} />
+                  لا توجد مركبات متاحة — كل المركبات النشطة مرتبطة بمناديب أو في صيانة/إيجار
+                </div>
+              </>
             ) : (
-              <Select value={form.vehicle_id} onValueChange={v => setForm(p => ({ ...p, vehicle_id: v }))}>
-                <SelectTrigger id="vehicle-select"><SelectValue placeholder="اختر المركبة الفاضية" /></SelectTrigger>
-                <SelectContent>
-                  {freeVehicles.map(v => (
-                    <SelectItem key={v.id} value={v.id}>
-                      <span className="flex items-center gap-2">
-                        <span>{v.type === 'motorcycle' ? '🏍️' : '🚗'}</span>
-                        <span className="font-mono font-bold">{v.plate_number}</span>
-                        {(v.brand || v.model) && (
-                          <span className="text-muted-foreground text-xs">— {v.brand} {v.model}</span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <>
+                <label htmlFor="vehicle-select" className="text-sm font-medium mb-1 block">
+                  المركبة *
+                  <span className="text-xs text-muted-foreground font-normal ms-2">
+                    (المركبات الفاضية فقط — {freeVehicles.length} متاحة)
+                  </span>
+                </label>
+                <Select value={form.vehicle_id} onValueChange={v => setForm(p => ({ ...p, vehicle_id: v }))}>
+                  <SelectTrigger id="vehicle-select"><SelectValue placeholder="اختر المركبة الفاضية" /></SelectTrigger>
+                  <SelectContent>
+                    {freeVehicles.map(v => (
+                      <SelectItem key={v.id} value={v.id}>
+                        <span className="flex items-center gap-2">
+                          <span>{v.type === 'motorcycle' ? '🏍️' : '🚗'}</span>
+                          <span className="font-mono font-bold">{v.plate_number}</span>
+                          {(v.brand || v.model) && (
+                            <span className="text-muted-foreground text-xs">— {v.brand} {v.model}</span>
+                          )}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
             )}
           </div>
 

@@ -58,7 +58,6 @@ export const AppCard = ({
             className="absolute left-2 top-2 z-10 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity"
             onClick={(event) => event.stopPropagation()}
             onKeyDown={(event) => event.stopPropagation()}
-            aria-hidden="true"
           >
             <button
               onClick={(event) => {

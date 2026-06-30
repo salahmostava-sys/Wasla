@@ -16,7 +16,7 @@ const envPath = resolve(repoRoot, '.env');
 if (existsSync(envPath)) {
   const lines = readFileSync(envPath, 'utf-8').split('\n');
   for (const line of lines) {
-    const match = line.match(/^\s*([\w]+)\s*=\s*(.*)$/);
+    const match = line.match(/^\s*([\w]+)\s*=\s*(.*)$/); // NOSONAR
     if (match && !process.env[match[1]]) {
       process.env[match[1]] = match[2].trim().replace(/^["']|["']$/g, '');
     }

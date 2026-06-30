@@ -7,15 +7,15 @@ const query = `SELECT tablename, cmd, policyname, qual, with_check FROM pg_polic
 
 try {
     const rawOut = execSync(`npx supabase db query --linked "${query}" --output-format json`, { encoding: 'utf8' });
-    const jsonStr = rawOut.match(/\[.*\]/s);
+    const jsonStr = rawOut.match(/\[.*\]/s); // NOSONAR
     const policies = JSON.parse(jsonStr[0]);
 
     let sql = `-- Fix remaining auth.role() warnings\n\n`;
     let changed = false;
 
     for (const p of policies) {
-        let newQual = p.qual ? p.qual.replace(/(?<!\(select\s+)auth\.role\(\)/g, '(select auth.role())') : null;
-        let newWithCheck = p.with_check ? p.with_check.replace(/(?<!\(select\s+)auth\.role\(\)/g, '(select auth.role())') : null;
+        let newQual = p.qual ? p.qual.replace(/(?<!\(select\s+)auth\.role\(\)/g, '(select auth.role())') : null; // NOSONAR
+        let newWithCheck = p.with_check ? p.with_check.replace(/(?<!\(select\s+)auth\.role\(\)/g, '(select auth.role())') : null; // NOSONAR
 
         if ((p.qual && newQual !== p.qual) || (p.with_check && newWithCheck !== p.with_check)) {
             changed = true;

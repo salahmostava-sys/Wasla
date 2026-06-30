@@ -38,7 +38,7 @@ export function SchemeFormModal({
   const [formTiers, setFormTiers] = useState<Tier[]>([{ from: 1, to: 500, pricePerOrder: 5, tierType: 'total_multiplier' }]);
   const [hasTarget, setHasTarget] = useState(false);
   const [targetOrders, setTargetOrders] = useState(700);
-  const [targetBonus, setTargetBonusVal] = useState(400);
+  const [targetBonus, setTargetBonus] = useState(400);
   const [assignAppId, setAssignAppId] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -55,7 +55,7 @@ export function SchemeFormModal({
         );
         setHasTarget(!!(editing.target_bonus && editing.target_orders));
         setTargetOrders(editing.target_orders || 700);
-        setTargetBonusVal(editing.target_bonus || 400);
+        setTargetBonus(editing.target_bonus || 400);
         setAssignAppId('');
       } else {
         setName('');
@@ -64,7 +64,7 @@ export function SchemeFormModal({
         setFormTiers([{ from: 1, to: 500, pricePerOrder: 5, tierType: 'total_multiplier' }]);
         setHasTarget(false);
         setTargetOrders(700);
-        setTargetBonusVal(400);
+        setTargetBonus(400);
         setAssignAppId('');
       }
     }
@@ -280,7 +280,7 @@ export function SchemeFormModal({
                 {hasTarget && (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1"><Label className="text-xs">عدد الطلبات المستهدف</Label><Input type="number" value={targetOrders} onChange={e => setTargetOrders(+e.target.value)} /></div>
-                    <div className="space-y-1"><Label className="text-xs">قيمة المكافأة (ر.س)</Label><Input type="number" value={targetBonus} onChange={e => setTargetBonusVal(+e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">قيمة المكافأة (ر.س)</Label><Input type="number" value={targetBonus} onChange={e => setTargetBonus(+e.target.value)} /></div>
                   </div>
                 )}
               </div>
