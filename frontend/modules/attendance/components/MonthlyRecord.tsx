@@ -250,8 +250,8 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                       </td>
                     );
                   })}
-                  <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5">{row.summary.p}</td>
-                  <td className="p-3 text-center border-b border-border font-bold text-destructive bg-destructive/5">{row.summary.a}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5">{row.summary.presentCount}</td>
+                  <td className="p-3 text-center border-b border-border font-bold text-destructive bg-destructive/5">{row.summary.absentCount}</td>
                 </tr>
               ))}
             </tbody>

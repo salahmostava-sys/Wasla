@@ -19,9 +19,6 @@ import {
   dayColorByThreshold,
   GRID_SKELETON_IDS,
   EMPTY_DATA_PLACEHOLDER,
-  type Employee,
-  type SortDir,
-  type ColumnDef,
 } from "@modules/employees/types/employee.types";
 
 import { buildColumnFilter } from "./table/EmployeeTableFilters";

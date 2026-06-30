@@ -3,12 +3,12 @@ import type { Employee, CellData } from '../components/MonthlyRecord';
 export type EmployeeGridRow = Employee & {
   recordByDay: Record<number, CellData>;
   summary: {
-    p: number;
-    a: number;
-    l: number;
-    s: number;
-    lt: number;
-    th: number;
+    presentCount: number;
+    absentCount: number;
+    leaveCount: number;
+    sickCount: number;
+    lateCount: number;
+    totalHours: number;
   };
 };
 
@@ -19,22 +19,29 @@ export function buildAttendanceGridData(
   return employees.map((emp) => {
     const empRows = attendanceRows.filter((r) => r.employee_id === emp.id);
     const recordByDay: Record<number, CellData> = {};
-    let p = 0, a = 0, l = 0, s = 0, lt = 0;
+    let presentCount = 0, absentCount = 0, leaveCount = 0, sickCount = 0, lateCount = 0;
     
     empRows.forEach(r => {
       const day = parseInt(r.date.split('-')[2], 10);
       recordByDay[day] = r;
-      if (r.status === 'present') p++;
-      if (r.status === 'absent') a++;
-      if (r.status === 'leave') l++;
-      if (r.status === 'sick') s++;
-      if (r.status === 'late') lt++;
+      if (r.status === 'present') presentCount++;
+      if (r.status === 'absent') absentCount++;
+      if (r.status === 'leave') leaveCount++;
+      if (r.status === 'sick') sickCount++;
+      if (r.status === 'late') lateCount++;
     });
     
     return { 
       ...emp, 
       recordByDay, 
-      summary: { p, a, l, s, lt, th: (p + lt) * 8 } 
+      summary: { 
+        presentCount, 
+        absentCount, 
+        leaveCount, 
+        sickCount, 
+        lateCount, 
+        totalHours: (presentCount + lateCount) * 8 
+      } 
     };
   });
 }
