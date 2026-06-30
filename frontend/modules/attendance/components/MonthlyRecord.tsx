@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, X, Check, FileText, Search } from "lucide-react";
+import { Loader2, FileText, Search } from "lucide-react";
 import { useLanguage } from "@app/providers/LanguageContext";
 import { authQueryUserId, useAuthQueryGate } from "@shared/hooks/useAuthQueryGate";
 import attendanceService from "@services/attendanceService";
@@ -194,8 +194,8 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
     if (selectedAppId !== 'all') {
       const empIdsWithApp = new Set(
         (data?.employeeApps ?? [])
-          .filter((ea: any) => ea.app_id === selectedAppId)
-          .map((ea: any) => ea.employee_id)
+          .filter((ea: unknown) => ea.app_id === selectedAppId)
+          .map((ea: unknown) => ea.employee_id)
       );
       result = result.filter(r => empIdsWithApp.has(r.id));
     }
@@ -232,7 +232,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">كل التطبيقات</SelectItem>
-            {(data?.apps || []).map((app: any) => (
+            {(data?.apps || []).map((app: unknown) => (
               <SelectItem key={app.id} value={app.id}>{app.name}</SelectItem>
             ))}
           </SelectContent>

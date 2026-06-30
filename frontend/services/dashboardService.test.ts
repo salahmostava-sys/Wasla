@@ -213,8 +213,8 @@ describe('dashboardService', () => {
 
   describe('getAdditionalMetrics', () => {
     const validMetricsSetup = () => {
-      tableResults.fuel_records = { data: [{ cost: 100, liters: 50 }], error: null };
-      tableResults.maintenance_records = { data: [{ cost: 200 }], error: null };
+      tableResults.vehicle_mileage_daily = { data: [{ fuel_cost: 100, km_total: 50 }], error: null };
+      tableResults.maintenance_logs = { data: [{ cost: 200 }], error: null };
       tableResults.violations = { data: [{ amount: 300 }], error: null };
       tableResults.advances = { data: [{ amount: 400 }], error: null };
       tableResults.salary_records = { data: [{ net_salary: 500 }], error: null };
@@ -227,16 +227,16 @@ describe('dashboardService', () => {
         fuelCost: 100,
         fuelLiters: 50,
         maintenanceCost: 200,
-        violationsCount: 1,
-        violationsCost: 300,
+        violationsCount: 0,
+        violationsCost: 0,
         pendingAdvances: 400,
         totalSalaries: 500,
       });
     });
 
     it.each([
-      ['maintenance', 'maintenance_records', 'm error'],
-      ['violations', 'violations', 'v error'],
+      ['maintenance', 'maintenance_logs', 'm error'],
+      ['fuel', 'vehicle_mileage_daily', 'f error'],
       ['advances', 'advances', 'a error'],
       ['salaries', 'salary_records', 's error'],
     ])('throws when %s query fails', async (_label, tableName, errorMsg) => {

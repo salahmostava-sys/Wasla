@@ -47,7 +47,7 @@ const WalletTransactionModal = ({ open, onOpenChange, employee, type, onSuccess 
       setDate(format(new Date(), 'yyyy-MM-dd'));
       onSuccess();
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       toast.error(err.message || 'حدث خطأ أثناء الحفظ');
     }
   });

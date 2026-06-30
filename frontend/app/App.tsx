@@ -30,7 +30,6 @@ const Employees = lazy(() => import("@modules/employees/pages/EmployeesPage"));
 const Attendance = lazy(() => import("@modules/pages/Attendance"));
 const Orders = lazy(() => import("@modules/orders/pages/OrdersPage"));
 const Salaries = lazy(() => import("@modules/salaries/pages/SalariesPage"));
-const SalarySchemes = lazy(() => import("@modules/pages/SalarySchemes"));
 const Advances = lazy(() => import("@modules/advances/pages/AdvancesPage"));
 const FuelPage = lazy(() => import("@modules/fuel/pages/FuelPage"));
 const MaintenancePage = lazy(() => import("@modules/maintenance/pages/MaintenancePage"));

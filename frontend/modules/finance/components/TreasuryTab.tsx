@@ -4,7 +4,7 @@ import { useTreasury } from '../hooks/useTreasury';
 import type { TreasuryTransactionType } from '../types/treasury';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, Plus, ArrowUpRight, ArrowDownRight, Trash2 } from 'lucide-react';
+import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { storageService } from '@services/storageService';
 
@@ -52,7 +52,7 @@ export function TreasuryTab() {
       setDescription('');
       setFile(null);
       toast.success('تم تسجيل العملية بنجاح');
-    } catch (err) {
+    } catch (_err) {
       toast.error('فشل في تسجيل العملية');
     }
   };
@@ -144,7 +144,7 @@ export function TreasuryTab() {
                             try {
                               const url = await storageService.createSignedUrl('advance-attachments', t.attachment_url!);
                               window.open(url, '_blank');
-                            } catch (e) { toast.error('فشل فتح المرفق'); }
+                            } catch (_e) { toast.error('فشل فتح المرفق'); }
                           }}>
                             <Paperclip size={14} />
                           </Button>
