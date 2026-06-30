@@ -159,12 +159,12 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
       await attendanceService.upsertDailyAttendance(payload);
     },
     onSuccess: () => {
-      toast("تم الحفظ بنجاح", { style: { background: "var(--ds-surface-container)", color: "var(--ds-on-surface)" } });
+      toast.success("تم الحفظ بنجاح", { style: { background: "var(--ds-surface-container)", color: "var(--ds-on-surface)" } } as any);
       queryClient.invalidateQueries({ queryKey });
       setEditingCell(null);
     },
     onError: () => {
-      toast("حدث خطأ أثناء الحفظ", { style: { background: "var(--destructive)", color: "white" } });
+      toast.error("حدث خطأ أثناء الحفظ", { style: { background: "var(--destructive)", color: "white" } } as any);
     }
   });
 
