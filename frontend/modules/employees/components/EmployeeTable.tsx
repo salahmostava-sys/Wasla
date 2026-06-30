@@ -1,53 +1,22 @@
 import React, { useMemo } from "react";
-import { Eye, Edit, Trash2 } from "lucide-react";
-import { Button } from "@shared/components/ui/button";
-import { EmployeeTablePagination } from "@modules/employees/components/EmployeeTablePagination";
-import { Checkbox } from "@shared/components/ui/checkbox";
-import { Input } from "@shared/components/ui/input";
+import { parseISO, format } from "date-fns";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@shared/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu";
-import { differenceInDays, parseISO, format } from "date-fns";
-import { todayISO, normalizeArabicDigits } from "@shared/lib/formatters";
-import {
-  CityBadges,
-  LicenseBadge,
-  SponsorBadge,
-  StatusBadge,
-  EmployeeAvatar,
   SortIcon,
   ColFilterPopover,
   SkeletonRow,
-  TextFilterInput,
 } from "@modules/employees/components/EmployeesViewParts";
 import {
   cityLabel,
   DEFAULT_EMPLOYEE_CITY_OPTIONS,
 } from "@modules/employees/model/employeeCity";
-import { getEmployeeCities } from "@modules/employees/model/employeeUtils";
 import {
   InlineInputEditor,
-  InlineMultiSelectEditor,
-  InlineSelectEditor,
 } from "@modules/employees/components/EmployeeInlineEditors";
-import { PlatformAppsEditor } from "@modules/employees/components/PlatformAppsEditor";
 import { useActiveApps } from "@modules/employees/hooks/useActiveApps";
 import { useCommercialRecords } from "@shared/hooks/useCommercialRecords";
 import {
   calcResidency,
   dayColorByThreshold,
-  probationColor,
   GRID_SKELETON_IDS,
   EMPTY_DATA_PLACEHOLDER,
   type Employee,
@@ -58,33 +27,7 @@ import {
 import { buildColumnFilter } from "./table/EmployeeTableFilters";
 import { renderEmployeeCell } from "./table/EmployeeTableRenderers";
 
-const DATE_FILTER_KEYS = new Set([
-  "join_date",
-  "birth_date",
-  "probation_end_date",
-  "residency_combined",
-  "health_insurance_expiry",
-  "license_expiry",
-]);
 
-const SPONSORSHIP_OPTIONS = [
-  { value: "sponsored", label: "على الكفالة" },
-  { value: "not_sponsored", label: "ليس على الكفالة" },
-  { value: "absconded", label: "هروب" },
-  { value: "terminated", label: "انتهاء الخدمة" },
-] as const;
-
-const LICENSE_OPTIONS = [
-  { value: "has_license", label: "لديه رخصة" },
-  { value: "no_license", label: "ليس لديه رخصة" },
-  { value: "applied", label: "تم التقديم" },
-] as const;
-
-const STATUS_OPTIONS = [
-  { value: "active", label: "نشط" },
-  { value: "inactive", label: "غير نشط" },
-  { value: "ended", label: "منتهي" },
-] as const;
 
 
 type EmployeeDetailedTableProps = {

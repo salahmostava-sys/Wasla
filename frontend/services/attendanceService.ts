@@ -3,6 +3,7 @@ import { handleSupabaseError } from '@services/serviceError';
 import { filterEmployeesForAttendanceMonth, filterOperationallyVisibleEmployees } from '@shared/lib/employeeVisibility';
 
 const attendanceService = {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   getDailyAttendanceBase: async () => {
     const PAGE_SIZE = 1000;
     type EmployeeRow = { id: string; name: string; salary_type: string | null; job_title: string | null; sponsorship_status: string | null; probation_end_date: string | null; status: string | null };
