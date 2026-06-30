@@ -17,7 +17,7 @@ export const appService = {
   getAll: async () => {
     const { data, error } = await supabase
       .from('apps')
-      .select('id, name, name_en, brand_color, text_color, is_active, is_archived, custom_columns, work_type')
+      .select('id, name, name_en, brand_color, text_color, is_active, is_archived, custom_columns, work_type, logo_url')
       .eq('is_archived', false)
       .order('name');
     if (error) handleSupabaseError(error, 'appService.getAll');
@@ -27,7 +27,7 @@ export const appService = {
   getMonthlyApps: async (_monthYear: string) => {
     const { data: allApps, error: appsError } = await supabase
       .from('apps')
-      .select('id, name, name_en, brand_color, text_color, is_active, is_archived, custom_columns, work_type')
+      .select('id, name, name_en, brand_color, text_color, is_active, is_archived, custom_columns, work_type, logo_url')
       .eq('is_archived', false)
       .order('name');
     

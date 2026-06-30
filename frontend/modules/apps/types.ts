@@ -16,6 +16,7 @@ export interface AppData {
   employeeCount: number;
   ordersCount: number;
   work_type?: WorkType | null;
+  logo_url?: string | null;
   custom_columns: CustomColumn[];
 }
 

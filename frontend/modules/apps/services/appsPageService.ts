@@ -26,6 +26,7 @@ export const appsPageService = {
         is_active_this_month?: boolean;
         custom_columns?: Json | null;
         work_type?: 'orders' | 'shift' | 'hybrid' | null;
+        logo_url?: string | null;
       }>,
       orderRows,
       assignments,

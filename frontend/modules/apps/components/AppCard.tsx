@@ -93,8 +93,12 @@ export const AppCard = ({
           </div>
         )}
 
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-xl font-bold shadow-sm">
-          {app.name.charAt(0)}
+        <div className={`mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-2xl ${app.logo_url ? 'bg-white' : 'bg-white/20'} text-3xl font-bold shadow-sm overflow-hidden`}>
+          {app.logo_url ? (
+            <img src={app.logo_url} alt={app.name} className="w-full h-full object-contain p-1" />
+          ) : (
+            app.name.charAt(0)
+          )}
         </div>
 
         <h3 className="truncate text-sm font-bold" style={{ color: app.text_color }}>

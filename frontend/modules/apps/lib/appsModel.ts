@@ -106,6 +106,7 @@ export const buildAppsOverview = (
       employeeCount: employeeIdsByApp.get(app.id)?.size ?? 0,
       ordersCount: stats?.ordersCount ?? 0,
       work_type: app.work_type ?? null,
+      logo_url: app.logo_url ?? null,
       custom_columns: normalizeCustomColumns(app.custom_columns),
     };
   });
