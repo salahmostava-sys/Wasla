@@ -77,8 +77,11 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
     const handler = (e: MouseEvent) => {
       if (popRef.current && !popRef.current.contains(e.target as Node)) onClose();
     };
-    setTimeout(() => document.addEventListener('mousedown', handler), 10);
-    return () => document.removeEventListener('mousedown', handler);
+    const timer = setTimeout(() => document.addEventListener('mousedown', handler), 10);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handler);
+    };
   }, [onClose]);
 
   useEffect(() => {
