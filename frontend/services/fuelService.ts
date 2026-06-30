@@ -91,7 +91,8 @@ export const fuelService = {
 
   getMonthlyDailyMileage: async (monthStart: string, monthEnd: string) => {
     const PAGE_SIZE = 1000;
-    const allRows: any[] = [];
+    type Row = { employee_id: string; km_total: number; fuel_cost: number; employees: { name: string; personal_photo_url: string | null } | null };
+    const allRows: Row[] = [];
     let offset = 0;
     let hasMore = true;
 
@@ -117,7 +118,8 @@ export const fuelService = {
 
   getMonthlyOrders: async (monthStart: string, monthEnd: string) => {
     const PAGE_SIZE = 1000;
-    const allRows: any[] = [];
+    type Row = { employee_id: string; orders_count: number };
+    const allRows: Row[] = [];
     let offset = 0;
     let hasMore = true;
 
@@ -143,7 +145,8 @@ export const fuelService = {
 
   getMonthlyFuelByMonthYear: async (monthYear: string) => {
     const PAGE_SIZE = 1000;
-    const allRows: any[] = [];
+    type Row = { employee_id: string; fuel_cost: number };
+    const allRows: Row[] = [];
     let offset = 0;
     let hasMore = true;
 
@@ -167,7 +170,8 @@ export const fuelService = {
 
   getActiveVehicleAssignments: async () => {
     const PAGE_SIZE = 1000;
-    const allRows: any[] = [];
+    type Row = { employee_id: string; vehicles: { plate_number: string; type: string; brand: string; model: string } | null };
+    const allRows: Row[] = [];
     let offset = 0;
     let hasMore = true;
 
@@ -192,7 +196,8 @@ export const fuelService = {
 
   getDailyMileageByMonth: async (monthStart: string, monthEnd: string) => {
     const PAGE_SIZE = 1000;
-    const allRows: any[] = [];
+    // select * returns many fields, using Record<string, unknown> as a base to avoid any
+    const allRows: Record<string, unknown>[] = [];
     let offset = 0;
     let hasMore = true;
 
