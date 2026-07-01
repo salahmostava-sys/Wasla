@@ -1,8 +1,11 @@
 const { createClient } = require('@supabase/supabase-js');
 const aiTools = require('./_aiTools');
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// FIX #19: NEVER use VITE_* variables (frontend env) as fallback for server-side secrets.
+// VITE_* variables are bundled into the frontend and exposed to browsers.
+// Server must have explicit, separate environment variables.
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // FIX #6: Log at startup instead of throwing at module-load time.
@@ -13,7 +16,8 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error(
     '[api/_lib] FATAL: Missing SUPABASE_URL or SUPABASE_ANON_KEY. ' +
     'All authenticated requests will return 503. ' +
-    'Set these variables in your Vercel project settings.'
+    'Set these variables in your Vercel project settings under Environment Variables. ' +
+    'DO NOT use VITE_* variables (those are frontend-only and exposed in bundles).'
   );
 }
 
