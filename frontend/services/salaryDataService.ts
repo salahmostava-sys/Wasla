@@ -65,6 +65,10 @@ export const salaryDataService = {
     await salaryService.upsertMany(records);
   },
 
+  async delete(id: string) {
+    await salaryService.delete(id);
+  },
+
   captureMonthSnapshot(monthYear: string) {
     return performanceService.captureSalaryMonthSnapshot(monthYear);
   },

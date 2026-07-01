@@ -45,7 +45,6 @@ export const routesManifest: AppRouteManifestItem[] = [
   { id: 'fuel', titleAr: 'استهلاك المناديب', group: 'operations', path: '/fuel', permission: routePermission('fuel'), sidebar: true },
   { id: 'violation_resolver', titleAr: 'تسوية المخالفات', group: 'operations', path: '/violation-resolver', permission: routePermission('violation_resolver'), sidebar: true },
   { id: 'employee_tiers', titleAr: 'شرائح الشركة', group: 'operations', path: '/employee-tiers', permission: routePermission('employee_tiers'), sidebar: true },
-  { id: 'platform_accounts', titleAr: 'حسابات المنصات', group: 'operations', path: '/platform-accounts', permission: routePermission('platform_accounts'), sidebar: true },
 
   { id: 'salaries', titleAr: 'الرواتب', group: 'finance', path: '/salaries', permission: routePermission('salaries'), sidebar: true },
   { id: 'salary_schemes', titleAr: 'مخططات الرواتب', group: 'finance', path: '/settings?tab=schemes', permission: routePermission('salary_schemes'), sidebar: false },

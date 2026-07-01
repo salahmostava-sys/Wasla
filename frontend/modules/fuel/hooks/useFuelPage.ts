@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { format, endOfMonth } from 'date-fns';
 import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
-import { useMonthlyActiveEmployeeIds } from '@shared/hooks/useMonthlyActiveEmployeeIds';
-import { filterVisibleEmployeesInMonth } from '@shared/lib/employeeVisibility';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { defaultQueryRetry } from '@shared/lib/query';
 import { logError } from '@shared/lib/logger';
@@ -21,6 +19,9 @@ import type {
   DailyRow,
   Employee,
   AppRow,
+  VehicleAssignmentRow,
+  DailyMileageAggSource,
+  DailyMileageResponseRow,
 } from '@modules/fuel/types/fuel.types';
 import {
   getErrorMessageOrFallback,
@@ -113,7 +114,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
         fuelApi.getActiveEmployeeAppLinks(),
         fuelApi.getActiveVehicleAssignments(),
       ]);
-      const vehicleMap = buildVehicleMap((assignmentRows || []));
+      const vehicleMap = buildVehicleMap((assignmentRows || []) as VehicleAssignmentRow[]);
       const employeesWithVehicles = (empRows || []).map((emp: Employee) => ({
         ...emp,
         vehicle: vehicleMap[emp.id] || null,
@@ -128,15 +129,14 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     staleTime: 60_000,
   });
 
-  const { data: activeIdsData } = useMonthlyActiveEmployeeIds(monthYear);
-  const activeEmployeeIdsInMonth = activeIdsData?.employeeIds;
-
   useEffect(() => {
     if (!fuelBaseData) return;
-    setEmployees(filterVisibleEmployeesInMonth(fuelBaseData.employees, activeEmployeeIdsInMonth));
+    // For fuel page, show all active employees regardless of monthly activity
+    // This ensures couriers with vehicles are visible even if they have no orders/attendance in the month
+    setEmployees(fuelBaseData.employees.filter(e => e.status === 'active'));
     setApps(fuelBaseData.apps);
     setEmployeeAppLinks(fuelBaseData.links);
-  }, [fuelBaseData, activeEmployeeIdsInMonth]);
+  }, [fuelBaseData]);
 
   useEffect(() => {
     if (!fuelBaseError) return;
@@ -199,8 +199,8 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
         fuelApi.getActiveVehicleAssignments(),
       ]);
       const ordersMap = buildOrdersMap((orderRows || []));
-      const vehicleMap = buildVehicleMap((assignmentRows || []));
-      const aggMap = buildMonthlyAggMap((dailyRowsRaw || []), employeeIdsOnPlatform);
+      const vehicleMap = buildVehicleMap((assignmentRows || []) as VehicleAssignmentRow[]);
+      const aggMap = buildMonthlyAggMap((dailyRowsRaw || []) as DailyMileageAggSource[], employeeIdsOnPlatform);
       return buildMonthlyRows(aggMap, ordersMap, vehicleMap, employees, employeeIdsOnPlatform);
     },
     retry: defaultQueryRetry,
@@ -219,7 +219,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
       const ms = `${monthYear}-01`;
       const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
       const dailyData = await fuelApi.getDailyMileageByMonth(ms, me);
-      const mappedRows = mapDailyRows((dailyData || []));
+      const mappedRows = mapDailyRows((dailyData || []) as DailyMileageResponseRow[]);
       return applyDailyFilters(mappedRows, selectedEmployee, employeeIdsOnPlatform);
     },
     retry: defaultQueryRetry,
@@ -243,9 +243,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     refetchDaily().catch(() => {});
   };
   const getLoadingStatus = () => {
-    if (view === 'monthly') return monthlyLoading;
-    if (view === 'spreadsheet') return monthlyLoading || dailyLoading;
-    return dailyLoading;
+    return monthlyLoading || dailyLoading;
   };
   const loading = getLoadingStatus();
 

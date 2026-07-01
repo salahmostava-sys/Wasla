@@ -301,13 +301,13 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
         {/* ── Page content ─────────────────────────────────── */}
         <div
           key={pageKey}
-          className="flex-1 overflow-auto p-4 sm:p-5 lg:p-6 xl:p-8 min-h-0 flex flex-col page-enter"
+          className="flex-1 overflow-auto p-4 sm:p-5 lg:p-6 xl:p-8 min-h-0 flex flex-col page-enter relative"
           style={{ background: 'var(--ds-surface)' }}
         >
           {children}
+          <AiChatWidget />
         </div>
       </main>
-      <AiChatWidget />
     </div>
   );
 };

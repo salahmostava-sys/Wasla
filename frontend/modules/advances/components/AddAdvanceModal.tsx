@@ -71,9 +71,9 @@ export const InlineRowEntry = ({ employeeId, onSaved, onCancel }: Readonly<Inlin
       if (installments.length > 0) await advanceService.createInstallments(installments);
       toast({ title: '✅ تم إضافة السلفة' });
       onSaved();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] load employees failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'حدث خطأ', description: message, variant: 'destructive' });
     } finally {
       setSaving(false);
@@ -128,9 +128,9 @@ export const WriteOffDialog = ({ employeeName, remaining, advanceIds, onClose, o
       await advanceService.writeOffMany(advanceIds, reason || 'ديون معدومة');
       toast({ title: `✅ تم إعدام ديون ${employeeName}` });
       onDone(); onClose();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] create failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'حدث خطأ', description: message, variant: 'destructive' });
     } finally {
       setSaving(false);
@@ -175,9 +175,9 @@ export const RestoreWriteOffDialog = ({ employeeName, advanceIds, onClose, onDon
       await advanceService.restoreWrittenOffMany(advanceIds);
       toast({ title: `✅ تم استرداد ديون ${employeeName}` });
       onDone(); onClose();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] update failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'حدث خطأ', description: message, variant: 'destructive' });
     } finally {
       setSaving(false);
@@ -262,9 +262,9 @@ export const EditAdvanceModal = ({ advance, onClose, onSaved }: Readonly<EditAdv
       if (installments.length > 0) await advanceService.createInstallments(installments);
       toast({ title: 'تم تحديث السلفة ✅' });
       onSaved(); onClose();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] save installments failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'حدث خطأ', description: message, variant: 'destructive' });
     } finally {
       setSaving(false);
@@ -448,9 +448,9 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
       toast({ title: '✅ تم حذف السلفة نهائياً' });
       setDeleteAdvanceId(null);
       onRefresh();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] delete advance failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'خطأ في الحذف', description: message, variant: 'destructive' });
     } finally {
       setDeletingAdvance(false);
@@ -465,9 +465,9 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
       toast({ title: '✅ تم حذف الصف' });
       setDeleteInstallmentId(null);
       onRefresh();
-    } catch (_e) {
+    } catch (e) {
       logError('[Advances] delete installment failed', e);
-      const message = getErrorMessage(_e, 'حدث خطأ غير متوقع');
+      const message = getErrorMessage(e, 'حدث خطأ غير متوقع');
       toast({ title: 'خطأ في الحذف', description: message, variant: 'destructive' });
     } finally {
       setDeletingInstallment(false);
@@ -519,6 +519,20 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
                       }}
                     >
                       <Edit2 size={12} /> تعديل
+                    </Button>
+                  )}
+                  {empAdvances.length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="h-7 text-xs gap-1.5"
+                      onClick={() => {
+                        const activeAdv = empAdvances.find(a => a.status === 'active') || empAdvances.at(-1);
+                        if (!activeAdv) return;
+                        setDeleteAdvanceId(activeAdv.id);
+                      }}
+                    >
+                      <Trash2 size={12} /> حذف السلفة
                     </Button>
                   )}
                   {remaining > 0 && onWriteOff && (
@@ -620,7 +634,7 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
                       </td>
                       <td className="ta-td">
                         {inst.attachmentUrl ? (
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground" onClick={async (_e) => {
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground" onClick={async (e) => {
                             e.stopPropagation();
                             try {
                               const url = await storageService.createSignedUrl('advance-attachments', inst.attachmentUrl!);
@@ -638,7 +652,7 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
                       <td className="ta-td">
                         {canEdit && (
                           <button
-                            onClick={(_e) => { e.stopPropagation(); setDeleteInstallmentId(inst.id); }}
+                            onClick={(e) => { e.stopPropagation(); setDeleteInstallmentId(inst.id); }}
                             className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                             title="حذف هذا الصف"
                           >
@@ -768,8 +782,8 @@ export const AddEmployeeAdvanceDialog = ({
                 <CommandEmpty>لا يوجد مندوب مطابق</CommandEmpty>
                 <CommandGroup>
                   {employees
-                    .filter((_e) => !employeeSummaries.some((s) => s.employeeId === e.id))
-                    .map((_e) => (
+                    .filter((e) => !employeeSummaries.some((s) => s.employeeId === e.id))
+                    .map((e) => (
                       <CommandItem
                         key={e.id}
                         value={`${e.name} ${e.national_id ?? ''} ${e.id}`}

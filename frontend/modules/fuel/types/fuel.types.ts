@@ -24,7 +24,7 @@ export type MonthlyRow = {
   daily_count: number;
 };
 
-export type Employee = { id: string; name: string; personal_photo_url?: string | null; vehicle?: { plate_number: string; type: string; brand?: string | null; model?: string | null } | null };
+export type Employee = { id: string; name: string; personal_photo_url?: string | null; status?: string | null; sponsorship_status?: string | null; probation_end_date?: string | null; vehicle?: { plate_number: string; type: string; brand?: string | null; model?: string | null } | null };
 export type AppRow = { id: string; name: string };
 export type DailyMileageResponseRow = DailyRow & { employees?: { name: string; personal_photo_url?: string | null } };
 export type ImportStep = 1 | 2 | 3;

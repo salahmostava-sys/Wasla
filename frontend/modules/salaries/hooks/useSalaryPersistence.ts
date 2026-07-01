@@ -271,7 +271,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
       setApprovingRowId(id);
       const success = await run(
         async () => {
-          await salaryService.delete(row.id);
+          await salaryDataService.delete(row.id);
           return true;
         },
         { errorTitle: 'تعذّر إلغاء الاعتماد' },

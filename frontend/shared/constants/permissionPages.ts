@@ -12,7 +12,6 @@ export const PERMISSION_PAGE_ENTRIES: { key: string; labelAr: string; labelEn: s
   { key: 'alerts', labelAr: 'التنبيهات', labelEn: 'Alerts' },
   { key: 'settings', labelAr: 'الإعدادات', labelEn: 'Settings' },
   { key: 'apps', labelAr: 'التطبيقات', labelEn: 'Apps' },
-  { key: 'platform_accounts', labelAr: 'حسابات المنصات', labelEn: 'Platform accounts' },
   { key: 'violation_resolver', labelAr: 'المخالفات', labelEn: 'Violations' },
   { key: 'vehicle_assignment', labelAr: 'تعيين المركبات', labelEn: 'Vehicle assignment' },
   { key: 'fuel', labelAr: 'استهلاك المناديب', labelEn: 'Rider consumption' },

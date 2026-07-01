@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { CalendarIcon, UserCheck, Save } from "lucide-react";
+import { CalendarIcon, UserCheck, Save, CheckSquare, Square } from "lucide-react";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { Calendar } from "@shared/components/ui/calendar";
@@ -64,6 +64,8 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
   const [records, setRecords] = useState<Record<string, AttendanceRecord>>({});
   const [saving, setSaving]   = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<string>("");
 
   // Custom statuses from Supabase (with localStorage fallback)
   const queryClient = useQueryClient();
@@ -187,6 +189,40 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
     toast.success(TOAST_SUCCESS_ACTION);
   };
 
+  const toggleSelectAll = () => {
+    if (selectedEmployeeIds.size === employees.length) {
+      setSelectedEmployeeIds(new Set());
+    } else {
+      setSelectedEmployeeIds(new Set(employees.map(e => e.id)));
+    }
+  };
+
+  const toggleSelectEmployee = (empId: string) => {
+    setSelectedEmployeeIds(prev => {
+      const next = new Set(prev);
+      if (next.has(empId)) {
+        next.delete(empId);
+      } else {
+        next.add(empId);
+      }
+      return next;
+    });
+  };
+
+  const applyBulkStatus = () => {
+    if (!bulkStatus || selectedEmployeeIds.size === 0) return;
+    setRecords(prev => {
+      const updated = { ...prev };
+      selectedEmployeeIds.forEach(empId => {
+        updated[empId] = { ...updated[empId], status: bulkStatus as AttendanceStatus };
+      });
+      return updated;
+    });
+    toast.success(`تم تحديث حالة ${selectedEmployeeIds.size} مندوب`);
+    setBulkStatus("");
+    setSelectedEmployeeIds(new Set());
+  };
+
   const addCustomStatus = (empId: string) => {
     const trimmed = customInput.trim();
     if (!trimmed) return;
@@ -291,6 +327,22 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
 
       return (
         <tr key={emp.id} className="ta-tr">
+          {/* Checkbox */}
+          <td className="ta-td w-10">
+            <button
+              type="button"
+              onClick={() => toggleSelectEmployee(emp.id)}
+              className="p-1 hover:bg-muted rounded transition-colors"
+              title="تحديد المندوب"
+            >
+              {selectedEmployeeIds.has(emp.id) ? (
+                <CheckSquare size={18} className="text-primary" />
+              ) : (
+                <Square size={18} className="text-muted-foreground" />
+              )}
+            </button>
+          </td>
+
           {/* Name */}
           <td className={`ta-td sticky ${isRTL ? "right-0" : "left-0"} bg-card max-w-[130px]`}>
             <div className="flex items-center gap-2">
@@ -483,6 +535,40 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
           )}
         </div>
         <div className="flex gap-2 shrink-0">
+          {selectedEmployeeIds.size > 0 && permissions.can_edit && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {selectedEmployeeIds.size} محدد
+              </span>
+              <Select value={bulkStatus} onValueChange={setBulkStatus}>
+                <SelectTrigger className="h-9 w-40 text-sm">
+                  <SelectValue placeholder="تطبيق حالة..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {allStatuses.map(s => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                onClick={applyBulkStatus}
+                disabled={!bulkStatus}
+                className="h-9 text-sm"
+              >
+                تطبيق
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedEmployeeIds(new Set())}
+                className="h-9 text-sm"
+              >
+                إلغاء
+              </Button>
+            </div>
+          )}
           {permissions.can_edit && (
             <Button variant="outline" onClick={markAllPresent} className="gap-2 h-9 text-sm">
               <UserCheck size={16} />
@@ -521,6 +607,20 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
           <table className="w-full" dir={isRTL ? "rtl" : "ltr"}>
             <thead className="ta-thead">
               <tr>
+                <th className="ta-th w-10">
+                  <button
+                    type="button"
+                    onClick={toggleSelectAll}
+                    className="p-1 hover:bg-muted rounded transition-colors"
+                    title="تحديد الكل"
+                  >
+                    {selectedEmployeeIds.size === employees.length && employees.length > 0 ? (
+                      <CheckSquare size={18} className="text-primary" />
+                    ) : (
+                      <Square size={18} className="text-muted-foreground" />
+                    )}
+                  </button>
+                </th>
                 <th className={`ta-th sticky ${isRTL ? "right-0" : "left-0"} bg-muted/40 min-w-[88px] max-w-[130px] text-start`}>
                   المندوب
                 </th>

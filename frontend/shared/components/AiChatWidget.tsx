@@ -78,7 +78,7 @@ export function AiChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 left-6 z-50 w-14 h-14 -2xl bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-2xl shadow-card hover:shadow-card-hover hover:scale-105 transition-all duration-300 flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 rounded-2xl"
+          className="absolute bottom-6 left-6 z-50 w-14 h-14 -2xl bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-2xl shadow-card hover:shadow-card-hover hover:scale-105 transition-all duration-300 flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 rounded-2xl"
           title="محادثة ذكية"
         >
           <MessageCircle size={24} />
@@ -86,7 +86,7 @@ export function AiChatWidget() {
       )}
 
       {isOpen && (
-        <div className="fixed bottom-6 left-6 z-50 w-[380px] h-[520px] bg-card -2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 rounded-2xl">
+        <div className="absolute bottom-6 left-6 z-50 w-[380px] h-[520px] bg-card -2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 rounded-2xl">
           {/* Header */}
           <div className="px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-700 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">

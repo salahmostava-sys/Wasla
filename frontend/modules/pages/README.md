@@ -13,7 +13,6 @@
 | `SalarySchemes.tsx` | مخططات الرواتب | `modules/salaries/` |
 | `UsersAndPermissions.tsx` | المستخدمين والصلاحيات | `modules/users/` |
 | `Attendance.tsx` | الحضور والانصراف | `modules/attendance/` |
-| `PlatformAccounts.tsx` | حسابات المنصات | `modules/platform-accounts/` |
 | `Apps.tsx` | التطبيقات | `modules/apps/` |
 | `Dashboard.tsx` | لوحة التحكم | `modules/dashboard/` |
 | `Login.tsx` / `ForgotPassword.tsx` / `ResetPassword.tsx` | صفحات المصادقة | `modules/auth/` |
