@@ -1,8 +1,9 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, ArrowUpRight, ArrowDownRight, History } from 'lucide-react';
+import { Loader2, ArrowUpRight, ArrowDownRight, History, Search } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
 import { useLanguage } from '@app/providers/LanguageContext';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import walletService from '@services/walletService';
@@ -16,6 +17,7 @@ const WalletPage = () => {
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; name: string } | null>(null);
   const [transactionType, setTransactionType] = useState<'collection' | 'deposit'>('collection');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: balances = [], isLoading, refetch } = useQuery({
     queryKey: ['wallet-balances'],
@@ -34,11 +36,26 @@ const WalletPage = () => {
     setHistoryModalOpen(true);
   };
 
-  // Only show employees with non-zero balances or those we want to filter
-  const displayedBalances = balances.filter(b => b.balance > 0 || b.employee_status === 'active');
+  // Filter balances by search query and show employees with non-zero balances or active status
+  const displayedBalances = useMemo(() => {
+    const filtered = balances.filter(b => b.balance > 0 || b.employee_status === 'active');
+    if (!searchQuery) return filtered;
+    return filtered.filter(b => b.employee_name.includes(searchQuery));
+  }, [balances, searchQuery]);
 
   return (
     <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="بحث بالاسم..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+      </div>
       <div className="bg-card border border-border shadow-sm rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center p-12">
