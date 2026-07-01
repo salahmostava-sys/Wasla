@@ -32,6 +32,14 @@ export const treasuryService = {
     if (error) handleSupabaseError(error, 'treasuryService.updateAccount');
   },
 
+  deactivateAccount: async (id: string) => {
+    const { error } = await supabase
+      .from('treasury_accounts')
+      .update({ is_active: false })
+      .eq('id', id);
+    if (error) handleSupabaseError(error, 'treasuryService.deactivateAccount');
+  },
+
   // Categories
   getCategories: async () => {
     const { data, error } = await supabase
@@ -51,6 +59,14 @@ export const treasuryService = {
       .single();
     if (error) handleSupabaseError(error, 'treasuryService.createCategory');
     return data as TreasuryCategory;
+  },
+
+  deactivateCategory: async (id: string) => {
+    const { error } = await supabase
+      .from('treasury_categories')
+      .update({ is_active: false })
+      .eq('id', id);
+    if (error) handleSupabaseError(error, 'treasuryService.deactivateCategory');
   },
 
   // Transactions

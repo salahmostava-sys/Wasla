@@ -55,6 +55,21 @@ export function useTreasury(from: string, to: string) {
     },
   });
 
+  const deleteAccount = useMutation({
+    mutationFn: (id: string) => treasuryService.deactivateAccount(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['treasury_accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['treasury_balances'] });
+    },
+  });
+
+  const deleteCategory = useMutation({
+    mutationFn: (id: string) => treasuryService.deactivateCategory(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['treasury_categories'] });
+    },
+  });
+
   return {
     accounts: accountsQuery.data ?? [],
     categories: categoriesQuery.data ?? [],
@@ -64,6 +79,8 @@ export function useTreasury(from: string, to: string) {
     createTransaction: createTransaction.mutateAsync,
     createAccount: createAccount.mutateAsync,
     createCategory: createCategory.mutateAsync,
+    deleteAccount: deleteAccount.mutateAsync,
+    deleteCategory: deleteCategory.mutateAsync,
     isCreatingTransaction: createTransaction.isPending,
   };
 }
