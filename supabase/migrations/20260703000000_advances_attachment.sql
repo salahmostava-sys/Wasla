@@ -16,21 +16,25 @@ ON CONFLICT (id) DO UPDATE SET
     allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 -- RLS policies for advance-attachments bucket
+DROP POLICY IF EXISTS "Authenticated users can upload advance attachments" ON storage.objects;
 CREATE POLICY "Authenticated users can upload advance attachments"
     ON storage.objects FOR INSERT
     TO authenticated
     WITH CHECK ( bucket_id = 'advance-attachments' );
 
+DROP POLICY IF EXISTS "Authenticated users can update their advance attachments" ON storage.objects;
 CREATE POLICY "Authenticated users can update their advance attachments"
     ON storage.objects FOR UPDATE
     TO authenticated
     USING ( bucket_id = 'advance-attachments' );
 
+DROP POLICY IF EXISTS "Authenticated users can delete advance attachments" ON storage.objects;
 CREATE POLICY "Authenticated users can delete advance attachments"
     ON storage.objects FOR DELETE
     TO authenticated
     USING ( bucket_id = 'advance-attachments' );
 
+DROP POLICY IF EXISTS "Authenticated users can view advance attachments" ON storage.objects;
 CREATE POLICY "Authenticated users can view advance attachments"
     ON storage.objects FOR SELECT
     TO authenticated

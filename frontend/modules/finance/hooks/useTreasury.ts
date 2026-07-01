@@ -1,35 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@app/providers/AuthContext';
+import { useAuthQueryGate, authQueryUserId } from '@shared/hooks/useAuthQueryGate';
 import { treasuryService } from '@services/treasuryService';
-import type { TreasuryTransaction, TreasuryAccount, TreasuryCategory } from './types/treasury';
+import type { TreasuryTransaction, TreasuryAccount, TreasuryCategory } from '../types/treasury';
 
 export function useTreasury(from: string, to: string) {
-  const { user } = useAuth();
+  const { enabled, userId } = useAuthQueryGate();
   const queryClient = useQueryClient();
-  const uid = user?.id;
+  const userKey = authQueryUserId(userId);
 
   const accountsQuery = useQuery({
-    queryKey: ['treasury_accounts', uid],
+    queryKey: ['treasury_accounts', userKey],
     queryFn: () => treasuryService.getAccounts(),
-    enabled: !!uid,
+    enabled,
   });
 
   const categoriesQuery = useQuery({
-    queryKey: ['treasury_categories', uid],
+    queryKey: ['treasury_categories', userKey],
     queryFn: () => treasuryService.getCategories(),
-    enabled: !!uid,
+    enabled,
   });
 
   const balancesQuery = useQuery({
-    queryKey: ['treasury_balances', uid],
+    queryKey: ['treasury_balances', userKey],
     queryFn: () => treasuryService.getAccountBalances(),
-    enabled: !!uid,
+    enabled,
   });
 
   const transactionsQuery = useQuery({
-    queryKey: ['treasury_transactions', uid, from, to],
+    queryKey: ['treasury_transactions', userKey, from, to],
     queryFn: () => treasuryService.getTransactions(from, to),
-    enabled: !!uid && !!from && !!to,
+    enabled: enabled && !!from && !!to,
   });
 
   const createTransaction = useMutation({
