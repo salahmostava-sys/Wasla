@@ -221,8 +221,8 @@ export function useSpreadsheetGrid() {
       const next = { ...prev };
       Object.entries(vals).forEach(([appId, count]) => {
         const key = `${empId}::${appId}::${day}`;
-        if (count > 0) next.set(key, count);
-        else next.delete(key);
+        if (count > 0) next[key] = count;
+        else delete next[key];
       });
       return next;
     });
