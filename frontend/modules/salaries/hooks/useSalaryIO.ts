@@ -15,6 +15,7 @@ import { loadXlsx } from '@modules/salaries/lib/salaryPdfLoaders';
 import type { SalaryRow } from '@modules/salaries/types/salary.types';
 import type { computeSalaryRow } from '@modules/salaries/hooks/useSalaryTable';
 import { runSafe } from '@shared/lib/logger';
+import { useSafeAction } from '@shared/hooks/useSafeAction';
 
 // ─── Params ──────────────────────────────────────────────────────────────────
 
@@ -95,7 +96,7 @@ export function useSalaryIO(params: UseSalaryIOParams) {
       try {
         await run(async () => {
           const buf = await file.arrayBuffer();
-          const { rows: parsed, parseErrors } = parseSalaryImportWorkbook(buf, {
+          const { rows: parsed, parseErrors } = await parseSalaryImportWorkbook(buf, {
             defaultMonthYear: selectedMonth,
           });
           if (parsed.length === 0) {

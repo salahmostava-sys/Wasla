@@ -252,14 +252,14 @@ export function DashboardAnalyticsTab() {
       const months = buildHistoricalMonths();
       const { apps, employees, monthOrders } = await dashboardService.fetchHistoricalData(months);
       const employeeMap = Object.fromEntries((employees || []).map((employee) => [employee.id, employee.name]));
-      const monthlyTrend = buildMonthlyTrend(months, monthOrders as Array<AnalyticsOrderRow[] | null>);
+      const monthlyTrend = buildMonthlyTrend(months, monthOrders);
       const currentOrdersRows = monthOrders[MONTHS_BACK - 1] || [];
       const currentOrders = sumOrders(currentOrdersRows);
       const projectedOrders = daysPassed > 0 ? Math.round((currentOrders / daysPassed) * daysInMonth) : 0;
       const lastMonthOrders = monthOrders[MONTHS_BACK - 2] || [];
       const appBreakdown = buildAppBreakdown(apps, currentOrdersRows, lastMonthOrders);
       const recentMonths = monthOrders.slice(MONTHS_BACK - 4);
-      const riderData = accumulateRiderOrders(recentMonths as Array<AnalyticsOrderRow[] | null>);
+      const riderData = accumulateRiderOrders(recentMonths);
       const riderMetrics = buildRiderMetrics(riderData, employeeMap);
 
       return {

@@ -98,7 +98,7 @@ export function useBatchPdfExport(params: {
           return;
         }
 
-        const container = iDoc?.querySelector('.slip-container') as HTMLElement | null;
+        const container = iframe.contentDocument?.querySelector('.slip-container') as HTMLElement | null;
         if (container) {
           await pdf.html(container, { x: 5, y: 5, width: 190, windowWidth: 700 });
         }

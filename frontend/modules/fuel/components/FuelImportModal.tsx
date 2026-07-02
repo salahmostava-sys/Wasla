@@ -90,7 +90,7 @@ export const ImportModal = ({
     setSaving(true);
     try {
       const payload = toSave.map(r => ({
-        employee_id: r.manual_employee_id || r.matched_employee?.id ?? '',
+        employee_id: r.manual_employee_id || (r.matched_employee?.id ?? ''),
         month_year: monthYear,
         km_total: r.km_total,
         fuel_cost: r.fuel_cost,

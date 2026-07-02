@@ -1,29 +1,50 @@
 /**
  * AI Service - Analytics and Analysis Functions Only
  * Chat functionality has been removed
+ *
+ * NOTE: types and endpoints mirror ai-backend/main.py (FastAPI) — the source of truth.
  */
 
-export interface BestEmployeeResponse {
-  employees: Array<{
-    id: string;
-    name: string;
-    score: number;
-    reason: string;
-  }>;
+export interface EmployeeRank {
+  employee_id: string;
+  employee_name: string;
+  composite_score: number;
+  rank: number;
+  total_orders: number;
+  attendance_rate: number;
+  error_rate: number;
+  performance_tier: 'excellent' | 'good' | 'average' | 'needs_improvement';
 }
 
-export interface SalaryForecastResponse {
-  predicted_salary: number;
-  confidence: 'high' | 'medium' | 'low';
-  trend: 'up' | 'down' | 'stable';
+export interface BestEmployeeResponse {
+  employees: EmployeeRank[];
+  best_employee: EmployeeRank | null;
+}
+
+export interface EmployeeRecord {
+  employee_id: string;
+  employee_name: string;
+  total_orders: number;
+  attendance_days: number;
+  error_count: number;
+  late_days: number;
+  salary: number;
   avg_orders_per_day: number;
 }
 
+export interface SalaryForecastResponse {
+  predicted_monthly_salary: number;
+  current_daily_avg: number;
+  projected_monthly_orders: number;
+  confidence: 'high' | 'medium' | 'low';
+  trend: 'on_track' | 'above_target' | 'below_target';
+  days_remaining: number;
+}
+
 export interface SalaryAnalysisResponse {
-  analysis: string;
-  recommendations: string[];
-  score: number;
-  category: 'excellent' | 'good' | 'average' | 'needs_improvement';
+  expected_salary: number;
+  risk: 'underpaid' | 'normal' | 'overpaid';
+  diff_percent: number;
 }
 
 class AIService {
@@ -44,63 +65,50 @@ class AIService {
     return this.isConfiguredValue;
   }
 
-  async predictSalary(params: {
-    current_orders: number;
-    days_passed: number;
-    avg_order_value: number;
-  }): Promise<SalaryForecastResponse> {
+  private getBackendUrl(): string {
     if (!this.isConfiguredValue) {
       throw new Error('AI backend is not configured');
     }
-
     const aiBackendUrl = import.meta.env.VITE_AI_BACKEND_URL;
     if (!aiBackendUrl) {
       throw new Error('AI backend URL is not configured');
     }
+    return aiBackendUrl;
+  }
 
+  private async post<T>(path: string, body: unknown): Promise<T> {
+    const response = await fetch(`${this.getBackendUrl()}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new Error(`AI service error: ${response.statusText}`);
+    }
+    return (await response.json()) as T;
+  }
+
+  async predictSalary(params: {
+    current_orders: number;
+    days_passed: number;
+    avg_order_value: number;
+    base_salary?: number;
+    working_days_per_month?: number;
+  }): Promise<SalaryForecastResponse> {
     try {
-      const response = await fetch(`${aiBackendUrl}/predict-salary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-
-      if (!response.ok) {
-        throw new Error(`AI service error: ${response.statusText}`);
-      }
-
-      return await response.json();
+      return await this.post<SalaryForecastResponse>('/predict-salary', params);
     } catch (error) {
       console.error('[AIService] predictSalary failed:', error);
       throw error;
     }
   }
 
-  async bestEmployees(
-    employees: Array<{ id: string; name: string; performance_score?: number }>,
-    limit: number
-  ): Promise<BestEmployeeResponse> {
-    if (!this.isConfiguredValue) {
-      throw new Error('AI backend is not configured');
-    }
-
-    const aiBackendUrl = import.meta.env.VITE_AI_BACKEND_URL;
-    if (!aiBackendUrl) {
-      throw new Error('AI backend URL is not configured');
-    }
-
+  async bestEmployees(employees: EmployeeRecord[], limit: number): Promise<BestEmployeeResponse> {
     try {
-      const response = await fetch(`${aiBackendUrl}/best-employees`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ employees, limit }),
+      return await this.post<BestEmployeeResponse>('/best-employee', {
+        employees,
+        top_n: limit,
       });
-
-      if (!response.ok) {
-        throw new Error(`AI service error: ${response.statusText}`);
-      }
-
-      return await response.json();
     } catch (error) {
       console.error('[AIService] bestEmployees failed:', error);
       throw error;
@@ -108,35 +116,16 @@ class AIService {
   }
 
   async analyzeSalary(
-    totalPlatformSalary: number,
+    baseSalary: number,
     totalOrders: number,
     totalBonus: number
   ): Promise<SalaryAnalysisResponse> {
-    if (!this.isConfiguredValue) {
-      throw new Error('AI backend is not configured');
-    }
-
-    const aiBackendUrl = import.meta.env.VITE_AI_BACKEND_URL;
-    if (!aiBackendUrl) {
-      throw new Error('AI backend URL is not configured');
-    }
-
     try {
-      const response = await fetch(`${aiBackendUrl}/analyze-salary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          totalPlatformSalary,
-          totalOrders,
-          totalBonus,
-        }),
+      return await this.post<SalaryAnalysisResponse>('/analyze', {
+        base_salary: baseSalary,
+        orders: totalOrders,
+        bonus: totalBonus,
       });
-
-      if (!response.ok) {
-        throw new Error(`AI service error: ${response.statusText}`);
-      }
-
-      return await response.json();
     } catch (error) {
       console.error('[AIService] analyzeSalary failed:', error);
       throw error;
