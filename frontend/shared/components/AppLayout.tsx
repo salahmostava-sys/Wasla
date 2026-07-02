@@ -142,7 +142,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
             <button
               type="button"
               onClick={toggle}
-              className="h-9 w-9 flex items-center justify-center -full border border-border/60 bg-card/80 flex-shrink-0 rounded-2xl"
+              className="h-9 w-9 flex items-center justify-center border border-border/60 bg-card/80 flex-shrink-0 rounded-2xl"
               style={{ color: 'var(--ds-on-surface-variant)' }}
               aria-label="Toggle sidebar"
             >
@@ -323,7 +323,7 @@ function MobileLogo({ logoSrc }: Readonly<{ logoSrc?: string }>) {
       <img
         src={logoSrc}
         alt=""
-        className="h-10 w-10 sm:h-11 sm:w-11 -full object-cover border-2 border-border/80 bg-card shadow-sm shrink-0 rounded-2xl"
+        className="h-10 w-10 sm:h-11 sm:w-11 object-cover border-2 border-border/80 bg-card shadow-sm shrink-0 rounded-2xl"
         onError={() => setFailed(true)}
       />
     );

@@ -148,7 +148,7 @@ export default function NotificationCenter() {
           setOpen(v => !v);
           if (!open) refetch().catch(() => {});
         }}
-        className="relative h-9 w-9 flex items-center justify-center -full border border-border/60 bg-card/80 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground rounded-2xl"
+        className="relative h-9 w-9 flex items-center justify-center border border-border/60 bg-card/80 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground rounded-2xl"
         title={isRTL ? 'الإشعارات' : 'Notifications'}
       >
         <Bell size={17} className={cn(unread > 0 && 'text-foreground')} />
