@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { useTreasury } from '../hooks/useTreasury';
-import type { TreasuryTransactionType } from '../types/treasury';
+import type { TreasuryTransaction, TreasuryTransactionType } from '../types/treasury';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@shared/components/ui/alert-dialog';
+import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, ArrowDownRight, Trash2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { storageService } from '@services/storageService';
 
 export function TreasuryTab() {
   const [from, setFrom] = useState(format(subDays(new Date(), 30), 'yyyy-MM-dd'));
   const [to, setTo] = useState(format(new Date(), 'yyyy-MM-dd'));
-  
-  const { 
-    accounts, categories, balances, transactions, 
-    createTransaction, isCreatingTransaction 
+
+  const {
+    accounts, categories, balances, transactions,
+    createTransaction, isCreatingTransaction,
+    deleteTransaction, isDeletingTransaction,
   } = useTreasury(from, to);
 
   // New Transaction Form State
@@ -25,6 +30,9 @@ export function TreasuryTab() {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
+
+  // Delete confirmation state
+  const [deleteTarget, setDeleteTarget] = useState<TreasuryTransaction | null>(null);
 
   const handleAddTransaction = async () => {
     if (!accountId || !amount || Number(amount) <= 0) return;
@@ -49,7 +57,7 @@ export function TreasuryTab() {
         attachment_url,
         transaction_date: format(new Date(), 'yyyy-MM-dd'),
       });
-      
+
       setAmount('');
       setDescription('');
       setFile(null);
@@ -59,10 +67,28 @@ export function TreasuryTab() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteTransaction(deleteTarget.id!);
+      toast.success('تم حذف القيد بنجاح');
+    } catch {
+      toast.error('فشل في حذف القيد');
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
   const getAccountIcon = (type: string) => {
     if (type === 'bank') return <Landmark size={20} className="text-blue-500" />;
     if (type === 'custody') return <Wallet size={20} className="text-purple-500" />;
     return <Banknote size={20} className="text-emerald-500" />;
+  };
+
+  const typeLabel = (t: TreasuryTransaction) => {
+    if (t.type === 'income') return 'إيراد';
+    if (t.type === 'expense') return 'مصروف';
+    return 'تحويل';
   };
 
   return (
@@ -87,7 +113,7 @@ export function TreasuryTab() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* ── Ledger Table (سجل الحركة) ──────────────── */}
         <div className="lg:col-span-2 bg-card shadow-sm border border-border rounded-xl flex flex-col">
           <div className="p-4 border-b border-border/50 flex flex-wrap items-center justify-between gap-3 bg-muted/20">
@@ -98,7 +124,7 @@ export function TreasuryTab() {
               <Input type="date" value={to} onChange={e => setTo(e.target.value)} className="h-8 text-xs w-32" />
             </div>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs">
@@ -111,11 +137,12 @@ export function TreasuryTab() {
                   <th className="ta-th w-24">مدين (إيراد)</th>
                   <th className="ta-th w-24">دائن (مصروف)</th>
                   <th className="ta-th w-12">المرفق</th>
+                  <th className="ta-th w-12">حذف</th>
                 </tr>
               </thead>
               <tbody>
                 {transactions.length === 0 ? (
-                  <tr><td colSpan={8} className="ta-td text-center text-muted-foreground py-8">لا توجد حركات في هذه الفترة</td></tr>
+                  <tr><td colSpan={9} className="ta-td text-center text-muted-foreground py-8">لا توجد حركات في هذه الفترة</td></tr>
                 ) : (
                   transactions.map((t, i) => (
                     <tr key={t.id} className="border-b border-border/30 hover:bg-muted/20">
@@ -152,6 +179,17 @@ export function TreasuryTab() {
                           </Button>
                         ) : '—'}
                       </td>
+                      <td className="ta-td">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          title={`حذف القيد — ${typeLabel(t)} ${t.amount?.toLocaleString('en-US')} ر.س`}
+                          onClick={() => setDeleteTarget(t)}
+                        >
+                          <Trash2 size={13} />
+                        </Button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -162,16 +200,16 @@ export function TreasuryTab() {
 
         {/* ── Add Transaction & Categories Summary ─────── */}
         <div className="space-y-6">
-          
+
           {/* Add Form */}
           <div className="bg-card shadow-sm border border-border rounded-xl p-4">
             <h3 className="font-bold mb-4 flex items-center gap-2 border-b border-border/50 pb-2">تسجيل عملية جديدة</h3>
-            
+
             <div className="space-y-3">
               <div className="flex bg-muted p-1 rounded-lg">
-                <button className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'expense' ? 'bg-background shadow-sm text-rose-500' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('expense')}>مصروف</button>
-                <button className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'income' ? 'bg-background shadow-sm text-emerald-600' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('income')}>إيراد</button>
-                <button className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'transfer' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('transfer')}>تحويل</button>
+                <button type="button" className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'expense' ? 'bg-background shadow-sm text-rose-500' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('expense')}>مصروف</button>
+                <button type="button" className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'income' ? 'bg-background shadow-sm text-emerald-600' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('income')}>إيراد</button>
+                <button type="button" className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${type === 'transfer' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setType('transfer')}>تحويل</button>
               </div>
 
               <div>
@@ -221,33 +259,61 @@ export function TreasuryTab() {
             </div>
           </div>
 
-          {/* Categories Summary */}
-          <div className="bg-card shadow-sm border border-border rounded-xl p-4">
-            <h3 className="font-bold mb-3 text-sm flex items-center justify-between border-b border-border/50 pb-2">
-              ملخص البنود 
-              <span className="text-[10px] font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">الفترة المحددة أعلاه</span>
-            </h3>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-              {categories.map(cat => {
-                const total = transactions.filter(t => t.category_id === cat.id).reduce((s, t) => s + Number(t.amount), 0);
-                if (total === 0) return null;
-                return (
-                  <div key={cat.id} className="flex items-center justify-between bg-muted/30 p-2 rounded-lg border border-border/40">
-                    <span className="text-xs font-medium">{cat.name}</span>
-                    <span className={`text-sm font-bold ${cat.type === 'income' ? 'text-emerald-600' : 'text-rose-500'}`}>
-                      {total.toLocaleString('en-US')}
-                    </span>
-                  </div>
-                );
-              })}
-              {transactions.filter(t => t.category_id).length === 0 && (
-                <p className="text-xs text-center text-muted-foreground py-4">لا يوجد مصاريف في هذه الفترة</p>
-              )}
-            </div>
-          </div>
 
         </div>
       </div>
+
+      {/* ── Delete Confirmation Dialog ─────────────── */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 size={16} className="text-destructive" />
+              تأكيد حذف القيد
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <p>هل أنت متأكد من حذف هذا القيد؟ <strong>لا يمكن التراجع عن هذا الإجراء.</strong></p>
+                {deleteTarget && (
+                  <div className="bg-muted/50 rounded-lg p-3 border border-border/50 space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">النوع:</span>
+                      <span className={`font-semibold ${deleteTarget.type === 'income' ? 'text-emerald-600' : deleteTarget.type === 'expense' ? 'text-rose-500' : 'text-blue-500'}`}>
+                        {deleteTarget.type === 'income' ? 'إيراد' : deleteTarget.type === 'expense' ? 'مصروف' : 'تحويل'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">المبلغ:</span>
+                      <span className="font-bold">{Number(deleteTarget.amount).toLocaleString('en-US')} ر.س</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">التاريخ:</span>
+                      <span dir="ltr">{deleteTarget.transaction_date}</span>
+                    </div>
+                    {deleteTarget.description && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">البيان:</span>
+                        <span className="truncate max-w-[180px]">{deleteTarget.description}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeletingTransaction}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeletingTransaction ? <Loader2 size={14} className="animate-spin me-1" /> : null}
+              حذف القيد
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

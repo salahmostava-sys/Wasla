@@ -12,6 +12,7 @@ import type { FinanceTransaction, TransactionType } from '@services/financeServi
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import { TreasuryTab } from '../components/TreasuryTab';
 import { TreasurySettingsTab } from '../components/TreasurySettingsTab';
+import { TreasuryCategorySummaryTab } from '../components/TreasuryCategorySummaryTab';
 
 /* ── Smart Recommendations sub-component ─────────────────────── */
 function PlatformProfitCard({ p }: Readonly<{ p: { name: string; revenue: number; salary: number; orders: number } }>) {
@@ -327,6 +328,7 @@ export default function FinancePage() {
         <TabsList className="bg-muted">
           <TabsTrigger value="monthly">التحليلات الشهرية</TabsTrigger>
           <TabsTrigger value="treasury">حركة الخزينة والعهد</TabsTrigger>
+          <TabsTrigger value="category-summary">ملخص البنود</TabsTrigger>
           <TabsTrigger value="settings">إعدادات الحسابات</TabsTrigger>
         </TabsList>
 
@@ -407,6 +409,10 @@ export default function FinancePage() {
 
         <TabsContent value="treasury">
           <TreasuryTab />
+        </TabsContent>
+
+        <TabsContent value="category-summary">
+          <TreasuryCategorySummaryTab />
         </TabsContent>
 
         <TabsContent value="settings">
