@@ -99,6 +99,14 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
       return;
     }
 
+    // Check for duplicate parts
+    const partIds = validParts.map(r => r.part_id);
+    const uniquePartIds = new Set(partIds);
+    if (partIds.length !== uniquePartIds.size) {
+      toast({ title: 'لا يمكن إضافة نفس القطعة أكثر من مرة', variant: 'destructive' });
+      return;
+    }
+
     setSaving(true);
     try {
       // If no parts and no override cost, we need a cost
