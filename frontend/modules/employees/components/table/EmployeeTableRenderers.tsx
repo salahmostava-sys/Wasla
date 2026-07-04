@@ -67,7 +67,7 @@ export type CellContext = {
   commercialRecordNames: string[];
   uniqueVals: { job_title: string[]; nationality: string[]; sponsorship_status: string[]; license_status: string[]; status: string[]; city: string[] };
   emptyCell: React.ReactNode;
-  saveField: (id: string, field: string, value: string, extraFields?: Record<string, unknown>) => Promise<void>;
+  saveField: (id: string, field: string, value: string | null, extraFields?: Record<string, unknown>) => Promise<void>;
   setSelectedEmployee: React.Dispatch<React.SetStateAction<string | null>>;
   setEditEmployee: React.Dispatch<React.SetStateAction<Employee | null>>;
   setShowAddModal: React.Dispatch<React.SetStateAction<boolean>>;

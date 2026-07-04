@@ -69,9 +69,10 @@ export function useEmployeeActions(params: {
     setSortDir(next.sortDir);
   }, [sortField, sortDir, setSortField, setSortDir]);
 
-  const saveField = useCallback(async (id: string, field: string, value: string, extraFields?: Record<string, unknown>) => {
+  const saveField = useCallback(async (id: string, field: string, value: string | null, extraFields?: Record<string, unknown>) => {
     const prev = dataRef.current.find(e => e.id === id);
-    const updatePatch = { [field]: value, ...(extraFields) };
+    const coerced = value === '' ? null : value;
+    const updatePatch = { [field]: coerced, ...(extraFields) };
     setData(d => d.map(e => e.id === id ? { ...e, ...updatePatch } : e));
     try {
       await employeeService.updateEmployee(id, updatePatch);

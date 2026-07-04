@@ -19,7 +19,7 @@ export type EmployeeTableContextValue = {
   saveField: (
     id: string,
     field: string,
-    value: string,
+    value: string | null,
     extraFields?: Record<string, unknown>,
   ) => Promise<void>;
   setSelectedEmployee: React.Dispatch<React.SetStateAction<string | null>>;

@@ -136,7 +136,7 @@ function EmployeeDetailedTableInner() {
         value={getDateInputValue(value)}
         inputType="date"
         dir="ltr"
-        onSave={(nextValue) => saveField(employeeId, field, nextValue)}
+        onSave={(nextValue) => saveField(employeeId, field, nextValue === '' ? null : nextValue)}
         renderDisplay={() => displayNode}
       />
     );
