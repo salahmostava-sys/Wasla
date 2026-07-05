@@ -220,12 +220,23 @@ export async function createMaintenanceLog(
   const logId = inserted.id;
 
   if (parts.length > 0) {
-    const rows = parts.map((p) => ({
-      maintenance_log_id: logId,
-      part_id: p.part_id,
-      quantity_used: p.quantity_used,
-      cost_at_time: p.cost_at_time,
-    }));
+    // Merge rows with the same part_id (sum quantities, use last cost_at_time)
+    // so we never violate the UNIQUE(maintenance_log_id, part_id) constraint.
+    const merged = new Map<string, { maintenance_log_id: string; part_id: string; quantity_used: number; cost_at_time: number }>();
+    for (const p of parts) {
+      const existing = merged.get(p.part_id);
+      if (existing) {
+        existing.quantity_used += p.quantity_used;
+      } else {
+        merged.set(p.part_id, {
+          maintenance_log_id: logId,
+          part_id: p.part_id,
+          quantity_used: p.quantity_used,
+          cost_at_time: p.cost_at_time,
+        });
+      }
+    }
+    const rows = [...merged.values()];
     const { error: pErr } = await supabase.from('maintenance_parts').insert(rows);
     if (pErr) throwMaintenanceSchemaError(pErr, 'maintenanceService.createMaintenanceLog.parts');
   }
