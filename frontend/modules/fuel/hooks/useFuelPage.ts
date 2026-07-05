@@ -348,6 +348,32 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     });
   };
 
+  /**
+   * Saves a single day/employee cell for the fuel-only or km-only tabs.
+   * Merges with the existing row so the *other* metric is never overwritten/zeroed.
+   */
+  const saveMetricCell = async (employeeId: string, date: string, metric: 'km' | 'fuel', value: number) => {
+    if (!permissions.can_edit) return;
+    const existing = dailyRows.find((r) => r.employee_id === employeeId && r.date === date);
+    try {
+      await fuelApi.upsertDailyMileage(
+        {
+          employee_id: employeeId,
+          date,
+          km_total: metric === 'km' ? value : (existing?.km_total ?? 0),
+          fuel_cost: metric === 'fuel' ? value : (existing?.fuel_cost ?? 0),
+          notes: existing?.notes ?? null,
+        },
+        existing?.id
+      );
+      refresh();
+    } catch (e) {
+      logError('[Fuel] save metric cell failed', e);
+      const message = getErrorMessage(e);
+      toast({ title: 'خطأ في الحفظ', description: message, variant: 'destructive' });
+    }
+  };
+
   return {
     view,
     setView,
@@ -369,6 +395,8 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     loading,
     filteredMonthly,
     filteredDaily,
+    dailyRows,
+    saveMetricCell,
     totalKm,
     totalFuel,
     totalOrders,
@@ -393,6 +421,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     saveEditedDaily,
     handleDeleteDaily,
     permissions,
+    bulkUpsertDailyMileage: fuelApi.bulkUpsertDailyMileage,
     refetchMonthly,
     monthOrdersMap,
     dailyOrderRows,

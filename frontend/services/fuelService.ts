@@ -203,6 +203,45 @@ export const fuelService = {
     if (error) handleSupabaseError(error, 'fuelService.deleteDailyMileage');
   },
 
+  /**
+   * Bulk-upsert daily mileage rows (used by the fuel-only / km-only spreadsheet
+   * import). Falls back to row-by-row saving when a chunk fails so a single bad
+   * row doesn't block the rest of the batch.
+   */
+  bulkUpsertDailyMileage: async (rows: MileageDailyPayload[], chunkSize = 200) => {
+    let saved = 0;
+    const failed: { row: MileageDailyPayload; error: string }[] = [];
+
+    const saveRowByRow = async (chunk: MileageDailyPayload[]) => {
+      for (const row of chunk) {
+        try {
+          await fuelService.upsertDailyMileage(row);
+          saved += 1;
+        } catch (error) {
+          failed.push({ row, error: error instanceof Error ? error.message : 'خطأ غير معروف' });
+        }
+      }
+    };
+
+    for (let i = 0; i < rows.length; i += chunkSize) {
+      const chunk = rows.slice(i, i + chunkSize);
+      try {
+        const { error } = await supabase
+          .from('vehicle_mileage_daily')
+          .upsert(chunk, { onConflict: 'employee_id,date' });
+        if (error) {
+          await saveRowByRow(chunk);
+        } else {
+          saved += chunk.length;
+        }
+      } catch {
+        await saveRowByRow(chunk);
+      }
+    }
+
+    return { saved, failed };
+  },
+
   saveMonthlyMileageImport: async (rows: MileageMonthlyPayload[], replaceExisting: boolean) => {
     if (replaceExisting) {
       const { error } = await supabase
