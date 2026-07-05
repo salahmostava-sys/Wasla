@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar } from 'lucide-react';
+import { Search, Car, Banknote, Wrench, Calendar, Download } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Button } from '@shared/components/ui/button';
 import { Skeleton } from '@shared/components/ui/skeleton';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useMaintenanceLogs } from '@modules/maintenance/hooks/useMaintenanceData';
 import type { MaintenanceLogWithDetails } from '@services/maintenanceService';
+import { loadXlsx } from '@modules/orders/utils/xlsx';
 
 
 const TYPE_COLORS: Record<string, string> = {
@@ -61,6 +63,42 @@ export function VehicleReportsTab() {
     );
   }, [vehicleGroups, search]);
 
+  const exportToExcel = async () => {
+    try {
+      const XLSX = await loadXlsx();
+      const rows = [];
+      for (const group of filteredGroups) {
+        if (group.logs.length === 0) {
+          rows.push({
+            'رقم اللوحة': group.plate_number,
+            'نوع المركبة': group.type,
+            'التاريخ': '',
+            'نوع الصيانة': '',
+            'التكلفة': group.total_cost,
+            'ملاحظات': 'لا توجد صيانات مسجلة',
+          });
+        } else {
+          for (const log of group.logs) {
+            rows.push({
+              'رقم اللوحة': group.plate_number,
+              'نوع المركبة': group.type,
+              'التاريخ': log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : '',
+              'نوع الصيانة': log.type,
+              'التكلفة': Number(log.total_cost) || 0,
+              'ملاحظات': log.notes || '',
+            });
+          }
+        }
+      }
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'تقارير المركبات');
+      XLSX.writeFile(wb, `Vehicle_Reports.xlsx`);
+    } catch (err) {
+      console.error('Failed to export to excel', err);
+    }
+  };
+
   if (logsQ.isError) {
     return (
       <QueryErrorRetry
@@ -85,14 +123,20 @@ export function VehicleReportsTab() {
             </span>
           </div>
         </div>
-        <div className="relative w-full sm:w-72 shrink-0">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input
-            placeholder="بحث برقم اللوحة..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-9"
-          />
+        <div className="flex gap-2 w-full sm:w-auto shrink-0">
+          <div className="relative w-full sm:w-72 shrink-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            <Input
+              placeholder="بحث برقم اللوحة..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pr-9"
+            />
+          </div>
+          <Button variant="outline" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
+            <Download size={16} className="ml-2" />
+            تصدير
+          </Button>
         </div>
       </div>
 
