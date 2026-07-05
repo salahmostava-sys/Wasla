@@ -178,10 +178,10 @@ describe('attendanceService', () => {
   describe('upsertDailyAttendance', () => {
     it('upserts data successfully', async () => {
       tableResults.attendance = { data: null, error: null }; // upsert returns no error
-      // A rejected promise here would fail the test, so a successful await is the assertion.
       await attendanceService.upsertDailyAttendance({
         employee_id: 'e1', date: '2026-04-01', status: 'present', check_in: null, check_out: null, note: null
       });
+      expect(fromMock).toHaveBeenCalledWith('attendance');
     });
 
     it('throws on error', async () => {
@@ -272,8 +272,8 @@ describe('attendanceService', () => {
   describe('addStatusConfig', () => {
     it('inserts successfully', async () => {
       tableResults.attendance_status_configs = { data: null, error: null };
-      // A rejected promise here would fail the test, so a successful await is the assertion.
       await attendanceService.addStatusConfig('test cfg');
+      expect(fromMock).toHaveBeenCalledWith('attendance_status_configs');
     });
 
     it('throws on error', async () => {
