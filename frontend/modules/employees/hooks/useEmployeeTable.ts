@@ -98,7 +98,7 @@ export function useEmployeeActions(params: {
       // Register undo action after successful save
       if (prev) {
         const revertRow = async () => {
-          const revertPatch = buildRevertPatch(prev as Record<string, unknown>, field, prevValue, extraFields);
+          const revertPatch = buildRevertPatch(prev, field, prevValue, extraFields);
           setData(d => d.map(e => e.id === id ? { ...e, ...revertPatch } : e));
           await employeeService.updateEmployee(id, revertPatch);
         };
