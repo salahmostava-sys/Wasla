@@ -103,6 +103,7 @@ const iconByRouteId: Record<string, ComponentType<{ size?: string | number; clas
   employee_tiers: Layers,
   platform_accounts: ShieldCheck,
   settings: Settings2,
+  stitch_preview: Sparkles,
 };
 
 const groupIcons: Record<RouteGroup, ComponentType<{ size?: string | number; className?: string }>> = {

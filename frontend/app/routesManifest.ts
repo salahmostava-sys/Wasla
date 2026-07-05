@@ -57,6 +57,7 @@ export const routesManifest: AppRouteManifestItem[] = [
   { id: 'maintenance', titleAr: 'الصيانة والمخزون', group: 'fleet', path: '/maintenance', permission: routePermission('maintenance'), sidebar: true },
 
   { id: 'settings', titleAr: 'إعدادات النظام', group: 'system', path: '/settings', permission: routePermission('settings'), sidebar: true },
+  { id: 'stitch_preview', titleAr: 'مستعرض تصاميم Stitch', group: 'system', path: '/stitch-preview', sidebar: true },
   { id: 'profile', titleAr: 'الملف الشخصي', group: 'system', path: '/profile', sidebar: false },
 ];
 
