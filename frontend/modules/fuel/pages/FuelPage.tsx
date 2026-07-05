@@ -1,12 +1,40 @@
-import React from 'react';
-import { Loader2, ShieldAlert } from 'lucide-react';
+import React, { useState } from 'react';
+import { Loader2, ShieldAlert, UploadCloud } from 'lucide-react';
 import { useFuelPage } from '@modules/fuel/hooks/useFuelPage';
 import { FuelPageHeader } from '@modules/fuel/components/FuelPageHeader';
 import { FuelFiltersToolbar, FuelPlatformTabs } from '@modules/fuel/components/FuelFilters';
 import { FuelMonthlyStats } from '@modules/fuel/components/FuelStats';
+import { FuelMetricTable } from '@modules/fuel/components/FuelMetricTable';
+import { FuelImportDialog } from '@modules/fuel/components/FuelImportDialog';
 import { Card, CardContent } from '@shared/components/ui/card';
+import { Button } from '@shared/components/ui/button';
 import type { DailyRow, MonthlyRow } from '@modules/fuel/types/fuel.types';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
+
+type PageTab = 'summary' | 'fuel' | 'km';
+
+const PAGE_TABS: { key: PageTab; label: string }[] = [
+  { key: 'summary', label: 'الملخص' },
+  { key: 'fuel', label: 'البنزين' },
+  { key: 'km', label: 'الكيلومترات' },
+];
+
+function FuelPageTabs({ pageTab, setPageTab }: Readonly<{ pageTab: PageTab; setPageTab: (v: PageTab) => void }>) {
+  return (
+    <div className="flex flex-wrap gap-2 items-center border-b border-border/50 pb-2">
+      {PAGE_TABS.map((t) => (
+        <button
+          key={t.key}
+          type="button"
+          onClick={() => setPageTab(t.key)}
+          className={`px-4 py-1.5 rounded-lg text-sm font-semibold border transition-colors ${pageTab === t.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-card border-border hover:bg-muted/50'}`}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /* ─── Mega Spreadsheet Table ──────────────────────────────────────── */
 function MegaSpreadsheetTable({
@@ -125,6 +153,8 @@ function MegaSpreadsheetTable({
 export default function FuelPage() {
   const { authLoading } = useAuthQueryGate();
   const page = useFuelPage();
+  const [pageTab, setPageTab] = useState<PageTab>('summary');
+  const [importOpen, setImportOpen] = useState(false);
 
   if (authLoading) {
     return (
@@ -151,13 +181,23 @@ export default function FuelPage() {
     search, setSearch,
     platformTab, setPlatformTab,
     apps,
+    employees,
     monthYear,
     loading,
     filteredMonthly, filteredDaily,
+    dailyRows,
     totalKm, totalFuel, totalOrders, avgCostPerKm,
     handleExportMonthly, handleExportDaily,
     dailyOrderRows,
+    saveMetricCell,
+    bulkUpsertDailyMileage,
+    permissions,
   } = page;
+
+  const [year, month] = monthYear.split('-').map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const dayArr = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const activeMetric: 'km' | 'fuel' = pageTab === 'km' ? 'km' : 'fuel';
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-[1600px] overflow-hidden" dir="rtl">
@@ -167,18 +207,27 @@ export default function FuelPage() {
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
         toolbarEnd={
-          <FuelFiltersToolbar
-            search={search}
-            setSearch={setSearch}
-            view={view}
-            handleExportMonthly={handleExportMonthly}
-            handleExportDaily={handleExportDaily}
-            onOpenImport={() => page.setShowImport(true)}
-          />
+          <div className="flex items-center gap-2">
+            {pageTab !== 'summary' && permissions.can_edit && (
+              <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setImportOpen(true)}>
+                <UploadCloud size={14} /> رفع ملف كامل
+              </Button>
+            )}
+            <FuelFiltersToolbar
+              search={search}
+              setSearch={setSearch}
+              view={view}
+              handleExportMonthly={handleExportMonthly}
+              handleExportDaily={handleExportDaily}
+              onOpenImport={() => page.setShowImport(true)}
+            />
+          </div>
         }
       />
 
-      {apps.length > 1 && (
+      <FuelPageTabs pageTab={pageTab} setPageTab={setPageTab} />
+
+      {pageTab === 'summary' && apps.length > 1 && (
         <FuelPlatformTabs
           platformTab={platformTab}
           setPlatformTab={setPlatformTab}
@@ -201,7 +250,7 @@ export default function FuelPage() {
               <Loader2 size={24} className="animate-spin text-primary" />
             </div>
           )}
-          {!loading && (
+          {!loading && pageTab === 'summary' && (
             <MegaSpreadsheetTable
               monthly={filteredMonthly}
               daily={filteredDaily}
@@ -209,8 +258,33 @@ export default function FuelPage() {
               monthYear={monthYear}
             />
           )}
+          {!loading && pageTab !== 'summary' && (
+            <FuelMetricTable
+              metric={activeMetric}
+              employees={employees}
+              dailyRows={dailyRows}
+              year={year}
+              month={month}
+              search={search}
+              canEdit={permissions.can_edit}
+              onSaveCell={saveMetricCell}
+            />
+          )}
         </CardContent>
       </Card>
+
+      <FuelImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        metric={activeMetric}
+        dayArr={dayArr}
+        year={year}
+        month={month}
+        employees={employees}
+        dailyRows={dailyRows}
+        bulkUpsertDailyMileage={bulkUpsertDailyMileage}
+        onImported={() => page.refetch()}
+      />
     </div>
   );
 }

@@ -15,6 +15,7 @@ export function useFuel() {
     getDailyMileageByMonth: fuelService.getDailyMileageByMonth,
     upsertDailyMileage: fuelService.upsertDailyMileage,
     deleteDailyMileage: fuelService.deleteDailyMileage,
+    bulkUpsertDailyMileage: fuelService.bulkUpsertDailyMileage,
     saveMonthlyMileageImport: fuelService.saveMonthlyMileageImport,
     exportDailyMileage: fuelService.exportDailyMileage,
   }), []);
