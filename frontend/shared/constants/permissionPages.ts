@@ -19,7 +19,4 @@ export const PERMISSION_PAGE_ENTRIES: { key: string; labelAr: string; labelEn: s
   { key: 'employee_tiers', labelAr: 'شرائح الشركة', labelEn: 'Employee tiers' },
   { key: 'finance', labelAr: 'المصاريف والإيرادات', labelEn: 'Finance' },
   { key: 'salary_schemes', labelAr: 'إسكيمات الرواتب', labelEn: 'Salary schemes' },
-  { key: 'leaves', labelAr: 'الإجازات', labelEn: 'Leaves' },
-  { key: 'documents', labelAr: 'الوثائق', labelEn: 'Documents' },
-  { key: 'performance_reviews', labelAr: 'تقييمات الأداء', labelEn: 'Performance reviews' },
 ];

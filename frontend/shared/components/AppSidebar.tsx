@@ -4,8 +4,7 @@ import {
   Bike, FileDown, Bell, Smartphone,
   Fuel, Settings2, X, FileWarning,
   Layers, ChevronsLeft, ChevronsRight, ShieldCheck, Sparkles, Wrench,
-  ChevronDown, CalendarDays, FileText, Star,
-  Activity, Car
+  ChevronDown, Activity, Car
 } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@shared/components/ui/collapsible';
@@ -104,9 +103,6 @@ const iconByRouteId: Record<string, ComponentType<{ size?: string | number; clas
   employee_tiers: Layers,
   platform_accounts: ShieldCheck,
   settings: Settings2,
-  leaves: CalendarDays,
-  documents: FileText,
-  performance_reviews: Star,
 };
 
 const groupIcons: Record<RouteGroup, ComponentType<{ size?: string | number; className?: string }>> = {
