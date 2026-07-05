@@ -41,5 +41,3 @@ export const useSignedUrl = (bucket: string, path: string | null | undefined) =>
 
   return query.data ?? null;
 };
-
-export default useSignedUrl;

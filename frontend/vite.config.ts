@@ -12,7 +12,7 @@ function manualChunks(id: string): string | undefined {
   if (id.includes('recharts')) return 'vendor-charts';
   if (id.includes('xlsx')) return 'vendor-xlsx';
   if (id.includes('html2canvas')) return 'vendor-html2canvas';
-  if (id.includes('jspdf') || id.includes('jspdf-autotable')) return 'vendor-jspdf';
+  if (id.includes('jspdf')) return 'vendor-jspdf';
   if (id.includes('jszip')) return 'vendor-jszip';
   if (id.includes('@supabase')) return 'vendor-supabase';
   if (id.includes('@tanstack')) return 'vendor-query';
