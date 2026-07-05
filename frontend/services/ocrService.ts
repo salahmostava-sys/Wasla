@@ -1,12 +1,10 @@
 /**
- * OCR Service — قراءة وثائق هوية الموظفين تلقائياً باستخدام Tesseract.js
+ * OCR Service — قراءة وثائق هوية الموظفين تلقائياً باستخدام Google Cloud Vision API
  *
  * الوظائف:
- * - extractTextFromImage: تحويل الصورة إلى نص باستخدام محرك OCR
+ * - extractTextFromImage: إرسال الصورة لخادم الـ AI لاستخراج النص باستخدام Google Cloud Vision
  * - parseIqamaData:  استخراج بيانات الإقامة (الاسم، رقم الإقامة، الجنسية، التواريخ)
  * - parseLicenseData: استخراج بيانات رخصة القيادة (الرقم، التاريخ، الفئة)
- *
- * ملاحظة: تعمل المعالجة كلياً في المتصفح (client-side) دون رفع الصورة للخوادم.
  */
 // ─── أنواع البيانات المستخرجة ─────────────────────────────────────────────────
 
@@ -50,36 +48,47 @@ const LICENSE_CLASS_RE = /\b([A-Z])\s*(CLASS|CATEGORY|فئة)?\b|\bفئة\s*([أ
 // ─── استخراج النص من الصورة ───────────────────────────────────────────────────
 
 /**
- * دالة: استخراج النص من الصورة (client-side)
- * تقوم بتحميل محرك Tesseract وقراءة النص من الصورة محلياً.
+ * دالة: استخراج النص من الصورة باستخدام Google Cloud Vision API
+ * ترسل الصورة إلى خادم الـ AI لتحليلها ضوئياً.
  */
 export async function extractTextFromImage(
   imageFile: File,
   onProgress?: (progress: OcrProgress) => void,
 ): Promise<string> {
   try {
-    const tesseractModule = await import('tesseract.js');
-    const Tesseract = tesseractModule.default || tesseractModule;
-    const worker = await Tesseract.createWorker('ara+eng', 1, {
-      workerPath: '/worker.min.js',
-      corePath: '/tesseract-core.wasm.js',
-      langPath: '/',
-      gzip: false,
-      workerBlobURL: false,
-      logger: (m: { status: string; progress: number }) => {
-        if (onProgress) {
-          onProgress({ status: m.status, progress: m.progress ?? 0 });
-        }
-      },
+    if (onProgress) {
+      onProgress({ status: 'جاري تحضير ملف الوثيقة وإرساله...', progress: 0.3 });
+    }
+
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    if (onProgress) {
+      onProgress({ status: 'جاري استخراج النص عبر Google Vision...', progress: 0.6 });
+    }
+
+    const response = await fetch('/ai/api/ocr/extract-waybill', {
+      method: 'POST',
+      body: formData,
     });
 
-    const { data } = await worker.recognize(imageFile);
-    await worker.terminate();
-    return data.text;
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server error: ${response.statusText}`);
+    }
+
+    if (onProgress) {
+      onProgress({ status: 'اكتمل تحليل المستند', progress: 1.0 });
+    }
+
+    const result = await response.json();
+    if (result.success) {
+      return result.text || '';
+    }
+    throw new Error('فشل استخراج النصوص من المستند');
   } catch (err: unknown) {
-    const errString = err ? JSON.stringify(err, Object.getOwnPropertyNames(err)) : String(err);
-    console.error('OCR Error Details:', err);
-    throw new Error(`Tesseract Error: ${errString}`);
+    console.error('Google Vision OCR Error:', err);
+    throw new Error(err instanceof Error ? err.message : String(err));
   }
 }
 

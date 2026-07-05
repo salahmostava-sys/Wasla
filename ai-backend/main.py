@@ -20,11 +20,12 @@ Security:
 
 import hmac
 import os
+from google.cloud import vision
 import time
 import hashlib
 import threading
 
-from fastapi import FastAPI, Depends, Request, Header, HTTPException
+from fastapi import FastAPI, Depends, Request, Header, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -40,6 +41,12 @@ from model import (
 )
 
 # ─── Configuration ────────────────────────────────────────────────────────────
+
+# Set Google Cloud Vision credentials if not already defined and local key exists
+if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
+    _local_key = "./credentials/vision-key.json"
+    if os.path.exists(_local_key):
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _local_key
 
 # If set, every protected endpoint MUST include this value in X-Internal-Key.
 # When unset (dev default), auth is SKIPPED and a warning is printed at startup.
@@ -460,3 +467,28 @@ def api_best_employee(req: BestEmployeeRequest):
 def api_detect_anomalies(req: AnomalyDetectionRequest):
     """Detect anomalies in salary, orders, and deductions."""
     return detect_anomalies(req.model_dump())
+
+
+@app.post("/api/ocr/extract-waybill", dependencies=[Depends(_security)])
+async def extract_text_from_image(file: UploadFile = File(...)):
+    """Extract text from a waybill or document image using Google Cloud Vision."""
+    try:
+        content = await file.read()
+        
+        client = vision.ImageAnnotatorClient()
+        image = vision.Image(content=content)
+        
+        response = client.text_detection(image=image)
+        texts = response.text_annotations
+        
+        if response.error.message:
+            raise HTTPException(status_code=500, detail=response.error.message)
+            
+        if texts:
+            extracted_text = texts[0].description
+            return {"success": True, "text": extracted_text}
+            
+        return {"success": True, "text": ""}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
