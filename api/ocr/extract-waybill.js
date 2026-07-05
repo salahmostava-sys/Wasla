@@ -84,8 +84,18 @@ async function getGoogleAccessToken(credentials) {
 
   const { createSign, createPrivateKey } = await import('node:crypto');
 
-  // Fix potential double-escaped newlines in private key string
-  const privateKeyStr = (credentials.private_key || '').replace(/\\n/g, '\n');
+  // Aggressively reformat the private key to ensure it's a valid PEM
+  let privateKeyStr = credentials.private_key || '';
+  if (privateKeyStr.includes('BEGIN PRIVATE KEY')) {
+    const b64 = privateKeyStr
+      .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+      .replace(/-----END PRIVATE KEY-----/g, '')
+      .replace(/\\n/g, '')
+      .replace(/\s+/g, '');
+    const chunks = b64.match(/.{1,64}/g) || [];
+    privateKeyStr = `-----BEGIN PRIVATE KEY-----\n${chunks.join('\n')}\n-----END PRIVATE KEY-----\n`;
+  }
+
   // createPrivateKey() properly parses the PEM key — required for Node 18+ / OpenSSL 3.x
   const privateKey = createPrivateKey(privateKeyStr);
   const sign = createSign('RSA-SHA256');
