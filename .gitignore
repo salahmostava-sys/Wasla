@@ -84,4 +84,6 @@ pnpm-lock.yaml
 
 # Reports and Dumps
 sonar_issues*.json
+sonar_report.md
 pg.zip
+scratch/
