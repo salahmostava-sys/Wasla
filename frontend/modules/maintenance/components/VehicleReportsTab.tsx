@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar, Download } from 'lucide-react';
+import { Search, Car, Banknote, Wrench, Calendar, Download, Printer } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Skeleton } from '@shared/components/ui/skeleton';
@@ -99,6 +99,83 @@ export function VehicleReportsTab() {
     }
   };
 
+  const exportToPdf = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const html = `
+      <html dir="rtl" lang="ar">
+        <head>
+          <title>تقرير صيانة المركبات</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+            body { font-family: 'Tajawal', system-ui, sans-serif; padding: 30px; color: #111; }
+            h1 { text-align: center; margin-bottom: 5px; color: #0f172a; }
+            .header-info { text-align: center; margin-bottom: 30px; font-size: 14px; color: #64748b; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: right; font-size: 14px; }
+            th, td { border: 1px solid #cbd5e1; padding: 12px; }
+            th { background-color: #f8fafc; font-weight: bold; color: #334155; }
+            tr:nth-child(even) { background-color: #f8fafc; }
+            @media print {
+              body { padding: 0; }
+              @page { margin: 1cm; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>تقرير صيانة المركبات</h1>
+          <div class="header-info">
+            <p>تاريخ استخراج التقرير: ${new Date().toLocaleDateString('ar-SA')} | إجمالي المركبات المشمولة: ${filteredGroups.length}</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>رقم اللوحة</th>
+                <th>نوع المركبة</th>
+                <th>تاريخ الصيانة</th>
+                <th>نوع الصيانة</th>
+                <th>التكلفة</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredGroups.map(g => {
+                if (g.logs.length === 0) {
+                  return `<tr>
+                    <td>${g.plate_number}</td>
+                    <td>${g.type}</td>
+                    <td colspan="4" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
+                  </tr>`;
+                }
+                return g.logs.map(log => `
+                  <tr>
+                    <td>${g.plate_number}</td>
+                    <td>${g.type}</td>
+                    <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
+                    <td>${log.type}</td>
+                    <td>${Number(log.total_cost) || 0} ر.س</td>
+                    <td>${log.notes || ''}</td>
+                  </tr>
+                `).join('');
+              }).join('')}
+            </tbody>
+          </table>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   if (logsQ.isError) {
     return (
       <QueryErrorRetry
@@ -133,10 +210,16 @@ export function VehicleReportsTab() {
               className="pr-9"
             />
           </div>
-          <Button variant="outline" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
-            <Download size={16} className="ml-2" />
-            تصدير
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportToPdf} disabled={logsQ.isLoading || filteredGroups.length === 0}>
+              <Printer size={16} className="ml-2" />
+              PDF طباعة / 
+            </Button>
+            <Button variant="outline" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
+              <Download size={16} className="ml-2" />
+              Excel
+            </Button>
+          </div>
         </div>
       </div>
 
