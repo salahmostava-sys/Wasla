@@ -8,14 +8,10 @@
  *   GOOGLE_APPLICATION_CREDENTIALS_JSON  — full JSON string of the service account key
  */
 
-const { ensurePostRequest, logError } = require('../../_lib');
+const { ensurePostRequest, logError } = require('../_lib');
 
 // ─── Google Vision helper ──────────────────────────────────────────────────────
 
-/**
- * Call Google Vision API using a raw HTTP request (no heavy SDK needed in serverless).
- * Uses the service account key from GOOGLE_APPLICATION_CREDENTIALS_JSON env var.
- */
 async function detectTextViaVisionApi(imageBase64) {
   const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
   if (!credentialsJson) {
@@ -31,7 +27,6 @@ async function detectTextViaVisionApi(imageBase64) {
     throw new Error('GOOGLE_APPLICATION_CREDENTIALS_JSON is not valid JSON.');
   }
 
-  // Build a signed JWT to obtain an access token
   const accessToken = await getGoogleAccessToken(credentials);
 
   const response = await fetch(
@@ -65,7 +60,6 @@ async function detectTextViaVisionApi(imageBase64) {
 
 /**
  * Obtain a short-lived Google OAuth2 access token via JWT (RS256).
- * This is the standard service-account auth flow without any SDK.
  */
 async function getGoogleAccessToken(credentials) {
   const now = Math.floor(Date.now() / 1000);
@@ -88,7 +82,6 @@ async function getGoogleAccessToken(credentials) {
 
   const signingInput = `${b64u(header)}.${b64u(payload)}`;
 
-  // Import the private key using Node's built-in crypto
   const { createSign } = await import('node:crypto');
   const sign = createSign('RSA-SHA256');
   sign.update(signingInput);
@@ -120,10 +113,6 @@ async function getGoogleAccessToken(credentials) {
 
 // ─── Multipart parser ─────────────────────────────────────────────────────────
 
-/**
- * Minimal multipart/form-data parser — extracts the raw bytes of the first
- * file field without any external dependency.
- */
 function parseMultipartFile(body, contentType) {
   const boundaryMatch = /boundary=([^\s;]+)/.exec(contentType);
   if (!boundaryMatch) throw new Error('No boundary in Content-Type');
@@ -138,7 +127,6 @@ function parseMultipartFile(body, contentType) {
     if (boundaryIdx === -1) break;
 
     const afterBoundary = boundaryIdx + boundary.length;
-    // Check for final boundary (--)
     if (body[afterBoundary] === 0x2d && body[afterBoundary + 1] === 0x2d) break;
 
     const headerStart = afterBoundary + nl.length;
@@ -148,11 +136,9 @@ function parseMultipartFile(body, contentType) {
     const headerText = body.slice(headerStart, headerEndIdx).toString('utf8');
     const fileStart = headerEndIdx + headerEnd.length;
 
-    // Find the next boundary to know where file data ends
     const nextBoundaryIdx = body.indexOf(boundary, fileStart);
     if (nextBoundaryIdx === -1) break;
 
-    // Strip trailing \r\n before next boundary
     const fileEnd = nextBoundaryIdx - nl.length;
 
     if (/filename=/i.test(headerText)) {
@@ -171,7 +157,6 @@ module.exports = async function handler(req, res) {
   if (!ensurePostRequest(req, res)) return;
 
   try {
-    // Collect raw body chunks
     const chunks = [];
     await new Promise((resolve, reject) => {
       req.on('data', (chunk) => chunks.push(chunk));
