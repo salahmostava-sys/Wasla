@@ -20,7 +20,7 @@ export function UndoProvider({ children }: { children: React.ReactNode }) {
   const [isUndoing, setIsUndoing] = useState(false);
 
   const registerAction = useCallback((action: Omit<UndoAction, 'id'>) => {
-    const newAction: UndoAction = { ...action, id: Math.random().toString(36).slice(2, 9) };
+    const newAction: UndoAction = { ...action, id: crypto.randomUUID() };
     setActionStack(prev => [...prev, newAction].slice(-20)); // Keep last 20 actions
     
     // Optional: show toast with undo button
