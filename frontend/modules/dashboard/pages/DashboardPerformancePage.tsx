@@ -12,6 +12,7 @@ import {
   type DashboardPerformanceTabKey,
 } from '@modules/dashboard/components/DashboardPerformanceHeader';
 import { DashboardPerformanceOverviewTab } from '@modules/dashboard/components/DashboardPerformanceOverviewTab';
+import { SystemOverviewSection } from '@modules/dashboard/components/SystemOverviewSection';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
 
@@ -78,6 +79,8 @@ export default function DashboardPerformancePage() {
 
   return (
     <div className="space-y-5" dir="rtl">
+      <SystemOverviewSection />
+
       <DashboardPerformanceHeader
         activeTab={activeTab}
         onTabChange={handleTabChange}
