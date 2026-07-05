@@ -52,16 +52,9 @@ export function buildSlipFieldsFromRow(
     { key: 'baseSalary', label: t.platformTotal, value: computed.totalPlatformSalary, type: 'earning', color: 'blue' },
     ...(row.incentives > 0 ? [{ key: 'incentives', label: t.incentives, value: row.incentives, type: 'earning' as const, color: 'green' as const }] : []),
     ...(row.sickAllowance > 0 ? [{ key: 'sickAllowance', label: t.sickAllowance, value: row.sickAllowance, type: 'earning' as const, color: 'green' as const }] : []),
+    // ── Earning total ───────────────────────────────────────────────────────
+    { key: 'totalEarnings', label: t.totalWithSalary, value: computed.totalWithSalary, type: 'total', color: 'blue' },
   );
-
-  // ── Earning total ─────────────────────────────────────────────────────────
-  fields.push({
-    key: 'totalEarnings',
-    label: t.totalWithSalary,
-    value: computed.totalWithSalary,
-    type: 'total',
-    color: 'blue',
-  });
 
   // ── Deduction fields ──────────────────────────────────────────────────────
   if (row.advanceDeduction > 0) {

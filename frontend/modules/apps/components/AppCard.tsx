@@ -102,7 +102,12 @@ export const AppCard = ({
         <h3 className="truncate text-sm font-bold" style={{ color: app.text_color }}>
           {app.name}
         </h3>
-        <div className="mt-1 flex justify-center" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }}>
+        <div
+          className="mt-1 flex justify-center"
+          role="presentation"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }}
+        >
           {canEdit && onWorkTypeChange ? (
             <Select
               value={app.work_type || 'orders'}

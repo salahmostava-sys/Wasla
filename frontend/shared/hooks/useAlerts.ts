@@ -45,12 +45,14 @@ export const useAlerts = () => {
       };
       // Supabase responses are { data, error } — buildAlertsFromResponses reads only .data
       return buildAlertsFromResponses(
-        employeesVisibleRes,
-        vehiclesRes as { data: VehicleExpiryRow[] | null },
-        platformAccountsRes as { data: PlatformAccountAlertRow[] | null },
-        dbAlertsRes as { data: PersistedAlertRow[] | null },
-        sparePartsRes as { data: LowStockSparePartAlertRow[] | null },
-        abscondedRes as { data: AbscondedEmployeeAlertRow[] | null },
+        {
+          employeesRes: employeesVisibleRes,
+          vehiclesRes: vehiclesRes as { data: VehicleExpiryRow[] | null },
+          platformAccountsRes: platformAccountsRes as { data: PlatformAccountAlertRow[] | null },
+          dbAlertsRes: dbAlertsRes as { data: PersistedAlertRow[] | null },
+          sparePartsRes: sparePartsRes as { data: LowStockSparePartAlertRow[] | null },
+          abscondedRes: abscondedRes as { data: AbscondedEmployeeAlertRow[] | null },
+        },
         expiryHorizon, today,
       );
     },

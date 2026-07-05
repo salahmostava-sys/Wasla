@@ -56,10 +56,10 @@ const EmployeeTableContext = createContext<EmployeeTableContextValue | null>(nul
 export function EmployeeTableProvider({
   children,
   value,
-}: {
+}: Readonly<{
   children: ReactNode;
   value: EmployeeTableContextValue;
-}) {
+}>) {
   return (
     <EmployeeTableContext.Provider value={value}>
       {children}

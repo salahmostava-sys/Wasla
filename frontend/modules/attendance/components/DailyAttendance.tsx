@@ -239,50 +239,59 @@ const DailyAttendance = ({ selectedMonth, selectedYear }: Readonly<Props>) => {
     setCustomInput("");
   };
 
+  const VALID_DB_STATUSES = new Set<AttendanceStatus>(["present", "absent", "leave", "sick", "late"]);
+
+  // Clears an existing DB record for an employee with no status selected. Returns whether it saved.
+  const clearAttendanceRecord = async (dbId: string | undefined): Promise<boolean> => {
+    if (!dbId) return false;
+    try {
+      await attendanceService.deleteDailyAttendance(dbId);
+      return true;
+    } catch {
+      /* row failed; continue */
+      return false;
+    }
+  };
+
+  // Upserts a single employee's attendance record for the given date. Returns whether it saved.
+  const saveAttendanceRecord = async (r: AttendanceRecord, dateStr: string): Promise<boolean> => {
+    const dbStatus: AttendanceStatus = VALID_DB_STATUSES.has(r.status as AttendanceStatus)
+      ? (r.status as AttendanceStatus)
+      : "present";
+    const noteText =
+      [r.note, VALID_DB_STATUSES.has(r.status as AttendanceStatus) ? "" : r.status]
+        .filter(Boolean).join(" | ") || null;
+
+    const payload = {
+      employee_id: r.employeeId,
+      date:        dateStr,
+      status:      dbStatus,
+      check_in:    r.checkIn  || null,
+      check_out:   r.checkOut || null,
+      note:        noteText,
+    };
+    try {
+      await attendanceService.upsertDailyAttendance(payload);
+      return true;
+    } catch {
+      /* row failed; continue */
+      return false;
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     const dateStr = format(date, "yyyy-MM-dd");
     let saved = 0;
-    const validDbStatuses = new Set<AttendanceStatus>(["present", "absent", "leave", "sick", "late"]);
 
     const currentDbRecords = recordsQuery.data || [];
     const dbRecordMap = new Map(currentDbRecords.map(r => [r.employee_id, r.id]));
 
     for (const r of Object.values(records)) {
-      if (r.status === null) {
-        const dbId = dbRecordMap.get(r.employeeId);
-        if (dbId) {
-          try {
-            await attendanceService.deleteDailyAttendance(dbId);
-            saved++;
-          } catch {
-            /* row failed; continue */
-          }
-        }
-        continue;
-      }
-
-      const dbStatus: AttendanceStatus = validDbStatuses.has(r.status)
-        ? (r.status)
-        : "present";
-      const noteText =
-        [r.note, validDbStatuses.has(r.status) ? "" : r.status]
-          .filter(Boolean).join(" | ") || null;
-
-      const payload = {
-        employee_id: r.employeeId,
-        date:        dateStr,
-        status:      dbStatus,
-        check_in:    r.checkIn  || null,
-        check_out:   r.checkOut || null,
-        note:        noteText,
-      };
-      try {
-        await attendanceService.upsertDailyAttendance(payload);
-        saved++;
-      } catch {
-        /* row failed; continue */
-      }
+      const didSave = r.status === null
+        ? await clearAttendanceRecord(dbRecordMap.get(r.employeeId))
+        : await saveAttendanceRecord(r, dateStr);
+      if (didSave) saved++;
     }
 
     queryClient.invalidateQueries({ queryKey: ["attendance", uid, "daily-records", dateStr] });

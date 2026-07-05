@@ -17,7 +17,7 @@ for filename in files:
 
     modified = False
 
-    def replace_policy(match):
+    def replace_policy(match, content=content):
         full_match = match.group(0)
         policy_name = match.group(2)
         table_name = match.group(3).rstrip('(').strip()
@@ -35,7 +35,7 @@ for filename in files:
         modified = True
         content = new_content
 
-    def replace_trigger(match):
+    def replace_trigger(match, content=content):
         full_match = match.group(0)
         trigger_name = match.group(2)
 

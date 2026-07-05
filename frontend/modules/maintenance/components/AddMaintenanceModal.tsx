@@ -63,17 +63,22 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
     setRows([]);
   }, [open]);
 
+  // Auto-fills cost_at_time from the selected spare part's unit_cost, if applicable.
+  const applyPartFieldChange = (row: PartRow, field: keyof PartRow, value: string): PartRow => {
+    const updated = { ...row, [field]: value };
+    if (field !== 'part_id' || !value) return updated;
+    const part = spareParts.find(p => p.id === value);
+    if (part) updated.cost_at_time = String(part.unit_cost);
+    return updated;
+  };
+
   // Auto-fill cost_at_time from spare part unit_cost
   const handlePartChange = (rowId: string, field: keyof PartRow, value: string) => {
-    setRows(prev => prev.map(r => {
-      if (r.id !== rowId) return r;
-      const updated = { ...r, [field]: value };
-      if (field === 'part_id' && value) {
-        const part = spareParts.find(p => p.id === value);
-        if (part) updated.cost_at_time = String(part.unit_cost);
-      }
-      return updated;
-    }));
+    setRows(prev => prev.map(r => (r.id === rowId ? applyPartFieldChange(r, field, value) : r)));
+  };
+
+  const removePartRow = (rowId: string) => {
+    setRows(prev => prev.filter(r => r.id !== rowId));
   };
 
   // Sum of parts cost
@@ -93,8 +98,8 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
     if (!maintenanceDate) { toast({ title: 'اختر التاريخ', variant: 'destructive' }); return; }
 
     const validParts = rows.filter(r => r.part_id && Number.parseFloat(r.quantity_used) > 0);
-    const invalidPart = validParts.find(r => Number.parseFloat(r.cost_at_time) <= 0);
-    if (invalidPart) {
+    const hasInvalidPart = validParts.some(r => Number.parseFloat(r.cost_at_time) <= 0);
+    if (hasInvalidPart) {
       toast({ title: 'أدخل سعر الشراء لكل قطعة', variant: 'destructive' });
       return;
     }
@@ -289,7 +294,7 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
                         </td>
                         <td className="p-2 text-center">
                           <button
-                            onClick={() => setRows(prev => prev.filter(r => r.id !== row.id))}
+                            onClick={() => removePartRow(row.id)}
                             className="text-muted-foreground hover:text-destructive transition-colors p-1"
                           >
                             <Trash2 size={14} />

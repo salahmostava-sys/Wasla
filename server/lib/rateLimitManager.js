@@ -16,12 +16,9 @@ const RATE_LIMIT_WINDOW_SECS = Number.parseInt(process.env.RATE_LIMIT_WINDOW || 
 const MAX_REQUESTS_PER_WINDOW = Number.parseInt(process.env.RATE_LIMIT_MAX || '60');
 
 class RateLimitManager {
-  constructor() {
-    this.redisClient = null;
-    this.inMemoryStore = new Map(); // Fallback only
-    this.isProduction = process.env.ENV === 'production';
-    this.initRedis();
-  }
+  redisClient = null;
+  inMemoryStore = new Map(); // Fallback only
+  isProduction = process.env.ENV === 'production';
 
   async initRedis() {
     const redisUrl = process.env.REDIS_URL;
@@ -109,4 +106,9 @@ class RateLimitManager {
   }
 }
 
-module.exports = new RateLimitManager();
+const rateLimitManager = new RateLimitManager();
+// Kick off the async Redis connection outside the constructor (fire-and-forget by design;
+// requests fall back to in-memory limiting until the connection is ready).
+rateLimitManager.initRedis();
+
+module.exports = rateLimitManager;

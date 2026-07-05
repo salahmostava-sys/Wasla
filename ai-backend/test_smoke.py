@@ -1,7 +1,9 @@
 import sys
 import unittest
 from pathlib import Path
+from typing import cast
 
+from fastapi import Request
 from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -170,7 +172,9 @@ class AiBackendSmokeTests(unittest.TestCase):
     def test_api_handlers_accept_pydantic_requests(self) -> None:
         class MockRequest:
             headers = {}
-        orders_result = api_predict_orders(MockRequest(), PredictOrdersRequest(history=self.history, forecast_days=2))
+        orders_result = api_predict_orders(
+            cast(Request, MockRequest()), PredictOrdersRequest(history=self.history, forecast_days=2)
+        )
         self.assertEqual(len(orders_result["daily_forecast"]), 2)
 
         driver_result = api_best_driver(BestDriverRequest(history=self.history, top_n=2))

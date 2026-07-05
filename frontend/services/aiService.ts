@@ -48,7 +48,7 @@ export interface SalaryAnalysisResponse {
 }
 
 class AIService {
-  private isConfiguredValue = false;
+  private readonly isConfiguredValue: boolean;
 
   constructor() {
     // Check if AI backend is configured

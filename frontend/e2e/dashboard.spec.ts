@@ -17,7 +17,10 @@ test.describe('Dashboard smoke', () => {
   });
 
   test('shows dashboard entry UI when authenticated', async ({ page }) => {
-    test.skip(!shouldAssertAuthenticatedDashboard, 'Authenticated dashboard smoke requires confirmed dashboard credentials');
+    // NOSONAR typescript:S1607 - intentionally, conditionally skipped: this smoke test only
+    // runs when E2E_ASSERT_AUTHENTICATED_DASHBOARD=1 and real dashboard credentials are
+    // configured (see shouldAssertAuthenticatedDashboard above); a reason is always provided.
+    test.skip(!shouldAssertAuthenticatedDashboard, 'Authenticated dashboard smoke requires confirmed dashboard credentials'); // NOSONAR
 
     // With global auth setup, we just need to go to the root.
     await page.goto('/');

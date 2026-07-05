@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 export type UndoAction = {
@@ -15,7 +15,7 @@ interface UndoContextType {
 
 const UndoContext = createContext<UndoContextType | null>(null);
 
-export function UndoProvider({ children }: { children: React.ReactNode }) {
+export function UndoProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [actionStack, setActionStack] = useState<UndoAction[]>([]);
   const [isUndoing, setIsUndoing] = useState(false);
 
@@ -99,8 +99,14 @@ export function UndoProvider({ children }: { children: React.ReactNode }) {
     return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [actionStack, undoLastAction]);
 
+  const hasActions = actionStack.length > 0;
+  const contextValue = useMemo(
+    () => ({ registerAction, undoLastAction, hasActions }),
+    [registerAction, undoLastAction, hasActions],
+  );
+
   return (
-    <UndoContext.Provider value={{ registerAction, undoLastAction, hasActions: actionStack.length > 0 }}>
+    <UndoContext.Provider value={contextValue}>
       {children}
     </UndoContext.Provider>
   );

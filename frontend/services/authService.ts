@@ -78,7 +78,8 @@ export const authService = {
   signOut: async (): Promise<void> => {
     const { error } = await supabase.auth.signOut({ scope: "local" });
     if (!error) return;
-    const message = String((error as { message?: unknown }).message ?? "").toLowerCase();
+    const rawMessage = (error as { message?: unknown }).message;
+    const message = (typeof rawMessage === "string" ? rawMessage : "").toLowerCase();
     if (message.includes("session") && message.includes("missing")) {
       return;
     }

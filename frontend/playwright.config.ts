@@ -35,7 +35,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
   },
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    { name: 'setup', testMatch: /\.setup\.ts$/ },
     {
       name: 'chromium',
       use: {

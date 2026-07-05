@@ -396,7 +396,12 @@ def health():
     return {"status": "ok", "version": "2.0.0"}
 
 
-@app.post("/predict-orders", response_model=PredictOrdersResponse, dependencies=[Depends(_security)])
+@app.post(
+    "/predict-orders",
+    response_model=PredictOrdersResponse,
+    dependencies=[Depends(_security)],
+    responses={413: {"description": "Payload or input history exceeds the allowed size limit."}},
+)
 def api_predict_orders(request: Request, req: PredictOrdersRequest):
     content_length = request.headers.get('content-length')
     if content_length and int(content_length) > 100_000:

@@ -72,6 +72,21 @@ export function useEmployeeActions(params: {
     setSortDir(next.sortDir);
   }, [sortField, sortDir, setSortField, setSortDir]);
 
+  // Reverts a single employee row to its previous field values (used by the undo stack).
+  const buildRevertPatch = (
+    prev: Record<string, unknown>,
+    field: string,
+    prevValue: string | null,
+    extraFields?: Record<string, unknown>,
+  ): Record<string, unknown> => {
+    const revertPatch: Record<string, unknown> = { [field]: prevValue };
+    if (!extraFields) return revertPatch;
+    for (const key of Object.keys(extraFields)) {
+      revertPatch[key] = prev[key] ?? null;
+    }
+    return revertPatch;
+  };
+
   const saveField = useCallback(async (id: string, field: string, value: string | null, extraFields?: Record<string, unknown>) => {
     const prev = dataRef.current.find(e => e.id === id);
     const prevValue = prev ? (prev as Record<string, unknown>)[field] as string | null : null;
@@ -82,19 +97,14 @@ export function useEmployeeActions(params: {
       await employeeService.updateEmployee(id, updatePatch);
       // Register undo action after successful save
       if (prev) {
+        const revertRow = async () => {
+          const revertPatch = buildRevertPatch(prev as Record<string, unknown>, field, prevValue, extraFields);
+          setData(d => d.map(e => e.id === id ? { ...e, ...revertPatch } : e));
+          await employeeService.updateEmployee(id, revertPatch);
+        };
         registerAction({
           description: `تعديل ${prev.name} — حقل "${field}"`,
-          undoCommand: async () => {
-            const revertPatch: Record<string, unknown> = { [field]: prevValue };
-            if (extraFields) {
-              // Revert any extra fields to their old values too
-              for (const key of Object.keys(extraFields)) {
-                revertPatch[key] = (prev as Record<string, unknown>)[key] ?? null;
-              }
-            }
-            setData(d => d.map(e => e.id === id ? { ...e, ...revertPatch } : e));
-            await employeeService.updateEmployee(id, revertPatch);
-          },
+          undoCommand: revertRow,
         });
       }
     } catch (err: unknown) {

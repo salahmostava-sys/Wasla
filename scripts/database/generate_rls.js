@@ -62,7 +62,7 @@ try {
         if (cmd === 'INSERT' || cmd === 'UPDATE' || cmd === 'ALL') {
             const uniqueChecks = [...new Set(combinedWithChecks)];
             if (uniqueChecks.length > 0) {
-                createStmt += (cmd !== 'INSERT' ? `\n  WITH CHECK (\n` : `  WITH CHECK (\n`) + `    ${uniqueChecks.join(' OR \n    ')}\n  )`;
+                createStmt += (cmd === 'INSERT' ? `  WITH CHECK (\n` : `\n  WITH CHECK (\n`) + `    ${uniqueChecks.join(' OR \n    ')}\n  )`;
             }
         }
 

@@ -79,7 +79,7 @@ export function MonthSummaryStats(props: Readonly<Props>) {
                   placeholder="هدف"
                   value={targets[app.id] ?? ''}
                   onChange={(e) => {
-                    const val = e.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString()).replace(/[^0-9]/g, '');
+                    const val = e.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString()).replace(/\D/g, '');
                     setTargets((prev) => ({ ...prev, [app.id]: val }));
                   }}
                   onBlur={(e) => { saveTarget(app.id, e.target.value); }}

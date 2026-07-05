@@ -27,7 +27,7 @@ export class CardErrorBoundary extends Component<Props, State> {
     console.error('CardErrorBoundary caught an error:', error, errorInfo);
   }
 
-  private handleRetry = () => {
+  private readonly handleRetry = () => {
     this.setState({ hasError: false, error: null });
     if (this.props.onRetry) {
       this.props.onRetry();

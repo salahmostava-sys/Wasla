@@ -16,8 +16,8 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    // NOSONAR - generic heading wrapper; callers are required to pass accessible text via children
-    <h3 ref={ref} className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />
+    // Generic heading wrapper; callers are required to pass accessible text via children.
+    <h3 ref={ref} className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} /> // NOSONAR
   ),
 );
 CardTitle.displayName = "CardTitle";

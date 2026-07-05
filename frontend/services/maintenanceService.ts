@@ -1,5 +1,4 @@
 import { supabase } from '@services/supabase/client';
-import type { } from '@services/supabase/types';
 import { handleSupabaseError, toServiceError } from '@services/serviceError';
 
 export interface SparePart {

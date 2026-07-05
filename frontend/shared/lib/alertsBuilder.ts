@@ -273,16 +273,21 @@ const pushPersistedDbAlerts = (out: Alert[], rows: PersistedAlertRow[], today: D
   }
 };
 
+export type AlertSourceResponses = {
+  employeesRes: { data: EmployeeAlertRow[] | null };
+  vehiclesRes: { data: VehicleExpiryRow[] | null };
+  platformAccountsRes: { data: PlatformAccountAlertRow[] | null };
+  dbAlertsRes: { data: PersistedAlertRow[] | null };
+  sparePartsRes: { data: LowStockSparePartAlertRow[] | null };
+  abscondedRes: { data: AbscondedEmployeeAlertRow[] | null };
+};
+
 export function buildAlertsFromResponses(
-  employeesRes: { data: EmployeeAlertRow[] | null },
-  vehiclesRes: { data: VehicleExpiryRow[] | null },
-  platformAccountsRes: { data: PlatformAccountAlertRow[] | null },
-  dbAlertsRes: { data: PersistedAlertRow[] | null },
-  sparePartsRes: { data: LowStockSparePartAlertRow[] | null },
-  abscondedRes: { data: AbscondedEmployeeAlertRow[] | null },
+  responses: AlertSourceResponses,
   threshold: string,
   today: Date
 ): Alert[] {
+  const { employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes, abscondedRes } = responses;
   const generatedAlerts: Alert[] = [];
   const employees = employeesRes.data ?? [];
   const platformAccounts = platformAccountsRes.data ?? [];

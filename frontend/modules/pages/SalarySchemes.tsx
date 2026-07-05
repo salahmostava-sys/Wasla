@@ -221,7 +221,7 @@ const SalarySchemes = () => {
       const schemeTiers = tiers[schemeId] || [];
       const months = monthsToPin && monthsToPin.length > 0 ? monthsToPin : [currentMonth];
       // Convert tiers to a JSON-safe structure to avoid unsafe `as unknown as Json` double cast
-      const tiersJson = JSON.parse(JSON.stringify(schemeTiers));
+      const tiersJson = structuredClone(schemeTiers);
       for (const m of months) {
         await salarySchemeService.upsertSnapshot(
           schemeId,

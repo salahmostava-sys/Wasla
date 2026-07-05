@@ -212,13 +212,13 @@ export default function SettingsHub() {
             <p className="text-[11px] font-semibold mb-1" style={{ color: 'var(--ds-on-surface-variant)' }}>
               {isRTL ? 'المساعدة' : 'Help'}
             </p>
-            <a
-              href="#"
-              className="text-[11px] flex items-center gap-1 hover:underline"
+            <button
+              type="button"
+              className="text-[11px] flex items-center gap-1 hover:underline bg-transparent p-0"
               style={{ color: 'var(--ds-primary)' }}
             >
               {isRTL ? '? وثائق المساعدة' : '? Help Docs'}
-            </a>
+            </button>
           </div>
         </aside>
 

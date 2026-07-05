@@ -38,7 +38,7 @@ function runReplace(dir) {
     const tdRemove = /^(px-\d+|py-\d+(\.\d+)?|text-xs|text-sm|text-center|whitespace-nowrap)$/;
     content = replaceClasses(content, 'td', 'ta-td', tdRemove);
 
-    content = content.replace(/className=["']bg-muted\/[0-9]+ border-b border-border\/[0-9]+["']/g, 'className="ta-thead"');
+    content = content.replace(/className=["']bg-muted\/\d+ border-b border-border\/\d+["']/g, 'className="ta-thead"');
 
     if (content !== original) {
       fs.writeFileSync(filepath, content);

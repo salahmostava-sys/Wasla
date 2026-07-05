@@ -12,17 +12,13 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function test() {
-  console.log("Calling performance_dashboard_rpc...");
-  const { data, error } = await supabase.rpc('performance_dashboard_rpc', {
-    p_month_year: '2026-05', // Try a valid month
-  });
+console.log("Calling performance_dashboard_rpc...");
+const { data, error } = await supabase.rpc('performance_dashboard_rpc', {
+  p_month_year: '2026-05', // Try a valid month
+});
 
-  if (error) {
-    console.error("RPC Error Details:", JSON.stringify(error, null, 2));
-  } else {
-    console.log("Success! Data preview:", JSON.stringify(data).substring(0, 200));
-  }
+if (error) {
+  console.error("RPC Error Details:", JSON.stringify(error, null, 2));
+} else {
+  console.log("Success! Data preview:", JSON.stringify(data).substring(0, 200));
 }
-
-test();
