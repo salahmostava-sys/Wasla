@@ -116,6 +116,7 @@ const WalletPage = () => {
                             className="h-8 w-8 text-muted-foreground"
                             onClick={() => handleOpenHistory({ id: item.employee_id, name: item.employee_name })}
                             title="سجل الحركات"
+                            aria-label="سجل الحركات"
                           >
                             <History className="w-4 h-4" />
                           </Button>

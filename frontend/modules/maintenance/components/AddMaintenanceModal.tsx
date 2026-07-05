@@ -94,6 +94,7 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
     : partsTotalCost;
 
   const handleSave = async () => {
+    if (saving) return; // prevent double-submit (fast double-click races past the `disabled` re-render)
     if (!vehicleId) { toast({ title: 'اختر المركبة', variant: 'destructive' }); return; }
     if (!maintenanceDate) { toast({ title: 'اختر التاريخ', variant: 'destructive' }); return; }
 

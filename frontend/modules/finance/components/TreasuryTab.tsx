@@ -231,7 +231,7 @@ export function TreasuryTab() {
                       </td>
                       <td className="ta-td">
                         {t.attachment_url ? (
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground" onClick={async () => {
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground" aria-label="عرض المرفق" onClick={async () => {
                             try {
                               const url = await storageService.createSignedUrl('advance-attachments', t.attachment_url!);
                               window.open(url, '_blank');
