@@ -1,5 +1,5 @@
--- Triggers: auto employee, stock deduct/restore, total_cost rollup
-
+-- Fix "Function Search Path Mutable" security lint warnings on maintenance/spare-parts
+-- trigger functions by pinning search_path explicitly.
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.fill_maintenance_employee()
@@ -20,11 +20,6 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_fill_maintenance_employee ON public.maintenance_logs;
-CREATE TRIGGER trg_fill_maintenance_employee
-  BEFORE INSERT ON public.maintenance_logs
-  FOR EACH ROW EXECUTE FUNCTION public.fill_maintenance_employee();
-
 CREATE OR REPLACE FUNCTION public.deduct_spare_part_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -44,11 +39,6 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_deduct_stock ON public.maintenance_parts;
-CREATE TRIGGER trg_deduct_stock
-  AFTER INSERT ON public.maintenance_parts
-  FOR EACH ROW EXECUTE FUNCTION public.deduct_spare_part_stock();
-
 CREATE OR REPLACE FUNCTION public.restore_spare_part_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -62,11 +52,6 @@ BEGIN
   RETURN OLD;
 END;
 $$;
-
-DROP TRIGGER IF EXISTS trg_restore_stock ON public.maintenance_parts;
-CREATE TRIGGER trg_restore_stock
-  AFTER DELETE ON public.maintenance_parts
-  FOR EACH ROW EXECUTE FUNCTION public.restore_spare_part_stock();
 
 CREATE OR REPLACE FUNCTION public.update_maintenance_total_cost()
 RETURNS TRIGGER
@@ -88,10 +73,5 @@ BEGIN
   RETURN COALESCE(NEW, OLD);
 END;
 $$;
-
-DROP TRIGGER IF EXISTS trg_update_total_cost ON public.maintenance_parts;
-CREATE TRIGGER trg_update_total_cost
-  AFTER INSERT OR UPDATE OR DELETE ON public.maintenance_parts
-  FOR EACH ROW EXECUTE FUNCTION public.update_maintenance_total_cost();
 
 COMMIT;
