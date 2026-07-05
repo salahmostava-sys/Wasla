@@ -48,7 +48,7 @@ export const processBulkImportRows = async (
 
   for (let batchStart = 0; batchStart < validRows.length; batchStart += BATCH_SIZE) {
     const batch = validRows.slice(batchStart, batchStart + BATCH_SIZE);
-    const lastItem = batch[batch.length - 1];
+    const lastItem = batch.at(-1)!;
     const currentName = String(lastItem.row.name ?? '').trim() || `سطر ${lastItem.rowIndex}`;
     onLiveStats({ processedNames: batchStart, totalNames: validRows.length, currentName });
 

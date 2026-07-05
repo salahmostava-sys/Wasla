@@ -12,8 +12,8 @@
 
 const redis = require('redis');
 
-const RATE_LIMIT_WINDOW_SECS = parseInt(process.env.RATE_LIMIT_WINDOW || '60');
-const MAX_REQUESTS_PER_WINDOW = parseInt(process.env.RATE_LIMIT_MAX || '60');
+const RATE_LIMIT_WINDOW_SECS = Number.parseInt(process.env.RATE_LIMIT_WINDOW || '60');
+const MAX_REQUESTS_PER_WINDOW = Number.parseInt(process.env.RATE_LIMIT_MAX || '60');
 
 class RateLimitManager {
   constructor() {

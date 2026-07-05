@@ -20,7 +20,7 @@ export function UndoProvider({ children }: { children: React.ReactNode }) {
   const [isUndoing, setIsUndoing] = useState(false);
 
   const registerAction = useCallback((action: Omit<UndoAction, 'id'>) => {
-    const newAction: UndoAction = { ...action, id: Math.random().toString(36).substr(2, 9) };
+    const newAction: UndoAction = { ...action, id: Math.random().toString(36).slice(2, 9) };
     setActionStack(prev => [...prev, newAction].slice(-20)); // Keep last 20 actions
     
     // Optional: show toast with undo button
@@ -95,8 +95,8 @@ export function UndoProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [actionStack, undoLastAction]);
 
   return (

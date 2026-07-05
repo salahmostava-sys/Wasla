@@ -232,7 +232,7 @@ export const OrdersGridTable = React.memo(({
                         className="border-b border-border/20 bg-[var(--rowbg)]"
                         style={rowStyle}
                       >
-                        <td className="sticky right-0 z-20 border-l border-border bg-[var(--rowbg)]" style={{ minWidth: seqColMin, width: seqColMin }} aria-hidden />
+                        <td className="sticky right-0 z-20 border-l border-border bg-[var(--rowbg)]" style={{ minWidth: seqColMin, width: seqColMin }} aria-hidden tabIndex={-1} />
                         <td className="ta-td sticky z-10 px-1.5 border-l-2 border-border bg-[var(--rowbg)]" style={{ right: seqColMin, minWidth: repColMin }}>
                           <div className="flex items-center gap-2 pr-8">
                             <ColorBadge label={app.name} bg={c.solid} fg={c.solidText} className="text-[10px]" />

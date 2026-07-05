@@ -99,6 +99,8 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
   return (
     <div
       ref={popRef}
+      role="dialog"
+      aria-modal="true"
       className="fixed z-50 bg-popover border border-border rounded-xl shadow-xl p-3 min-w-[200px]"
       style={{ top: pos.top, left: pos.left }}
       onMouseDown={e => e.stopPropagation()}

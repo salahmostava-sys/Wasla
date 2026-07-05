@@ -13,6 +13,61 @@ interface Props {
   employee: { id: string; name: string };
 }
 
+interface WalletHistoryTx {
+  id: string;
+  transaction_type: string;
+  transaction_date: string;
+  notes?: string | null;
+  amount: number;
+}
+
+function renderHistoryContent(isLoading: boolean, history: WalletHistoryTx[]) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center p-8">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (history.length === 0) {
+    return (
+      <div className="text-center p-8 text-muted-foreground text-sm">
+        لا توجد حركات مسجلة لهذا المندوب
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {history.map((tx) => {
+        const isCollection = tx.transaction_type === 'collection';
+        return (
+          <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-full ${isCollection ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30' : 'bg-green-100 text-green-600 dark:bg-green-900/30'}`}>
+                {isCollection ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+              </div>
+              <div>
+                <div className="font-medium text-sm">
+                  {isCollection ? 'استلام كاش (مستحق)' : 'شحن المحفظة (مسدد)'}
+                </div>
+                <div className="text-xs text-muted-foreground flex gap-2">
+                  <span>{format(new Date(tx.transaction_date), 'dd MMMM yyyy', { locale: ar })}</span>
+                  {tx.notes && <span>• {tx.notes}</span>}
+                </div>
+              </div>
+            </div>
+            <div className={`font-bold ${isCollection ? 'text-orange-600' : 'text-green-600'}`} dir="ltr">
+              {isCollection ? '+' : '-'}{tx.amount}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const WalletHistoryModal = ({ open, onOpenChange, employee }: Props) => {
   const { enabled } = useAuthQueryGate();
 
@@ -30,42 +85,7 @@ const WalletHistoryModal = ({ open, onOpenChange, employee }: Props) => {
         </DialogHeader>
         
         <div className="py-2 max-h-[60vh] overflow-y-auto custom-sidebar-scroll">
-          {isLoading ? (
-            <div className="flex justify-center p-8">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : history.length === 0 ? (
-            <div className="text-center p-8 text-muted-foreground text-sm">
-              لا توجد حركات مسجلة لهذا المندوب
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {history.map((tx) => {
-                const isCollection = tx.transaction_type === 'collection';
-                return (
-                  <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${isCollection ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30' : 'bg-green-100 text-green-600 dark:bg-green-900/30'}`}>
-                        {isCollection ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm">
-                          {isCollection ? 'استلام كاش (مستحق)' : 'شحن المحفظة (مسدد)'}
-                        </div>
-                        <div className="text-xs text-muted-foreground flex gap-2">
-                          <span>{format(new Date(tx.transaction_date), 'dd MMMM yyyy', { locale: ar })}</span>
-                          {tx.notes && <span>• {tx.notes}</span>}
-                        </div>
-                      </div>
-                    </div>
-                    <div className={`font-bold ${isCollection ? 'text-orange-600' : 'text-green-600'}`} dir="ltr">
-                      {isCollection ? '+' : '-'}{tx.amount}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          {renderHistoryContent(isLoading, history)}
         </div>
       </DialogContent>
     </Dialog>

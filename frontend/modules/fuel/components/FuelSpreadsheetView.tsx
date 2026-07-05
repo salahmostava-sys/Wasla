@@ -95,7 +95,14 @@ function CellDetailPopover(props: Readonly<{
       className="relative bg-card -2xl shadow-xl border border-border p-5 min-w-[300px] max-w-[380px] space-y-4 rounded-2xl"
       open
     >
-      <div className="absolute inset-0 bg-black/20" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Enter') onClose(); }} role="presentation" />
+      <div
+        className="absolute inset-0 bg-black/20"
+        onClick={onClose}
+        onKeyDown={(e) => { if (e.key === 'Enter') onClose(); }}
+        role="button"
+        tabIndex={0}
+        aria-label="إغلاق"
+      />
       <div className="relative">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-bold text-foreground">{popover.riderName}</h4>

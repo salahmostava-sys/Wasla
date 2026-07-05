@@ -82,8 +82,9 @@ export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) 
         <h3 className="text-sm font-bold text-foreground mb-4">إعدادات الأهداف</h3>
         <div className="space-y-3">
           <div>
-            <label className="text-[11px] text-muted-foreground">الهدف الشهري (عدد الطلبات)</label>
+            <label className="text-[11px] text-muted-foreground" htmlFor="perf-field-1">الهدف الشهري (عدد الطلبات)</label>
             <Input
+              id="perf-field-1"
               value={monthlyTargetOrders}
               onChange={(event) => setMonthlyTargetOrders(event.target.value)}
               inputMode="numeric"
@@ -91,8 +92,9 @@ export function EmployeePerformanceTab(props: Readonly<{ employeeId: string }>) 
             />
           </div>
           <div>
-            <label className="text-[11px] text-muted-foreground">الهدف اليومي (المنطقي)</label>
+            <label className="text-[11px] text-muted-foreground" htmlFor="perf-field-2">الهدف اليومي (المنطقي)</label>
             <Input
+              id="perf-field-2"
               value={dailyTargetOrders}
               onChange={(event) => setDailyTargetOrders(event.target.value)}
               inputMode="numeric"

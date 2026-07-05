@@ -306,7 +306,7 @@ const Salaries = () => {
           </div>
           <div className="flex-shrink-0">
             <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
-              <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+              <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />{' '}
               جارٍ التحميل
             </span>
           </div>

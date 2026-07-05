@@ -547,15 +547,6 @@ export function ShiftsTab({
                             key={d}
                             className={getShiftCellClassName(isToday, isWeekend, isEditing, canEdit)}
                             style={{ minWidth: 44 }}
-                            onClick={() => { if (!isEditing) handleCellClick(emp.id, d); }}
-                            role="button"
-                            tabIndex={canEdit && !isEditing ? 0 : undefined}
-                            onKeyDown={(e) => {
-                              if (canEdit && !isEditing && (e.key === 'Enter' || e.key === ' ')) {
-                                e.preventDefault();
-                                handleCellClick(emp.id, d);
-                              }
-                            }}
                           >
                             {isEditing ? (
                               <select
@@ -579,13 +570,18 @@ export function ShiftsTab({
                                 <option value="-2">إجازة مرضى</option>
                               </select>
                             ) : (
-                              <div className="h-7 flex items-center justify-center">
+                              <button
+                                type="button"
+                                disabled={!canEdit}
+                                onClick={() => handleCellClick(emp.id, d)}
+                                className="h-7 w-full flex items-center justify-center bg-transparent"
+                              >
                                 {display ? (
                                   <span className={`font-bold text-[10px] leading-none ${display.colorClass}`}>{display.label}</span>
                                 ) : (
                                   <span className="text-muted-foreground/20">·</span>
                                 )}
-                              </div>
+                              </button>
                             )}
                           </td>
                         );

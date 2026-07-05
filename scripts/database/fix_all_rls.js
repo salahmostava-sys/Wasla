@@ -14,7 +14,7 @@ WHERE schemaname = 'public'
   AND (qual LIKE '%( SELECT auth.uid()%' OR with_check LIKE '%( SELECT auth.uid()%');
 `;
 
-const rawOut = execSync('npx supabase db query --linked "' + query.replace(/\n/g, ' ') + '" --output-format json', { encoding: 'utf8' });
+const rawOut = execSync('npx supabase db query --linked "' + query.replaceAll('\n', ' ') + '" --output-format json', { encoding: 'utf8' });
 const jsonMatch = rawOut.match(/\[.*\]/s); // NOSONAR
 if (!jsonMatch) {
     console.error('No json found');

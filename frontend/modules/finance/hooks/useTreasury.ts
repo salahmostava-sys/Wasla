@@ -4,6 +4,12 @@ import { treasuryService } from '@services/treasuryService';
 import type { TreasuryTransaction, TreasuryAccount, TreasuryCategory } from '../types/treasury';
 import { useUndo } from '@shared/context/UndoContext';
 
+function describeTreasuryTxType(type: TreasuryTransaction['type']): string {
+  if (type === 'income') return 'إيراد';
+  if (type === 'expense') return 'مصروف';
+  return 'تحويل';
+}
+
 export function useTreasury(from: string, to: string) {
   const { enabled, userId } = useAuthQueryGate();
   const queryClient = useQueryClient();
@@ -40,7 +46,7 @@ export function useTreasury(from: string, to: string) {
       queryClient.invalidateQueries({ queryKey: ['treasury_transactions'] });
       queryClient.invalidateQueries({ queryKey: ['treasury_balances'] });
       registerAction({
-        description: `إضافة قيد — ${newTx.type === 'income' ? 'إيراد' : newTx.type === 'expense' ? 'مصروف' : 'تحويل'} ${Number(newTx.amount).toLocaleString('en-US')} ر.س`,
+        description: `إضافة قيد — ${describeTreasuryTxType(newTx.type)} ${Number(newTx.amount).toLocaleString('en-US')} ر.س`,
         undoCommand: async () => {
           await treasuryService.deleteTransaction(newTx.id);
           queryClient.invalidateQueries({ queryKey: ['treasury_transactions'] });
@@ -60,7 +66,7 @@ export function useTreasury(from: string, to: string) {
       const prevTx = currentTxs?.find(t => t.id === variables.id);
       if (prevTx) {
         registerAction({
-          description: `تعديل قيد — ${prevTx.type === 'income' ? 'إيراد' : prevTx.type === 'expense' ? 'مصروف' : 'تحويل'} ${Number(prevTx.amount).toLocaleString('en-US')} ر.س`,
+          description: `تعديل قيد — ${describeTreasuryTxType(prevTx.type)} ${Number(prevTx.amount).toLocaleString('en-US')} ر.س`,
           undoCommand: async () => {
             await treasuryService.updateTransaction(variables.id, {
               type: prevTx.type,
@@ -88,7 +94,7 @@ export function useTreasury(from: string, to: string) {
       queryClient.invalidateQueries({ queryKey: ['treasury_transactions'] });
       queryClient.invalidateQueries({ queryKey: ['treasury_balances'] });
       registerAction({
-        description: `حذف قيد — ${deletedTx.type === 'income' ? 'إيراد' : deletedTx.type === 'expense' ? 'مصروف' : 'تحويل'} ${Number(deletedTx.amount).toLocaleString('en-US')} ر.س`,
+        description: `حذف قيد — ${describeTreasuryTxType(deletedTx.type)} ${Number(deletedTx.amount).toLocaleString('en-US')} ر.س`,
         undoCommand: async () => {
           await treasuryService.createTransaction({
             type: deletedTx.type,

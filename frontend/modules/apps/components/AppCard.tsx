@@ -56,8 +56,6 @@ export const AppCard = ({
         {canEdit && (
           <div
             className="absolute left-2 top-2 z-10 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
           >
             <button
               onClick={(event) => {
@@ -104,7 +102,7 @@ export const AppCard = ({
         <h3 className="truncate text-sm font-bold" style={{ color: app.text_color }}>
           {app.name}
         </h3>
-        <div className="mt-1 flex justify-center" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }} role="presentation">
+        <div className="mt-1 flex justify-center" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }}>
           {canEdit && onWorkTypeChange ? (
             <Select
               value={app.work_type || 'orders'}

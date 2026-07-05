@@ -1,15 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, Search, Loader2, AlertTriangle, CheckCircle2,
-  Calendar, Layers, ChevronUp, ChevronDown, ChevronsUpDown, Check, X,
+  Calendar, Layers, Check, X,
 } from 'lucide-react';
 import { getErrorMessage } from '@services/serviceError';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@shared/components/ui/alert-dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@shared/components/ui/popover';
 import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { differenceInDays, parseISO } from 'date-fns';
@@ -43,10 +41,8 @@ import {
   STATUS_DELIVERED,
   STATUS_NOT_DELIVERED,
   statusLabel,
-  _statusCls,
 } from '../employees/types/tier.types';
 import {
-  RenewalBadge,
   AppMultiSelect,
   EmployeeSelect,
   ThSort,

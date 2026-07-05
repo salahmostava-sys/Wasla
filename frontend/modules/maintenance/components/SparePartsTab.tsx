@@ -98,10 +98,10 @@ function PurchaseModal({
 
   const handleSave = async () => {
     if (!form.name_ar.trim()) { toast({ title: 'أدخل اسم القطعة', variant: 'destructive' }); return; }
-    const qty = parseFloat(form.quantity);
-    const cost = parseFloat(form.unit_cost);
-    if (isNaN(qty) || qty < 0) { toast({ title: 'أدخل كمية صحيحة', variant: 'destructive' }); return; }
-    if (isNaN(cost) || cost < 0) { toast({ title: 'أدخل سعر شراء صحيح', variant: 'destructive' }); return; }
+    const qty = Number.parseFloat(form.quantity);
+    const cost = Number.parseFloat(form.unit_cost);
+    if (Number.isNaN(qty) || qty < 0) { toast({ title: 'أدخل كمية صحيحة', variant: 'destructive' }); return; }
+    if (Number.isNaN(cost) || cost < 0) { toast({ title: 'أدخل سعر شراء صحيح', variant: 'destructive' }); return; }
 
     setSaving(true);
     try {
@@ -133,6 +133,15 @@ function PurchaseModal({
   };
 
   const isEdit = !!editing;
+
+  let saveButtonLabel: string;
+  if (saving) {
+    saveButtonLabel = 'جاري الحفظ...';
+  } else if (isEdit) {
+    saveButtonLabel = '💾 حفظ التعديلات';
+  } else {
+    saveButtonLabel = '✅ إضافة للمخزون';
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -202,7 +211,7 @@ function PurchaseModal({
               />
               {!isEdit && form.quantity && form.unit_cost && (
                 <p className="text-xs text-muted-foreground">
-                  الإجمالي: {(parseFloat(form.quantity || '0') * parseFloat(form.unit_cost || '0')).toLocaleString('en-US')} ر.س
+                  الإجمالي: {(Number.parseFloat(form.quantity || '0') * Number.parseFloat(form.unit_cost || '0')).toLocaleString('en-US')} ر.س
                 </p>
               )}
             </div>
@@ -240,7 +249,7 @@ function PurchaseModal({
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? 'جاري الحفظ...' : isEdit ? '💾 حفظ التعديلات' : '✅ إضافة للمخزون'}
+            {saveButtonLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

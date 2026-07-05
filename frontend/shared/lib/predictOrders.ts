@@ -8,7 +8,7 @@ export function predictOrders(values: number[]) {
     last7.reduce((a, b) => a + b, 0) / last7.length;
 
   const growth =
-    values[values.length - 1] - values[values.length - 2];
+    (values.at(-1) ?? 0) - (values.at(-2) ?? 0);
 
   return Math.round(avg + growth * 0.5);
 }

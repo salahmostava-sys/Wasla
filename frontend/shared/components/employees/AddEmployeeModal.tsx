@@ -1,22 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type React from 'react';
-import { useState, useRef, useCallback, useEffect, type Dispatch, type SetStateAction } from 'react';
-import { X, Check, Trash2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { X, ChevronLeft } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import { Label } from '@shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
 import { useToast } from '@shared/hooks/use-toast';
-import { differenceInDays, parseISO } from 'date-fns';
-import { employeeService } from '@services/employeeService';
-import { useSignedUrl, extractStoragePath } from '@shared/hooks/useSignedUrl';
-import { validateUploadFile } from '@shared/lib/validation';
-import { auditService } from '@services/auditService';
 import { useForm, type FieldPath, type FieldPathValue } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getErrorMessage } from '@shared/lib/query';
-import { cn } from '@shared/lib/utils';
 import { normalizeArabicDigits } from '@shared/lib/formatters';
 import { logError } from '@shared/lib/logger';
 import { useCommercialRecords } from '@shared/hooks/useCommercialRecords';
@@ -31,14 +22,11 @@ import {
   clampEmployeePhoneInput,
   EMPLOYEE_INTL_PHONE_DIGITS,
   EMPLOYEE_NATIONAL_ID_DIGITS,
-  isValidEmployeeNationalId,
-  isValidEmployeePhone,
 } from '@modules/employees/model/employeeFieldValidation';
 
 
 import {
   AddEmployeeModalProps as Props,
-  EmployeeDocUploadState,
   STEPS,
   UploadStatus
 } from './add-modal/addEmployee.types';

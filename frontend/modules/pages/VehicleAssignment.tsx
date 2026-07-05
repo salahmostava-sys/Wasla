@@ -109,7 +109,7 @@ const AssignmentFormModal = ({
             {freeVehicles.length === 0 ? (
               <>
                 <div className="text-sm font-medium mb-1 block">
-                  المركبة *
+                  المركبة *{' '}
                   <span className="text-xs text-muted-foreground font-normal ms-2">
                     (المركبات الفاضية فقط — 0 متاحة)
                   </span>
@@ -122,7 +122,7 @@ const AssignmentFormModal = ({
             ) : (
               <>
                 <label htmlFor="vehicle-select" className="text-sm font-medium mb-1 block">
-                  المركبة *
+                  المركبة *{' '}
                   <span className="text-xs text-muted-foreground font-normal ms-2">
                     (المركبات الفاضية فقط — {freeVehicles.length} متاحة)
                   </span>
@@ -473,18 +473,23 @@ const VehicleAssignment = () => {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                Array.from({ length: 5 }, (_, i) => `assignment-skeleton-row-${i}`).map((key) => <SkeletonRow key={key} />)
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="ta-td">
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <ClipboardList size={40} className="opacity-30" />
-                      <p className="font-medium">لا توجد سجلات</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : filtered.map(a => {
+              {(() => {
+                if (loading) {
+                  return Array.from({ length: 5 }, (_, i) => `assignment-skeleton-row-${i}`).map((key) => <SkeletonRow key={key} />);
+                }
+                if (filtered.length === 0) {
+                  return (
+                    <tr>
+                      <td colSpan={7} className="ta-td">
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <ClipboardList size={40} className="opacity-30" />
+                          <p className="font-medium">لا توجد سجلات</p>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                }
+                return filtered.map(a => {
                 const isActive = !a.returned_at;
                 return (
                   <tr key={a.id} className={`border-b border-border/30 hover:bg-muted/20 transition-colors ${isActive ? 'bg-primary/2' : ''}`}>
@@ -535,7 +540,8 @@ const VehicleAssignment = () => {
                     </td>
                   </tr>
                 );
-              })}
+                });
+              })()}
             </tbody>
           </table>
         </div>

@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, User, FileText, Wallet, CreditCard, Clock, Package, DollarSign, ExternalLink, Loader2, ChevronDown, ChevronUp, TrendingUp, ScanLine } from 'lucide-react';
+import { ArrowRight, User, FileText, Wallet, CreditCard, Clock, Package, DollarSign, Loader2, ChevronDown, ChevronUp, TrendingUp, ScanLine } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
@@ -12,16 +11,8 @@ import { useQueryErrorToast } from '@shared/hooks/useQueryErrorToast';
 import { useToast } from '@shared/hooks/use-toast';
 import { logError } from '@shared/lib/logger';
 import { employeeService } from '@services/employeeService';
-import { getEmployeeCities } from '@modules/employees/model/employeeUtils';
-import { cityLabel } from '@modules/employees/model/employeeCity';
 import { EMPTY_DATA_PLACEHOLDER } from '@modules/employees/types/employee.types';
-import {
-  employeeProfileService,
-  type EmployeeProfileAdvance,
-  type EmployeeProfileApp,
-  type EmployeeProfileDailyOrder,
-  type EmployeeProfileSalaryRecord,
-} from '@services/employeeProfileService';
+import { employeeProfileService } from '@services/employeeProfileService';
 import { EmployeePerformanceTab } from '@shared/components/employees/EmployeePerformanceTab';
 import { DocumentScanner } from '@modules/employees/components/DocumentScanner';
 import { getErrorMessage } from '@services/serviceError';
@@ -29,7 +20,6 @@ import { getErrorMessage } from '@services/serviceError';
 import {
   Advance,
   DailyOrder,
-  Employee,
   EmployeeApp,
   EmployeeProfileProps as Props,
   SalaryRecord,

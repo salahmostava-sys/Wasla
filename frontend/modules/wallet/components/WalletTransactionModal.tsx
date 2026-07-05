@@ -29,8 +29,8 @@ const WalletTransactionModal = ({ open, onOpenChange, employee, type, onSuccess 
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const numAmount = parseFloat(amount);
-      if (isNaN(numAmount) || numAmount <= 0) throw new Error('المبلغ غير صحيح');
+      const numAmount = Number.parseFloat(amount);
+      if (Number.isNaN(numAmount) || numAmount <= 0) throw new Error('المبلغ غير صحيح');
       
       await walletService.addTransaction({
         employee_id: employee.id,

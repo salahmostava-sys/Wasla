@@ -78,22 +78,22 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
 
   // Sum of parts cost
   const partsTotalCost = rows.reduce((sum, r) => {
-    const qty = parseFloat(r.quantity_used) || 0;
-    const cost = parseFloat(r.cost_at_time) || 0;
+    const qty = Number.parseFloat(r.quantity_used) || 0;
+    const cost = Number.parseFloat(r.cost_at_time) || 0;
     return sum + qty * cost;
   }, 0);
 
   // If user didn't override total cost, use parts sum
   const finalTotalCost = totalCostOverride !== ''
-    ? parseFloat(totalCostOverride) || 0
+    ? Number.parseFloat(totalCostOverride) || 0
     : partsTotalCost;
 
   const handleSave = async () => {
     if (!vehicleId) { toast({ title: 'اختر المركبة', variant: 'destructive' }); return; }
     if (!maintenanceDate) { toast({ title: 'اختر التاريخ', variant: 'destructive' }); return; }
 
-    const validParts = rows.filter(r => r.part_id && parseFloat(r.quantity_used) > 0);
-    const invalidPart = validParts.find(r => parseFloat(r.cost_at_time) <= 0);
+    const validParts = rows.filter(r => r.part_id && Number.parseFloat(r.quantity_used) > 0);
+    const invalidPart = validParts.find(r => Number.parseFloat(r.cost_at_time) <= 0);
     if (invalidPart) {
       toast({ title: 'أدخل سعر الشراء لكل قطعة', variant: 'destructive' });
       return;
@@ -118,8 +118,8 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts }
 
       const parts = validParts.map(r => ({
         part_id: r.part_id,
-        quantity_used: parseFloat(r.quantity_used),
-        cost_at_time: parseFloat(r.cost_at_time),
+        quantity_used: Number.parseFloat(r.quantity_used),
+        cost_at_time: Number.parseFloat(r.cost_at_time),
       }));
 
       // If no parts but user entered total cost manually, we still create log without parts

@@ -5,6 +5,12 @@ import { useTreasury } from '../hooks/useTreasury';
 import type { TreasuryAccountType, TreasuryCategoryType } from '../types/treasury';
 import { Landmark, Wallet, Banknote, Tag, Plus, Trash2 } from 'lucide-react';
 
+function treasuryAccountTypeLabel(type: TreasuryAccountType): string {
+  if (type === 'bank') return 'بنك';
+  if (type === 'custody') return 'عهدة';
+  return 'كاش';
+}
+
 export function TreasurySettingsTab() {
   const { accounts, categories, createAccount, createCategory, deleteAccount, deleteCategory } = useTreasury('', '');
   
@@ -78,7 +84,7 @@ export function TreasurySettingsTab() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                  {acc.type === 'bank' ? 'بنك' : acc.type === 'custody' ? 'عهدة' : 'كاش'}
+                  {treasuryAccountTypeLabel(acc.type)}
                 </span>
                 <button
                   onClick={() => handleDeleteAccount(acc.id, acc.name)}

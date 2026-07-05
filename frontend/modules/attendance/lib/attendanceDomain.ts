@@ -22,7 +22,7 @@ export function buildAttendanceGridData(
     let presentCount = 0, absentCount = 0, leaveCount = 0, sickCount = 0, lateCount = 0;
     
     empRows.forEach(r => {
-      const day = parseInt(r.date.split('-')[2], 10);
+      const day = Number.parseInt(r.date.split('-')[2], 10);
       recordByDay[day] = r;
       if (r.status === 'present') presentCount++;
       if (r.status === 'absent') absentCount++;

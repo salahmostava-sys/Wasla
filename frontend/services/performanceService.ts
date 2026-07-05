@@ -278,7 +278,7 @@ function mapRpcToDashboardResponse(raw: any): PerformanceDashboardResponse {
   const topRiderToday = raw.topRiderToday ?? raw.top_rider_today ?? null;
   const lowestRiderToday = raw.lowestRiderToday ?? raw.lowest_rider_today ?? null;
   const topRiderMonth = topPerformers[0] ?? null;
-  const lowRiderMonth = topPerformers[topPerformers.length - 1] ?? null;
+  const lowRiderMonth = topPerformers.at(-1) ?? null;
 
   // ── distribution ─────────────────────────────────────────────────────────
   const dist = raw.performanceDistribution ?? raw.performance_distribution ?? {};

@@ -53,9 +53,9 @@ export function printSlipHTML(html: string): void {
     return;
   }
 
-  iframeDoc.open();
-  iframeDoc.write(html);
-  iframeDoc.close();
+  const parser = new DOMParser();
+  const parsedDoc = parser.parseFromString(html, 'text/html');
+  iframeDoc.replaceChild(iframeDoc.adoptNode(parsedDoc.documentElement), iframeDoc.documentElement);
 
   // Wait for fonts to load, then print
   iframe.addEventListener('load', () => {
@@ -143,11 +143,11 @@ export async function exportSlipToBlob(html: string, _filename: string): Promise
       return;
     }
 
-    iframeDoc.open();
     // Sanitize HTML to prevent XSS before injecting into iframe
     const cleanHtml = String(DOMPurify.sanitize(html));
-    iframeDoc.write(cleanHtml);
-    iframeDoc.close();
+    const parser = new DOMParser();
+    const parsedDoc = parser.parseFromString(cleanHtml, 'text/html');
+    iframeDoc.replaceChild(iframeDoc.adoptNode(parsedDoc.documentElement), iframeDoc.documentElement);
 
     iframe.addEventListener('load', async () => {
       try {

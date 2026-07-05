@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { differenceInDays, parseISO } from "date-fns";
 import { Eye, Edit, Trash2 } from "lucide-react";
@@ -20,7 +19,6 @@ import {
 } from "@modules/employees/components/EmployeesViewParts";
 import { getEmployeeCities } from "@modules/employees/model/employeeUtils";
 import {
-  InlineInputEditor,
   InlineMultiSelectEditor,
   InlineSelectEditor,
 } from "@modules/employees/components/EmployeeInlineEditors";

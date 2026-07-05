@@ -26,7 +26,7 @@ export function printHtmlTable(
 
   const doc = iframe.contentWindow?.document;
   if (!doc) {
-    document.body.removeChild(iframe);
+    iframe.remove();
     throw new Error('Failed to create print iframe');
   }
 
@@ -87,13 +87,11 @@ export function printHtmlTable(
       // Clean up after print dialog is closed
       setTimeout(() => {
         if (document.body.contains(iframe)) {
-          document.body.removeChild(iframe);
+          iframe.remove();
         }
       }, 500);
     }, 200);
-  } else {
-    if (document.body.contains(iframe)) {
-      document.body.removeChild(iframe);
-    }
+  } else if (document.body.contains(iframe)) {
+    iframe.remove();
   }
 }

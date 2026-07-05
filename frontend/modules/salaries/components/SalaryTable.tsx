@@ -472,7 +472,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
             </tr>
             <tr style={{ backgroundColor: 'hsl(var(--card))' }}>
               {/* FIX I1: was duplicating # header — second row just needs spacer */}
-              <th className={`${thFrozenBase} w-10 text-center`} style={stickyLeft(0)} aria-hidden="true"></th>
+              <th className={`${thFrozenBase} w-10 text-center`} style={stickyLeft(0)} aria-hidden="true" tabIndex={-1}></th>
               <th className={`${thFrozenBase} w-32 cursor-pointer hover:text-foreground select-none`} style={stickyLeft(40)} onClick={() => handleSort('employeeName')}>
                 الاسم <SalarySortIcon field="employeeName" sortField={sortField} sortDir={sortDir} />
               </th>
@@ -538,7 +538,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
           <tbody>
             {/* Top spacer: represents rows above the visible window */}
             {virtualRows.length > 0 && virtualRows[0].start > 0 && (
-              <tr style={{ height: virtualRows[0].start }} aria-hidden="true">
+              <tr style={{ height: virtualRows[0].start }} aria-hidden="true" tabIndex={-1}>
                 <td colSpan={999} />
               </tr>
             )}
@@ -587,7 +587,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
               const lastRow = virtualRows[virtualRows.length - 1];
               const bottomPad = totalVirtualHeight - lastRow.end;
               return bottomPad > 0 ? (
-                <tr style={{ height: bottomPad }} aria-hidden="true">
+                <tr style={{ height: bottomPad }} aria-hidden="true" tabIndex={-1}>
                   <td colSpan={999} />
                 </tr>
               ) : null;

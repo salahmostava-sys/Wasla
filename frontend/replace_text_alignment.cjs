@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const path = require('path');
+const path = require('node:path');
 
 function walkDir(dir, callback) {
   if (!fs.existsSync(dir)) return;

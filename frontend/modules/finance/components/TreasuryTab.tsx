@@ -13,6 +13,18 @@ import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, Ar
 import toast from 'react-hot-toast';
 import { storageService } from '@services/storageService';
 
+function treasuryTxTypeLabel(type: TreasuryTransactionType): string {
+  if (type === 'income') return 'إيراد';
+  if (type === 'expense') return 'مصروف';
+  return 'تحويل';
+}
+
+function treasuryTxTypeColorClass(type: TreasuryTransactionType): string {
+  if (type === 'income') return 'text-emerald-600';
+  if (type === 'expense') return 'text-rose-500';
+  return 'text-blue-500';
+}
+
 export function TreasuryTab() {
   const [from, setFrom] = useState(format(subDays(new Date(), 30), 'yyyy-MM-dd'));
   const [to, setTo] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -274,8 +286,8 @@ export function TreasuryTab() {
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">من حساب (المنصرف منه)</label>
-                <select value={accountId} onChange={e => setAccountId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-1">من حساب (المنصرف منه)</label>
+                <select id="treasury-field-1" value={accountId} onChange={e => setAccountId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                   <option value="">اختر الحساب...</option>
                   {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
@@ -283,16 +295,16 @@ export function TreasuryTab() {
 
               {type === 'transfer' ? (
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">إلى حساب (المحول إليه)</label>
-                  <select value={transferToId} onChange={e => setTransferToId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                  <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-2">إلى حساب (المحول إليه)</label>
+                  <select id="treasury-field-2" value={transferToId} onChange={e => setTransferToId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                     <option value="">اختر الحساب...</option>
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
                 </div>
               ) : (
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">البند</label>
-                  <select value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                  <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-3">البند</label>
+                  <select id="treasury-field-3" value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                     <option value="">اختر البند...</option>
                     {categories.filter(c => c.type === type).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
@@ -300,18 +312,18 @@ export function TreasuryTab() {
               )}
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">المبلغ</label>
-                <Input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="text-end font-bold" />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-4">المبلغ</label>
+                <Input id="treasury-field-4" type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="text-end font-bold" />
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">البيان / الوصف</label>
-                <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="تفاصيل العملية..." />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-5">البيان / الوصف</label>
+                <Input id="treasury-field-5" value={description} onChange={e => setDescription(e.target.value)} placeholder="تفاصيل العملية..." />
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">المرفق (اختياري)</label>
-                <Input type="file" onChange={e => setFile(e.target.files?.[0] || null)} className="text-xs h-9 cursor-pointer" accept="image/*,.pdf" />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-6">المرفق (اختياري)</label>
+                <Input id="treasury-field-6" type="file" onChange={e => setFile(e.target.files?.[0] || null)} className="text-xs h-9 cursor-pointer" accept="image/*,.pdf" />
               </div>
 
               <Button onClick={handleAddTransaction} disabled={isCreatingTransaction || !accountId || !amount} className="w-full mt-2">
@@ -339,8 +351,8 @@ export function TreasuryTab() {
                   <div className="bg-muted/50 rounded-lg p-3 border border-border/50 space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">النوع:</span>
-                      <span className={`font-semibold ${deleteTarget.type === 'income' ? 'text-emerald-600' : deleteTarget.type === 'expense' ? 'text-rose-500' : 'text-blue-500'}`}>
-                        {deleteTarget.type === 'income' ? 'إيراد' : deleteTarget.type === 'expense' ? 'مصروف' : 'تحويل'}
+                      <span className={`font-semibold ${treasuryTxTypeColorClass(deleteTarget.type)}`}>
+                        {treasuryTxTypeLabel(deleteTarget.type)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -391,13 +403,13 @@ export function TreasuryTab() {
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">التاريخ</label>
-                <Input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="h-9 text-sm" />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-7">التاريخ</label>
+                <Input id="treasury-field-7" type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="h-9 text-sm" />
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">من حساب (المنصرف منه)</label>
-                <select value={editAccountId} onChange={e => setEditAccountId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-8">من حساب (المنصرف منه)</label>
+                <select id="treasury-field-8" value={editAccountId} onChange={e => setEditAccountId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                   <option value="">اختر الحساب...</option>
                   {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
@@ -405,16 +417,16 @@ export function TreasuryTab() {
 
               {editType === 'transfer' ? (
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">إلى حساب (المحول إليه)</label>
-                  <select value={editTransferToId} onChange={e => setEditTransferToId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                  <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-9">إلى حساب (المحول إليه)</label>
+                  <select id="treasury-field-9" value={editTransferToId} onChange={e => setEditTransferToId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                     <option value="">اختر الحساب...</option>
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
                 </div>
               ) : (
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">البند</label>
-                  <select value={editCategoryId} onChange={e => setEditCategoryId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
+                  <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-10">البند</label>
+                  <select id="treasury-field-10" value={editCategoryId} onChange={e => setEditCategoryId(e.target.value)} className="w-full bg-background border border-input rounded-md px-3 h-9 text-sm">
                     <option value="">اختر البند...</option>
                     {categories.filter(c => c.type === editType).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
@@ -422,13 +434,13 @@ export function TreasuryTab() {
               )}
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">المبلغ</label>
-                <Input type="number" min="0" value={editAmount} onChange={e => setEditAmount(e.target.value)} placeholder="0.00" className="text-end font-bold" />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-11">المبلغ</label>
+                <Input id="treasury-field-11" type="number" min="0" value={editAmount} onChange={e => setEditAmount(e.target.value)} placeholder="0.00" className="text-end font-bold" />
               </div>
 
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">البيان / الوصف</label>
-                <Input value={editDescription} onChange={e => setEditDescription(e.target.value)} placeholder="تفاصيل العملية..." />
+                <label className="text-xs text-muted-foreground mb-1 block" htmlFor="treasury-field-12">البيان / الوصف</label>
+                <Input id="treasury-field-12" value={editDescription} onChange={e => setEditDescription(e.target.value)} placeholder="تفاصيل العملية..." />
               </div>
             </div>
           )}
