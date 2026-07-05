@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from '@shared/components/ui/alert-dialog';
 import { Skeleton } from '@shared/components/ui/skeleton';
+import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { useMaintenanceLogs, useSpareParts, useInvalidateMaintenanceQueries } from '@modules/maintenance/hooks/useMaintenanceData';
@@ -165,6 +166,22 @@ export function MaintenanceLogsTab() {
 
   return (
     <div className="space-y-4">
+      {logsQ.isError && !logsQ.isLoading && (
+        <QueryErrorRetry
+          error={logsQ.error}
+          onRetry={() => logsQ.refetch().catch(() => {})}
+          title="تعذر تحميل سجلات الصيانة"
+          hint="تحقق من الاتصال بالإنترنت أو أعد المحاولة."
+        />
+      )}
+      {partsQ.isError && !partsQ.isLoading && (
+        <QueryErrorRetry
+          error={partsQ.error}
+          onRetry={() => partsQ.refetch().catch(() => {})}
+          title="تعذر تحميل قطع الغيار"
+          hint="تحقق من الاتصال بالإنترنت أو أعد المحاولة."
+        />
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div className="flex gap-4">

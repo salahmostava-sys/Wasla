@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from '@shared/components/ui/alert-dialog';
 import { Skeleton } from '@shared/components/ui/skeleton';
+import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useToast } from '@shared/hooks/use-toast';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { useSpareParts, useInvalidateMaintenanceQueries } from '@modules/maintenance/hooks/useMaintenanceData';
@@ -315,6 +316,14 @@ export function SparePartsTab() {
 
   return (
     <div className="space-y-4">
+      {q.isError && !q.isLoading && (
+        <QueryErrorRetry
+          error={q.error}
+          onRetry={() => q.refetch().catch(() => {})}
+          title="تعذر تحميل قطع الغيار"
+          hint="تحقق من الاتصال بالإنترنت أو أعد المحاولة."
+        />
+      )}
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-card border border-border/60 rounded-xl p-3 text-center">
