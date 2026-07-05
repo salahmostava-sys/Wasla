@@ -88,7 +88,7 @@ if (!skipBackend) {
   const pythonCommand = getPythonCommand();
   const dependencyCheck = spawnSync(
     pythonCommand,
-    ['-c', 'import fastapi, pandas, sklearn'],
+    ['-c', 'import fastapi, pandas, sklearn, google.cloud.vision'],
     { stdio: 'ignore', cwd: repoRoot },
   );
 

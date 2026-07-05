@@ -122,6 +122,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "stitch-preview",
+        element: (
+          <PublicLayout>
+            <StitchPreview />
+          </PublicLayout>
+        ),
+      },
+      {
         path: "/",
         element: (
           <ProtectedRoute>
@@ -150,7 +158,6 @@ const router = createBrowserRouter([
           { path: "employee-tiers", element: <PageGuard pageKey="employee_tiers"><EmployeeTiers /></PageGuard> },
           { path: "ai-analytics", element: <PageGuard pageKey="ai_analytics"><AiAnalytics /></PageGuard> },
           { path: "profile", element: <ProfilePage /> },
-          { path: "stitch-preview", element: <StitchPreview /> },
           { path: "profile-page", element: <Navigate to="/profile" replace /> },
           { path: "settings", element: <PageGuard pageKey="settings"><SettingsHub /></PageGuard> },
           { path: "settings/general", element: <Navigate to="/settings?tab=general" replace /> },
