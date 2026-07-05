@@ -67,11 +67,9 @@ export async function extractTextFromImage(
       onProgress({ status: 'جاري استخراج النص عبر Google Vision...', progress: 0.6 });
     }
 
-    const aiBackendUrl = import.meta.env.VITE_AI_BACKEND_URL;
-    const baseUrl = aiBackendUrl && aiBackendUrl !== 'none' ? aiBackendUrl : '/ai';
-    const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-
-    const response = await fetch(`${cleanBaseUrl}/api/ocr/extract-waybill`, {
+    // Always use the Vercel Serverless Function at /api/ocr/extract-waybill.
+    // The Python backend path (/ai/...) is not available on Vercel.
+    const response = await fetch('/api/ocr/extract-waybill', {
       method: 'POST',
       body: formData,
     });

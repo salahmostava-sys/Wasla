@@ -4,6 +4,9 @@
   "functions": {
     "api/functions/*.js": {
       "includeFiles": "server/lib/**"
+    },
+    "api/functions/ocr/extract-waybill.js": {
+      "includeFiles": "server/lib/**"
     }
   },
   "rewrites": [
