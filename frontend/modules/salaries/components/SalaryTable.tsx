@@ -508,19 +508,41 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
               <th className="ta-th text-foreground border border-border/30 bg-primary/10 cursor-pointer select-none hover:brightness-95" onClick={() => handleSort('totalPlatformOrders')}>
                 إجمالي الطلبات <SalarySortIcon field="totalPlatformOrders" sortField={sortField} sortDir={sortDir} />
               </th>
-              <th className={`${thBase} bg-primary/10`}>الراتب الأساسي</th>
-              <th className={`${thBase} bg-success/5`}>حوافز</th>
-              <th className={`${thBase} bg-success/5`}>إجازة مرضية</th>
-              <th className={`${thBase} bg-success/10 border-l border-border/40`}>الإجمالي مع الراتب</th>
-              <th className={`${thBase} bg-destructive/5`}>سلف</th>
-              <th className={`${thBase} bg-destructive/5`}>مخالفات</th>
+              <th className={`${thBase} bg-primary/10 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('platformSalaries')}>
+                الراتب الأساسي <SalarySortIcon field="platformSalaries" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} bg-success/5 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('incentives')}>
+                حوافز <SalarySortIcon field="incentives" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} bg-success/5 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('sickAllowance')}>
+                إجازة مرضية <SalarySortIcon field="sickAllowance" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} bg-success/10 border-l border-border/40 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('totalWithSalary')}>
+                الإجمالي مع الراتب <SalarySortIcon field="totalWithSalary" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} bg-destructive/5 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('advanceDeduction')}>
+                سلف <SalarySortIcon field="advanceDeduction" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} bg-destructive/5 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('violationDeduction')}>
+                مخالفات <SalarySortIcon field="violationDeduction" sortField={sortField} sortDir={sortDir} />
+              </th>
               {allCustomCols.map(col => (
-                <th key={col.fullKey} className={`${thBase} bg-destructive/5`}>{col.label}</th>
+                <th key={col.fullKey} className={`${thBase} bg-destructive/5 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort(col.fullKey)}>
+                  {col.label} <SalarySortIcon field={col.fullKey} sortField={sortField} sortDir={sortDir} />
+                </th>
               ))}
-              <th className={`${thBase} bg-destructive/10 border-l border-border/40`}>إجمالي المستقطعات</th>
-              <th className={thBase}>المستحق</th>
-              <th className={thBase}>المحوّل</th>
-              <th className={`${thBase} border-l border-border/40`}>المتبقي</th>
+              <th className={`${thBase} bg-destructive/10 border-l border-border/40 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('totalDeductions')}>
+                إجمالي المستقطعات <SalarySortIcon field="totalDeductions" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('netSalary')}>
+                المستحق <SalarySortIcon field="netSalary" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('transfer')}>
+                المحوّل <SalarySortIcon field="transfer" sortField={sortField} sortDir={sortDir} />
+              </th>
+              <th className={`${thBase} border-l border-border/40 cursor-pointer select-none hover:brightness-95`} onClick={() => handleSort('remaining')}>
+                المتبقي <SalarySortIcon field="remaining" sortField={sortField} sortDir={sortDir} />
+              </th>
               <th className={`${thBase} cursor-pointer hover:text-foreground select-none`} onClick={() => handleSort('city')}>
                 الفرع <SalarySortIcon field="city" sortField={sortField} sortDir={sortDir} />
               </th>

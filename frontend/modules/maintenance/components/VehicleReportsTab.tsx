@@ -84,7 +84,7 @@ export function VehicleReportsTab() {
     return vehicleGroups.filter(g => {
       if (!activeSelection.has(g.vehicle_id)) return false;
       if (!t) return true;
-      return g.plate_number.toLowerCase().includes(t) || g.type.toLowerCase().includes(t);
+      return (g.plate_number || '').toLowerCase().includes(t) || (g.type || '').toLowerCase().includes(t);
     });
   }, [vehicleGroups, search, activeSelection]);
 
@@ -125,150 +125,120 @@ export function VehicleReportsTab() {
   };
 
   /** يمنع كسر جدول الـ PDF أو حقن HTML عند وجود رموز خاصة في الملاحظات/أسماء القطع */
-  const escapeHtml = (value: string) =>
-    value
+  const escapeHtml = (value?: string | null) => {
+    if (!value) return '';
+    return String(value)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  };
 
   const partsSummary = (log: MaintenanceLogWithDetails) =>
     (log.maintenance_parts ?? [])
       .map(p => `${escapeHtml(p.spare_parts?.name_ar ?? '—')} ×${p.quantity_used}`)
       .join('، ');
 
-  /** ينشئ مستند jsPDF من المركبات المحددة حالياً (filteredGroups) دون حفظه أو فتحه */
-  const buildReportPdf = async () => {
-    const { default: JsPdf } = await import('jspdf');
+  const printReport = () => {
+    const totalCost = filteredGroups.reduce((s, g) => s + g.total_cost, 0);
+
+    const html = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+        <head>
+          <title>تقرير صيانة المركبات والمخزون</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+            body { font-family: 'Tajawal', system-ui, sans-serif; padding: 20px; margin: 0; color: #111; background: #fff; }
+            .company-name { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 5px; color: #1e293b; }
+            h1 { text-align: center; margin-bottom: 5px; color: #0f172a; font-size: 18px; }
+            .header-info { text-align: center; margin-bottom: 20px; font-size: 13px; color: #64748b; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: right; font-size: 12px; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px; }
+            th { background-color: #f8fafc; font-weight: bold; color: #334155; }
+            tr:nth-child(even) { background-color: #f8fafc; }
+            .totals { text-align: left; margin-top: 12px; font-size: 13px; font-weight: bold; color: #0f172a; }
+            @media print {
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+          <h1>تقرير صيانة المركبات والمخزون</h1>
+          <div class="header-info">
+            <p>تاريخ الاستخراج: ${new Date().toLocaleDateString('ar-SA')} | عدد المركبات في التقرير: ${filteredGroups.length}</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>رقم اللوحة</th>
+                <th>نوع المركبة</th>
+                <th>تاريخ الصيانة</th>
+                <th>نوع الصيانة</th>
+                <th>القطع المستخدمة</th>
+                <th>التكلفة</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredGroups.map(g => {
+                if (g.logs.length === 0) {
+                  return `<tr>
+                    <td>${escapeHtml(g.plate_number)}</td>
+                    <td>${escapeHtml(g.type)}</td>
+                    <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
+                  </tr>`;
+                }
+                return g.logs.map(log => `
+                  <tr>
+                    <td>${escapeHtml(g.plate_number)}</td>
+                    <td>${escapeHtml(g.type)}</td>
+                    <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
+                    <td>${escapeHtml(log.type)}</td>
+                    <td>${partsSummary(log) || '—'}</td>
+                    <td>${(Number(log.total_cost) || 0).toLocaleString('en-US')} ر.س</td>
+                    <td>${escapeHtml(log.notes || '')}</td>
+                  </tr>
+                `).join('');
+              }).join('')}
+            </tbody>
+          </table>
+          <p class="totals">إجمالي تكلفة الصيانة للمركبات المحددة: ${totalCost.toLocaleString('en-US')} ر.س</p>
+        </body>
+      </html>
+    `;
 
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
-    iframe.style.left = '-10000px';
-    iframe.style.top = '-10000px';
-    iframe.style.width = '794px';
-    iframe.style.height = '1123px';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
     iframe.style.border = 'none';
     document.body.appendChild(iframe);
 
-    try {
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (!iframeDoc) throw new Error('تعذر تجهيز مستند التقرير');
-
-      const totalCost = filteredGroups.reduce((s, g) => s + g.total_cost, 0);
-
-      const html = `
-        <html dir="rtl" lang="ar">
-          <head>
-            <style>
-              @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-              body { font-family: 'Tajawal', system-ui, sans-serif; padding: 0; margin: 0; color: #111; background: #fff; }
-              .pdf-container { width: 700px; padding: 20px; background: #fff; margin: 0 auto; }
-              .company-name { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 5px; color: #1e293b; }
-              h1 { text-align: center; margin-bottom: 5px; color: #0f172a; font-size: 18px; }
-              .header-info { text-align: center; margin-bottom: 20px; font-size: 13px; color: #64748b; }
-              table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: right; font-size: 12px; }
-              th, td { border: 1px solid #cbd5e1; padding: 8px; }
-              th { background-color: #f8fafc; font-weight: bold; color: #334155; }
-              tr:nth-child(even) { background-color: #f8fafc; }
-              .totals { text-align: left; margin-top: 12px; font-size: 13px; font-weight: bold; color: #0f172a; }
-            </style>
-          </head>
-          <body>
-            <div class="pdf-container">
-              <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
-              <h1>تقرير صيانة المركبات والمخزون</h1>
-              <div class="header-info">
-                <p>تاريخ الاستخراج: ${new Date().toLocaleDateString('ar-SA')} | عدد المركبات في التقرير: ${filteredGroups.length}</p>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>رقم اللوحة</th>
-                    <th>نوع المركبة</th>
-                    <th>تاريخ الصيانة</th>
-                    <th>نوع الصيانة</th>
-                    <th>القطع المستخدمة</th>
-                    <th>التكلفة</th>
-                    <th>ملاحظات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${filteredGroups.map(g => {
-                    if (g.logs.length === 0) {
-                      return `<tr>
-                        <td>${escapeHtml(g.plate_number)}</td>
-                        <td>${escapeHtml(g.type)}</td>
-                        <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
-                      </tr>`;
-                    }
-                    return g.logs.map(log => `
-                      <tr>
-                        <td>${escapeHtml(g.plate_number)}</td>
-                        <td>${escapeHtml(g.type)}</td>
-                        <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
-                        <td>${escapeHtml(log.type)}</td>
-                        <td>${partsSummary(log) || '—'}</td>
-                        <td>${(Number(log.total_cost) || 0).toLocaleString('en-US')} ر.س</td>
-                        <td>${escapeHtml(log.notes || '')}</td>
-                      </tr>
-                    `).join('');
-                  }).join('')}
-                </tbody>
-              </table>
-              <p class="totals">إجمالي تكلفة الصيانة للمركبات المحددة: ${totalCost.toLocaleString('en-US')} ر.س</p>
-            </div>
-          </body>
-        </html>
-      `;
-
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-
-      await new Promise<void>(resolve => {
-        iframe.addEventListener('load', () => setTimeout(resolve, 1000), { once: true });
-      });
-
-      const container = iframeDoc.querySelector('.pdf-container') as HTMLElement;
-      const pdf = new JsPdf({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      await pdf.html(container, {
-        callback: () => {},
-        x: 10,
-        y: 10,
-        width: 190,
-        windowWidth: 700,
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-      });
-      return pdf;
-    } finally {
-      document.body.removeChild(iframe);
+    const doc = iframe.contentWindow?.document;
+    if (!doc) {
+      iframe.remove();
+      return;
     }
-  };
 
-  const [generatingPdf, setGeneratingPdf] = useState<'view' | 'download' | null>(null);
+    doc.open();
+    doc.write(html);
+    doc.close();
 
-  const previewPdf = async () => {
-    setGeneratingPdf('view');
-    try {
-      const pdf = await buildReportPdf();
-      const blobUrl = pdf.output('bloburl');
-      window.open(blobUrl, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      console.error('Failed to preview PDF', error);
-    } finally {
-      setGeneratingPdf(null);
-    }
-  };
-
-  const downloadPdf = async () => {
-    setGeneratingPdf('download');
-    try {
-      const pdf = await buildReportPdf();
-      pdf.save('تقرير_صيانة_المركبات.pdf');
-    } catch (error) {
-      console.error('Failed to export to PDF', error);
-    } finally {
-      setGeneratingPdf(null);
+    const contentWindow = iframe.contentWindow;
+    if (contentWindow) {
+      contentWindow.focus();
+      setTimeout(() => {
+        contentWindow.print();
+        setTimeout(() => {
+          if (document.body.contains(iframe)) iframe.remove();
+        }, 500);
+      }, 500);
+    } else {
+      iframe.remove();
     }
   };
 
@@ -309,19 +279,11 @@ export function VehicleReportsTab() {
           <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
-              onClick={previewPdf}
-              disabled={logsQ.isLoading || filteredGroups.length === 0 || generatingPdf !== null}
-            >
-              <Eye size={16} className="ml-2" />
-              {generatingPdf === 'view' ? 'جاري التحضير...' : 'معاينة PDF'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={downloadPdf}
-              disabled={logsQ.isLoading || filteredGroups.length === 0 || generatingPdf !== null}
+              onClick={printReport}
+              disabled={logsQ.isLoading || filteredGroups.length === 0}
             >
               <Printer size={16} className="ml-2" />
-              {generatingPdf === 'download' ? 'جاري التحضير...' : 'تنزيل PDF'}
+              طباعة / حفظ PDF
             </Button>
             <Button variant="outline" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
               <Download size={16} className="ml-2" />

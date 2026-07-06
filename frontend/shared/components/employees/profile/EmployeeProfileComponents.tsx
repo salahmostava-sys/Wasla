@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2, ExternalLink, Trash2 } from 'lucide-react';
 import { useSignedUrl, extractStoragePath } from '@shared/hooks/useSignedUrl';
 import { isImageDocument } from './employeeProfile.utils';
+import { Button } from '@shared/components/ui/button';
 
 export const SecureDocThumb = ({
-  storagePath, label,
-}: { storagePath: string | null | undefined; label: string }) => {
+  storagePath, label, onDelete
+}: { storagePath: string | null | undefined; label: string; onDelete?: () => void }) => {
   const path = extractStoragePath(storagePath);
   const signedUrl = useSignedUrl('employee-documents', path);
 
@@ -42,19 +43,29 @@ export const SecureDocThumb = ({
   }
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 relative">
       {thumb}
       <p className="text-xs text-center text-muted-foreground">{label}</p>
-      {signedUrl && (
-        <a
-          href={signedUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
-        >
-          <ExternalLink size={9} /> فتح
-        </a>
-      )}
+      <div className="flex items-center gap-3">
+        {signedUrl && (
+          <a
+            href={signedUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
+          >
+            <ExternalLink size={9} /> فتح
+          </a>
+        )}
+        {signedUrl && onDelete && (
+          <button
+            onClick={onDelete}
+            className="flex items-center gap-0.5 text-[10px] text-destructive hover:underline"
+          >
+            <Trash2 size={9} /> حذف
+          </button>
+        )}
+      </div>
     </div>
   );
 };

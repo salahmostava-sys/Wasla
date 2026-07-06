@@ -54,18 +54,33 @@ export function useSalaryFilteredRows(
           return computed.totalPlatformSalary;
         case 'incentives':
           return row.incentives;
+        case 'sickAllowance':
+          return row.sickAllowance;
         case 'totalAdditions':
           return computed.totalAdditions;
+        case 'totalWithSalary':
+          return computed.totalWithSalary;
         case 'advanceDeduction':
           return row.advanceDeduction;
+        case 'violationDeduction':
+          return row.violationDeduction;
         case 'totalDeductions':
           return computed.totalDeductions;
         case 'netSalary':
           return computed.netSalary;
+        case 'transfer':
+          return row.transfer;
+        case 'remaining':
+          return computed.remaining;
         case 'status':
           return row.status;
         default:
           if (platforms.includes(sortField)) return row.platformOrders[sortField] || 0;
+          if (sortField.includes('_')) {
+            const [appId, colId] = sortField.split('_');
+            const col = row.customColumns.find(c => c.appId === appId && c.colId === colId);
+            return col ? col.value : 0;
+          }
           // Fallback: check known numeric fields on SalaryRow
           if (sortField in row) {
             const val = (row as unknown as Record<string, unknown>)[sortField];

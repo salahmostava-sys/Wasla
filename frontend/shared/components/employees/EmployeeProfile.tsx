@@ -63,6 +63,18 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
     ? differenceInDays(parseISO(employee.residency_expiry), new Date())
     : null;
 
+  const handleDeleteDocument = async (docType: 'personal_photo_url' | 'id_photo_url' | 'iqama_photo_url' | 'license_photo_url') => {
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا المستند نهائياً؟')) return;
+    try {
+      await employeeService.deleteEmployeeDocument(employee.id, docType);
+      toast({ title: 'تم', description: 'تم حذف المستند بنجاح', variant: 'default' });
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+    } catch (e) {
+      logError('Failed to delete document', e);
+      toast({ title: 'خطأ', description: getErrorMessage(e), variant: 'destructive' });
+    }
+  };
+
   const relatedDataQuery = useQuery({
     queryKey: ['employee-profile', uid, employee.id] as const,
     enabled,
@@ -301,10 +313,26 @@ const EmployeeProfile = ({ employee, onBack }: Readonly<Props>) => {
 
             {/* Secure document thumbnails — signed URLs only */}
             <div className="mt-5 flex gap-4 flex-wrap">
-              <SecureDocThumb storagePath={employee.personal_photo_url} label="الصورة الشخصية" />
-              <SecureDocThumb storagePath={employee.id_photo_url} label="صورة الهوية" />
-              <SecureDocThumb storagePath={employee.iqama_photo_url} label="صورة الإقامة" />
-              <SecureDocThumb storagePath={employee.license_photo_url} label="صورة الرخصة" />
+              <SecureDocThumb
+                storagePath={employee.personal_photo_url}
+                label="الصورة الشخصية"
+                onDelete={employee.personal_photo_url ? () => handleDeleteDocument('personal_photo_url') : undefined}
+              />
+              <SecureDocThumb
+                storagePath={employee.id_photo_url}
+                label="صورة الهوية"
+                onDelete={employee.id_photo_url ? () => handleDeleteDocument('id_photo_url') : undefined}
+              />
+              <SecureDocThumb
+                storagePath={employee.iqama_photo_url}
+                label="صورة الإقامة"
+                onDelete={employee.iqama_photo_url ? () => handleDeleteDocument('iqama_photo_url') : undefined}
+              />
+              <SecureDocThumb
+                storagePath={employee.license_photo_url}
+                label="صورة الرخصة"
+                onDelete={employee.license_photo_url ? () => handleDeleteDocument('license_photo_url') : undefined}
+              />
             </div>
 
             <p className="mt-3 text-[11px] text-muted-foreground flex items-center gap-1">

@@ -241,6 +241,28 @@ export const employeeService = {
     if (error) throw toServiceError(error, 'employeeService.deleteById');
   },
 
+  async deleteEmployeeDocument(employeeId: string, docType: 'personal_photo_url' | 'id_photo_url' | 'iqama_photo_url' | 'license_photo_url') {
+    const { data: employee, error: fetchError } = await supabase
+      .from('employees')
+      .select(docType)
+      .eq('id', employeeId)
+      .single();
+    if (fetchError) throw toServiceError(fetchError, 'employeeService.deleteEmployeeDocument.fetch');
+
+    const filePath = employee[docType];
+    if (filePath) {
+      // Remove from avatars bucket
+      await supabase.storage.from('avatars').remove([filePath]);
+    }
+
+    // Nullify in the database
+    const { error: updateError } = await supabase
+      .from('employees')
+      .update({ [docType]: null })
+      .eq('id', employeeId);
+    if (updateError) throw toServiceError(updateError, 'employeeService.deleteEmployeeDocument.update');
+  },
+
   async getActiveForSalaryContext() {
     // FIX: paginate to bypass Supabase's default 1000-row limit.
     // The salary page needs every employee — companies with 1000+ employees
