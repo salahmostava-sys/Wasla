@@ -67,10 +67,22 @@ export async function extractTextFromImage(
       onProgress({ status: 'جاري استخراج النص عبر Google Vision...', progress: 0.6 });
     }
 
+    // يتطلب الخادم الآن تسجيل دخول صالح (نفس نمط باقي نقاط الـ API الداخلية)
+    // لمنع استخدام هذه النقطة بدون هوية واستنزاف حصة Google Vision المدفوعة.
+    const { supabase } = await import('@services/supabase/client');
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      throw new Error('يجب تسجيل الدخول لاستخدام استخراج النصوص');
+    }
+
     // Always use the Vercel Serverless Function at /api/ocr/extract-waybill.
     // The Python backend path (/ai/...) is not available on Vercel.
     const response = await fetch('/api/ocr/extract-waybill', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: formData,
     });
 

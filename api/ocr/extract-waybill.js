@@ -8,7 +8,31 @@
  *   GOOGLE_APPLICATION_CREDENTIALS_JSON  — full JSON string of the service account key
  */
 
-const { ensurePostRequest, logError } = require('../_lib');
+const { ensurePostRequest, requireAuth, getAdminClient, logError } = require('../_lib');
+
+// 8 MB is generous for a single photographed document while still bounding
+// memory/Vision-API spend per request. Requests over this are rejected
+// before any Vision API call is made.
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+
+// Lightweight local rate limiter (mirrors server/lib/handlers.js#checkRateLimit,
+// duplicated here because this route is a standalone Vercel function that
+// cannot import the ESM server handlers module).
+async function checkRateLimit(supabaseClient, userId, action, limit, windowSeconds) {
+  const key = `${action}_${userId}`;
+  const { data, error } = await supabaseClient.rpc('enforce_rate_limit', {
+    p_key: key,
+    p_limit: limit,
+    p_window_seconds: windowSeconds,
+  });
+  if (error) {
+    logError('[ocr/extract-waybill] rate limit check failed — denying request (fail-closed)', {
+      error: error.message,
+    });
+    return { allowed: false };
+  }
+  return data?.[0] ?? { allowed: true };
+}
 
 // ─── Google Vision helper ──────────────────────────────────────────────────────
 
@@ -185,13 +209,43 @@ function parseMultipartFile(body, contentType) {
 module.exports = async function handler(req, res) {
   if (!ensurePostRequest(req, res)) return;
 
+  // FIX: this endpoint used to call a paid Google Vision API with no
+  // authentication, no rate limit, and no upload size cap — any anonymous
+  // caller who knew the URL could exhaust the Vision API quota/invoice or
+  // DoS the function. It now requires a valid logged-in session and is
+  // rate-limited, exactly like every other endpoint in this project.
+  const auth = await requireAuth(req, res);
+  if (!auth) return;
+
   try {
+    const adminClient = getAdminClient();
+    const rl = await checkRateLimit(adminClient, auth.user.id, 'ocr_extract_waybill', 20, 60);
+    if (!rl.allowed) {
+      return res.status(429).json({ success: false, detail: 'Too many requests. Please wait before trying again.' });
+    }
+
     const chunks = [];
+    let totalBytes = 0;
+    let tooLarge = false;
     await new Promise((resolve, reject) => {
-      req.on('data', (chunk) => chunks.push(chunk));
+      req.on('data', (chunk) => {
+        totalBytes += chunk.length;
+        if (totalBytes > MAX_UPLOAD_BYTES) {
+          tooLarge = true;
+          req.destroy();
+          return;
+        }
+        chunks.push(chunk);
+      });
       req.on('end', resolve);
       req.on('error', reject);
+      req.on('close', () => {
+        if (tooLarge) reject(new Error('PAYLOAD_TOO_LARGE'));
+      });
     });
+    if (tooLarge) {
+      return res.status(413).json({ success: false, detail: 'Uploaded file is too large (max 8MB).' });
+    }
     const rawBody = Buffer.concat(chunks);
 
     const contentType = req.headers['content-type'] ?? '';
@@ -201,6 +255,9 @@ module.exports = async function handler(req, res) {
     const text = await detectTextViaVisionApi(imageBase64);
     return res.status(200).json({ success: true, text });
   } catch (err) {
+    if (err instanceof Error && err.message === 'PAYLOAD_TOO_LARGE') {
+      return res.status(413).json({ success: false, detail: 'Uploaded file is too large (max 8MB).' });
+    }
     logError('[ocr/extract-waybill] error', { message: err.message });
     return res.status(500).json({
       success: false,
