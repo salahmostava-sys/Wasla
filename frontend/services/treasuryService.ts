@@ -81,21 +81,35 @@ export const treasuryService = {
 
   // Transactions
   getTransactions: async (from: string, to: string) => {
-    const { data, error } = await supabase
-      .from('treasury_transactions')
-      .select(`
-        *,
-        account:treasury_accounts!account_id(name),
-        transfer_to_account:treasury_accounts!transfer_to_account_id(name),
-        category:treasury_categories!category_id(name),
-        app:apps!app_id(name)
-      `)
-      .gte('transaction_date', from)
-      .lte('transaction_date', to)
-      .order('transaction_date', { ascending: false })
-      .order('created_at', { ascending: false });
-    if (error) handleSupabaseError(error, 'treasuryService.getTransactions');
-    return data as TreasuryTransaction[];
+    // FIX: paginate to bypass Supabase's default 1000-row limit.
+    // Companies with 1000+ transactions in the selected range were
+    // silently missing rows beyond row 1000.
+    const PAGE_SIZE = 1000;
+    const allRows: TreasuryTransaction[] = [];
+    let offset = 0;
+    let hasMore = true;
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from('treasury_transactions')
+        .select(`
+          *,
+          account:treasury_accounts!account_id(name),
+          transfer_to_account:treasury_accounts!transfer_to_account_id(name),
+          category:treasury_categories!category_id(name),
+          app:apps!app_id(name)
+        `)
+        .gte('transaction_date', from)
+        .lte('transaction_date', to)
+        .order('transaction_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
+      if (error) handleSupabaseError(error, 'treasuryService.getTransactions');
+      const rows = (data ?? []) as TreasuryTransaction[];
+      allRows.push(...rows);
+      hasMore = rows.length === PAGE_SIZE;
+      offset += PAGE_SIZE;
+    }
+    return allRows;
   },
 
   createTransaction: async (input: Partial<TreasuryTransaction>) => {
@@ -130,14 +144,38 @@ export const treasuryService = {
   // Balances
   getAccountBalances: async (): Promise<TreasuryAccountBalance[]> => {
     const accounts = await treasuryService.getAccounts();
-    
-    // We can compute balances locally or via an RPC.
-    // For simplicity and since volume is generally low, we fetch all transactions and compute.
-    // Or we fetch sums grouped by account. Let's do it via aggregations.
-    const { data: incomeData } = await supabase.from('treasury_transactions').select('account_id, amount').eq('type', 'income');
-    const { data: expenseData } = await supabase.from('treasury_transactions').select('account_id, amount').eq('type', 'expense');
-    const { data: transfersOut } = await supabase.from('treasury_transactions').select('account_id, amount').eq('type', 'transfer');
-    const { data: transfersIn } = await supabase.from('treasury_transactions').select('transfer_to_account_id, amount').eq('type', 'transfer');
+
+    // FIX: paginate to bypass Supabase's default 1000-row limit.
+    // Any active company with 1000+ income/expense/transfer transactions
+    // was silently getting under-computed balances (rows beyond 1000
+    // were dropped with no error), since Supabase caps unbounded
+    // .select() calls at 1000 rows unless .range() is used.
+    const fetchAllRows = async <T>(column: 'account_id' | 'transfer_to_account_id', type: 'income' | 'expense' | 'transfer'): Promise<T[]> => {
+      const PAGE_SIZE = 1000;
+      const allRows: T[] = [];
+      let offset = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('treasury_transactions')
+          .select(`${column}, amount`)
+          .eq('type', type)
+          .range(offset, offset + PAGE_SIZE - 1);
+        if (error) handleSupabaseError(error, 'treasuryService.getAccountBalances');
+        const rows = (data ?? []) as T[];
+        allRows.push(...rows);
+        hasMore = rows.length === PAGE_SIZE;
+        offset += PAGE_SIZE;
+      }
+      return allRows;
+    };
+
+    const [incomeData, expenseData, transfersOut, transfersIn] = await Promise.all([
+      fetchAllRows<{ account_id: string; amount: number }>('account_id', 'income'),
+      fetchAllRows<{ account_id: string; amount: number }>('account_id', 'expense'),
+      fetchAllRows<{ account_id: string; amount: number }>('account_id', 'transfer'),
+      fetchAllRows<{ transfer_to_account_id: string; amount: number }>('transfer_to_account_id', 'transfer'),
+    ]);
 
     return accounts.map(acc => {
       const in1 = (incomeData ?? []).filter(t => t.account_id === acc.id).reduce((s, t) => s + Number(t.amount), 0);
