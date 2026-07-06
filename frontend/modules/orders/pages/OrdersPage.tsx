@@ -77,6 +77,7 @@ const TabLoader = () => <Loading minHeightClassName="min-h-[240px]" />;
 const OrdersPage = () => {
   const { authLoading } = useAuthQueryGate();
   const { permissions, loading: permsLoading } = usePermissions('orders');
+  const { permissions: walletPerms } = usePermissions('wallet');
   const { tab, onTabChange } = useUrlTab(isOrderTab, 'grid');
 
   if (authLoading || permsLoading) {
@@ -111,7 +112,7 @@ const OrdersPage = () => {
               { value: 'grid', label: '📦 الطلبات', selectLabel: 'الطلبات' },
               { value: 'shifts', label: '⏰ الدوام', selectLabel: 'الدوام' },
               { value: 'summary', label: '📊 ملخص الشهر', selectLabel: 'ملخص الشهر' },
-              { value: 'wallet', label: '💼 المحفظة', selectLabel: 'المحفظة' },
+              ...(walletPerms.can_view ? [{ value: 'wallet', label: '💼 المحفظة', selectLabel: 'المحفظة' }] : []),
             ]}
           />
           <TabsContent value="grid" className="mt-2 outline-none">
@@ -129,11 +130,13 @@ const OrdersPage = () => {
               <MonthSummaryTab />
             </Suspense>
           </TabsContent>
-          <TabsContent value="wallet" className="mt-2 outline-none">
-            <Suspense fallback={<TabLoader />}>
-              <WalletTab />
-            </Suspense>
-          </TabsContent>
+          {walletPerms.can_view && (
+            <TabsContent value="wallet" className="mt-2 outline-none">
+              <Suspense fallback={<TabLoader />}>
+                <WalletTab />
+              </Suspense>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </OrdersErrorBoundary>

@@ -42,6 +42,8 @@ const DEFAULT_PERMISSIONS: Record<AppRole, Record<string, PagePermission>> = {
     employee_tiers: { can_view: true, can_edit: true, can_delete: true },
     salary_schemes: { can_view: true, can_edit: true, can_delete: true },
     finance: { can_view: true, can_edit: true, can_delete: true },
+    wallet: { can_view: true, can_edit: true, can_delete: true },
+    treasury: { can_view: true, can_edit: true, can_delete: true },
   },
   hr: {
     employees: { can_view: true, can_edit: true, can_delete: false },
@@ -61,6 +63,8 @@ const DEFAULT_PERMISSIONS: Record<AppRole, Record<string, PagePermission>> = {
     employee_tiers: { can_view: true, can_edit: true, can_delete: true },
     salary_schemes: { can_view: true, can_edit: false, can_delete: false },
     finance: { can_view: false, can_edit: false, can_delete: false },
+    wallet: { can_view: false, can_edit: false, can_delete: false },
+    treasury: { can_view: false, can_edit: false, can_delete: false },
   },
   finance: {
     employees: { can_view: true, can_edit: false, can_delete: false },
@@ -80,6 +84,8 @@ const DEFAULT_PERMISSIONS: Record<AppRole, Record<string, PagePermission>> = {
     employee_tiers: { can_view: true, can_edit: false, can_delete: false },
     salary_schemes: { can_view: true, can_edit: true, can_delete: false },
     finance: { can_view: true, can_edit: true, can_delete: true },
+    wallet: { can_view: true, can_edit: true, can_delete: false },
+    treasury: { can_view: true, can_edit: true, can_delete: true },
   },
   operations: {
     employees: { can_view: true, can_edit: true, can_delete: false },
@@ -99,6 +105,8 @@ const DEFAULT_PERMISSIONS: Record<AppRole, Record<string, PagePermission>> = {
     maintenance: { can_view: true, can_edit: true, can_delete: true },
     employee_tiers: { can_view: true, can_edit: false, can_delete: false },
     salary_schemes: { can_view: false, can_edit: false, can_delete: false },
+    wallet: { can_view: true, can_edit: false, can_delete: false },
+    treasury: { can_view: false, can_edit: false, can_delete: false },
   },
   viewer: {
     employees: { can_view: false, can_edit: false, can_delete: false },
@@ -118,6 +126,8 @@ const DEFAULT_PERMISSIONS: Record<AppRole, Record<string, PagePermission>> = {
     maintenance: { can_view: true, can_edit: false, can_delete: false },
     employee_tiers: { can_view: false, can_edit: false, can_delete: false },
     salary_schemes: { can_view: false, can_edit: false, can_delete: false },
+    wallet: { can_view: false, can_edit: false, can_delete: false },
+    treasury: { can_view: false, can_edit: false, can_delete: false },
   },
 };
 

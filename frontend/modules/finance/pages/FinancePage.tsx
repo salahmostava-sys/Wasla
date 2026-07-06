@@ -11,6 +11,7 @@ import { useTemporalContext } from '@app/providers/TemporalContext';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useFinance } from '@modules/finance/hooks/useFinance';
 import type { FinanceTransaction, TransactionType } from '@services/financeService';
+import { usePermissions } from '@shared/hooks/usePermissions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import { TreasuryTab } from '../components/TreasuryTab';
 import { TreasurySettingsTab } from '../components/TreasurySettingsTab';
@@ -297,6 +298,7 @@ export default function FinancePage() {
       setCarryingOver(false);
     }
   };
+  const { permissions: treasuryPerms } = usePermissions('treasury');
 
   if (error && !loading) {
     return <div className="space-y-4" dir="rtl"><QueryErrorRetry error={error} onRetry={() => { refetch(); }} title="تعذر تحميل البيانات المالية" /></div>;
@@ -329,9 +331,9 @@ export default function FinancePage() {
       <Tabs defaultValue="monthly" className="w-full">
         <TabsList className="bg-muted">
           <TabsTrigger value="monthly">التحليلات الشهرية</TabsTrigger>
-          <TabsTrigger value="treasury">حركة الخزينة والعهد</TabsTrigger>
+          {treasuryPerms.can_view && <TabsTrigger value="treasury">حركة الخزينة والعهد</TabsTrigger>}
           <TabsTrigger value="category-summary">ملخص البنود</TabsTrigger>
-          <TabsTrigger value="settings">إعدادات الحسابات</TabsTrigger>
+          {treasuryPerms.can_view && <TabsTrigger value="settings">إعدادات الحسابات</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="monthly" className="mt-4 space-y-5">
@@ -409,17 +411,21 @@ export default function FinancePage() {
       )}
       </TabsContent>
 
-        <TabsContent value="treasury">
-          <TreasuryTab />
-        </TabsContent>
+        {treasuryPerms.can_view && (
+          <TabsContent value="treasury">
+            <TreasuryTab />
+          </TabsContent>
+        )}
 
         <TabsContent value="category-summary">
           <TreasuryCategorySummaryTab />
         </TabsContent>
 
-        <TabsContent value="settings">
-          <TreasurySettingsTab />
-        </TabsContent>
+        {treasuryPerms.can_view && (
+          <TabsContent value="settings">
+            <TreasurySettingsTab />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
