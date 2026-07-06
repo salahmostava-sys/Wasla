@@ -182,6 +182,7 @@ export default function FuelPage() {
     platformTab, setPlatformTab,
     apps,
     employees,
+    ridersForTab,
     monthYear,
     loading,
     filteredMonthly, filteredDaily,
@@ -282,7 +283,7 @@ export default function FuelPage() {
           {!loading && pageTab !== 'summary' && (
             <FuelMetricTable
               metric={activeMetric}
-              employees={employees}
+              employees={ridersForTab}
               dailyRows={dailyRows}
               year={year}
               month={month}
