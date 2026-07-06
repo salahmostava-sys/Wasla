@@ -80,28 +80,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     return set;
   }, [platformTab, employeeAppLinks]);
 
-  const ridersForTab = useMemo(() => {
-    const byId = new Map<string, Employee>();
-    employees.forEach((e) => {
-      if (!employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id)) byId.set(e.id, e);
-    });
 
-    // Ensure riders with monthly orders are visible so fuel/km can be recorded,
-    // even if they are currently inactive (terminated, suspended, etc.)
-    Object.entries(monthOrdersMap).forEach(([empId, orders]) => {
-      if (orders <= 0) return;
-      if (employeeIdsOnPlatform && !employeeIdsOnPlatform.has(empId)) return;
-      const emp = fuelBaseData?.employees.find(e => e.id === empId) || employees.find(e => e.id === empId);
-      if (emp) byId.set(empId, emp);
-    });
-
-    let list = Array.from(byId.values());
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(e => e.name.toLowerCase().includes(q));
-    }
-    return list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-  }, [employees, employeeIdsOnPlatform, monthOrdersMap, search, fuelBaseData]);
 
   const { data: fuelBaseData, error: fuelBaseError } = useQuery({
     queryKey: ['fuel', uid, 'base-data'],
@@ -127,6 +106,29 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     retry: defaultQueryRetry,
     staleTime: 60_000,
   });
+
+  const ridersForTab = useMemo(() => {
+    const byId = new Map<string, Employee>();
+    employees.forEach((e) => {
+      if (!employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id)) byId.set(e.id, e);
+    });
+
+    // Ensure riders with monthly orders are visible so fuel/km can be recorded,
+    // even if they are currently inactive (terminated, suspended, etc.)
+    Object.entries(monthOrdersMap).forEach(([empId, orders]) => {
+      if (orders <= 0) return;
+      if (employeeIdsOnPlatform && !employeeIdsOnPlatform.has(empId)) return;
+      const emp = fuelBaseData?.employees.find(e => e.id === empId) || employees.find(e => e.id === empId);
+      if (emp) byId.set(empId, emp);
+    });
+
+    let list = Array.from(byId.values());
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(e => e.name.toLowerCase().includes(q));
+    }
+    return list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  }, [employees, employeeIdsOnPlatform, monthOrdersMap, search, fuelBaseData]);
 
   useEffect(() => {
     if (!fuelBaseData) return;
