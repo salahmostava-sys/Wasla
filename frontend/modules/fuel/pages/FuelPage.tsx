@@ -261,6 +261,7 @@ export default function FuelPage() {
         totalFuel={totalFuel}
         avgCostPerKm={avgCostPerKm}
         totalOrders={totalOrders}
+        pageTab={pageTab}
       />
 
       <Card className="border-border/60 shadow-sm overflow-hidden">
