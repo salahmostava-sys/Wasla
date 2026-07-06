@@ -29,6 +29,7 @@ export interface TreasuryTransaction {
   description: string | null;
   attachment_url: string | null;
   transfer_to_account_id: string | null;
+  app_id: string | null;
   created_by: string | null;
   created_at: string;
   
@@ -36,6 +37,7 @@ export interface TreasuryTransaction {
   account?: { name: string };
   transfer_to_account?: { name: string };
   category?: { name: string };
+  app?: { name: string };
 }
 
 export interface TreasuryAccountBalance extends TreasuryAccount {

@@ -22,6 +22,12 @@ export function useTreasury(from: string, to: string) {
     enabled,
   });
 
+  const appsQuery = useQuery({
+    queryKey: ['treasury_apps', userKey],
+    queryFn: () => treasuryService.getApps(),
+    enabled,
+  });
+
   const categoriesQuery = useQuery({
     queryKey: ['treasury_categories', userKey],
     queryFn: () => treasuryService.getCategories(),
@@ -73,6 +79,7 @@ export function useTreasury(from: string, to: string) {
               account_id: prevTx.account_id,
               category_id: prevTx.category_id,
               transfer_to_account_id: prevTx.transfer_to_account_id,
+              app_id: prevTx.app_id,
               amount: prevTx.amount,
               description: prevTx.description,
               transaction_date: prevTx.transaction_date,
@@ -101,6 +108,7 @@ export function useTreasury(from: string, to: string) {
             account_id: deletedTx.account_id,
             category_id: deletedTx.category_id,
             transfer_to_account_id: deletedTx.transfer_to_account_id,
+            app_id: deletedTx.app_id,
             amount: deletedTx.amount,
             description: deletedTx.description,
             attachment_url: deletedTx.attachment_url,
@@ -145,10 +153,11 @@ export function useTreasury(from: string, to: string) {
 
   return {
     accounts: accountsQuery.data ?? [],
+    apps: appsQuery.data ?? [],
     categories: categoriesQuery.data ?? [],
     balances: balancesQuery.data ?? [],
     transactions: transactionsQuery.data ?? [],
-    isLoading: accountsQuery.isLoading || categoriesQuery.isLoading || transactionsQuery.isLoading || balancesQuery.isLoading,
+    isLoading: accountsQuery.isLoading || appsQuery.isLoading || categoriesQuery.isLoading || transactionsQuery.isLoading || balancesQuery.isLoading,
     createTransaction: createTransaction.mutateAsync,
     updateTransaction: updateTransactionMutation.mutateAsync,
     deleteTransaction: deleteTransactionMutation.mutateAsync,

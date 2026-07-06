@@ -14,6 +14,16 @@ export const treasuryService = {
     return data as TreasuryAccount[];
   },
 
+  getApps: async () => {
+    const { data, error } = await supabase
+      .from('apps')
+      .select('id, name')
+      .eq('is_active', true)
+      .order('name');
+    if (error) handleSupabaseError(error, 'treasuryService.getApps');
+    return data as { id: string; name: string }[];
+  },
+
   createAccount: async (input: Partial<TreasuryAccount>) => {
     const { data, error } = await supabase
       .from('treasury_accounts')
@@ -77,7 +87,8 @@ export const treasuryService = {
         *,
         account:treasury_accounts!account_id(name),
         transfer_to_account:treasury_accounts!transfer_to_account_id(name),
-        category:treasury_categories!category_id(name)
+        category:treasury_categories!category_id(name),
+        app:apps!app_id(name)
       `)
       .gte('transaction_date', from)
       .lte('transaction_date', to)

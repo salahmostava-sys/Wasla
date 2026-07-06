@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@shared/components/ui/alert-dialog';
-import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, ArrowDownRight, Trash2, Pencil, Loader2, Download } from 'lucide-react';
+import { Landmark, Wallet, Banknote, ArrowLeftRight, Paperclip, ArrowUpRight, ArrowDownRight, Trash2, Pencil, Loader2, Download, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { storageService } from '@services/storageService';
 
@@ -29,7 +29,7 @@ export function TreasuryTab() {
   const [to, setTo] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   const {
-    accounts, categories, balances, transactions,
+    accounts, apps, categories, balances, transactions,
     createTransaction, isCreatingTransaction,
     deleteTransaction, isDeletingTransaction,
     updateTransaction, isUpdatingTransaction,
@@ -41,6 +41,7 @@ export function TreasuryTab() {
   const [accountId, setAccountId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [transferToId, setTransferToId] = useState('');
+  const [appId, setAppId] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -55,6 +56,7 @@ export function TreasuryTab() {
   const [editAccountId, setEditAccountId] = useState('');
   const [editCategoryId, setEditCategoryId] = useState('');
   const [editTransferToId, setEditTransferToId] = useState('');
+  const [editAppId, setEditAppId] = useState('');
   const [editAmount, setEditAmount] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editDate, setEditDate] = useState('');
@@ -65,6 +67,7 @@ export function TreasuryTab() {
     setEditAccountId(t.account_id);
     setEditCategoryId(t.category_id || '');
     setEditTransferToId(t.transfer_to_account_id || '');
+    setEditAppId(t.app_id || '');
     setEditAmount(t.amount.toString());
     setEditDescription(t.description || '');
     setEditDate(t.transaction_date);
@@ -84,6 +87,7 @@ export function TreasuryTab() {
           account_id: editAccountId,
           category_id: editType === 'transfer' ? null : editCategoryId,
           transfer_to_account_id: editType === 'transfer' ? editTransferToId : null,
+          app_id: editAppId || null,
           amount: Number(editAmount),
           description: editDescription || null,
           transaction_date: editDate,
@@ -115,6 +119,7 @@ export function TreasuryTab() {
         account_id: accountId,
         category_id: type === 'transfer' ? null : categoryId,
         transfer_to_account_id: type === 'transfer' ? transferToId : null,
+        app_id: appId || null,
         amount: Number(amount),
         description: description || null,
         attachment_url,
@@ -124,6 +129,7 @@ export function TreasuryTab() {
       setAmount('');
       setDescription('');
       setFile(null);
+      setAppId('');
       setIsAddingRow(false);
       toast.success('تم تسجيل العملية بنجاح');
     } catch {
@@ -175,6 +181,38 @@ export function TreasuryTab() {
           </div>
         ))}
       </div>
+
+      {/* ── App Revenues (إيرادات المنصات) ────────────────────── */}
+      {(() => {
+        const sums: Record<string, number> = {};
+        transactions.forEach(t => {
+          if (t.type === 'income' && t.app_id) {
+            sums[t.app_id] = (sums[t.app_id] || 0) + t.amount;
+          }
+        });
+        const appRevenues = Object.entries(sums).map(([id, amount]) => {
+          const app = apps.find(a => a.id === id);
+          return { id, name: app?.name || 'منصة غير معروفة', amount };
+        }).sort((a, b) => b.amount - a.amount);
+
+        if (appRevenues.length === 0) return null;
+
+        return (
+          <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-xl p-4">
+            <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-3">
+              <TrendingUp size={16} /> المبالغ المحصلة من المنصات (خلال الفترة)
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {appRevenues.map(ar => (
+                <div key={ar.id} className="bg-background shadow-sm border border-border rounded-lg px-3 py-2 flex items-center gap-3">
+                  <span className="text-xs font-medium text-muted-foreground">{ar.name}</span>
+                  <span className="text-sm font-black text-emerald-600">{ar.amount.toLocaleString('en-US')} <span className="text-[10px] font-normal">ر.س</span></span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="space-y-6">
 
@@ -337,10 +375,18 @@ export function TreasuryTab() {
                                 {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                               </select>
                             ) : (
-                              <select value={editCategoryId} onChange={e => setEditCategoryId(e.target.value)} className="w-full h-8 text-xs rounded border border-input bg-background px-2">
-                                <option value="">البند...</option>
-                                {categories.filter(c => c.type === editType).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                              </select>
+                              <div className="space-y-1.5">
+                                <select value={editCategoryId} onChange={e => setEditCategoryId(e.target.value)} className="w-full h-8 text-xs rounded border border-input bg-background px-2">
+                                  <option value="">البند...</option>
+                                  {categories.filter(c => c.type === editType).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                                {editType === 'income' && (
+                                  <select value={editAppId} onChange={e => setEditAppId(e.target.value)} className="w-full h-8 text-xs rounded border border-input bg-background px-2">
+                                    <option value="">(اختياري) المنصة / الشركة...</option>
+                                    {apps.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                  </select>
+                                )}
+                              </div>
                             )}
                           </td>
                           <td className="ta-td align-top pt-3">
@@ -406,7 +452,14 @@ export function TreasuryTab() {
                             t.account?.name
                           )}
                         </td>
-                        <td className="ta-td text-xs">{t.category?.name || '—'}</td>
+                        <td className="ta-td text-xs">
+                          {t.category?.name || '—'}
+                          {t.app?.name && (
+                            <div className="text-[10px] text-muted-foreground mt-0.5 font-semibold bg-muted px-1.5 py-0.5 rounded-sm inline-block">
+                              {t.app.name}
+                            </div>
+                          )}
+                        </td>
                         <td className="ta-td text-emerald-600 font-bold">
                           {t.type === 'income' ? t.amount.toLocaleString('en-US') : '—'}
                         </td>
