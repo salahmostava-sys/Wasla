@@ -1,7 +1,8 @@
 import { formatCurrency, formatStandardDateTime } from '@shared/lib/formatters';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square } from 'lucide-react';
+import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Skeleton } from '@shared/components/ui/skeleton';
@@ -141,12 +142,104 @@ export function VehicleReportsTab() {
       .map(p => `${escapeHtml(p.spare_parts?.name_ar ?? '—')} ×${p.quantity_used}`)
       .join('، ');
 
-  const printReport = () => {
+  const printReport = (mode: 'separated' | 'combined' = 'separated') => {
+    let bodyHtml = '';
+
+    if (mode === 'separated') {
+      bodyHtml = filteredGroups.map((g) => {
+        const tableHtml = g.logs.length === 0 ? `
+              <tr>
+                <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
+              </tr>` : g.logs.map(log => `
+              <tr>
+                <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
+                <td>${escapeHtml(log.type)}</td>
+                <td>${partsSummary(log) || '—'}</td>
+                <td>${(Number(log.total_cost) || 0).toLocaleString('en-US')} ر.س</td>
+                <td>${escapeHtml(log.notes || '')}</td>
+              </tr>
+            `).join('');
+
+        return `
+        <div class="page-break">
+          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+          <h1>تقرير صيانة المركبات والمخزون</h1>
+          <div class="header-info">
+            <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>
+            <p style="font-size: 15px; font-weight: bold; color: #0f172a; margin-top: 10px;">المركبة: ${escapeHtml(g.type)} - لوحة: <span style="direction: ltr; display: inline-block;">${escapeHtml(g.plate_number)}</span></p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>تاريخ الصيانة</th>
+                <th>نوع الصيانة</th>
+                <th>القطع المستخدمة</th>
+                <th>التكلفة</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableHtml}
+            </tbody>
+          </table>
+          <p class="totals">إجمالي تكلفة الصيانة لهذه المركبة: ${formatCurrency(g.total_cost)}</p>
+        </div>
+        `;
+      }).join('');
+    } else {
+      const allRowsHtml = filteredGroups.map(g => {
+        if (g.logs.length === 0) {
+          return `<tr>
+            <td><strong>${escapeHtml(g.type)}<br/><span style="direction: ltr; display: inline-block;">${escapeHtml(g.plate_number)}</span></strong></td>
+            <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
+          </tr>`;
+        }
+        return g.logs.map((log, idx) => `
+          <tr>
+            ${idx === 0 ? `<td rowspan="${g.logs.length}"><strong>${escapeHtml(g.type)}<br/><span style="direction: ltr; display: inline-block;">${escapeHtml(g.plate_number)}</span></strong></td>` : ''}
+            <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
+            <td>${escapeHtml(log.type)}</td>
+            <td>${partsSummary(log) || '—'}</td>
+            <td>${(Number(log.total_cost) || 0).toLocaleString('en-US')} ر.س</td>
+            <td>${escapeHtml(log.notes || '')}</td>
+          </tr>
+        `).join('');
+      }).join('');
+
+      const totalCostSum = filteredGroups.reduce((sum, g) => sum + g.total_cost, 0);
+
+      bodyHtml = `
+        <div>
+          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+          <h1>تقرير صيانة المركبات والمخزون المجمع</h1>
+          <div class="header-info">
+            <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>المركبة</th>
+                <th>تاريخ الصيانة</th>
+                <th>نوع الصيانة</th>
+                <th>القطع المستخدمة</th>
+                <th>التكلفة</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${allRowsHtml}
+            </tbody>
+          </table>
+          <p class="totals">إجمالي تكلفة الصيانة لجميع المركبات المحددة: ${formatCurrency(totalCostSum)}</p>
+        </div>
+      `;
+    }
+
     const html = `
       <!DOCTYPE html>
       <html dir="rtl" lang="ar">
         <head>
-          <title>تقرير صيانة المركبات والمخزون</title>
+          <title>تقرير صيانة المركبات</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
             body { font-family: 'Tajawal', system-ui, sans-serif; padding: 20px; margin: 0; color: #111; background: #fff; }
@@ -166,46 +259,7 @@ export function VehicleReportsTab() {
           </style>
         </head>
         <body>
-          ${filteredGroups.map((g) => {
-            const tableHtml = g.logs.length === 0 ? `
-                  <tr>
-                    <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
-                  </tr>` : g.logs.map(log => `
-                  <tr>
-                    <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
-                    <td>${escapeHtml(log.type)}</td>
-                    <td>${partsSummary(log) || '—'}</td>
-                    <td>${(Number(log.total_cost) || 0).toLocaleString('en-US')} ر.س</td>
-                    <td>${escapeHtml(log.notes || '')}</td>
-                  </tr>
-                `).join('');
-
-            return `
-            <div class="page-break">
-              <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
-              <h1>تقرير صيانة المركبات والمخزون</h1>
-              <div class="header-info">
-                <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>
-                <p style="font-size: 15px; font-weight: bold; color: #0f172a; margin-top: 10px;">المركبة: ${escapeHtml(g.type)} - لوحة: <span style="direction: ltr; display: inline-block;">${escapeHtml(g.plate_number)}</span></p>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>تاريخ الصيانة</th>
-                    <th>نوع الصيانة</th>
-                    <th>القطع المستخدمة</th>
-                    <th>التكلفة</th>
-                    <th>ملاحظات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${tableHtml}
-                </tbody>
-              </table>
-              <p class="totals">إجمالي تكلفة الصيانة لهذه المركبة: ${formatCurrency(g.total_cost)}</p>
-            </div>
-            `;
-          }).join('')}
+          ${bodyHtml}
         </body>
       </html>
     `;
@@ -278,14 +332,23 @@ export function VehicleReportsTab() {
             />
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              onClick={printReport}
-              disabled={logsQ.isLoading || filteredGroups.length === 0}
-            >
-              <Printer size={16} className="ml-2" />
-              طباعة / حفظ PDF
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={logsQ.isLoading || filteredGroups.length === 0}>
+                  <Printer size={16} className="ml-2" />
+                  طباعة / حفظ PDF
+                  <ChevronDown size={14} className="mr-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => printReport('combined')}>
+                  طباعة مجمعة للمركبات المحددة
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => printReport('separated')}>
+                  طباعة ملف لكل دباب (صفحات منفصلة)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
               <Download size={16} className="ml-2" />
               Excel

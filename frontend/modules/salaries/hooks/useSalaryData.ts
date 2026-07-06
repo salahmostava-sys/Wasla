@@ -97,6 +97,7 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
     enabled: isQueryEnabled,
     staleTime: 20_000,
     retry: defaultQueryRetry,
+    structuralSharing: false,
     queryFn: () => {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(
@@ -117,6 +118,7 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
     enabled: isQueryEnabled && phase1.isSuccess,
     staleTime: 20_000,
     retry: 1,
+    structuralSharing: false,
     queryFn: async () => {
       let previewData: Awaited<ReturnType<typeof salaryDataService.getSalaryPreviewForMonth>> = [];
       let previewBackendError: string | null = null;
@@ -144,6 +146,7 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
     staleTime: 0,        // always fresh — we control invalidation manually
     gcTime: 5 * 60_000, // keep in memory 5 min after unmount
     retry: false,
+    structuralSharing: false,
     queryFn: async () => {
       const monthlyContext = phase1.data ?? {};
       // Use current phase2 data if available, otherwise empty (phase1-only pass)
