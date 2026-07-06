@@ -204,7 +204,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
       const vehicleMap = buildVehicleMap((assignmentRows || []));
       const aggMap = buildMonthlyAggMap((dailyRowsRaw || []), employeeIdsOnPlatform);
       const allEmps = fuelBaseData?.employees?.length ? fuelBaseData.employees : employees;
-      return buildMonthlyRows(aggMap, ordersMap, vehicleMap, allEmps, employeeIdsOnPlatform);
+      return buildMonthlyRows(aggMap, ordersMap, vehicleMap, employees, allEmps, employeeIdsOnPlatform);
     },
     retry: defaultQueryRetry,
     staleTime: 30_000,
