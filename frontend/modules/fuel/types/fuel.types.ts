@@ -25,7 +25,7 @@ export type MonthlyRow = {
   daily_count: number;
 };
 
-export type Employee = { id: string; name: string; personal_photo_url?: string | null; status?: string | null; sponsorship_status?: string | null; probation_end_date?: string | null; vehicle?: { plate_number: string; type: string; brand?: string | null; model?: string | null } | null };
+export type Employee = { id: string; name: string; personal_photo_url?: string | null; status?: string | null; sponsorship_status?: string | null; probation_end_date?: string | null; job_title?: string | null; vehicle?: { plate_number: string; type: string; brand?: string | null; model?: string | null } | null };
 export type AppRow = { id: string; name: string };
 export type DailyMileageResponseRow = DailyRow & { employees?: { name: string; personal_photo_url?: string | null } };
 export type ImportStep = 1 | 2 | 3;
@@ -114,13 +114,14 @@ export const buildMonthlyRows = (
   employeeIdsOnPlatform: Set<string> | null
 ): MonthlyRow[] => {
   const employeeById = buildEmployeeIndex(allEmployees);
+  const isAdminEmployeeId = (id: string): boolean => isAdministrativeJobTitle(employeeById[id]?.job_title);
   const allEmployeeIds = new Set<string>([
     ...baseEmployees
-      .filter(e => !isAdministrativeJobTitle((e as unknown as { job_title?: string }).job_title))
+      .filter(e => !isAdministrativeJobTitle(e.job_title))
       .filter(e => !employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id))
       .map(e => e.id),
-    ...Object.keys(aggMap),
-    ...Object.keys(ordersMap).filter((id) => (ordersMap[id] || 0) > 0),
+    ...Object.keys(aggMap).filter((id) => !isAdminEmployeeId(id)),
+    ...Object.keys(ordersMap).filter((id) => (ordersMap[id] || 0) > 0 && !isAdminEmployeeId(id)),
   ]);
   return Array.from(allEmployeeIds).map((employeeId) => {
     const agg = aggMap[employeeId];

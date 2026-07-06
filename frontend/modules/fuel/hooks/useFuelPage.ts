@@ -10,6 +10,7 @@ import { getErrorMessage } from '@services/serviceError';
 import { orderService } from '@services/orderService';
 import { useFuel } from '@modules/fuel/hooks/useFuel';
 import { isEmployeeExcluded, isEmployeeVisibleInMonth } from '@shared/lib/employeeVisibility';
+import { isAdministrativeJobTitle } from '@modules/salaries/model/salaryUtils';
 import {
   calcDailyStats,
   calcMonthlyStats,
@@ -121,8 +122,9 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
   const ridersForTab = useMemo(() => {
     const byId = new Map<string, Employee>();
 
-    // 1. أضف المناديب النشطين دائماً
+    // 1. أضف المناديب النشطين دائماً (باستثناء الوظائف الإدارية — هذه الصفحة خاصة بالمناديب)
     employees.forEach((e) => {
+      if (isAdministrativeJobTitle(e.job_title)) return;
       if (!employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id)) byId.set(e.id, e);
     });
 
@@ -131,7 +133,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
       if (orders <= 0) return;
       if (employeeIdsOnPlatform && !employeeIdsOnPlatform.has(empId)) return;
       const emp = fuelBaseData?.employees.find(e => e.id === empId);
-      if (emp && !byId.has(empId)) byId.set(empId, emp);
+      if (emp && !isAdministrativeJobTitle(emp.job_title) && !byId.has(empId)) byId.set(empId, emp);
     });
 
     // 3. طبّق قاعدة الظهور: اخفِ غير النشطين الذين لا طلبات لهم في الشهر

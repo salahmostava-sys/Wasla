@@ -67,11 +67,11 @@ function sanitizeEmployeeDateFields(payload: Record<string, unknown>): Record<st
 
 export const employeeService = {
   getActiveEmployees: async () => {
-    type EmployeeRow = { id: string; name: string; personal_photo_url: string | null; city: string | null; sponsorship_status: string | null; probation_end_date: string | null; status: string | null };
+    type EmployeeRow = { id: string; name: string; personal_photo_url: string | null; city: string | null; sponsorship_status: string | null; probation_end_date: string | null; status: string | null; job_title: string | null };
     return await fetchAllPages<EmployeeRow>(async (offset, limit) => {
       const { data, error } = await supabase
         .from('employees')
-        .select('id, name, personal_photo_url, city, sponsorship_status, probation_end_date, status')
+        .select('id, name, personal_photo_url, city, sponsorship_status, probation_end_date, status, job_title')
         .order('name')
         .range(offset, offset + limit - 1);
       return { data, error };
