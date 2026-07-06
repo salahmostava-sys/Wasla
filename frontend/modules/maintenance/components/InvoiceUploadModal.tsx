@@ -114,7 +114,8 @@ export function InvoiceUploadModal({
       let invoiceAttachmentUrl: string | null = null;
       if (file) {
         const ext = file.name.split('.').pop() ?? 'jpg';
-        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const randomPart = crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+        const fileName = `${Date.now()}-${randomPart}.${ext}`;
         invoiceAttachmentUrl = await storageService.uploadFile('invoice-attachments', fileName, file);
       }
 

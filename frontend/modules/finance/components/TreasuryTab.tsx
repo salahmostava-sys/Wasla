@@ -249,13 +249,13 @@ export function TreasuryTab() {
         <td className="ta-td">
           <Input type="number" min="0" placeholder="0" className="h-8 text-xs px-1.5 text-center"
             value={editType === 'income' ? editAmount : ''}
-            onChange={e => { if (editType !== 'income') setEditType('income'); setEditAmount(e.target.value); }}
+            onChange={e => { if (editType !== 'income') { setEditType('income'); } setEditAmount(e.target.value); }}
           />
         </td>
         <td className="ta-td">
           <Input type="number" min="0" placeholder="0" className="h-8 text-xs px-1.5 text-center"
             value={editType !== 'income' ? editAmount : ''}
-            onChange={e => { if (editType === 'income') setEditType('expense'); setEditAmount(e.target.value); }}
+            onChange={e => { if (editType === 'income') { setEditType('expense'); } setEditAmount(e.target.value); }}
           />
         </td>
         <td className="ta-td text-center text-muted-foreground text-xs">—</td>
@@ -319,7 +319,7 @@ export function TreasuryTab() {
         <div className="bg-card border-2 border-primary/30 rounded-xl p-5 shadow-md">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-sm flex items-center gap-2">
-              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">+</span>
+              <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">+</span>{' '}
               تسجيل عملية جديدة
             </h3>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setIsAddingRow(false); setFile(null); setAmount(''); setDescription(''); setAppId(''); }}>
@@ -329,12 +329,12 @@ export function TreasuryTab() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {/* Date */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-muted-foreground">التاريخ</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">التاريخ</div>
               <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="h-9 text-xs" />
             </div>
             {/* Type */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-muted-foreground">نوع العملية</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">نوع العملية</div>
               <select value={type} onChange={e => {
                 setType(e.target.value as TreasuryTransactionType);
                 if (e.target.value === 'transfer') setCategoryId('');
@@ -348,7 +348,7 @@ export function TreasuryTab() {
             </div>
             {/* Account */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-muted-foreground">{type === 'transfer' ? 'من حساب' : 'الحساب'}</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">{type === 'transfer' ? 'من حساب' : 'الحساب'}</div>
               <select value={accountId} onChange={e => setAccountId(e.target.value)} className={SELECT_CLS}>
                 <option value="">اختر الحساب...</option>
                 {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -357,7 +357,7 @@ export function TreasuryTab() {
             {/* Category or Transfer To */}
             {type === 'transfer' ? (
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-semibold text-muted-foreground">إلى حساب</label>
+                <div className="text-[11px] font-semibold text-muted-foreground">إلى حساب</div>
                 <select value={transferToId} onChange={e => setTransferToId(e.target.value)} className={SELECT_CLS}>
                   <option value="">اختر الحساب...</option>
                   {accounts.filter(a => a.id !== accountId).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -365,7 +365,7 @@ export function TreasuryTab() {
               </div>
             ) : (
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-semibold text-muted-foreground">البند</label>
+                <div className="text-[11px] font-semibold text-muted-foreground">البند</div>
                 <select value={categoryId} onChange={e => setCategoryId(e.target.value)} className={SELECT_CLS}>
                   <option value="">اختر البند...</option>
                   {categories.filter(c => c.type === categoryTypeForForm).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -375,7 +375,7 @@ export function TreasuryTab() {
             {/* App (only for income) */}
             {type === 'income' && (
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-semibold text-muted-foreground">المنصة / الشركة <span className="text-muted-foreground/60">(اختياري)</span></label>
+                <div className="text-[11px] font-semibold text-muted-foreground">المنصة / الشركة <span className="text-muted-foreground/60">(اختياري)</span></div>
                 <select value={appId} onChange={e => setAppId(e.target.value)} className={SELECT_CLS}>
                   <option value="">بدون منصة</option>
                   {apps.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -384,17 +384,17 @@ export function TreasuryTab() {
             )}
             {/* Amount */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-muted-foreground">المبلغ (ر.س)</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">المبلغ (ر.س)</div>
               <Input type="number" min="0" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="h-9 text-xs" />
             </div>
             {/* Description */}
             <div className="flex flex-col gap-1 md:col-span-2">
-              <label className="text-[11px] font-semibold text-muted-foreground">البيان / الوصف</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">البيان / الوصف</div>
               <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="وصف العملية..." className="h-9 text-xs" />
             </div>
             {/* File */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-muted-foreground">مرفق</label>
+              <div className="text-[11px] font-semibold text-muted-foreground">مرفق</div>
               <label className="flex items-center gap-2 h-9 px-3 border border-input rounded-lg cursor-pointer hover:bg-muted transition-colors text-xs text-muted-foreground">
                 <Paperclip size={13} className={file ? 'text-primary' : ''} />
                 <span className="truncate">{file ? file.name : 'إرفاق ملف...'}</span>
