@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
 import { Checkbox } from '@shared/components/ui/checkbox';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
-import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import {
   Dialog,

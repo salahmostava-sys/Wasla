@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, ArrowUpRight, ArrowDownRight, History, Search } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, History, Search } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { useLanguage } from '@app/providers/LanguageContext';
