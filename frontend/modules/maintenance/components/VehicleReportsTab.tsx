@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, Eye, CheckSquare, Square } from 'lucide-react';
+import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Skeleton } from '@shared/components/ui/skeleton';

@@ -1,4 +1,4 @@
-import { useState, useEffect, type Dispatch, type FormEvent, type SetStateAction } from 'react';
+import { useState, useEffect, type Dispatch, type FormEvent, type SetStateAction, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@app/providers/AuthContext';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
@@ -10,6 +10,7 @@ import { logError } from '@shared/lib/logger';
 import { brandLogoSrc } from '@shared/lib/brandLogo';
 import { Checkbox } from '@shared/components/ui/checkbox';
 import { Label } from '@shared/components/ui/label';
+import { useTranslation } from 'react-i18next';
 
 interface SystemSettings {
   project_name_ar: string;
@@ -58,12 +59,16 @@ function getFriendlyLoginErrorMessage(message: string): string {
   return 'تعذّر تسجيل الدخول حالياً. حاول مرة أخرى لاحقاً';
 }
 
-const FEATURES = [
-  { icon: 'dashboard_customize', title: 'لوحة تحكم ذكية', desc: 'متابعة فورية لجميع العمليات والمؤشرات الحيوية بلمحة واحدة.' },
-  { icon: 'local_shipping', title: 'إدارة المناديب', desc: 'تتبع وإدارة فريق التوصيل بالكامل مع تحليل الأداء.' },
-  { icon: 'analytics', title: 'تقارير مفصلة', desc: 'تحليل البيانات لتحسين الأداء وتقليل التكاليف التشغيلية.' },
-  { icon: 'security', title: 'أمان البيانات', desc: 'حماية كاملة لبيانات العملاء والشحنات بأحدث معايير التشفير.' },
-];
+import type { TFunction } from 'i18next';
+
+function useFeatures(t: TFunction) {
+  return useMemo(() => [
+    { icon: 'dashboard_customize', title: t('feature1Title'), desc: t('feature1Desc') },
+    { icon: 'local_shipping', title: t('feature2Title'), desc: t('feature2Desc') },
+    { icon: 'analytics', title: t('feature3Title'), desc: t('feature3Desc') },
+    { icon: 'security', title: t('feature4Title'), desc: t('feature4Desc') },
+  ], [t]);
+}
 
 async function fetchSettingsSafely(setSettings: (s: SystemSettings) => void) {
   try {
@@ -175,21 +180,25 @@ function LoginBrandingPanel({
   projectName: string;
   projectSubtitle: string;
 }>) {
+  const { t, i18n } = useTranslation();
+  const features = useFeatures(t);
+  const isRtl = i18n.language === 'ar';
+
   return (
     <section
       className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 overflow-hidden"
       style={{ background: 'linear-gradient(225deg, #00288e 0%, #1e40af 60%, #1d4ed8 100%)' }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10 animate-float-slow"
+        <div className={`absolute -top-24 ${isRtl ? '-right-24' : '-left-24'} w-96 h-96 rounded-full opacity-10 animate-float-slow`}
           style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)' }} />
-        <div className="absolute top-1/3 -left-16 w-64 h-64 rounded-full opacity-[0.07] animate-float-medium"
+        <div className={`absolute top-1/3 ${isRtl ? '-left-16' : '-right-16'} w-64 h-64 rounded-full opacity-[0.07] animate-float-medium`}
           style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)', animationDelay: '2s' }} />
-        <div className="absolute bottom-16 right-1/3 w-48 h-48 rounded-full opacity-[0.06] animate-float-slow"
+        <div className={`absolute bottom-16 ${isRtl ? 'right-1/3' : 'left-1/3'} w-48 h-48 rounded-full opacity-[0.06] animate-float-slow`}
           style={{ background: 'radial-gradient(circle, rgba(99,179,237,0.8) 0%, transparent 70%)', animationDelay: '3.5s' }} />
-        <div className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full border border-white/10 animate-float-medium"
+        <div className={`absolute top-1/2 ${isRtl ? 'right-1/4' : 'left-1/4'} w-32 h-32 rounded-full border border-white/10 animate-float-medium`}
           style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-20 h-20 rounded-full border border-white/8 animate-float-slow"
+        <div className={`absolute bottom-1/3 ${isRtl ? 'left-1/4' : 'right-1/4'} w-20 h-20 rounded-full border border-white/8 animate-float-slow`}
           style={{ animationDelay: '4s' }} />
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -208,7 +217,7 @@ function LoginBrandingPanel({
           ) : (
             <div className="w-24 h-24 -2xl bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-2xl">
               <span className="material-symbols-outlined text-6xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30" />
+              <span className={`absolute -top-1 ${isRtl ? '-right-1' : '-left-1'} w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30`} />
             </div>
           )}
           <div>
@@ -217,12 +226,12 @@ function LoginBrandingPanel({
           </div>
         </div>
         <p className="text-blue-100/70 text-lg max-w-md leading-relaxed">
-          نظام متكامل لإدارة الخدمات اللوجستية، مصمم لرفع كفاءة التوصيل وضمان الدقة في كل خطوة.
+          {t('systemSubtitleDesc')}
         </p>
       </div>
 
       <div className="relative z-10 grid grid-cols-2 gap-4 mt-12">
-        {FEATURES.map((f, i) => (
+        {features.map((f, i) => (
           <div
             key={f.icon}
             className="group bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-sm border border-white/10 hover:border-white/20 p-5 rounded-2xl flex flex-col gap-2.5 transition-all duration-300 cursor-default card-lift"
@@ -242,7 +251,7 @@ function LoginBrandingPanel({
         ))}
       </div>
 
-      <p className="relative z-10 text-blue-200/40 text-xs tracking-widest uppercase mt-8">
+      <p className={`relative z-10 text-blue-200/40 text-xs tracking-widest uppercase mt-8 ${isRtl ? 'text-right' : 'text-left'}`}>
         {`© ${new Date().getFullYear()} ${projectName}`}
       </p>
     </section>
@@ -273,9 +282,12 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
   password: string; setPassword: (v: string) => void; showPw: boolean; setShowPw: Dispatch<SetStateAction<boolean>>;
   capsLock: boolean; setCapsLock: (v: boolean) => void; email: string; loginError: string;
 }>) {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
   return (
     <div className="relative group">
-      <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200">
+      <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-5' : 'left-0 pl-5'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
         <span className="material-symbols-outlined text-2xl">lock</span>
       </div>
       <input
@@ -290,21 +302,21 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
         autoComplete="current-password"
         autoFocus={!!email}
         aria-invalid={!!loginError}
-        className="block w-full pr-14 pl-14 py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80"
+        className={`block w-full ${isRtl ? 'pr-14 pl-14' : 'pl-14 pr-14'} py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
         style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.2em' : 'normal', fontSize: !showPw ? '1.5rem' : '1.125rem' }} // NOSONAR
       />
       <button
         type="button"
         onClick={() => setShowPw(v => !v)}
-        className="absolute inset-y-0 left-0 pl-5 flex items-center text-muted-foreground hover:text-foreground transition-colors duration-200"
-        aria-label={showPw ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+        className={`absolute inset-y-0 ${isRtl ? 'left-0 pl-5' : 'right-0 pr-5'} flex items-center text-muted-foreground hover:text-foreground transition-colors duration-200`}
+        aria-label={showPw ? t('hidePassword') : t('showPassword')}
       >
         {showPw ? <EyeOff size={22} /> : <Eye size={22} />}
       </button>
       {capsLock && (
-        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 px-1 animate-slide-up mt-2">
+        <div className={`flex items-center gap-2 text-amber-600 dark:text-amber-400 px-1 animate-slide-up mt-2`}>
           <span className="material-symbols-outlined text-sm">warning</span>
-          <span className="text-xs">تنبيه: زر Caps Lock مفعّل</span>
+          <span className="text-xs">{t('capsLockWarning')}</span>
         </div>
       )}
     </div>
@@ -342,10 +354,13 @@ function LoginFormSection(props: LoginFormSectionProps) {
     projectSubtitle,
   } = props;
 
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
   return (
     <section className="w-full lg:w-[45%] flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-background relative min-h-screen lg:min-h-0">
 
-      <div className="absolute top-5 left-5 flex gap-2">
+      <div className={`absolute top-5 ${isRtl ? 'left-5' : 'right-5'} flex gap-2`}>
         <ThemeToggle className="w-10 h-10 hover:scale-105 active:scale-95" />
         <LanguageToggle className="w-10 h-10 hover:scale-105 active:scale-95" />
       </div>
@@ -375,8 +390,8 @@ function LoginFormSection(props: LoginFormSectionProps) {
           className="mb-10"
           style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(12px)', transition: 'opacity 450ms 50ms, transform 450ms 50ms cubic-bezier(0.22,1,0.36,1)' }}
         >
-          <h2 className="text-3xl font-extrabold text-foreground mb-2">تسجيل الدخول</h2>
-          <p className="text-muted-foreground">مرحباً بك مجدداً، يرجى إدخال بياناتك للمتابعة</p>
+          <h2 className="text-3xl font-extrabold text-foreground mb-2">{t('login')}</h2>
+          <p className="text-muted-foreground">{t('welcomeBack')}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
@@ -385,9 +400,9 @@ function LoginFormSection(props: LoginFormSectionProps) {
             className="space-y-2"
             style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(14px)', transition: 'opacity 450ms 120ms, transform 450ms 120ms cubic-bezier(0.22,1,0.36,1)' }}
           >
-            <label htmlFor="login-email" className="block text-sm font-medium text-muted-foreground">البريد الإلكتروني</label>
+            <label htmlFor="login-email" className="block text-sm font-medium text-muted-foreground">{t('email')}</label>
             <div className="relative group">
-              <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200">
+              <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-5' : 'left-0 pl-5'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
                 <span className="material-symbols-outlined text-2xl">mail</span>
               </div>
               <input
@@ -402,7 +417,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
                 autoComplete="email"
                 autoFocus={!email}
                 aria-invalid={!!loginError}
-                className="block w-full pr-14 pl-5 py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80"
+                className={`block w-full ${isRtl ? 'pr-14 pl-5' : 'pl-14 pr-5'} py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
               />
             </div>
           </div>
@@ -411,7 +426,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
             className="space-y-2"
             style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(14px)', transition: 'opacity 450ms 180ms, transform 450ms 180ms cubic-bezier(0.22,1,0.36,1)' }}
           >
-            <label htmlFor="login-password" className="block text-sm font-medium text-muted-foreground">كلمة المرور</label>
+            <label htmlFor="login-password" className="block text-sm font-medium text-muted-foreground">{t('password')}</label>
             <PasswordField
               password={password}
               setPassword={setPassword}
@@ -435,7 +450,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
               className="h-5 w-5"
             />
             <Label htmlFor="remember-me" className="text-sm text-muted-foreground font-normal cursor-pointer select-none leading-none">
-              تذكرني في المرة القادمة
+              {t('rememberMe')}
             </Label>
           </div>
 
@@ -459,9 +474,9 @@ function LoginFormSection(props: LoginFormSectionProps) {
                 }}
               />
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /><span>جاري التحقق…</span></>
+                <><Loader2 size={18} className="animate-spin" /><span>{t('loginVerifying')}</span></>
               ) : (
-                <><span>تسجيل الدخول</span><span className="material-symbols-outlined text-xl">login</span></>
+                <><span>{t('login')}</span><span className="material-symbols-outlined text-xl">login</span></>
               )}
             </button>
           </div>
@@ -481,11 +496,18 @@ const Login = () => {
     loading, loginError, settings, capsLock, setCapsLock, mounted, handleLogin
   } = useLoginLogic();
 
-  const projectName = settings?.project_name_ar || 'مهمات التوصيل';
-  const projectSubtitle = settings?.project_subtitle_ar || 'دقة في الإدارة';
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
+  const projectName = isRtl
+    ? settings?.project_name_ar || t('appName')
+    : settings?.project_name_en || t('appName');
+  const projectSubtitle = isRtl
+    ? settings?.project_subtitle_ar || t('appSubtitle')
+    : settings?.project_subtitle_en || t('appSubtitle');
 
   return (
-    <div className="min-h-screen flex" dir="rtl">
+    <div className="min-h-screen flex" dir={isRtl ? 'rtl' : 'ltr'}>
 
       <LoginBrandingPanel
         settings={settings}
@@ -515,9 +537,9 @@ const Login = () => {
       />
 
       {/* Security badge */}
-      <div className="fixed bottom-6 left-6 hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-4 shadow-card border border-border/40 rounded-2xl">
+      <div className={`fixed bottom-6 ${isRtl ? 'left-6' : 'right-6'} hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-4 shadow-card border border-border/40 rounded-2xl`}>
         <span className="material-symbols-outlined text-emerald-500 text-lg">verified_user</span>
-        <span className="text-xs font-semibold text-muted-foreground">اتصال آمن ومحمي</span>
+        <span className="text-xs font-semibold text-muted-foreground">{t('secureConnection')}</span>
       </div>
     </div>
   );

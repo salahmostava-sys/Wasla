@@ -169,6 +169,21 @@ const TRANSLATION_ENTRIES: readonly TranslationEntry[] = [
   ['settingsSaved', 'تم حفظ الإعدادات', 'Settings Saved'],
   ['lightTheme', '☀️ فاتح', '☀️ Light'],
   ['darkTheme', '🌙 داكن', '🌙 Dark'],
+  ['welcomeBack', 'مرحباً بك مجدداً، يرجى إدخال بياناتك للمتابعة', 'Welcome back, please enter your details to continue'],
+  ['systemSubtitleDesc', 'نظام متكامل لإدارة الخدمات اللوجستية، مصمم لرفع كفاءة التوصيل وضمان الدقة في كل خطوة.', 'An integrated logistics management system designed to increase delivery efficiency and ensure accuracy at every step.'],
+  ['feature1Title', 'لوحة تحكم ذكية', 'Smart Dashboard'],
+  ['feature1Desc', 'متابعة فورية لجميع العمليات والمؤشرات الحيوية بلمحة واحدة.', 'Real-time tracking of all operations and vital indicators at a glance.'],
+  ['feature2Title', 'إدارة المناديب', 'Rider Management'],
+  ['feature2Desc', 'تتبع وإدارة فريق التوصيل بالكامل مع تحليل الأداء.', 'Track and manage the entire delivery team with performance analysis.'],
+  ['feature3Title', 'تقارير مفصلة', 'Detailed Reports'],
+  ['feature3Desc', 'تحليل البيانات لتحسين الأداء وتقليل التكاليف التشغيلية.', 'Data analysis to improve performance and reduce operational costs.'],
+  ['feature4Title', 'أمان البيانات', 'Data Security'],
+  ['feature4Desc', 'حماية كاملة لبيانات العملاء والشحنات بأحدث معايير التشفير.', 'Full protection of customer and shipment data with latest encryption standards.'],
+  ['loginVerifying', 'جاري التحقق…', 'Verifying...'],
+  ['capsLockWarning', 'تنبيه: زر Caps Lock مفعّل', 'Warning: Caps Lock is on'],
+  ['secureConnection', 'اتصال آمن ومحمي', 'Secure and protected connection'],
+  ['hidePassword', 'إخفاء كلمة المرور', 'Hide password'],
+  ['showPassword', 'إظهار كلمة المرور', 'Show password'],
 ];
 
 const buildTranslations = (locale: Locale): Record<string, string> => {
