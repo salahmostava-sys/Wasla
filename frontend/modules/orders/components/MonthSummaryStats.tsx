@@ -61,7 +61,7 @@ export function MonthSummaryStats(props: Readonly<Props>) {
             >
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0"
-                style={{ backgroundColor: c.bg, color: c.text }}
+                style={{ backgroundColor: c.solid, color: c.solidText }}
               >
                 {app.name}
               </span>

@@ -1,4 +1,4 @@
-﻿import type React from 'react';
+import type React from 'react';
 import { Search, Save, FolderOpen, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
@@ -182,7 +182,7 @@ export function OrdersSpreadsheetToolbar(props: Readonly<Props>) {
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-foreground',
                   )}
-                  style={active ? { backgroundColor: c.bg, color: c.text, borderColor: c.bg } : undefined}
+                  style={active ? { backgroundColor: c.solid, color: c.solidText, borderColor: c.solid } : undefined}
                   title={`${app.name} — ${meta.title}`}
                 >
                   <span className="shrink-0" aria-hidden>{meta.icon}</span>

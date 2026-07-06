@@ -79,7 +79,7 @@ export const OrdersSummaryTable = React.memo(({
                 className="text-center p-3 font-semibold min-w-[90px] border-l border-border/50 cursor-pointer"
               >
                 <div className="flex items-center justify-center gap-1.5">
-                  <ColorBadge label={app.name} bg={c.bg} fg={c.text} />
+                  <ColorBadge label={app.name} bg={c.solid} fg={c.solidText} />
                   <SortIcon active={sortField === appField} dir={sortDir} />
                 </div>
               </th>

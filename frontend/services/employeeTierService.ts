@@ -9,7 +9,7 @@ export const employeeTierService = {
     return data ?? [];
   },
   getEmployees: async () => {
-    const { data, error } = await supabase.from('employees').select('id, name, sponsorship_status').order('name');
+    const { data, error } = await supabase.from('employees').select('id, name, sponsorship_status, status').order('name');
     throwIfError(error, 'employeeTierService.getEmployees');
     return data ?? [];
   },

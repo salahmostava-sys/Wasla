@@ -123,8 +123,8 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
             <div key={app.id} className="flex items-center gap-2">
               <ColorBadge
                 label={app.name}
-                bg={c.bg}
-                fg={c.text}
+                bg={c.solid}
+                fg={c.solidText}
                 className="min-w-[70px] text-center"
               />
               <input
