@@ -22,6 +22,8 @@ export type PresenceUser = {
   color: string;
   /** The row this user is currently editing (null = just viewing) */
   activeRowId: string | null;
+  /** The current path the user is on (optional, for global presence) */
+  currentPath?: string;
 };
 
 /** Stable avatar colors assigned per user index. */
@@ -44,6 +46,7 @@ type PresenceTrackPayload = {
   name: string;
   color: string;
   activeRowId: string | null;
+  currentPath?: string;
 };
 
 function collectPresenceState(
@@ -60,6 +63,7 @@ function collectPresenceState(
         name: p.name,
         color: p.color,
         activeRowId: p.activeRowId,
+        currentPath: p.currentPath,
       };
       users.push(u);
       if (p.activeRowId) {
@@ -70,12 +74,32 @@ function collectPresenceState(
   return { users, rows };
 }
 
-export function usePagePresence(pageKey: string) {
+export function usePagePresence(pageKey: string, currentPath?: string) {
   const { user } = useAuth();
   const [onlineUsers, setOnlineUsers] = useState<PresenceUser[]>([]);
   const [activeRows, setActiveRows] = useState<Map<string, PresenceUser>>(new Map());
   const channelRef = useRef<RealtimeChannel | null>(null);
   const currentRowRef = useRef<string | null>(null);
+  const currentPathRef = useRef<string | undefined>(currentPath);
+
+  // تحديث المسار الحالي باستمرار لتجنب الاعتماديات القديمة في subscribe
+  useEffect(() => {
+    currentPathRef.current = currentPath;
+  }, [currentPath]);
+
+  // تحديث الحالة عند تغير المسار (دون إعادة الاشتراك الكاملة)
+  useEffect(() => {
+    const channel = channelRef.current;
+    if (channel && user?.id) {
+      channel.track({
+        userId: user.id,
+        name: user.user_metadata?.name ?? user.email ?? 'مستخدم',
+        color: pickColor(user.id),
+        activeRowId: currentRowRef.current,
+        currentPath: currentPath,
+      }).catch(() => {});
+    }
+  }, [currentPath, user?.id, user?.user_metadata?.name, user?.email]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -98,7 +122,8 @@ export function usePagePresence(pageKey: string) {
             userId: user.id,
             name: user.user_metadata?.name ?? user.email ?? 'مستخدم',
             color: pickColor(user.id),
-            activeRowId: null,
+            activeRowId: currentRowRef.current,
+            currentPath: currentPathRef.current,
           });
         }
       });
@@ -106,11 +131,11 @@ export function usePagePresence(pageKey: string) {
     channelRef.current = channel;
 
     return () => {
+      channel.untrack().catch(() => {});
       supabase.removeChannel(channel).catch(() => {});
       channelRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- re-subscribe only when user.id or page changes, not on metadata updates
-  }, [user?.id, pageKey]);
+  }, [pageKey, user?.id, user?.email, user?.user_metadata?.name]);
 
   /** Call when user starts editing a specific row. Pass null to clear. */
   const trackRow = useCallback(
@@ -123,6 +148,7 @@ export function usePagePresence(pageKey: string) {
         name: user.user_metadata?.name ?? user.email ?? 'مستخدم',
         color: pickColor(user.id),
         activeRowId: rowId,
+        currentPath: currentPathRef.current,
       });
     },
     [user],
