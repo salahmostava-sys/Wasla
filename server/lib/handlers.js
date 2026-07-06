@@ -129,7 +129,7 @@ export async function salaryEngineHandler(req, res) {
     const message = getErrorMessage(err);
     logError('Salary engine failed', { request_id: requestId, error: message });
     const status = classifySalaryError(message);
-    const safeMessage = status === 500 ? 'Internal server error' : message;
+    const safeMessage = status === 500 ? 'Internal server error: ' + message : message;
     return res.status(status).json({ error: safeMessage });
   }
 }

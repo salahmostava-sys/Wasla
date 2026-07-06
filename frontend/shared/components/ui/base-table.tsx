@@ -44,12 +44,12 @@ export function BaseTable<T>({
   }
 
   return (
-    <div className={`w-full overflow-auto border rounded-xl bg-card ${className}`}>
+    <div className={`w-full overflow-x-auto border rounded-xl bg-card ${className}`}>
       <table className="w-full text-sm text-right">
         <thead className="bg-muted/50 border-b">
           <tr>
             {columns.map((col, idx) => (
-              <th key={String(col.key) + idx} className={`p-4 font-medium text-muted-foreground whitespace-nowrap ${col.className || ''}`}>
+              <th key={String(col.key) + idx} className={`p-4 font-medium text-muted-foreground min-w-[120px] whitespace-normal text-center align-middle ${col.className || ''}`}>
                 {col.title}
               </th>
             ))}

@@ -8,9 +8,10 @@ import { useLanguage } from '@app/providers/LanguageContext';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import walletService from '@services/walletService';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
+import { BaseTable, type TableColumn } from '@shared/components/ui/base-table';
 import WalletTransactionModal from '../components/WalletTransactionModal';
 import WalletHistoryModal from '../components/WalletHistoryModal';
-
+import type { EmployeeWalletBalance } from '@modules/wallet/types/wallet.types';
 const WalletPage = () => {
   const { isRTL } = useLanguage();
   const { enabled } = useAuthQueryGate();
@@ -44,6 +45,62 @@ const WalletPage = () => {
     return filtered.filter(b => b.employee_name.includes(searchQuery));
   }, [balances, searchQuery]);
 
+  const columns: TableColumn<EmployeeWalletBalance>[] = [
+    {
+      key: 'employee_name',
+      title: 'المندوب',
+      className: 'font-medium text-start',
+    },
+    {
+      key: 'balance',
+      title: 'الرصيد بالعهدة (كاش)',
+      className: 'text-start',
+      render: (item) => (
+        <span className={`font-bold ${item.balance > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}>
+          {item.balance.toLocaleString()} ريال
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: 'إجراءات',
+      className: 'text-end',
+      render: (item) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 gap-1 border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-900/50 dark:bg-orange-900/20 dark:text-orange-400"
+            onClick={() => handleOpenTransaction({ id: item.employee_id, name: item.employee_name }, 'collection')}
+          >
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            تسجيل كاش
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 gap-1 border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-400"
+            onClick={() => handleOpenTransaction({ id: item.employee_id, name: item.employee_name }, 'deposit')}
+            disabled={item.balance <= 0}
+          >
+            <ArrowDownRight className="w-3.5 h-3.5" />
+            شحن المحفظة
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground"
+            onClick={() => handleOpenHistory({ id: item.employee_id, name: item.employee_name })}
+            title="سجل الحركات"
+            aria-label="سجل الحركات"
+          >
+            <History className="w-4 h-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center gap-2">
@@ -57,82 +114,18 @@ const WalletPage = () => {
           />
         </div>
       </div>
-      <div className="bg-card border border-border shadow-sm rounded-xl overflow-hidden">
-        {walletError ? (
-          <QueryErrorRetry error={walletError} onRetry={() => refetch()} title="تعذر تحميل أرصدة المحفظة" />
-        ) : isLoading ? (
-          <div className="flex justify-center p-12">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-start font-semibold">المندوب</th>
-                  <th className="px-4 py-3 text-start font-semibold">الرصيد بالعهدة (كاش)</th>
-                  <th className="px-4 py-3 text-end font-semibold">إجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {displayedBalances.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
-                      لا يوجد أرصدة حالية للمناديب.
-                    </td>
-                  </tr>
-                ) : (
-                  displayedBalances.map((item) => (
-                    <tr key={item.employee_id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-3 font-medium">
-                        {item.employee_name}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`font-bold ${item.balance > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}>
-                          {item.balance.toLocaleString()} ريال
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 gap-1 border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-900/50 dark:bg-orange-900/20 dark:text-orange-400"
-                            onClick={() => handleOpenTransaction({ id: item.employee_id, name: item.employee_name }, 'collection')}
-                          >
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                            تسجيل كاش
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 gap-1 border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-400"
-                            onClick={() => handleOpenTransaction({ id: item.employee_id, name: item.employee_name }, 'deposit')}
-                            disabled={item.balance <= 0}
-                          >
-                            <ArrowDownRight className="w-3.5 h-3.5" />
-                            شحن المحفظة
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground"
-                            onClick={() => handleOpenHistory({ id: item.employee_id, name: item.employee_name })}
-                            title="سجل الحركات"
-                            aria-label="سجل الحركات"
-                          >
-                            <History className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      
+      {walletError ? (
+        <QueryErrorRetry error={walletError} onRetry={() => refetch()} title="تعذر تحميل أرصدة المحفظة" />
+      ) : (
+        <BaseTable 
+          data={displayedBalances}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage="لا يوجد أرصدة حالية للمناديب."
+          className="bg-card shadow-sm border-border"
+        />
+      )}
 
       {selectedEmployee && (
         <>

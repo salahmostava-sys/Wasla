@@ -142,8 +142,6 @@ export function VehicleReportsTab() {
       .join('، ');
 
   const printReport = () => {
-    const totalCost = filteredGroups.reduce((s, g) => s + g.total_cost, 0);
-
     const html = `
       <!DOCTYPE html>
       <html dir="rtl" lang="ar">
@@ -161,41 +159,19 @@ export function VehicleReportsTab() {
             tr:nth-child(even) { background-color: #f8fafc; }
             .totals { text-align: left; margin-top: 12px; font-size: 13px; font-weight: bold; color: #0f172a; }
             @media print {
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 0; margin: 0; }
+              .page-break { page-break-after: always; padding-bottom: 20px; }
+              .page-break:last-child { page-break-after: auto; }
             }
           </style>
         </head>
         <body>
-          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
-          <h1>تقرير صيانة المركبات والمخزون</h1>
-          <div class="header-info">
-            <p>تاريخ الاستخراج: ${formatStandardDateTime()} | عدد المركبات في التقرير: ${filteredGroups.length}</p>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>رقم اللوحة</th>
-                <th>نوع المركبة</th>
-                <th>تاريخ الصيانة</th>
-                <th>نوع الصيانة</th>
-                <th>القطع المستخدمة</th>
-                <th>التكلفة</th>
-                <th>ملاحظات</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filteredGroups.map(g => {
-                if (g.logs.length === 0) {
-                  return `<tr>
-                    <td>${escapeHtml(g.plate_number)}</td>
-                    <td>${escapeHtml(g.type)}</td>
-                    <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
-                  </tr>`;
-                }
-                return g.logs.map(log => `
+          ${filteredGroups.map((g) => {
+            const tableHtml = g.logs.length === 0 ? `
                   <tr>
-                    <td>${escapeHtml(g.plate_number)}</td>
-                    <td>${escapeHtml(g.type)}</td>
+                    <td colspan="5" style="text-align: center; color: #94a3b8;">لا توجد صيانات مسجلة</td>
+                  </tr>` : g.logs.map(log => `
+                  <tr>
                     <td>${log.maintenance_date ? new Date(log.maintenance_date).toLocaleDateString('ar-SA') : ''}</td>
                     <td>${escapeHtml(log.type)}</td>
                     <td>${partsSummary(log) || '—'}</td>
@@ -203,10 +179,33 @@ export function VehicleReportsTab() {
                     <td>${escapeHtml(log.notes || '')}</td>
                   </tr>
                 `).join('');
-              }).join('')}
-            </tbody>
-          </table>
-          <p class="totals">إجمالي تكلفة الصيانة للمركبات المحددة: ${formatCurrency(totalCost)}</p>
+
+            return `
+            <div class="page-break">
+              <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+              <h1>تقرير صيانة المركبات والمخزون</h1>
+              <div class="header-info">
+                <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>
+                <p style="font-size: 15px; font-weight: bold; color: #0f172a; margin-top: 10px;">المركبة: ${escapeHtml(g.type)} - لوحة: <span style="direction: ltr; display: inline-block;">${escapeHtml(g.plate_number)}</span></p>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>تاريخ الصيانة</th>
+                    <th>نوع الصيانة</th>
+                    <th>القطع المستخدمة</th>
+                    <th>التكلفة</th>
+                    <th>ملاحظات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableHtml}
+                </tbody>
+              </table>
+              <p class="totals">إجمالي تكلفة الصيانة لهذه المركبة: ${formatCurrency(g.total_cost)}</p>
+            </div>
+            `;
+          }).join('')}
         </body>
       </html>
     `;

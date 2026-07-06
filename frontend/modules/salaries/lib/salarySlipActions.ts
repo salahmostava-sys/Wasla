@@ -25,6 +25,7 @@ export function previewSlipInIframe(container: HTMLElement, html: string): void 
   iframe.style.borderRadius = '8px';
   iframe.style.background = '#ffffff';
   iframe.sandbox.add('allow-same-origin');
+  iframe.sandbox.add('allow-scripts');
   iframe.srcdoc = html;
 
   container.appendChild(iframe);
