@@ -43,6 +43,9 @@ jobs:
         working-directory: frontend
         run: npm run test:coverage
 
+      - name: Fix coverage paths for SonarCloud
+        run: sed -i 's/SF:/SF:frontend\//g' frontend/coverage/lcov.info
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
