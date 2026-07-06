@@ -17,11 +17,11 @@ export function FuelFiltersToolbar(props: Readonly<{
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <div className="relative w-[200px] min-w-[170px] max-w-[260px]">
-        <Search size={14} className="absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      <div className="relative w-[240px] min-w-[200px] max-w-[300px]">
+        <Search size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <Input
           placeholder="بحث باسم المندوب..."
-          className="h-8 ps-8 pe-[4.25rem] text-xs"
+          className={`h-8 pr-8 text-xs ${search.trim() ? 'pl-[3.5rem]' : 'pl-3'}`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -30,7 +30,7 @@ export function FuelFiltersToolbar(props: Readonly<{
             type="button"
             variant="ghost"
             size="sm"
-            className="absolute end-1 top-1/2 -translate-y-1/2 h-7 px-2 text-[10px] text-muted-foreground"
+            className="absolute left-1 top-1/2 -translate-y-1/2 h-7 px-2 text-[10px] text-muted-foreground"
             onClick={() => setSearch('')}
           >
             تصفير
