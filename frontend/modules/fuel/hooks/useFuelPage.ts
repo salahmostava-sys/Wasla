@@ -9,7 +9,7 @@ import { logError } from '@shared/lib/logger';
 import { getErrorMessage } from '@services/serviceError';
 import { orderService } from '@services/orderService';
 import { useFuel } from '@modules/fuel/hooks/useFuel';
-import { isEmployeeExcluded } from '@shared/lib/employeeVisibility';
+import { isEmployeeExcluded, isEmployeeVisibleInMonth } from '@shared/lib/employeeVisibility';
 import {
   calcDailyStats,
   calcMonthlyStats,
@@ -108,33 +108,48 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     staleTime: 60_000,
   });
 
+
+  // مجموعة معرّفات المناديب الذين لديهم طلبات في الشهر المحدد
+  const activeEmployeeIdsInMonth = useMemo(() => {
+    const ids = new Set<string>();
+    Object.entries(monthOrdersMap).forEach(([empId, orders]) => {
+      if (orders > 0) ids.add(empId);
+    });
+    return ids;
+  }, [monthOrdersMap]);
+
   const ridersForTab = useMemo(() => {
     const byId = new Map<string, Employee>();
+
+    // 1. أضف المناديب النشطين دائماً
     employees.forEach((e) => {
       if (!employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id)) byId.set(e.id, e);
     });
 
-    // Ensure riders with monthly orders are visible so fuel/km can be recorded,
-    // even if they are currently inactive (terminated, suspended, etc.)
+    // 2. أضف المناديب غير النشطين الذين لديهم طلبات فعلية في هذا الشهر
     Object.entries(monthOrdersMap).forEach(([empId, orders]) => {
       if (orders <= 0) return;
       if (employeeIdsOnPlatform && !employeeIdsOnPlatform.has(empId)) return;
-      const emp = fuelBaseData?.employees.find(e => e.id === empId) || employees.find(e => e.id === empId);
-      if (emp) byId.set(empId, emp);
+      const emp = fuelBaseData?.employees.find(e => e.id === empId);
+      if (emp && !byId.has(empId)) byId.set(empId, emp);
     });
 
-    let list = Array.from(byId.values());
+    // 3. طبّق قاعدة الظهور: اخفِ غير النشطين الذين لا طلبات لهم في الشهر
+    let list = Array.from(byId.values()).filter(e =>
+      isEmployeeVisibleInMonth(e, activeEmployeeIdsInMonth)
+    );
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(e => e.name.toLowerCase().includes(q));
     }
     return list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-  }, [employees, employeeIdsOnPlatform, monthOrdersMap, search, fuelBaseData]);
+  }, [employees, employeeIdsOnPlatform, monthOrdersMap, activeEmployeeIdsInMonth, search, fuelBaseData]);
 
   useEffect(() => {
     if (!fuelBaseData) return;
-    // For fuel page, show all active employees regardless of monthly activity
-    // This ensures couriers with vehicles are visible even if they have no orders/attendance in the month
+    // نُظهر المناديب النشطين دائماً، والمناديب غير النشطين (منتهى/هروب) فقط إذا
+    // كان لديهم طلبات في الشهر المحدد — باستخدام نفس قاعدة isEmployeeVisibleInMonth
     setEmployees(fuelBaseData.employees.filter(e => !isEmployeeExcluded(e)));
     setApps(fuelBaseData.apps);
     setEmployeeAppLinks(fuelBaseData.links);
