@@ -140,14 +140,14 @@ const isVisibleEmployee = (row: AppEmployeeAssignmentRow['employees']) => {
 export const buildAppEmployees = ({
   assignments,
   orderRows,
-  targetOrders,
+  _targetOrders,
   employeeTargetOrders,
   daysInMonth,
   daysPassed,
 }: {
   assignments: AppEmployeeAssignmentRow[];
   orderRows: AppEmployeeOrderRow[];
-  targetOrders: number | null;
+  _targetOrders?: number | null;
   employeeTargetOrders?: number | null;
   daysInMonth: number;
   daysPassed: number;
@@ -162,7 +162,6 @@ export const buildAppEmployees = ({
     totalsByEmployee.set(row.employee_id, (totalsByEmployee.get(row.employee_id) ?? 0) + (row.orders_count ?? 0));
   });
 
-  const riderCount = visibleEmployees.length;
   const targetShare = employeeTargetOrders != null ? employeeTargetOrders : null;
 
   return visibleEmployees.map((employee) => {
