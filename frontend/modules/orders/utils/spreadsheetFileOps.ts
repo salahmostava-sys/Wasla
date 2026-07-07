@@ -54,6 +54,7 @@ export type SpreadsheetImportResult = {
  * التأكيد اليدوي لمطابقة الأسماء.
  */
 function applyMatrixMappingAndNotify(params: {
+  headerRow: string[];
   matrix: unknown[][];
   dayArr: number[];
   apps: App[];
@@ -64,9 +65,10 @@ function applyMatrixMappingAndNotify(params: {
   nameMapping: Map<string, string>;
   isClearAll: boolean;
 }): SpreadsheetImportResult {
-  const { matrix, dayArr, apps, data, targetAppId, appEmployeeIds, onApplyData, nameMapping, isClearAll } = params;
+  const { headerRow, matrix, dayArr, apps, data, targetAppId, appEmployeeIds, onApplyData, nameMapping, isClearAll } = params;
 
   const { newData, imported, skipped, errors } = mergeImportedOrdersFromMatrixWithMapping({
+    headerRow,
     matrixRows: matrix.slice(1),
     dayArr,
     apps,
@@ -314,9 +316,12 @@ export async function runSpreadsheetImport(params: {
     const expectedHeaders = buildOrdersIoHeaders(dayArr);
     const actualHeaders = (matrix[0] || []).map((h) => String(h ?? '').trim());
 
-    if (!ordersImportHeadersMatch(actualHeaders, expectedHeaders)) {
+    const { ImportFactory } = await import('./import/importFactory');
+    const strategy = ImportFactory.detectStrategy(actualHeaders);
+
+    if (!strategy) {
       toast.error('هيكل الملف غير صحيح', {
-        description: `عدد الأعمدة المتوقع: ${expectedHeaders.length}، عدد الأعمدة الموجود: ${actualHeaders.length}. تأكد من استخدام القالب الصحيح للشهر الحالي`
+        description: `لم يتم التعرف على التنسيق. استخدم تنسيق الشبكة (المندوب + الأيام) أو تنسيق القائمة الطولية (الاسم، اليوم، العدد).`
       });
       return null;
     }
@@ -360,6 +365,7 @@ export async function runSpreadsheetImport(params: {
           nameMapping.forEach((id, name) => finalMapping.set(name, id));
 
           const result = applyMatrixMappingAndNotify({
+            headerRow: actualHeaders,
             matrix, dayArr, apps, data, targetAppId, appEmployeeIds, onApplyData,
             nameMapping: finalMapping,
             isClearAll: false,
@@ -374,6 +380,7 @@ export async function runSpreadsheetImport(params: {
     matched.forEach((match, name) => finalMapping.set(name, match.id));
 
     return applyMatrixMappingAndNotify({
+      headerRow: actualHeaders,
       matrix, dayArr, apps, data, targetAppId, appEmployeeIds, onApplyData,
       nameMapping: finalMapping,
       isClearAll: file.name === '__never__',

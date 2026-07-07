@@ -1,7 +1,8 @@
 import type { App, DailyData } from '@modules/orders/types';
 import { toCellText } from '@modules/orders/utils/text';
-
 export type AppEmployeeIdsMap = Record<string, ReadonlySet<string>>;
+import { ImportFactory } from './import/importFactory';
+import { MatrixImportStrategy } from './import/matrixStrategy';
 
 export type SpreadsheetMergeResult = {
   newData: DailyData;
@@ -10,12 +11,12 @@ export type SpreadsheetMergeResult = {
   errors: string[];
 };
 
-type ImportTargetResolution = {
+export type ImportTargetResolution = {
   targetApps: App[];
   error?: string;
 };
 
-function getEmployeeAssignedApps(
+export function getEmployeeAssignedApps(
   empId: string,
   apps: App[],
   appEmployeeIds: AppEmployeeIdsMap,
@@ -23,7 +24,7 @@ function getEmployeeAssignedApps(
   return apps.filter((app) => appEmployeeIds[app.id]?.has(empId));
 }
 
-function clearEmployeeAppMonthData(
+export function clearEmployeeAppMonthData(
   nextData: DailyData,
   empId: string,
   appId: string,
@@ -34,7 +35,7 @@ function clearEmployeeAppMonthData(
   }
 }
 
-function resolveImportTargetAppsForEmployee(params: {
+export function resolveImportTargetAppsForEmployee(params: {
   empId: string;
   apps: App[];
   targetAppId?: string;
@@ -79,7 +80,7 @@ function resolveImportTargetAppsForEmployee(params: {
   return { targetApps: assignedApps };
 }
 
-function validateCellValue(cellValue: unknown, rowIdx: number, day: number): { valid: boolean; value: number; error?: string } {
+export function validateCellValue(cellValue: unknown, rowIdx: number, day: number): { valid: boolean; value: number; error?: string } {
   const val = Number(cellValue);
 
   if (Number.isNaN(val)) {
@@ -140,7 +141,8 @@ function processRowCellsForMappedImport(
 }
 
 export function mergeImportedOrdersFromMatrixWithMapping(params: {
-  matrixRows: unknown[];
+  headerRow?: string[];
+  matrixRows: unknown[][];
   dayArr: number[];
   apps: App[];
   prev: DailyData;
@@ -148,57 +150,32 @@ export function mergeImportedOrdersFromMatrixWithMapping(params: {
   nameMapping: Map<string, string>;
   appEmployeeIds: AppEmployeeIdsMap;
 }): SpreadsheetMergeResult {
-  const { matrixRows, dayArr, apps, prev, targetAppId, nameMapping, appEmployeeIds } = params;
+  const { headerRow = [], matrixRows, dayArr, apps, prev, targetAppId, nameMapping, appEmployeeIds } = params;
 
   let imported = 0;
   let skipped = 0;
   const errors: string[] = [];
   const newData = { ...prev };
-  const clearedScopes = new Set<string>();
 
   if (apps.length === 0) {
     errors.push('لا توجد منصات طلبات نشطة');
     return { newData, imported, skipped, errors };
   }
 
-  for (let rowIdx = 0; rowIdx < matrixRows.length; rowIdx++) {
-    const row = matrixRows[rowIdx];
-    const line = Array.isArray(row) ? row : [];
-    const empName = toCellText(line[0]).trim();
-
-    if (!empName) {
-      skipped++;
-      continue;
-    }
-
-    const empId = nameMapping.get(empName);
-    if (!empId) {
-      skipped++;
-      errors.push(`صف ${rowIdx + 2}: الموظف "${empName}" غير موجود`);
-      continue;
-    }
-
-    const { targetApps, error } = resolveImportTargetAppsForEmployee({
-      empId,
-      apps,
-      targetAppId,
-      appEmployeeIds,
-    });
-
-    if (error) {
-      skipped++;
-      errors.push(`صف ${rowIdx + 2}: ${error}`);
-      continue;
-    }
-
-    const result = processRowCellsForMappedImport(line, dayArr, rowIdx, empId, targetApps, newData, clearedScopes);
-    imported += result.imported;
-    errors.push(...result.errors);
-
-    if (!result.hasValidData) {
-      skipped++;
-    }
+  // If we don't have headerRow (e.g. from old code calling without it), we assume Matrix
+  // Otherwise we let Factory detect it, fallback to Matrix if undetected for backward compatibility
+  let strategy = ImportFactory.detectStrategy(headerRow);
+  if (!strategy) {
+    strategy = new MatrixImportStrategy();
   }
 
-  return { newData, imported, skipped, errors };
+  return strategy.parse({
+    matrixRows,
+    dayArr,
+    apps,
+    prev,
+    targetAppId,
+    nameMapping,
+    appEmployeeIds,
+  });
 }
