@@ -407,11 +407,10 @@ export function VehicleReportsTab() {
           <p className="text-xs text-muted-foreground">لم يتم العثور على مركبات مطابقة.</p>
         </div>
       ) : (
-        <div className="bg-card border border-border/60 rounded-xl overflow-hidden">
-          <div className="w-full flex flex-col">
-            {filteredGroups.map(group => (
-              <details key={group.vehicle_id} className="group border-b last:border-b-0">
-                <summary className="px-4 py-4 hover:bg-muted/50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {filteredGroups.map(group => (
+            <details key={group.vehicle_id} className="group bg-card border border-border/60 rounded-xl overflow-hidden">
+              <summary className="px-4 py-4 hover:bg-muted/50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <div className="flex items-center justify-between w-full pr-2">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -479,7 +478,6 @@ export function VehicleReportsTab() {
                 </div>
               </details>
             ))}
-          </div>
         </div>
       )}
     </div>
