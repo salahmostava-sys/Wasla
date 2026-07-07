@@ -1,1 +1,0 @@
-import{n as e}from"./AuthContext-RNleqRUj.js";function t(){let{user:t,session:n,authLoading:r}=e(),i=!!(t&&!r);return{enabled:!!(n&&i),authReady:i,userId:t?.id??null,authLoading:r}}function n(e){return e??`__none__`}export{t as n,n as t};

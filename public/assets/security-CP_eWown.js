@@ -1,1 +1,0 @@
-function e(e){return e==null?``:(typeof e==`object`?JSON.stringify(e):String(e)).replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function t(e){return e?e.replaceAll(`\\`,String.raw`\\`).replaceAll(`%`,String.raw`\%`).replaceAll(`_`,String.raw`\_`):``}export{t as n,e as t};

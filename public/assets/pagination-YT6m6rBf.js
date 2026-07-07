@@ -1,1 +1,0 @@
-var e=e=>({rows:e.rows??[],total:e.total??0,page:e.page,pageSize:e.pageSize});export{e as t};

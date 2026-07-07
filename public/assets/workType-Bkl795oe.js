@@ -1,1 +1,0 @@
-function e(e){return e!==`shift`}function t(e){return e===`shift`||e===`hybrid`}function n(t){return e(t.work_type)}function r(e){return t(e.work_type)}function i(e){return e===`shift`?`دوام`:e===`hybrid`?`مختلط`:`طلبات`}export{n,r,i as t};

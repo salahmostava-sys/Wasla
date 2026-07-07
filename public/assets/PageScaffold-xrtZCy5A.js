@@ -1,1 +1,0 @@
-import{o as e}from"./vendor-query-ggBepOXu.js";var t=e();function n({title:e,children:n,className:r}){return(0,t.jsxs)(`section`,{className:`space-y-2 ${r??``}`.trim(),children:[(0,t.jsx)(`h2`,{className:`text-sm font-semibold text-muted-foreground`,children:e}),n]})}export{n as t};

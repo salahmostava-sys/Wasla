@@ -1,1 +1,0 @@
-var e=[`image/png`,`image/jpeg`,`image/webp`,`application/pdf`];function t(t,n={}){let r=n.allowedTypes??e,i=n.maxSizeBytes??5242880;return r.includes(t.type)?t.size>i?{valid:!1,error:`الملف كبير جدًا`}:{valid:!0}:{valid:!1,error:`غير مسموح بهذا النوع`}}export{t};

@@ -1,1 +1,0 @@
-function e(e,t,n){return e===t?n===`asc`?`↑`:`↓`:``}function t(e,t,n){return e===n?t===`asc`?{sortField:n,sortDir:`desc`}:t===`desc`?{sortField:null,sortDir:null}:{sortField:n,sortDir:`asc`}:{sortField:n,sortDir:`asc`}}function n(e,t,n,r){return e===t?n===`asc`?`↑`:`↓`:r}export{e as n,n as r,t};
