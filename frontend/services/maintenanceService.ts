@@ -206,6 +206,27 @@ async function getMaintenanceLogById(id: string): Promise<MaintenanceLogWithDeta
   return mapLog(data);
 }
 
+async function upsertMaintenanceParts(logId: string, parts: MaintenancePartInput[]) {
+  if (parts.length === 0) return;
+  const merged = new Map<string, { maintenance_log_id: string; part_id: string; quantity_used: number; cost_at_time: number }>();
+  for (const p of parts) {
+    const existing = merged.get(p.part_id);
+    if (existing) {
+      existing.quantity_used += p.quantity_used;
+    } else {
+      merged.set(p.part_id, {
+        maintenance_log_id: logId,
+        part_id: p.part_id,
+        quantity_used: p.quantity_used,
+        cost_at_time: p.cost_at_time,
+      });
+    }
+  }
+  const rows = [...merged.values()];
+  const { error: pErr } = await supabase.from('maintenance_parts').insert(rows);
+  if (pErr) throwMaintenanceSchemaError(pErr, 'maintenanceService.upsertMaintenanceParts');
+}
+
 export async function createMaintenanceLog(
   data: CreateMaintenanceLogInput,
   parts: MaintenancePartInput[]
@@ -232,27 +253,7 @@ export async function createMaintenanceLog(
   if (error) throwMaintenanceSchemaError(error, 'maintenanceService.createMaintenanceLog.insert');
   const logId = inserted.id;
 
-  if (parts.length > 0) {
-    // Merge rows with the same part_id (sum quantities, use last cost_at_time)
-    // so we never violate the UNIQUE(maintenance_log_id, part_id) constraint.
-    const merged = new Map<string, { maintenance_log_id: string; part_id: string; quantity_used: number; cost_at_time: number }>();
-    for (const p of parts) {
-      const existing = merged.get(p.part_id);
-      if (existing) {
-        existing.quantity_used += p.quantity_used;
-      } else {
-        merged.set(p.part_id, {
-          maintenance_log_id: logId,
-          part_id: p.part_id,
-          quantity_used: p.quantity_used,
-          cost_at_time: p.cost_at_time,
-        });
-      }
-    }
-    const rows = [...merged.values()];
-    const { error: pErr } = await supabase.from('maintenance_parts').insert(rows);
-    if (pErr) throwMaintenanceSchemaError(pErr, 'maintenanceService.createMaintenanceLog.parts');
-  }
+  await upsertMaintenanceParts(logId, parts);
 
   return getMaintenanceLogById(logId);
 }
@@ -285,25 +286,7 @@ export async function updateMaintenanceLog(
     if (delErr) throwMaintenanceSchemaError(delErr, 'maintenanceService.updateMaintenanceLog.deleteParts');
 
     // 2. Insert new parts
-    if (parts.length > 0) {
-      const merged = new Map<string, { maintenance_log_id: string; part_id: string; quantity_used: number; cost_at_time: number }>();
-      for (const p of parts) {
-        const existing = merged.get(p.part_id);
-        if (existing) {
-          existing.quantity_used += p.quantity_used;
-        } else {
-          merged.set(p.part_id, {
-            maintenance_log_id: id,
-            part_id: p.part_id,
-            quantity_used: p.quantity_used,
-            cost_at_time: p.cost_at_time,
-          });
-        }
-      }
-      const rows = [...merged.values()];
-      const { error: insErr } = await supabase.from('maintenance_parts').insert(rows);
-      if (insErr) throwMaintenanceSchemaError(insErr, 'maintenanceService.updateMaintenanceLog.insertParts');
-    }
+    await upsertMaintenanceParts(id, parts);
   }
 
   return getMaintenanceLogById(id);
