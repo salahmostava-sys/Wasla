@@ -9,8 +9,6 @@ import { exportDailyAppReportExcel, printDailyAppReportTable } from '@modules/or
 import { toast } from '@shared/components/ui/sonner';
 import { getErrorMessage } from '@services/serviceError';
 import { useAppColors } from '@shared/hooks/useAppColors';
-import { useQuery } from '@tanstack/react-query';
-import { recommendationsService } from '@services/recommendationsService';
 
 export function useDailyAppReportTab() {
   const { enabled, userId } = useAuthQueryGate();
@@ -40,25 +38,7 @@ export function useDailyAppReportTab() {
     }
   }, [sq.apps, selectedApp]);
 
-  // Handle month change adjusting endDay if it exceeds days in new month
-  useEffect(() => {
-    if (endDay > daysInMonth) {
-      setEndDay(daysInMonth);
-    }
-  }, [daysInMonth, endDay]);
 
-  const { data: recommendationsMap = new Map<string, string>() } = useQuery({
-    queryKey: ['recommendations', monthKey, selectedApp],
-    enabled: enabled && !!selectedApp,
-    queryFn: async () => {
-      const recs = await recommendationsService.getByMonthApp(monthKey, selectedApp);
-      const map = new Map<string, string>();
-      for (const r of recs) {
-        if (r.note && r.note.trim()) map.set(r.employee_id, r.note.trim());
-      }
-      return map;
-    },
-  });
 
   const exportExcel = async () => {
     if (!selectedApp) return;
@@ -120,9 +100,9 @@ export function useDailyAppReportTab() {
         if (val > 0) hasAnyOrdersInPeriod = true;
       }
 
-      const note = recommendationsMap.get(emp.id) || '';
+      const note = '';
 
-      if (hasAnyOrdersInPeriod || note) {
+      if (hasAnyOrdersInPeriod) {
         reportData.push({
           empName: emp.name,
           dailyVals,
@@ -135,7 +115,7 @@ export function useDailyAppReportTab() {
     // Sort descending by total
     reportData.sort((a, b) => b.total - a.total);
     return reportData;
-  }, [selectedApp, sq.loading, sq.employees, sq.spreadsheetMonthData, startDay, endDay, recommendationsMap]);
+  }, [selectedApp, sq.loading, sq.employees, sq.spreadsheetMonthData, startDay, endDay]);
 
   return {
     loading: sq.loading,
