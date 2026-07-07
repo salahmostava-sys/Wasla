@@ -34,72 +34,84 @@ export const DailyAppReportTab = React.memo(() => {
         </div>
       </div>
 
-      <div className="bg-card shadow-card border border-border/50 rounded-2xl p-4 space-y-5">
-        {/* Apps Selection */}
-        <div className="space-y-2">
-          <Label className="text-sm font-semibold text-muted-foreground block">اختر المنصة / التطبيق:</Label>
-          <div className="flex flex-wrap gap-2">
-            {r.apps.map(app => {
-              const isSelected = r.selectedApp === app.id;
-              const color = r.getAppColor(app.id);
-              return (
-                <button
-                  key={app.id}
-                  onClick={() => r.setSelectedApp(app.id)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent shadow-sm",
-                    isSelected
-                      ? "text-white"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                  style={isSelected ? { backgroundColor: color, boxShadow: `0 4px 12px -4px ${color}` } : undefined}
-                >
-                  {app.name}
-                </button>
-              );
-            })}
+      <div className="bg-card shadow-card border border-border/50 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-6">
+          {/* Apps Selection */}
+          <div className="flex items-center gap-3">
+            <Label className="text-sm font-semibold text-muted-foreground whitespace-nowrap">اختر المنصة / التطبيق:</Label>
+            <div className="flex flex-wrap gap-2">
+              {r.apps.map((app) => {
+                const isSelected = r.selectedApp === app.id;
+                const color = r.getAppColor(app.id);
+                return (
+                  <button
+                    key={app.id}
+                    onClick={() => r.setSelectedApp(app.id)}
+                    className={cn(
+                      'px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent shadow-sm',
+                      isSelected ? 'text-white' : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                    style={isSelected ? { backgroundColor: color, boxShadow: `0 4px 12px -4px ${color}` } : undefined}
+                  >
+                    {app.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Date Filters */}
+          <div className="flex items-center gap-4 border-r border-border/50 pr-6">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground whitespace-nowrap">من يوم:</Label>
+              <Select value={String(r.startDay)} onValueChange={(v) => r.setStartDay(Number(v))}>
+                <SelectTrigger className="w-[80px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent dir="rtl" className="max-h-48">
+                  {Array.from({ length: r.daysInMonth }, (_, i) => i + 1).map((d) => (
+                    <SelectItem key={d} value={String(d)}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground whitespace-nowrap">إلى يوم:</Label>
+              <Select value={String(r.endDay)} onValueChange={(v) => r.setEndDay(Number(v))}>
+                <SelectTrigger className="w-[80px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent dir="rtl" className="max-h-48">
+                  {Array.from({ length: r.daysInMonth }, (_, i) => i + 1).map((d) => (
+                    <SelectItem key={d} value={String(d)} disabled={d < r.startDay}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
-        {/* Filters & Actions */}
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="flex gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">من يوم</Label>
-              <Select value={String(r.startDay)} onValueChange={(v) => r.setStartDay(Number(v))}>
-                <SelectTrigger className="w-[100px] h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent dir="rtl" className="max-h-48">
-                  {Array.from({ length: r.daysInMonth }, (_, i) => i + 1).map((d) => (
-                    <SelectItem key={d} value={String(d)}>{d}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">إلى يوم</Label>
-              <Select value={String(r.endDay)} onValueChange={(v) => r.setEndDay(Number(v))}>
-                <SelectTrigger className="w-[100px] h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent dir="rtl" className="max-h-48">
-                  {Array.from({ length: r.daysInMonth }, (_, i) => i + 1).map((d) => (
-                    <SelectItem key={d} value={String(d)} disabled={d < r.startDay}>{d}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button onClick={r.printPdf} variant="outline" className="gap-2 border-slate-700 hover:bg-slate-800 hover:text-white" disabled={!r.selectedApp}>
-              <Printer size={16} /> طباعة / PDF
-            </Button>
-            <Button onClick={r.exportExcel} className="gap-2 bg-green-600 hover:bg-green-700 text-white" disabled={!r.selectedApp}>
-              <FileSpreadsheet size={16} /> تنزيل Excel
-            </Button>
-          </div>
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Button
+            onClick={r.printPdf}
+            variant="outline"
+            className="gap-2 border-slate-700 hover:bg-slate-800 hover:text-white h-10"
+            disabled={!r.selectedApp}
+          >
+            <Printer size={16} /> طباعة / PDF
+          </Button>
+          <Button
+            onClick={r.exportExcel}
+            className="gap-2 bg-green-600 hover:bg-green-700 text-white h-10"
+            disabled={!r.selectedApp}
+          >
+            <FileSpreadsheet size={16} /> تنزيل Excel
+          </Button>
         </div>
       </div>
 
