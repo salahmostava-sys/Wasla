@@ -28,6 +28,7 @@ export function useRealtimePostgresChanges(
   onEventRef.current = onEvent;
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tablesKey = tables.join('\0');
 
   useEffect(() => {
     if (tables.length === 0) return;
@@ -49,5 +50,5 @@ export function useRealtimePostgresChanges(
       }
       unsubscribe();
     };
-  }, [channelName, tables, debounceMs]);
+  }, [channelName, tablesKey, debounceMs]);
 }

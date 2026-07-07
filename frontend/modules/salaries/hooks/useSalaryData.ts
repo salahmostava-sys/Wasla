@@ -6,7 +6,7 @@
  *
  * ── Phase 2 (slow, background, ~2-3s) ────────────────────────────────────
  * Calls preview_salary_for_month RPC after Phase 1 succeeds.
- * When it finishes, fullDataQuery is invalidated to rebuild rows with preview.
+ * When it finishes, fullDataQuery rebuilds rows with preview.
  *
  * ── fullDataQuery ─────────────────────────────────────────────────────────
  * Merges phase1 + phase2 data into PreparedSalaryState (rows, schemes, rules).
@@ -21,7 +21,7 @@
  * - No keepPreviousData — avoids isPlaceholderData blocking bugs.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useAuth } from '@app/providers/AuthContext';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { isValidSalaryMonthYear } from '@shared/lib/salaryValidation';
@@ -86,10 +86,6 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
     () => ['salaries', uid, 'preview', selectedMonth] as const,
     [uid, selectedMonth],
   );
-  const fullDataKey = useMemo(
-    () => ['salaries', uid, 'full-data', selectedMonth] as const,
-    [uid, selectedMonth],
-  );
 
   // ── Phase 1: fetch all non-RPC data ──────────────────────────────────────
   const phase1 = useQuery({
@@ -137,13 +133,18 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
 
   // ── Full state: build rows from phase1 + (optionally) phase2 ─────────────
   // Runs once after phase1 (with previewData=[]).
-  // Runs again after phase2 finishes (invalidated below) with real preview data.
+  // Runs again after phase2 finishes with real preview data.
   // prepareSalaryState is CPU-heavy — we avoid extra runs by tracking
   // phase2.dataUpdatedAt instead of depending on the previewData array itself.
+  const fullDataKey = useMemo(
+    () => ['salaries', uid, 'full-data', selectedMonth, phase1.dataUpdatedAt, phase2.dataUpdatedAt] as const,
+    [uid, selectedMonth, phase1.dataUpdatedAt, phase2.dataUpdatedAt],
+  );
+
   const fullDataQuery = useQuery<PreparedSalaryState, Error>({
     queryKey: fullDataKey,
     enabled: isQueryEnabled && phase1.isSuccess,
-    staleTime: 0,        // always fresh — we control invalidation manually
+    staleTime: 0,
     gcTime: 5 * 60_000, // keep in memory 5 min after unmount
     retry: false,
     structuralSharing: false,
@@ -170,15 +171,6 @@ export function useSalaryData({ selectedMonth, salariesDraftKey }: UseSalaryData
       return result;
     },
   });
-
-  // ── Trigger fullDataQuery rebuild when phase2 finishes ───────────────────
-  // useEffect on dataUpdatedAt (a number) — stable dep, fires exactly once per phase2 result
-  useEffect(() => {
-    if (phase2.isSuccess) {
-      queryClient.invalidateQueries({ queryKey: fullDataKey });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase2.dataUpdatedAt]);
 
   // ── Realtime: invalidate on daily_orders or daily_shifts changes ─────────
   // Debounced 2s — avoids rapid re-fetches when multiple rows change at once

@@ -12,8 +12,6 @@ import {
   type DashboardPerformanceTabKey,
 } from '@modules/dashboard/components/DashboardPerformanceHeader';
 import { DashboardPerformanceOverviewTab } from '@modules/dashboard/components/DashboardPerformanceOverviewTab';
-import { SystemOverviewSection } from '@modules/dashboard/components/SystemOverviewSection';
-import { DashboardManagementTab } from '@modules/dashboard/components/DashboardManagementTab';
 import { DashboardRiderProfileModal } from '@modules/dashboard/components/DashboardRiderProfileModal';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
@@ -121,13 +119,6 @@ export default function DashboardPerformancePage() {
               <LazyDashboardPlatformsTab dashboard={dashboardQuery.data ?? null} />
             </Suspense>
           </div>
-        </div>
-      ) : null}
-
-      {!dashboardQuery.isError && activeTab === 'management' ? (
-        <div className="space-y-6">
-          <SystemOverviewSection />
-          <DashboardManagementTab />
         </div>
       ) : null}
 

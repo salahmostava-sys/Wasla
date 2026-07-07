@@ -1,4 +1,4 @@
-import { LayoutDashboard, Medal, UsersRound } from 'lucide-react';
+import { LayoutDashboard, Medal } from 'lucide-react';
 
 import { useTemporalContext } from '@app/providers/TemporalContext';
 import {
@@ -7,7 +7,7 @@ import {
   dashboardTabButtonClass,
 } from '@modules/dashboard/components/DashboardHeaderShared';
 
-export type DashboardPerformanceTabKey = 'overview' | 'analytics_ranking' | 'management';
+export type DashboardPerformanceTabKey = 'overview' | 'analytics_ranking';
 
 type DashboardPerformanceHeaderProps = {
   activeTab: DashboardPerformanceTabKey;
@@ -18,8 +18,9 @@ type DashboardPerformanceHeaderProps = {
 const TAB_LABELS: Record<DashboardPerformanceTabKey, string> = {
   overview: 'النظرة العامة',
   analytics_ranking: 'التحليلات والمراكز',
-  management: 'متابعة الإدارة',
 };
+
+const DASHBOARD_TABS: readonly DashboardPerformanceTabKey[] = ['overview', 'analytics_ranking'];
 
 export function DashboardPerformanceHeader({
   activeTab,
@@ -34,7 +35,7 @@ export function DashboardPerformanceHeader({
         <DashboardBreadcrumbTitle />
 
         <div className="flex items-center bg-muted rounded-xl p-1 gap-1 overflow-x-auto">
-          {(['overview', 'analytics_ranking', 'management'] as const).map((tab) => (
+          {DASHBOARD_TABS.map((tab) => (
             <button
               key={tab}
               type="button"
@@ -46,7 +47,6 @@ export function DashboardPerformanceHeader({
             >
               {tab === 'overview' ? <LayoutDashboard size={13} /> : null}
               {tab === 'analytics_ranking' ? <Medal size={13} /> : null}
-              {tab === 'management' ? <UsersRound size={13} /> : null}
               {TAB_LABELS[tab]}
             </button>
           ))}
