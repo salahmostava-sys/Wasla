@@ -284,7 +284,7 @@ export function buildAlertsFromResponses(
   threshold: string,
   today: Date
 ): Alert[] {
-  const { employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes, abscondedRes } = responses;
+  const { employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes: _sparePartsRes, abscondedRes } = responses;
   const generatedAlerts: Alert[] = [];
   const employees = employeesRes.data ?? [];
   const platformAccounts = platformAccountsRes.data ?? [];

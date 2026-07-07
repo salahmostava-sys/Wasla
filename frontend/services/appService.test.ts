@@ -162,15 +162,15 @@ describe('appService', () => {
 
   describe('getAppTargetForMonth', () => {
     it('returns target if found', async () => {
-      tableResults.app_targets = { data: { target_orders: 100 } };
+      tableResults.app_targets = { data: { target_orders: 100, employee_target_orders: 50 } };
       const res = await appService.getAppTargetForMonth('a1', '2024-01');
-      expect(res).toBe(100);
+      expect(res).toEqual({ targetOrders: 100, employeeTargetOrders: 50 });
     });
 
     it('returns null if no target', async () => {
       tableResults.app_targets = { data: null };
       const res = await appService.getAppTargetForMonth('a1', '2024-01');
-      expect(res).toBeNull();
+      expect(res).toEqual({ targetOrders: null, employeeTargetOrders: null });
     });
   });
 });

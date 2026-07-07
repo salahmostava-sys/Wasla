@@ -18,6 +18,7 @@ export type EmployeeLike = {
   status?: string | null;
   sponsorship_status?: string | null;
   probation_end_date?: string | null;
+  job_title?: string | null;
 };
 
 export function isExcludedSponsorshipStatus(status: string | null | undefined): boolean {
@@ -25,8 +26,21 @@ export function isExcludedSponsorshipStatus(status: string | null | undefined): 
   return (EXCLUDED_SPONSORSHIP_STATUSES as readonly string[]).includes(status);
 }
 
+const INVENTORY_KEYWORDS = ['مخزون', 'مستودع', 'inventory', 'warehouse'];
+
+export function isInventoryJobTitle(jobTitle: string | null | undefined): boolean {
+  if (!jobTitle) return false;
+  const normalized = jobTitle.toLowerCase();
+  return INVENTORY_KEYWORDS.some((kw) => normalized.includes(kw));
+}
+
 export function isEmployeeExcluded(employee: EmployeeLike): boolean {
-  return employee.status === 'inactive' || employee.status === 'ended' || isExcludedSponsorshipStatus(employee.sponsorship_status ?? null);
+  return (
+    employee.status === 'inactive' ||
+    employee.status === 'ended' ||
+    isExcludedSponsorshipStatus(employee.sponsorship_status ?? null) ||
+    isInventoryJobTitle(employee.job_title ?? null)
+  );
 }
 
 /**
@@ -38,8 +52,9 @@ export function isEmployeeVisibleInMonth(
   employee: EmployeeLike,
   activeEmployeeIdsInMonth: ReadonlySet<string> | null | undefined
 ): boolean {
-  if (!isEmployeeExcluded(employee)) return true;
-  /** أثناء تحميل نشاط الشهر لا نخفي المستبعدين لتفادي قائمة فارغة مؤقتاً */
+  // STRICT FILTERING: Never show excluded employees regardless of historical activity.
+  if (isEmployeeExcluded(employee)) return false;
+  
   if (activeEmployeeIdsInMonth === undefined || activeEmployeeIdsInMonth === null) return true;
   return !!activeEmployeeIdsInMonth.has(employee.id);
 }
@@ -55,7 +70,8 @@ export function isEmployeeRetainedForMonth<T extends EmployeeLike>(
   employee: T,
   activeEmployeeIdsInMonth: ReadonlySet<string> | null | undefined
 ): boolean {
-  if (employee.status === 'active' && !isExcludedSponsorshipStatus(employee.sponsorship_status ?? null)) return true;
+  if (isEmployeeExcluded(employee)) return false;
+  if (employee.status === 'active') return true;
   if (activeEmployeeIdsInMonth === undefined) return false;
   return !!activeEmployeeIdsInMonth?.has(employee.id);
 }
@@ -77,7 +93,9 @@ export function isEmployeeVisibleForSalaryMonth<T extends EmployeeLike>(
   monthStartIso: string,
   activeEmployeeIdsInMonth: ReadonlySet<string> | null | undefined
 ): boolean {
-  if (!isExcludedSponsorshipStatus(employee.sponsorship_status ?? null)) return true;
+  // STRICT FILTERING: Hide absconded/terminated/inventory completely
+  if (isEmployeeExcluded(employee)) return false;
+  
   if (activeEmployeeIdsInMonth === undefined) return true;
   if (isAttendanceRosterVisibleInMonth(employee, monthStartIso)) return true;
   return !!activeEmployeeIdsInMonth?.has(employee.id);
@@ -119,9 +137,10 @@ function toDateOnlyIso(input: string | null | undefined): string | null {
  * - If effective date is missing/invalid, hide immediately (safe default).
  */
 export function isOperationallyVisibleEmployee(
-  employee: Pick<EmployeeLike, 'sponsorship_status' | 'probation_end_date'>,
+  employee: Pick<EmployeeLike, 'sponsorship_status' | 'probation_end_date' | 'job_title' | 'status'> & { id?: string },
   asOfDate: Date = new Date()
 ): boolean {
+  if (isInventoryJobTitle(employee.job_title ?? null) || employee.status === 'inactive' || employee.status === 'ended') return false;
   if (!isExcludedSponsorshipStatus(employee.sponsorship_status ?? null)) return true;
   const effectiveDateIso = toDateOnlyIso(employee.probation_end_date ?? null);
   if (!effectiveDateIso) return false;
@@ -141,12 +160,14 @@ export function filterOperationallyVisibleEmployees<T extends EmployeeLike>(
  * من تاريخ الهروب/إنهاء الخدمة (شامل) لا يظهر في الحضور.
  */
 export function isAttendanceRosterVisibleOnDate(
-  employee: Pick<EmployeeLike, 'sponsorship_status' | 'probation_end_date'>,
+  employee: EmployeeLike,
   asOfDate: Date
 ): boolean {
+  if (isInventoryJobTitle(employee.job_title ?? null) || employee.status === 'inactive' || employee.status === 'ended') return false;
   if (!isExcludedSponsorshipStatus(employee.sponsorship_status ?? null)) return true;
   const effectiveDateIso = toDateOnlyIso(employee.probation_end_date ?? null);
-  if (!effectiveDateIso) return true;
+  // STRICT: no date = hide immediately (safe default)
+  if (!effectiveDateIso) return false;
   const asOfIso = asOfDate.toISOString().slice(0, 10);
   return asOfIso < effectiveDateIso;
 }
@@ -163,12 +184,14 @@ export function filterAttendanceRosterEmployees<T extends EmployeeLike>(
  * (أي تاريخ الخروج بعد أول يوم من الشهر).
  */
 export function isAttendanceRosterVisibleInMonth(
-  employee: Pick<EmployeeLike, 'sponsorship_status' | 'probation_end_date'>,
+  employee: EmployeeLike,
   monthStartIso: string
 ): boolean {
+  if (isInventoryJobTitle(employee.job_title ?? null) || employee.status === 'inactive' || employee.status === 'ended') return false;
   if (!isExcludedSponsorshipStatus(employee.sponsorship_status ?? null)) return true;
   const effectiveDateIso = toDateOnlyIso(employee.probation_end_date ?? null);
-  if (!effectiveDateIso) return true;
+  // STRICT: no date = hide immediately (safe default)
+  if (!effectiveDateIso) return false;
   /** يُستبعد من الشهر فقط إذا انتهت الخدمة قبل أول يوم من الشهر؛ من ينتهي داخل الشهر يبقى لترحيل الطلبات للرواتب */
   return effectiveDateIso >= monthStartIso;
 }

@@ -40,7 +40,7 @@ export const appsPageService = {
   ): Promise<AppEmployee[]> => {
     const { startDate, endDate, daysInMonth, daysPassed } = getMonthBounds(monthYear, referenceDate);
 
-    const [assignments, orderRows, targetOrders] = await Promise.all([
+    const [assignments, orderRows, targets] = await Promise.all([
       appService.getActiveEmployeeAppsWithEmployees(appId),
       appService.getMonthlyOrdersForApp(appId, startDate, endDate),
       appService.getAppTargetForMonth(appId, monthYear),
@@ -49,7 +49,8 @@ export const appsPageService = {
     return buildAppEmployees({
       assignments: assignments,
       orderRows: orderRows,
-      targetOrders,
+      targetOrders: targets.targetOrders,
+      employeeTargetOrders: targets.employeeTargetOrders,
       daysInMonth,
       daysPassed,
     });

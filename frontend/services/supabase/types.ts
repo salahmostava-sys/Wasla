@@ -400,6 +400,7 @@ export type Database = {
         Row: {
           app_id: string
           created_at: string
+          employee_target_orders: number | null
           id: string
           month_year: string
           target_orders: number
@@ -408,6 +409,7 @@ export type Database = {
         Insert: {
           app_id: string
           created_at?: string
+          employee_target_orders?: number | null
           id?: string
           month_year: string
           target_orders?: number
@@ -416,6 +418,7 @@ export type Database = {
         Update: {
           app_id?: string
           created_at?: string
+          employee_target_orders?: number | null
           id?: string
           month_year?: string
           target_orders?: number

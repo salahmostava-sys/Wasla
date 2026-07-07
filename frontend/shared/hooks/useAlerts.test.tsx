@@ -23,7 +23,7 @@ vi.mock('@app/providers/SystemSettingsContext', () => ({
 }));
 
 vi.mock('@shared/hooks/useMonthlyActiveEmployeeIds', () => ({
-  useMonthlyActiveEmployeeIds: () => ({ data: { employeeIds: ['emp-1'] } }),
+  useMonthlyActiveEmployeeIds: () => ({ data: { employeeIds: new Set(['emp-1']), orderEmployeeIds: new Set(['emp-1']) } }),
 }));
 
 vi.mock('@services/alertsService', () => ({

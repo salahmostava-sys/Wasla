@@ -141,12 +141,14 @@ export const buildAppEmployees = ({
   assignments,
   orderRows,
   targetOrders,
+  employeeTargetOrders,
   daysInMonth,
   daysPassed,
 }: {
   assignments: AppEmployeeAssignmentRow[];
   orderRows: AppEmployeeOrderRow[];
   targetOrders: number | null;
+  employeeTargetOrders?: number | null;
   daysInMonth: number;
   daysPassed: number;
 }): AppEmployee[] => {
@@ -161,7 +163,9 @@ export const buildAppEmployees = ({
   });
 
   const riderCount = visibleEmployees.length;
-  const targetShare = targetOrders !== null && riderCount > 0 ? targetOrders / riderCount : null;
+  const targetShare = employeeTargetOrders != null 
+    ? employeeTargetOrders 
+    : (targetOrders !== null && riderCount > 0 ? targetOrders / riderCount : null);
 
   return visibleEmployees.map((employee) => {
     const monthOrders = totalsByEmployee.get(employee.id) ?? 0;

@@ -200,11 +200,14 @@ export const appService = {
   getAppTargetForMonth: async (appId: string, monthYear: string) => {
     const { data, error } = await supabase
       .from('app_targets')
-      .select('target_orders')
+      .select('target_orders, employee_target_orders')
       .eq('app_id', appId)
       .eq('month_year', monthYear)
       .maybeSingle();
     if (error) handleSupabaseError(error, 'appService.getAppTargetForMonth');
-    return data?.target_orders ?? null;
+    return {
+      targetOrders: data?.target_orders ?? null,
+      employeeTargetOrders: data?.employee_target_orders ?? null,
+    };
   },
 };

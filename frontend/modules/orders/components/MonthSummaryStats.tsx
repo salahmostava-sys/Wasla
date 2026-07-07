@@ -11,8 +11,10 @@ type Props = Readonly<{
   grandTotal: number;
   targets: Record<string, string>;
   setTargets: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  employeeTargets: Record<string, string>;
+  setEmployeeTargets: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   appGrandTotal: (appId: string) => number;
-  saveTarget: (appId: string, value: string) => void | Promise<void>;
+  saveTargets: (appId: string, appTarget: string, employeeTarget: string) => void | Promise<void>;
   savingTarget: string | null;
   canEdit: boolean;
   isMonthLocked: boolean;
@@ -27,8 +29,10 @@ export function MonthSummaryStats(props: Readonly<Props>) {
     grandTotal,
     targets,
     setTargets,
+    employeeTargets,
+    setEmployeeTargets,
     appGrandTotal,
-    saveTarget,
+    saveTargets,
     savingTarget,
     canEdit,
     isMonthLocked,
@@ -72,22 +76,42 @@ export function MonthSummaryStats(props: Readonly<Props>) {
                 )}
                 {overTarget && <span className="text-[9px] text-success font-bold">✓</span>}
               </div>
-              <div className="flex items-center gap-1">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="هدف"
-                  value={targets[app.id] ?? ''}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString()).replace(/\D/g, '');
-                    setTargets((prev) => ({ ...prev, [app.id]: val }));
-                  }}
-                  onBlur={(e) => { saveTarget(app.id, e.target.value); }}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { saveTarget(app.id, targets[app.id] || '0'); } }}
-                  disabled={!canEdit || isMonthLocked}
-                  className="w-16 h-6 text-[10px] rounded border border-border bg-muted/30 px-1 focus:outline-none focus:border-primary text-center"
-                />
-                {isSaving && <Loader2 size={10} className="animate-spin text-muted-foreground" />}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="المنصة"
+                    title="هدف المنصة"
+                    value={targets[app.id] ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString()).replace(/\D/g, '');
+                      setTargets((prev) => ({ ...prev, [app.id]: val }));
+                    }}
+                    onBlur={(e) => { saveTargets(app.id, e.target.value, employeeTargets[app.id] ?? ''); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { saveTargets(app.id, targets[app.id] ?? '0', employeeTargets[app.id] ?? ''); } }}
+                    disabled={!canEdit || isMonthLocked}
+                    className="w-12 h-6 text-[10px] rounded border border-border bg-muted/30 px-1 focus:outline-none focus:border-primary text-center"
+                  />
+                  {isSaving && <Loader2 size={10} className="animate-spin text-muted-foreground" />}
+                </div>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="المندوب"
+                    title="هدف المندوب"
+                    value={employeeTargets[app.id] ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString()).replace(/\D/g, '');
+                      setEmployeeTargets((prev) => ({ ...prev, [app.id]: val }));
+                    }}
+                    onBlur={(e) => { saveTargets(app.id, targets[app.id] ?? '0', e.target.value); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { saveTargets(app.id, targets[app.id] ?? '0', employeeTargets[app.id] ?? ''); } }}
+                    disabled={!canEdit || isMonthLocked}
+                    className="w-12 h-6 text-[10px] rounded border border-border bg-muted/30 px-1 focus:outline-none focus:border-primary text-center"
+                  />
+                </div>
               </div>
             </div>
           );

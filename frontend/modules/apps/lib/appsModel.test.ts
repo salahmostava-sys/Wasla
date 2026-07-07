@@ -131,6 +131,7 @@ describe('appsModel', () => {
         assignments,
         orderRows: orders,
         targetOrders: 100, // 1 rider -> target is 100
+        employeeTargetOrders: null,
         daysInMonth: 30,
         daysPassed: 15,
       });
@@ -154,6 +155,7 @@ describe('appsModel', () => {
         assignments,
         orderRows: [],
         targetOrders: null,
+        employeeTargetOrders: null,
         daysInMonth: 30,
         daysPassed: 15,
       });

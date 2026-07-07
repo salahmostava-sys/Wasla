@@ -44,8 +44,10 @@ export const MonthSummaryTab = React.memo(() => {
         grandTotal={m.grandTotal}
         targets={m.targets}
         setTargets={m.setTargets}
+        employeeTargets={m.employeeTargets}
+        setEmployeeTargets={m.setEmployeeTargets}
         appGrandTotal={m.appGrandTotal}
-        saveTarget={m.saveTarget}
+        saveTargets={m.saveTargets}
         savingTarget={m.savingTarget}
         canEdit={m.permissions.can_edit}
         isMonthLocked={m.isMonthLocked}

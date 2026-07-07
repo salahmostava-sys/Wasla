@@ -348,11 +348,11 @@ export const orderService = {
     return orderService.getAppTargets(monthYear);
   },
 
-  upsertAppTarget: async (appId: string, monthYear: string, targetOrders: number) => {
+  upsertAppTarget: async (appId: string, monthYear: string, targetOrders: number, employeeTargetOrders: number | null = null) => {
     const { data, error } = await supabase
       .from('app_targets')
       .upsert(
-        { app_id: appId, month_year: monthYear, target_orders: targetOrders },
+        { app_id: appId, month_year: monthYear, target_orders: targetOrders, employee_target_orders: employeeTargetOrders },
         { onConflict: 'app_id,month_year' }
       )
       .select()

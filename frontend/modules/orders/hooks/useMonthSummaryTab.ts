@@ -28,6 +28,7 @@ export function useMonthSummaryTab() {
   const year = Number(yearStr);
   const month = Number(monthStr);
   const [targets, setTargets] = useState<Record<string, string>>({});
+  const [employeeTargets, setEmployeeTargets] = useState<Record<string, string>>({});
   const [data, setData] = useState<DailyData>({});
   const [savingTarget, setSavingTarget] = useState<string | null>(null);
   const [isMonthLocked, setIsMonthLocked] = useState(false);
@@ -118,10 +119,15 @@ export function useMonthSummaryTab() {
 
   useEffect(() => {
     const t: Record<string, string> = {};
+    const et: Record<string, string> = {};
     (summaryMonthMeta?.targets || []).forEach((r) => {
       t[r.app_id] = String(r.target_orders);
+      if (r.employee_target_orders != null) {
+        et[r.app_id] = String(r.employee_target_orders);
+      }
     });
     setTargets(t);
+    setEmployeeTargets(et);
   }, [summaryMonthMeta?.targets]);
 
   useEffect(() => {
@@ -139,13 +145,14 @@ export function useMonthSummaryTab() {
     toast.error(TOAST_ERROR_GENERIC, { description: message });
   }, [summaryBaseError, summaryMonthMetaError, summaryMonthError]);
 
-  const saveTarget = async (appId: string, value: string) => {
+  const saveTargets = async (appId: string, appTargetValue: string, employeeTargetValue: string) => {
     if (isMonthLocked) return;
-    const targetOrders = Number.parseInt(value, 10) || 0;
+    const targetOrders = Number.parseInt(appTargetValue, 10) || 0;
+    const employeeTargetOrders = employeeTargetValue ? Number.parseInt(employeeTargetValue, 10) || null : null;
     const my = monthYear(year, month);
     setSavingTarget(appId);
     try {
-      await orderService.upsertAppTarget(appId, my, targetOrders);
+      await orderService.upsertAppTarget(appId, my, targetOrders, employeeTargetOrders);
       toast.success(TOAST_SUCCESS_EDIT);
     } catch {
       toast.error(TOAST_ERROR_GENERIC);
@@ -244,6 +251,8 @@ export function useMonthSummaryTab() {
     data,
     targets,
     setTargets,
+    employeeTargets,
+    setEmployeeTargets,
     savingTarget,
     isMonthLocked,
     sortedEmployees,
@@ -252,7 +261,7 @@ export function useMonthSummaryTab() {
     grandTotal,
     empTotal,
     appGrandTotal,
-    saveTarget,
+    saveTargets,
     handleSort,
     sortField,
     sortDir,
