@@ -120,7 +120,7 @@ export const SpreadsheetGridTab = React.memo(() => {
         open={g.showDailyReportDialog}
         onOpenChange={g.setShowDailyReportDialog}
         apps={g.apps}
-        daysInMonth={g.daysInMonth}
+        daysInMonth={g.days}
         onExportExcel={g.exportDailyReportExcel}
         onPrintPdf={g.printDailyReportPdf}
       />
