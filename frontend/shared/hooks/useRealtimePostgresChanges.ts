@@ -50,5 +50,5 @@ export function useRealtimePostgresChanges(
       }
       unsubscribe();
     };
-  }, [channelName, tablesKey, debounceMs]);
+  }, [channelName, tables, tablesKey, debounceMs]);
 }

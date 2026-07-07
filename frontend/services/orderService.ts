@@ -344,6 +344,10 @@ export const orderService = {
     return data ?? [];
   },
 
+  getMonthTargets: async (monthYear: string) => {
+    return orderService.getAppTargets(monthYear);
+  },
+
   upsertAppTarget: async (appId: string, monthYear: string, targetOrders: number) => {
     const { data, error } = await supabase
       .from('app_targets')
