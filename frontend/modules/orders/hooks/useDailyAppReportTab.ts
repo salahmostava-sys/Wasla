@@ -1,4 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { orderService } from '@services/orderService';
 
 import { useAuthQueryGate, authQueryUserId } from '@shared/hooks/useAuthQueryGate';
 import { useTemporalContext } from '@app/providers/TemporalContext';
@@ -30,6 +32,12 @@ export function useDailyAppReportTab() {
   const [selectedApp, setSelectedApp] = useState<string>('');
   const [startDay, setStartDay] = useState<number>(1);
   const [endDay, setEndDay] = useState<number>(daysInMonth);
+
+  const { data: targetsData } = useQuery({
+    queryKey: ['monthTargets', monthKey],
+    queryFn: () => orderService.getMonthTargets(monthKey),
+    enabled: enabled && !!monthKey,
+  });
 
   // Auto select first app if not selected
   useEffect(() => {
@@ -85,6 +93,10 @@ export function useDailyAppReportTab() {
   // Build report data to preview
   const previewData = useMemo(() => {
     if (!selectedApp || sq.loading) return [];
+    
+    const targetRow = targetsData?.find((t) => t.app_id === selectedApp);
+    const target = targetRow ? targetRow.target_orders : 0;
+    
     const reportData = [];
     const dayArr = Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i);
 
@@ -101,12 +113,15 @@ export function useDailyAppReportTab() {
       }
 
       const note = '';
+      const remaining = target - total;
 
       if (hasAnyOrdersInPeriod) {
         reportData.push({
           empName: emp.name,
           dailyVals,
           total,
+          target,
+          remaining,
           note,
         });
       }
@@ -115,7 +130,7 @@ export function useDailyAppReportTab() {
     // Sort descending by total
     reportData.sort((a, b) => b.total - a.total);
     return reportData;
-  }, [selectedApp, sq.loading, sq.employees, sq.spreadsheetMonthData, startDay, endDay]);
+  }, [selectedApp, sq.loading, sq.employees, sq.spreadsheetMonthData, startDay, endDay, targetsData]);
 
   return {
     loading: sq.loading,

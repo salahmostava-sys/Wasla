@@ -120,6 +120,8 @@ export const DailyAppReportTab = React.memo(() => {
                       </th>
                     ))}
                     <th className="p-3 font-semibold text-primary text-center">الإجمالي</th>
+                    <th className="p-3 font-semibold text-muted-foreground text-center">التارجت</th>
+                    <th className="p-3 font-semibold text-muted-foreground text-center">المتبقي</th>
                     <th className="p-3 font-semibold text-muted-foreground min-w-[200px]">الملاحظات (التوصيات)</th>
                   </tr>
                 </thead>
@@ -139,8 +141,20 @@ export const DailyAppReportTab = React.memo(() => {
                             )}
                           </td>
                         ))}
-                        <td className="p-3 text-center font-bold text-foreground">
+                        <td className="p-3 text-center font-bold text-primary bg-primary/5 rounded-lg">
                           {row.total}
+                        </td>
+                        <td className="p-3 text-center font-medium text-muted-foreground">
+                          {row.target > 0 ? row.target : '-'}
+                        </td>
+                        <td className="p-3 text-center">
+                          {row.target > 0 ? (
+                            <span className={row.remaining <= 0 ? 'text-emerald-500 font-bold' : 'text-amber-500 font-medium'}>
+                              {row.remaining <= 0 ? '✔️ مكتمل' : row.remaining}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground/30">-</span>
+                          )}
                         </td>
                         <td className="p-3 text-muted-foreground">
                           {row.note || <span className="text-muted-foreground/30">--</span>}
