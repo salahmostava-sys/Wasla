@@ -55,6 +55,11 @@ const MonthSummaryTab = lazy(() =>
     default: module.MonthSummaryTab,
   })),
 );
+const DailyAppReportTab = lazy(() =>
+  import('@modules/orders/components/DailyAppReportTab').then((module) => ({
+    default: module.DailyAppReportTab,
+  })),
+);
 const ShiftsTabWrapper = lazy(() =>
   import('@modules/orders/components/ShiftsTabWrapper').then((module) => ({
     default: module.ShiftsTabWrapper,
@@ -111,6 +116,7 @@ const OrdersPage = () => {
             options={[
               { value: 'grid', label: '📦 الطلبات', selectLabel: 'الطلبات' },
               { value: 'shifts', label: '⏰ الدوام', selectLabel: 'الدوام' },
+              { value: 'app-report', label: '📑 تقرير منصة', selectLabel: 'تقرير منصة' },
               { value: 'summary', label: '📊 ملخص الشهر', selectLabel: 'ملخص الشهر' },
               ...(walletPerms.can_view ? [{ value: 'wallet', label: '💼 المحفظة', selectLabel: 'المحفظة' }] : []),
             ]}
@@ -123,6 +129,11 @@ const OrdersPage = () => {
           <TabsContent value="shifts" className="mt-2 outline-none">
             <Suspense fallback={<TabLoader />}>
               <ShiftsTabWrapper />
+            </Suspense>
+          </TabsContent>
+          <TabsContent value="app-report" className="mt-2 outline-none">
+            <Suspense fallback={<TabLoader />}>
+              <DailyAppReportTab />
             </Suspense>
           </TabsContent>
           <TabsContent value="summary" className="mt-2 overflow-x-auto outline-none">
