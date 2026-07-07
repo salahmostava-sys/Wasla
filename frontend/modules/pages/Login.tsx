@@ -56,8 +56,7 @@ function getFriendlyLoginErrorMessage(message: string): string {
   ) {
     return 'يجب تأكيد البريد الإلكتروني أولاً';
   }
-
-  return 'تعذّر تسجيل الدخول حالياً. حاول مرة أخرى لاحقاً';
+  return `تعذّر تسجيل الدخول حالياً. حاول مرة أخرى لاحقاً. (Error: ${errMsg})`;
 }
 
 import type { TFunction } from 'i18next';
