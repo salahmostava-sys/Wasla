@@ -35,6 +35,7 @@ export function VehicleReportsTab() {
   const [search, setSearch] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string> | null>(null);
 
   const logs = useMemo(() => logsQ.data ?? [], [logsQ.data]);
 

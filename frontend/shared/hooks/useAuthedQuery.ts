@@ -40,6 +40,7 @@ export function useAuthedQuery<TData, TQueryKey extends QueryKey = QueryKey>({
     enabled: !!session && authReady && (!requireUser || !!user?.id) && enabled,
     refetchOnWindowFocus,
     refetchOnReconnect,
+    structuralSharing: false,
   });
 
   useQueryErrorToast(
