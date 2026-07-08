@@ -124,9 +124,9 @@ describe('spreadsheetFileOps', () => {
 
       expect(aoaToSheetMock).toHaveBeenCalled();
       const exportedRows = aoaToSheetMock.mock.calls[0][0] as Array<Array<string | number>>;
-      expect(exportedRows[2]).toEqual(['اسم المندوب', 'إجمالي الطلبات', 'تارجت المنصة', 'تارجت المندوب', 'المتبقي للوصول للتارجت', 'التوصيات']);
-      expect(exportedRows).toContainEqual(['John', 5, 10, 10, 5, '']);
-      expect(exportedRows).toContainEqual(['Jane', 5, 10, 10, 5, '']);
+      expect(exportedRows[2]).toEqual(['اسم المندوب', 'إجمالي الطلبات', 'تارجت المندوب', 'المتبقي للوصول للتارجت', 'التوصيات']);
+      expect(exportedRows).toContainEqual(['John', 5, 10, 5, '']);
+      expect(exportedRows).toContainEqual(['Jane', 5, 10, 5, '']);
       expect(writeFileMock).toHaveBeenCalledWith(undefined, 'تقرير_App1_1_إلى_3.xlsx');
     });
   });

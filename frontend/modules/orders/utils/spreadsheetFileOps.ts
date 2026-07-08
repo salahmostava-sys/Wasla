@@ -158,19 +158,18 @@ export async function exportDailyAppReportExcel(params: {
   const rows: Array<Array<string | number>> = [
     [titleText],
     [],
-    ['اسم المندوب', 'إجمالي الطلبات', 'تارجت المنصة', 'تارجت المندوب', 'المتبقي للوصول للتارجت', 'التوصيات']
+    ['اسم المندوب', 'إجمالي الطلبات', 'تارجت المندوب', 'المتبقي للوصول للتارجت', 'التوصيات']
   ];
 
   results.forEach(r => {
     const remaining = r.empTarget != null ? r.empTarget - r.total : '—';
     const displayEmpTarget = r.empTarget != null ? r.empTarget : 'بدون هدف';
-    const displayAppTarget = r.appTarget > 0 ? r.appTarget : '—';
-    rows.push([r.name, r.total, displayAppTarget, displayEmpTarget, remaining, '']);
+    rows.push([r.name, r.total, displayEmpTarget, remaining, '']);
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
   if (!ws['!merges']) ws['!merges'] = [];
-  ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } });
+  ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } });
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'التقرير');
@@ -236,7 +235,6 @@ export async function printDailyAppReportTable(params: {
           <tr>
             <th>اسم المندوب</th>
             <th>إجمالي الطلبات</th>
-            <th>تارجت المنصة</th>
             <th>تارجت المندوب</th>
             <th>المتبقي</th>
             <th>التوصيات</th>
@@ -248,12 +246,10 @@ export async function printDailyAppReportTable(params: {
   results.forEach(r => {
     const remaining = r.empTarget != null ? r.empTarget - r.total : '—';
     const displayEmpTarget = r.empTarget != null ? r.empTarget : 'بدون هدف';
-    const displayAppTarget = r.appTarget > 0 ? r.appTarget : '—';
     html += `
       <tr>
         <td>${r.name}</td>
         <td>${r.total}</td>
-        <td>${displayAppTarget}</td>
         <td>${displayEmpTarget}</td>
         <td dir="ltr" style="text-align: right;">${remaining}</td>
         <td></td>
