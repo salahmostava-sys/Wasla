@@ -55,8 +55,9 @@ export function isEmployeeVisibleInMonth(
   // STRICT FILTERING: Never show excluded employees regardless of historical activity.
   if (isEmployeeExcluded(employee)) return false;
   
-  if (activeEmployeeIdsInMonth === undefined || activeEmployeeIdsInMonth === null) return true;
-  return !!activeEmployeeIdsInMonth.has(employee.id);
+  // If they are not excluded (i.e. they are active), they should always be visible
+  // so new employees can have orders assigned to them.
+  return true;
 }
 
 export function filterVisibleEmployeesInMonth<T extends EmployeeLike>(
