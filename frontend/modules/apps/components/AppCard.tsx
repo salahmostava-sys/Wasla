@@ -138,13 +138,13 @@ export const AppCard = ({
         <div className="mt-3 space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span style={{ color: app.text_color, opacity: 0.85 }}>المناديب العاملين</span>
-            <span className="font-black text-black text-[15px]">
+            <span className="font-black text-[15px]" style={{ color: app.text_color }}>
               {app.employeeCount.toLocaleString('en-US')}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs">
             <span style={{ color: app.text_color, opacity: 0.85 }}>إجمالي الطلبات</span>
-            <span className="font-black text-black text-[15px]">
+            <span className="font-black text-[15px]" style={{ color: app.text_color }}>
               {app.ordersCount.toLocaleString('en-US')}
             </span>
           </div>
