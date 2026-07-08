@@ -106,14 +106,15 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
       style={{ top: pos.top, left: pos.left }}
       onMouseDown={e => e.stopPropagation()}
     >
-      <div className="flex items-center justify-between mb-2.5">
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-popover border-t border-l border-border rotate-45" />
+      <div className="flex items-center justify-between mb-2.5 relative z-10">
         <span className="text-xs font-semibold text-foreground">يوم {state.day}</span>
         <button aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground p-0.5 rounded">
           <X size={13} />
         </button>
       </div>
       <form
-        className="space-y-1.5"
+        className="space-y-1.5 relative z-10"
         onSubmit={(e) => {
           e.preventDefault();
           handleApply();
@@ -149,7 +150,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
         )}
       </form>
       {canEdit && (
-        <Button size="sm" className="w-full mt-3 h-7 text-xs gap-1" onClick={handleApply} type="button">
+        <Button size="sm" className="w-full mt-3 h-7 text-xs gap-1 relative z-10" onClick={handleApply} type="button">
           <Check size={12} /> تطبيق
         </Button>
       )}

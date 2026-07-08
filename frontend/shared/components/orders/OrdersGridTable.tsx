@@ -154,23 +154,23 @@ export const OrdersGridTable = React.memo(({
                       }}
                       onClick={() => activeApps.length > 0 && toggleExpand(emp.id)}
                     >
-                      <div className="flex flex-col justify-center">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex flex-col justify-center w-full overflow-hidden">
+                        <div className="flex items-center gap-1.5 flex-nowrap w-full">
                           {activeApps.length > 0 && (
                             <span className="text-muted-foreground flex-shrink-0">
                               {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
                             </span>
                           )}
-                          <span className="font-medium text-foreground truncate max-w-[7.5rem]" title={emp.name}>{shortName(emp.name)}</span>
+                          <span className="font-medium text-foreground truncate flex-shrink" title={emp.name}>{shortName(emp.name)}</span>
                           {activeApps.length > 0 && (
-                            <div className="flex items-center gap-0.5 flex-wrap">
+                            <div className="flex items-center gap-0.5 flex-nowrap flex-shrink-0 ml-auto">
                               {activeApps.slice(0, 3).map(a => {
                                 const c = getAppColor(appColorsList, a.name);
                                 return (
-                                  <ColorBadge key={a.id} label={a.name.slice(0, 4)} bg={c.solid} fg={c.solidText} className="text-[9px] px-1 py-0 rounded" />
+                                  <ColorBadge key={a.id} label={a.name.slice(0, 4)} bg={c.solid} fg={c.solidText} className="text-[9px] px-1 py-0 rounded flex-shrink-0" />
                                 );
                               })}
-                              {activeApps.length > 3 && <span className="text-[9px] text-muted-foreground">+{activeApps.length - 3}</span>}
+                              {activeApps.length > 3 && <span className="text-[9px] text-muted-foreground flex-shrink-0">+{activeApps.length - 3}</span>}
                             </div>
                           )}
                         </div>

@@ -1,6 +1,6 @@
 import { supabase } from '@services/supabase/client';
 import { handleSupabaseError } from '@services/serviceError';
-import type { TreasuryAccount, TreasuryCategory, TreasuryTransaction, TreasuryAccountBalance } from '../modules/finance/types/treasury';
+import type { TreasuryAccount, TreasuryCategory, TreasuryTransaction, TreasuryAccountBalance } from '@modules/finance/types/treasury';
 
 export const treasuryService = {
   // Accounts

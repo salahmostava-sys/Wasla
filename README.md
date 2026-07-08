@@ -7,6 +7,12 @@
 
 ---
 
+## 📊 Business Logic
+- Salary calculation is centralized
+- Based on platform rules
+
+---
+
 ## 🚀 التشغيل المحلي
 
 ### المتطلبات
