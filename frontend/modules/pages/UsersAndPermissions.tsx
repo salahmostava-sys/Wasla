@@ -623,19 +623,12 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                       {filteredRows.map((row) => {
                         const isSelected = row.id === permUserId;
                         return (
-                          <div
+                          <button
                             key={row.id}
-                            role="button"
-                            tabIndex={0}
+                            type="button"
                             onClick={() => setPermUserId(row.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                setPermUserId(row.id);
-                              }
-                            }}
                             className={cn(
-                              "p-3 cursor-pointer transition-colors flex items-center justify-between gap-3 group hover:bg-muted/50",
+                              "w-full p-3 cursor-pointer transition-colors flex items-center justify-between gap-3 group hover:bg-muted/50 text-right",
                               isSelected ? "bg-primary/5 hover:bg-primary/10 border-r-4 border-primary" : "border-r-4 border-transparent"
                             )}
                           >
@@ -647,7 +640,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                               </p>
                             </div>
                             <ChevronLeft className={cn("h-4 w-4 text-muted-foreground transition-transform", isSelected && "text-primary -translate-x-1")} />
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
