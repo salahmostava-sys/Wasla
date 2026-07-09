@@ -19,6 +19,7 @@ import { printHtmlTable } from '@shared/lib/printTable';
 import { MOTORCYCLE_IO_COLUMNS } from '@shared/constants/excelSchemas';
 import { logError } from '@shared/lib/logger';
 import type { Vehicle, VehicleStatus } from '@modules/pages/motorcycles.shared';
+import type { VehicleReportRow } from '@services/vehicleReportService';
 import { getErrorMessage } from '@services/serviceError';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -359,7 +360,7 @@ async function runMotorcycleXlsxImportFile(
 const Motorcycles = () => {
   const { toast } = useToast();
   const { permissions } = usePermissions('vehicles');
-  const [data, setData] = useState<Vehicle[]>([]);
+  const [data, setData] = useState<VehicleReportRow[]>([]);
   const {
     data: vehiclesData = [],
     isLoading: loading,
@@ -422,7 +423,7 @@ const Motorcycles = () => {
   // Local state mirrors React Query — kept because filtered/stats derive from `data` and
   // removing it would require restructuring the component to use vehiclesData directly.
   useEffect(() => {
-    setData(vehiclesData as Vehicle[]);
+    setData(vehiclesData);
   }, [vehiclesData]);
 
   useEffect(() => {
