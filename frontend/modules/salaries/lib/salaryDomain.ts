@@ -102,7 +102,7 @@ export const buildSalaryRowSnapshot = (row: SalaryRow): SalaryRowSnapshot => ({
   engineBaseSalary: row.engineBaseSalary,
 });
 
-const valuesMatch = (left: unknown, right: unknown) => {
+const valuesMatch = (left: unknown, right: unknown): boolean => {
   if (left === right) return true;
   if (!left && !right) return true;
   if (
@@ -111,11 +111,23 @@ const valuesMatch = (left: unknown, right: unknown) => {
     typeof left === 'object' &&
     typeof right === 'object'
   ) {
-    // FIX #3: Sort keys before stringify to prevent false dirty-flag from key ordering.
-    // JSON.stringify({ a: 1, b: 2 }) !== JSON.stringify({ b: 2, a: 1 }) without sorting.
-    const sortKeys = (v: object): string =>
-      JSON.stringify(v, Object.keys(v).sort((a, b) => a.localeCompare(b)));
-    return sortKeys(left) === sortKeys(right);
+    if (Array.isArray(left) && Array.isArray(right)) {
+      if (left.length !== right.length) return false;
+      for (let i = 0; i < left.length; i++) {
+        if (!valuesMatch(left[i], right[i])) return false;
+      }
+      return true;
+    }
+    if (!Array.isArray(left) && !Array.isArray(right)) {
+      const leftKeys = Object.keys(left);
+      const rightKeys = Object.keys(right);
+      if (leftKeys.length !== rightKeys.length) return false;
+      for (const key of leftKeys) {
+        if (!Object.prototype.hasOwnProperty.call(right, key)) return false;
+        if (!valuesMatch((left as Record<string, unknown>)[key], (right as Record<string, unknown>)[key])) return false;
+      }
+      return true;
+    }
   }
   return false;
 };
