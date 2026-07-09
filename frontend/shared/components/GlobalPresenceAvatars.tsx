@@ -11,13 +11,15 @@ import { PresenceAvatars } from '@shared/components/PresenceAvatars';
  * a user's presence state syncs from Supabase.
  */
 export const GlobalPresenceAvatars = React.memo(() => {
-  const { role } = useAuth();
+  const { role, user } = useAuth();
   const location = useLocation();
   const { onlineUsers } = usePagePresence('global', location.pathname);
 
+  const filteredUsers = onlineUsers.filter(u => u.userId !== user?.id);
+
   return (
     <PresenceAvatars 
-      users={onlineUsers} 
+      users={filteredUsers} 
       maxVisible={4} 
       isAdmin={role === 'admin'} 
     />
