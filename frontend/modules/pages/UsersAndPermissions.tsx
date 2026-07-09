@@ -255,7 +255,7 @@ function CreateUserDialog({
   );
 }
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+ 
 const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsProps>) => {
   const { toast } = useToast();
   const { user, role: authRole, loading: authLoading } = useAuth();
