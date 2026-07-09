@@ -12,7 +12,6 @@ import {
   DialogTitle,
 } from '@shared/components/ui/dialog';
 import { useToast } from '@shared/hooks/use-toast';
-import { extractTextFromImage, parseInvoiceLineItems, type OcrProgress } from '@services/ocrService';
 import { storageService } from '@services/storageService';
 import * as maintenanceService from '@services/maintenanceService';
 import { getErrorMessage } from '@services/serviceError';
@@ -43,8 +42,6 @@ export function InvoiceUploadModal({
   const [invoiceDate, setInvoiceDate] = useState('');
   const [supplier, setSupplier] = useState('');
   const [rows, setRows] = useState<DraftRow[]>([]);
-  const [extracting, setExtracting] = useState(false);
-  const [progress, setProgress] = useState<OcrProgress | null>(null);
   const [saving, setSaving] = useState(false);
 
   const reset = () => {
@@ -53,7 +50,6 @@ export function InvoiceUploadModal({
     setInvoiceDate('');
     setSupplier('');
     setRows([]);
-    setProgress(null);
   };
 
   const close = () => {
@@ -61,43 +57,13 @@ export function InvoiceUploadModal({
     onOpenChange(false);
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const picked = e.target.files?.[0] ?? null;
     setFile(picked);
-    setRows([]);
-    if (!picked) return;
-
-    if (!picked.type.startsWith('image/')) {
-      toast({
-        title: 'صيغة غير مدعومة للتعرف التلقائي',
-        description: 'التعرّف التلقائي على البيانات يعمل مع صور الفواتير (JPG/PNG). أضف البنود يدوياً بالأسفل.',
-      });
+    if (picked) {
       setRows([emptyRow()]);
-      return;
-    }
-
-    setExtracting(true);
-    try {
-      const rawText = await extractTextFromImage(picked, setProgress);
-      const parsed = parseInvoiceLineItems(rawText);
-      if (parsed.length === 0) {
-        toast({ title: 'لم يتم التعرف على بنود بشكل مؤكد', description: 'أضف بنود الفاتورة يدوياً بالأسفل.' });
-        setRows([emptyRow()]);
-      } else {
-        setRows(parsed.map(p => ({
-          id: crypto.randomUUID(),
-          name: p.name,
-          quantity: String(p.quantity),
-          unitPrice: String(p.unitPrice)
-        })));
-        toast({ title: `✅ تم التعرف على ${parsed.length} صنف`, description: 'راجع البيانات وعدّلها قبل الحفظ.' });
-      }
-    } catch (err) {
-      toast({ title: 'تعذر استخراج بيانات الفاتورة', description: getErrorMessage(err), variant: 'destructive' });
-      setRows([emptyRow()]);
-    } finally {
-      setExtracting(false);
-      setProgress(null);
+    } else {
+      setRows([]);
     }
   };
 
@@ -158,21 +124,21 @@ export function InvoiceUploadModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText size={18} className="text-primary" />
-            رفع فاتورة وإضافة قطع الغيار تلقائياً
+            رفع فاتورة صيانة وإضافة البنود يدوياً
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           {/* File picker */}
           <div className="space-y-1.5">
-            <Label>صورة الفاتورة</Label>
+            <Label>ملف الفاتورة</Label>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="w-full border-2 border-dashed border-border rounded-lg p-4 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
             >
               <UploadCloud size={16} />
-              {file ? file.name : 'اضغط لاختيار صورة الفاتورة (JPG/PNG)'}
+              {file ? file.name : 'اضغط لاختيار ملف الفاتورة'}
             </button>
             <input
               ref={fileInputRef}
@@ -181,12 +147,6 @@ export function InvoiceUploadModal({
               className="hidden"
               onChange={handleFileChange}
             />
-            {extracting && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Loader2 size={12} className="animate-spin" />
-                {progress?.status ?? 'جاري التحليل...'}
-              </p>
-            )}
           </div>
 
           {/* Invoice meta */}
@@ -249,7 +209,7 @@ export function InvoiceUploadModal({
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={close}>إلغاء</Button>
-          <Button onClick={handleSave} disabled={saving || extracting || rows.length === 0}>
+          <Button onClick={handleSave} disabled={saving || rows.length === 0}>
             {saving ? 'جاري الحفظ...' : '✅ إضافة الأصناف للمخزون'}
           </Button>
         </DialogFooter>

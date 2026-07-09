@@ -492,30 +492,4 @@ def api_detect_anomalies(req: AnomalyDetectionRequest):
     return detect_anomalies(req.model_dump())
 
 
-@app.post(
-    "/api/ocr/extract-waybill",
-    dependencies=[Depends(_security)],
-    responses={500: {"description": "Internal Server Error"}},
-)
-async def extract_text_from_image(file: Annotated[UploadFile, File(...)]):
-    """Extract text from a waybill or document image using Google Cloud Vision."""
-    try:
-        content = await file.read()
-        
-        client = vision.ImageAnnotatorClient()
-        image = vision.Image(content=content)
-        
-        response = client.text_detection(image=image)
-        texts = response.text_annotations
-        
-        if response.error.message:
-            raise HTTPException(status_code=500, detail=response.error.message)
-            
-        if texts:
-            extracted_text = texts[0].description
-            return {"success": True, "text": extracted_text}
-            
-        return {"success": True, "text": ""}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+

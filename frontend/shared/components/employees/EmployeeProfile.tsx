@@ -16,7 +16,6 @@ import { employeeService } from '@services/employeeService';
 import { EMPTY_DATA_PLACEHOLDER } from '@modules/employees/types/employee.types';
 import { employeeProfileService } from '@services/employeeProfileService';
 import { EmployeePerformanceTab } from '@shared/components/employees/EmployeePerformanceTab';
-import { DocumentScanner } from '@modules/employees/components/DocumentScanner';
 import { getErrorMessage } from '@services/serviceError';
 
 import {
@@ -172,7 +171,6 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
           <TabsTrigger value="salaries" className="gap-1.5"><DollarSign size={14} /> الرواتب الشهرية</TabsTrigger>
           <TabsTrigger value="orders" className="gap-1.5"><TrendingUp size={14} /> الطلبات الشهرية</TabsTrigger>
           <TabsTrigger value="performance" className="gap-1.5"><TrendingUp size={14} /> الأداء</TabsTrigger>
-          <TabsTrigger value="ocr-scan" className="gap-1.5"><ScanLine size={14} /> مسح الوثائق</TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Basic Data */}
@@ -697,26 +695,7 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
           </div>
         </TabsContent>
 
-        {/* Tab 9: OCR Document Scanner */}
-        <TabsContent value="ocr-scan">
-          <div className="space-y-4">
-            <div className="bg-card border border-border/50 shadow-sm p-4 rounded-2xl">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                📌 <strong>كيفية الاستخدام:</strong> اضغط على زر رفع صورة الإقامة أو الرخصة، 
-                وسيقوم النظام بقراءة البيانات تلقائياً باستخدام تقنية OCR.&nbsp;
-                راجع البيانات المستخرجة وعدّل ما يلزم، ثم اضغط <strong>تأكيد وحفظ</strong>.
-              </p>
-            </div>
-            <DocumentScanner
-              employeeId={employee.id}
-              employeeName={employee.name}
-              onSaved={() => {
-                queryClient.invalidateQueries({ queryKey: ['employees'] }).catch(e => logError(e));
-                queryClient.invalidateQueries({ queryKey: ['employee-profile'] }).catch(e => logError(e));
-              }}
-            />
-          </div>
-        </TabsContent>
+
       </Tabs>
     </div>
   );
