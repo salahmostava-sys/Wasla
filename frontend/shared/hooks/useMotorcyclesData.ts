@@ -1,4 +1,4 @@
-import { vehicleService } from '@services/vehicleService';
+import { getVehicleReport } from '@services/vehicleReportService';
 import { useAuthedQuery } from '@shared/hooks/useAuthedQuery';
 
 export const motorcyclesDataQueryKey = (userId: string) => ['motorcycles', userId, 'list'] as const;
@@ -6,7 +6,7 @@ export const motorcyclesDataQueryKey = (userId: string) => ['motorcycles', userI
 export const useMotorcyclesData = () => {
   return useAuthedQuery({
     buildQueryKey: motorcyclesDataQueryKey,
-    queryFn: () => vehicleService.getAllWithCurrentRider(),
+    queryFn: () => getVehicleReport(),
     staleTime: 60_000,
   });
 };
