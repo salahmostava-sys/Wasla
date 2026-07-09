@@ -1,7 +1,7 @@
 import { BaseInput } from '@shared/components/ui/base-input';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, RefreshCw, Save, AlertCircle, UserPlus, Trash2, Pencil, Search, ChevronLeft, ShieldAlert } from 'lucide-react';
+import { Shield, RefreshCw, AlertCircle, UserPlus, Trash2, Pencil, Search, ChevronLeft, ShieldAlert } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
