@@ -1,7 +1,7 @@
 import { formatCurrency, formatStandardDateTime } from '@shared/lib/formatters';
 
-import { useState, useMemo, useEffect } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square, FileText, ChevronDown } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square, FileText, ChevronDown, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
@@ -29,6 +29,137 @@ type VehicleGroup = {
   logs: MaintenanceLogWithDetails[];
   total_cost: number;
 };
+
+interface VehicleDropdownProps {
+  vehicleGroups: VehicleGroup[];
+  activeSelection: Set<string>;
+  toggleVehicle: (id: string) => void;
+  selectAll: () => void;
+  clearAll: () => void;
+}
+
+function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, selectAll, clearAll }: VehicleDropdownProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = vehicleGroups.filter(g =>
+    g.plate_number.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const selectedCount = activeSelection.size;
+  const total = vehicleGroups.length;
+  const allSelected = selectedCount === total;
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="flex items-center gap-2 h-9 px-3 rounded-xl border border-border bg-card text-sm hover:border-primary/50 transition-colors"
+        >
+          <Car size={14} className="text-muted-foreground shrink-0" />
+          <span className="text-muted-foreground">
+            {allSelected
+              ? 'جميع المركبات'
+              : selectedCount === 0
+              ? 'اختر المركبات…'
+              : `${selectedCount} من ${total} مركبة`}
+          </span>
+          <ChevronDown size={14} className={`text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+
+        {!allSelected && selectedCount > 0 && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="flex items-center gap-1 h-9 px-2.5 rounded-xl border border-border bg-card text-xs text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
+            title="إلغاء التحديد"
+          >
+            <X size={13} />
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <div className="absolute top-11 right-0 z-50 w-80 max-h-80 bg-popover border border-border rounded-xl shadow-lg overflow-hidden flex flex-col">
+          {/* Search */}
+          <div className="p-2 border-b border-border/50">
+            <div className="relative">
+              <Search size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                autoFocus
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="ابحث عن رقم لوحة…"
+                className="w-full h-8 pr-8 pl-2 text-xs rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+            </div>
+          </div>
+
+          {/* Select all / Clear */}
+          <div className="flex gap-1 px-2 py-1.5 border-b border-border/30">
+            <button
+              type="button"
+              onClick={selectAll}
+              className="flex-1 text-xs py-1 rounded-lg hover:bg-muted/60 transition-colors text-center"
+            >
+              <CheckSquare size={11} className="inline ml-1" />
+              تحديد الكل
+            </button>
+            <button
+              type="button"
+              onClick={clearAll}
+              className="flex-1 text-xs py-1 rounded-lg hover:bg-muted/60 transition-colors text-center"
+            >
+              <Square size={11} className="inline ml-1" />
+              إلغاء التحديد
+            </button>
+          </div>
+
+          {/* Vehicle list */}
+          <div className="overflow-y-auto flex-1">
+            {filtered.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-6">لا توجد نتائج</p>
+            ) : (
+              filtered.map(g => {
+                const checked = activeSelection.has(g.vehicle_id);
+                return (
+                  <button
+                    key={g.vehicle_id}
+                    type="button"
+                    onClick={() => toggleVehicle(g.vehicle_id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs text-right hover:bg-muted/50 transition-colors ${
+                      checked ? 'bg-primary/5 text-primary' : 'text-foreground'
+                    }`}
+                  >
+                    {checked
+                      ? <CheckSquare size={13} className="shrink-0 text-primary" />
+                      : <Square size={13} className="shrink-0 text-muted-foreground" />}
+                    <span className="font-mono">{g.plate_number}</span>
+                    <span className="text-muted-foreground mr-auto">{g.logs.length} عملية</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 interface VehicleGroupCardProps {
   group: VehicleGroup;
@@ -522,41 +653,15 @@ export function VehicleReportsTab() {
         </div>
       </div>
 
-      {/* Vehicle selection */}
+      {/* Vehicle selection — compact dropdown */}
       {!logsQ.isLoading && vehicleGroups.length > 0 && (
-        <div className="bg-card border border-border/60 rounded-xl p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-foreground">اختر المركبات المطلوبة في التقرير</span>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={selectAll} className="h-7 gap-1 text-xs">
-                <CheckSquare size={13} /> تحديد الكل
-              </Button>
-              <Button variant="ghost" size="sm" onClick={clearAll} className="h-7 gap-1 text-xs">
-                <Square size={13} /> إلغاء التحديد
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-            {vehicleGroups.map(g => {
-              const checked = activeSelection.has(g.vehicle_id);
-              return (
-                <button
-                  key={g.vehicle_id}
-                  type="button"
-                  onClick={() => toggleVehicle(g.vehicle_id)}
-                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full border transition-colors ${
-                    checked
-                      ? 'bg-primary/10 border-primary text-primary'
-                      : 'bg-muted/40 border-border text-muted-foreground'
-                  }`}
-                >
-                  {checked ? <CheckSquare size={12} /> : <Square size={12} />}
-                  {g.plate_number}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <VehicleDropdown
+          vehicleGroups={vehicleGroups}
+          activeSelection={activeSelection}
+          toggleVehicle={toggleVehicle}
+          selectAll={selectAll}
+          clearAll={clearAll}
+        />
       )}
 
       {renderLogsList()}
