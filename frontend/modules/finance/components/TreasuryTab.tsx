@@ -26,6 +26,12 @@ function treasuryTxTypeColorClass(type: TreasuryTransactionType): string {
   return 'text-blue-500';
 }
 
+function getTransactionTypeStyle(type: TreasuryTransactionType): string {
+  if (type === 'income') return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400';
+  if (type === 'expense') return 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400';
+  return 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400';
+}
+
 const SELECT_CLS = 'w-full h-9 text-xs rounded-lg border border-input bg-background px-2 focus:outline-none focus:ring-1 focus:ring-primary';
 
 export function TreasuryTab() {
@@ -453,8 +459,8 @@ export function TreasuryTab() {
         {showFilters && (
           <div className="p-3 border-b border-border/50 bg-muted/10 flex flex-wrap gap-2 items-end">
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-semibold text-muted-foreground">نوع العملية</label>
-              <select value={filterType} onChange={e => setFilterType(e.target.value as TreasuryTransactionType | '')} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[110px]">
+              <label htmlFor="filter-type" className="text-[10px] font-semibold text-muted-foreground">نوع العملية</label>
+              <select id="filter-type" value={filterType} onChange={e => setFilterType(e.target.value as TreasuryTransactionType | '')} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[110px]">
                 <option value="">الكل</option>
                 <option value="income">إيراد</option>
                 <option value="expense">مصروف</option>
@@ -462,22 +468,22 @@ export function TreasuryTab() {
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-semibold text-muted-foreground">الحساب</label>
-              <select value={filterAccountId} onChange={e => setFilterAccountId(e.target.value)} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[130px]">
+              <label htmlFor="filter-account" className="text-[10px] font-semibold text-muted-foreground">الحساب</label>
+              <select id="filter-account" value={filterAccountId} onChange={e => setFilterAccountId(e.target.value)} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[130px]">
                 <option value="">الكل</option>
                 {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-semibold text-muted-foreground">البند</label>
-              <select value={filterCategoryId} onChange={e => setFilterCategoryId(e.target.value)} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[130px]">
+              <label htmlFor="filter-category" className="text-[10px] font-semibold text-muted-foreground">البند</label>
+              <select id="filter-category" value={filterCategoryId} onChange={e => setFilterCategoryId(e.target.value)} className="h-7 text-xs rounded border border-input bg-background px-2 min-w-[130px]">
                 <option value="">الكل</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-semibold text-muted-foreground">البيان</label>
-              <Input value={filterDesc} onChange={e => setFilterDesc(e.target.value)} placeholder="بحث في البيان..." className="h-7 text-xs w-36" />
+              <label htmlFor="filter-desc" className="text-[10px] font-semibold text-muted-foreground">البيان</label>
+              <Input id="filter-desc" value={filterDesc} onChange={e => setFilterDesc(e.target.value)} placeholder="بحث في البيان..." className="h-7 text-xs w-36" />
             </div>
             {activeFilterCount > 0 && (
               <Button variant="ghost" size="sm" className="h-7 text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 gap-1 mt-3.5" onClick={clearFilters}>
@@ -535,11 +541,7 @@ export function TreasuryTab() {
                         ) : t.account?.name}
                       </td>
                       <td className="ta-td">
-                        <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-sm ${
-                          t.type === 'income' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' :
-                          t.type === 'expense' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400' :
-                          'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
-                        }`}>
+                        <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-sm ${getTransactionTypeStyle(t.type)}`}>
                           {typeLabel(t)}
                         </span>
                       </td>
@@ -571,7 +573,7 @@ export function TreasuryTab() {
                                 const url = await storageService.createSignedDownloadUrl('advance-attachments', t.attachment_url!);
                                 const a = document.createElement('a');
                                 a.href = url; a.download = t.attachment_url!.split('/').pop() || 'download';
-                                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                                document.body.appendChild(a); a.click(); a.remove();
                               } catch { toast.error('فشل تحميل المرفق'); }
                             }}>
                               <Download size={13} />

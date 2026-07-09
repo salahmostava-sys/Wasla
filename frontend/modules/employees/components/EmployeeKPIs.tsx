@@ -337,21 +337,14 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
                 <p className="text-center text-sm text-muted-foreground py-6">لا يوجد موظفين</p>
               ) : (
                 detailModal.employees.map((emp) => (
-                  <div 
+                  <button 
                     key={emp.id} 
+                    type="button"
                     onClick={() => {
                       setDetailModal(prev => ({ ...prev, isOpen: false }));
                       onSelectEmployee?.(emp.id);
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        setDetailModal(prev => ({ ...prev, isOpen: false }));
-                        onSelectEmployee?.(emp.id);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border/40"
+                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border/40 text-start"
                   >
                     <div className="flex flex-col text-right">
                       <span className="font-semibold text-sm text-foreground hover:text-primary transition-colors">
@@ -366,7 +359,7 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
                         عرض الملف
                       </span>
                     </div>
-                  </div>
+                  </button>
                 ))
               )}
             </div>
@@ -410,20 +403,22 @@ function KpiCard({
   color?: keyof typeof COLOR_MAP;
   onClick?: () => void;
 }>) {
-  const c = COLOR_MAP[color];
+  if (onClick) {
+    return (
+      <button 
+        type="button"
+        onClick={onClick}
+        className={`w-full text-start rounded-lg p-3 flex flex-col gap-1.5 ${c.bg} cursor-pointer hover:opacity-85 transition-opacity`}
+      >
+        <div className={`${c.icon}`}>{icon}</div>
+        <div className={`text-2xl font-bold tabular-nums ${c.val}`}>{value}</div>
+        <div className="text-xs text-muted-foreground leading-tight">{label}</div>
+      </button>
+    );
+  }
+
   return (
-    <div 
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      className={`rounded-lg p-3 flex flex-col gap-1.5 ${c.bg} ${onClick ? 'cursor-pointer hover:opacity-85 transition-opacity' : ''}`}
-    >
+    <div className={`rounded-lg p-3 flex flex-col gap-1.5 ${c.bg}`}>
       <div className={`${c.icon}`}>{icon}</div>
       <div className={`text-2xl font-bold tabular-nums ${c.val}`}>{value}</div>
       <div className="text-xs text-muted-foreground leading-tight">{label}</div>
@@ -440,19 +435,22 @@ const SEVERITY = {
 function AlertCard({ label, value, severity, onClick }: Readonly<{ label: string; value: number; severity: keyof typeof SEVERITY; onClick?: () => void }>) {
   const s = SEVERITY[severity];
   const isEmpty = value === 0;
+  
+  if (!isEmpty && onClick) {
+    return (
+      <button 
+        type="button"
+        onClick={onClick}
+        className={`w-full text-start rounded-lg border p-3 flex flex-col gap-1 ${s.bg} ${s.border} cursor-pointer hover:opacity-85 transition-opacity`}
+      >
+        <div className={`text-2xl font-bold tabular-nums ${s.val}`}>{value}</div>
+        <div className={`text-xs leading-tight ${s.label}`}>{label}</div>
+      </button>
+    );
+  }
+
   return (
-    <div 
-      onClick={!isEmpty ? onClick : undefined}
-      onKeyDown={(e) => {
-        if (!isEmpty && onClick && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      role={!isEmpty && onClick ? 'button' : undefined}
-      tabIndex={!isEmpty && onClick ? 0 : undefined}
-      className={`rounded-lg border p-3 flex flex-col gap-1 ${isEmpty ? 'bg-muted/20 border-border opacity-60' : s.bg + ' ' + s.border} ${onClick && !isEmpty ? 'cursor-pointer hover:opacity-85 transition-opacity' : ''}`}
-    >
+    <div className={`rounded-lg border p-3 flex flex-col gap-1 ${isEmpty ? 'bg-muted/20 border-border opacity-60' : s.bg + ' ' + s.border}`}>
       <div className={`text-2xl font-bold tabular-nums ${isEmpty ? 'text-muted-foreground' : s.val}`}>{value}</div>
       <div className={`text-xs leading-tight ${isEmpty ? 'text-muted-foreground' : s.label}`}>{label}</div>
     </div>
@@ -462,19 +460,26 @@ function AlertCard({ label, value, severity, onClick }: Readonly<{ label: string
 function BarRow({ label, value, max, total, color, onClick }: Readonly<{ label: string; value: number; max: number; total: number; color: string; onClick?: () => void }>) {
   const pct = Math.round((value / Math.max(1, max)) * 100);
   const share = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+
+  if (onClick) {
+    return (
+      <button 
+        type="button"
+        onClick={onClick}
+        className="w-full flex items-center gap-3 p-1 rounded-lg cursor-pointer hover:bg-muted/40 transition-colors"
+      >
+        <div className="w-28 text-xs text-muted-foreground truncate text-start shrink-0">{label}</div>
+        <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
+          <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+        </div>
+        <div className="text-xs font-semibold tabular-nums w-8 text-start">{value}</div>
+        <div className="text-xs text-muted-foreground w-10 text-start">{share}%</div>
+      </button>
+    );
+  }
+
   return (
-    <div 
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      className={`flex items-center gap-3 p-1 rounded-lg ${onClick ? 'cursor-pointer hover:bg-muted/40 transition-colors' : ''}`}
-    >
+    <div className="flex items-center gap-3 p-1 rounded-lg">
       <div className="w-28 text-xs text-muted-foreground truncate text-start shrink-0">{label}</div>
       <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />

@@ -1,7 +1,6 @@
-import { formatStandardDateTime } from '@shared/lib/formatters';
+import { formatStandardDateTime, todayISO } from '@shared/lib/formatters';
 
 import { useCallback, useRef, useEffect } from 'react';
-import { todayISO } from '@shared/lib/formatters';
 import { cycleSortState } from '@shared/lib/sortTableIndicators';
 import { employeeService, EMPLOYEE_DELETE_BLOCKED_MESSAGE } from '@services/employeeService';
 import { getErrorMessage } from '@services/serviceError';
@@ -22,6 +21,21 @@ import {
 
 import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { useUndo } from '@shared/context/UndoContext';
+
+// Reverts a single employee row to its previous field values (used by the undo stack).
+const buildRevertPatch = (
+  prev: Record<string, unknown>,
+  field: string,
+  prevValue: string | null,
+  extraFields?: Record<string, unknown>,
+): Record<string, unknown> => {
+  const revertPatch: Record<string, unknown> = { [field]: prevValue };
+  if (!extraFields) return revertPatch;
+  for (const key of Object.keys(extraFields)) {
+    revertPatch[key] = prev[key] ?? null;
+  }
+  return revertPatch;
+};
 
 export function useEmployeeActions(params: {
   data: Employee[];
@@ -74,34 +88,23 @@ export function useEmployeeActions(params: {
     setSortDir(next.sortDir);
   }, [sortField, sortDir, setSortField, setSortDir]);
 
-  // Reverts a single employee row to its previous field values (used by the undo stack).
-  const buildRevertPatch = (
-    prev: Record<string, unknown>,
-    field: string,
-    prevValue: string | null,
-    extraFields?: Record<string, unknown>,
-  ): Record<string, unknown> => {
-    const revertPatch: Record<string, unknown> = { [field]: prevValue };
-    if (!extraFields) return revertPatch;
-    for (const key of Object.keys(extraFields)) {
-      revertPatch[key] = prev[key] ?? null;
-    }
-    return revertPatch;
-  };
+  const applyPatch = useCallback((id: string, patch: Record<string, unknown>) => {
+    setData(d => d.map(e => (e.id === id ? { ...e, ...patch } : e)));
+  }, [setData]);
 
   const saveField = useCallback(async (id: string, field: string, value: string | null, extraFields?: Record<string, unknown>) => {
     const prev = dataRef.current.find(e => e.id === id);
     const prevValue = prev ? (prev as Record<string, unknown>)[field] as string | null : null;
     const coerced = value === '' ? null : value;
     const updatePatch = { [field]: coerced, ...(extraFields) };
-    setData(d => d.map(e => e.id === id ? { ...e, ...updatePatch } : e));
+    applyPatch(id, updatePatch);
     try {
       await employeeService.updateEmployee(id, updatePatch);
       // Register undo action after successful save
       if (prev) {
         const revertRow = async () => {
           const revertPatch = buildRevertPatch(prev, field, prevValue, extraFields);
-          setData(d => d.map(e => e.id === id ? { ...e, ...revertPatch } : e));
+          applyPatch(id, revertPatch);
           await employeeService.updateEmployee(id, revertPatch);
         };
         registerAction({
@@ -111,7 +114,7 @@ export function useEmployeeActions(params: {
       }
     } catch (err: unknown) {
       const message = getErrorMessage(err, 'تعذر حفظ التعديل');
-      setData(d => d.map(e => e.id === id ? (prev ?? e) : e));
+      if (prev) applyPatch(id, prev);
       toast({ title: 'خطأ في الحفظ', description: message, variant: 'destructive' });
     }
   }, [setData, toast, registerAction]);

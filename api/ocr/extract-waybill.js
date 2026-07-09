@@ -118,13 +118,13 @@ async function getGoogleAccessToken(credentials) {
     const b64 = privateKeyStr
       .replaceAll(/-----BEGIN.*?-----/g, '')
       .replaceAll(/-----END.*?-----/g, '')
-      .replaceAll('\\n', '')
+      .replaceAll(String.raw`\n`, '')
       .replaceAll(/\s+/g, '');
     const chunks = b64.match(/.{1,64}/g) || [];
     privateKeyStr = `-----BEGIN PRIVATE KEY-----\n${chunks.join('\n')}\n-----END PRIVATE KEY-----\n`;
   } else {
     // If it has no headers at all, assume it's raw base64
-    const b64 = privateKeyStr.replaceAll('\\n', '').replaceAll(/\s+/g, '');
+    const b64 = privateKeyStr.replaceAll(String.raw`\n`, '').replaceAll(/\s+/g, '');
     const chunks = b64.match(/.{1,64}/g) || [];
     privateKeyStr = `-----BEGIN PRIVATE KEY-----\n${chunks.join('\n')}\n-----END PRIVATE KEY-----\n`;
   }

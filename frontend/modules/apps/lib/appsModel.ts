@@ -162,7 +162,7 @@ export const buildAppEmployees = ({
     totalsByEmployee.set(row.employee_id, (totalsByEmployee.get(row.employee_id) ?? 0) + (row.orders_count ?? 0));
   });
 
-  const targetShare = employeeTargetOrders != null ? employeeTargetOrders : null;
+  const targetShare = employeeTargetOrders ?? null;
 
   return visibleEmployees.map((employee) => {
     const monthOrders = totalsByEmployee.get(employee.id) ?? 0;

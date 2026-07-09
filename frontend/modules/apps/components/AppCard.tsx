@@ -104,7 +104,6 @@ export const AppCard = ({
         </h3>
         <div
           className="mt-1 flex justify-center"
-          role="presentation"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }}
         >
