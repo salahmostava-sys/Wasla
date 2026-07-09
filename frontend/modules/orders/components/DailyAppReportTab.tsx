@@ -139,13 +139,13 @@ export const DailyAppReportTab = React.memo(() => {
                 </thead>
                 <tbody className="divide-y divide-border/40">
                   {r.previewData.length > 0 ? (
-                    r.previewData.map((row, idx) => (
-                      <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                    r.previewData.map((row) => (
+                      <tr key={row.empName} className="hover:bg-muted/30 transition-colors">
                         <td className="p-3 font-medium text-foreground sticky right-0 bg-card z-10 shadow-[1px_0_0_0_hsl(var(--border)/0.4)]">
                           {row.empName}
                         </td>
                         {row.dailyVals.map((val, i) => (
-                          <td key={i} className="p-3 text-center">
+                          <td key={dayArr[i]} className="p-3 text-center">
                             {val > 0 ? (
                               <span className="font-semibold text-primary">{val}</span>
                             ) : (
@@ -157,7 +157,7 @@ export const DailyAppReportTab = React.memo(() => {
                           {row.total}
                         </td>
                         <td className="p-3 text-center font-medium text-muted-foreground">
-                          {row.employeeTarget != null ? row.employeeTarget : '-'}
+                          {row.employeeTarget ?? '-'}
                         </td>
                         <td className="p-3 text-center">
                           {row.employeeTarget != null ? (

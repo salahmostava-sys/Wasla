@@ -163,7 +163,7 @@ export async function exportDailyAppReportExcel(params: {
 
   results.forEach(r => {
     const remaining = r.empTarget != null ? r.empTarget - r.total : '—';
-    const displayEmpTarget = r.empTarget != null ? r.empTarget : 'بدون هدف';
+    const displayEmpTarget = r.empTarget ?? 'بدون هدف';
     rows.push([r.name, r.total, displayEmpTarget, remaining, '']);
   });
 
@@ -245,7 +245,7 @@ export async function printDailyAppReportTable(params: {
 
   results.forEach(r => {
     const remaining = r.empTarget != null ? r.empTarget - r.total : '—';
-    const displayEmpTarget = r.empTarget != null ? r.empTarget : 'بدون هدف';
+    const displayEmpTarget = r.empTarget ?? 'بدون هدف';
     html += `
       <tr>
         <td>${r.name}</td>

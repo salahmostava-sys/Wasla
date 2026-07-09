@@ -127,9 +127,7 @@ export function mergeImportedOrdersFromMatrixWithMapping(params: {
   // If we don't have headerRow (e.g. from old code calling without it), we assume Matrix
   // Otherwise we let Factory detect it, fallback to Matrix if undetected for backward compatibility
   let strategy = ImportFactory.detectStrategy(headerRow);
-  if (!strategy) {
-    strategy = new MatrixImportStrategy();
-  }
+  strategy ??= new MatrixImportStrategy();
 
   return strategy.parse({
     matrixRows,
