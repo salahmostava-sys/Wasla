@@ -175,3 +175,8 @@ pg.zip
 scratch/
 graphify-out/
 public/assets/
+
+# Root-level public/ is generated build output (see root package.json "build"
+# script: it wipes and recreates this folder from frontend/dist on every
+# build/deploy). It should never be committed to git.
+/public/
