@@ -1,7 +1,7 @@
 import { formatCurrency, formatStandardDateTime } from '@shared/lib/formatters';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square, FileText } from 'lucide-react';
+import { Search, Car, Banknote, Wrench, Calendar, Download, Printer, CheckSquare, Square, FileText, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
@@ -35,23 +35,55 @@ interface VehicleGroupCardProps {
 }
 
 function VehicleGroupCard({ group }: VehicleGroupCardProps) {
+  const uniqueTypes = useMemo(() => Array.from(new Set(group.logs.map(l => l.type))), [group.logs]);
+  
+  const uniqueParts = useMemo(() => {
+    const parts = group.logs
+      .flatMap(l => l.maintenance_parts ?? [])
+      .map(p => p.spare_parts?.name_ar)
+      .filter((name): name is string => typeof name === 'string' && name.trim() !== '');
+    return Array.from(new Set(parts));
+  }, [group.logs]);
+
+  const typesText = uniqueTypes.join('، ') || 'صيانة عامة';
+
   return (
     <details className="group bg-card border border-border/60 rounded-xl overflow-hidden">
       <summary className="px-4 py-4 hover:bg-muted/50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-        <div className="flex items-center justify-between w-full pr-2">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between w-full pr-2 gap-4">
+          
+          {/* Right side: Vehicle plate number & icon */}
+          <div className="flex items-center gap-3 min-w-[180px] shrink-0">
             <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Car size={20} />
             </div>
-            <div className="flex flex-col items-start text-right">
-              <span className="font-bold text-base">{group.plate_number}</span>
+            <div className="flex flex-col items-start text-right min-w-0">
+              <span className="font-bold text-base truncate">{group.plate_number}</span>
               <span className="text-xs text-muted-foreground">{group.type} • {group.logs.length} عمليات صيانة</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 shrink-0">
-            <Banknote size={16} className="shrink-0" />
-            <span className="font-bold">{formatCurrency(group.total_cost)}</span>
+
+          {/* Middle side: Repairs and parts summary */}
+          <div className="flex-1 min-w-0 text-right md:px-4">
+            <span className="text-sm font-semibold text-foreground truncate block">
+              {typesText}
+            </span>
+            {uniqueParts.length > 0 && (
+              <span className="text-xs text-muted-foreground truncate block mt-0.5" title={uniqueParts.join('، ')}>
+                قطع: {uniqueParts.join('، ')}
+              </span>
+            )}
           </div>
+
+          {/* Left side: Cost & Expand Indicator */}
+          <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-2 md:pt-0 border-border/30">
+            <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
+              <Banknote size={16} className="shrink-0" />
+              <span className="font-bold text-lg">{formatCurrency(group.total_cost)}</span>
+            </div>
+            <ChevronDown size={18} className="text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+          </div>
+
         </div>
       </summary>
       <div className="px-4 pb-4 pt-1 bg-muted/10 border-t border-border/40 shadow-inner group-open:block hidden">
@@ -415,7 +447,7 @@ export function VehicleReportsTab() {
     }
 
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="space-y-3">
         {filteredGroups.map(group => (
           <VehicleGroupCard key={group.vehicle_id} group={group} />
         ))}
