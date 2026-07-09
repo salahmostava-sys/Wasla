@@ -18,8 +18,12 @@ export function escapeHtml(value: unknown): string {
     str = value;
   } else if (typeof value === 'object') {
     str = JSON.stringify(value);
-  } else {
+  } else if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
     str = String(value);
+  } else if (typeof value === 'symbol' || typeof value === 'function') {
+    str = value.toString();
+  } else {
+    str = '';
   }
   return str
     .replaceAll('&', '&amp;')

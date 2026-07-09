@@ -35,7 +35,4 @@ NOTIFY pgrst, 'reload schema';
 
 COMMIT;
 
--- تحقق بعد التنفيذ (يجب أن ترجع صف واحد فقط لكل جدول بعدد سياسات = 0):
--- SELECT tablename, count(*) FROM pg_policies
--- WHERE schemaname='public' AND tablename IN ('hr_performance_reviews','leave_requests')
--- GROUP BY tablename;
+

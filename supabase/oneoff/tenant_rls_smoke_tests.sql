@@ -237,7 +237,7 @@ WITH policy_counts AS (
     )
   GROUP BY tablename
 )
-SELECT *
+SELECT tablename, select_policies, write_policies
 FROM policy_counts
 ORDER BY tablename ASC;
 
@@ -321,4 +321,4 @@ JOIN pg_namespace n ON n.oid = p.pronamespace
 JOIN pg_roles r ON r.rolname IN ('anon', 'authenticated', 'service_role')
 WHERE n.nspname = 'public'
   AND p.proname IN ('calculate_salary_for_employee_month', 'calculate_salary_for_month', 'preview_salary_for_month')
-ORDER BY p.proname, r.rolname ASC;
+ORDER BY p.proname ASC, r.rolname ASC;

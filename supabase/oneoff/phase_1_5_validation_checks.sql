@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- PHASE 1.5 VALIDATION CHECKS
 -- Safe + repeatable validation for core RLS, policy drift, and permission matrix.
 -- NOTE:
@@ -134,7 +134,7 @@ FROM pol p
 JOIN dups d
   ON d.tablename = p.tablename
  AND d.cmd = p.cmd
-ORDER BY p.tablename, p.cmd, p.policyname ASC;
+ORDER BY p.tablename ASC, p.cmd ASC, p.policyname ASC;
 
 -- --------------------------------------------------------------------------
 -- 3) Role simulation prerequisites (admin + viewer existence checks)

@@ -186,7 +186,7 @@ SELECT
 FROM pg_policies
 WHERE schemaname = 'public'
   AND tablename IN ('spare_parts', 'maintenance_logs', 'maintenance_parts')
-ORDER BY tablename, policyname ASC;
+ORDER BY tablename ASC, policyname ASC;
 
 -- النتيجة المتوقعة: قائمة بجميع الـ policies المطبقة
 

@@ -14,8 +14,8 @@
 -- This migration restores the correct, real column list, adds the missing
 -- ON CONFLICT upsert, and switches the return shape back to the TABLE shape
 -- that calculate_salary_for_month() (still defined from the 2026-04-08
--- migration) expects via `RETURN QUERY SELECT * FROM
--- calculate_salary_for_employee_month(...)` — that call has been silently
+-- migration) expects via the returned query results from the function
+-- calculate_salary_for_employee_month -- that call has been silently
 -- broken since 2026-06-28 because the function's return type changed to a
 -- bare UUID. Restoring the TABLE shape fixes calculate_salary_for_month()
 -- too, with zero frontend changes needed (frontend never depended on the

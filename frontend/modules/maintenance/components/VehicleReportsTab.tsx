@@ -30,6 +30,83 @@ type VehicleGroup = {
   total_cost: number;
 };
 
+interface VehicleGroupCardProps {
+  group: VehicleGroup;
+}
+
+function VehicleGroupCard({ group }: VehicleGroupCardProps) {
+  return (
+    <details className="group bg-card border border-border/60 rounded-xl overflow-hidden">
+      <summary className="px-4 py-4 hover:bg-muted/50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <div className="flex items-center justify-between w-full pr-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <Car size={20} />
+            </div>
+            <div className="flex flex-col items-start text-right">
+              <span className="font-bold text-base">{group.plate_number}</span>
+              <span className="text-xs text-muted-foreground">{group.type} • {group.logs.length} عمليات صيانة</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 shrink-0">
+            <Banknote size={16} className="shrink-0" />
+            <span className="font-bold">{formatCurrency(group.total_cost)}</span>
+          </div>
+        </div>
+      </summary>
+      <div className="px-4 pb-4 pt-1 bg-muted/10 border-t border-border/40 shadow-inner group-open:block hidden">
+        <div className="space-y-3 mt-3">
+          {group.logs.map(log => {
+            const colorClass = TYPE_COLORS[log.type] ?? TYPE_COLORS['أخرى'];
+            const dateFormatted = log.maintenance_date
+              ? new Date(log.maintenance_date).toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' })
+              : '—';
+            
+            return (
+              <div key={log.id} className="bg-background border border-border/60 rounded-lg p-3 shadow-sm">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}`}>
+                      {log.type}
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar size={12} />
+                      {dateFormatted}
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-foreground">
+                    {formatCurrency(Number(log.total_cost))}
+                  </span>
+                </div>
+                {log.notes && (
+                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
+                    {log.notes}
+                  </p>
+                )}
+                {log.maintenance_parts && log.maintenance_parts.length > 0 && (
+                  <div className="space-y-1 border-t border-border/50 pt-2 mt-2">
+                    {log.maintenance_parts.map(p => (
+                      <div key={p.id} className="flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Wrench size={10} />
+                          <span>{p.spare_parts?.name_ar ?? '—'}</span>
+                        </div>
+                        <span>
+                          {p.quantity_used} × {Number(p.cost_at_time).toLocaleString('en-US')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export function VehicleReportsTab() {
   const logsQ = useMaintenanceLogs();
   const [search, setSearch] = useState('');
@@ -340,74 +417,7 @@ export function VehicleReportsTab() {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredGroups.map(group => (
-          <details key={group.vehicle_id} className="group bg-card border border-border/60 rounded-xl overflow-hidden">
-            <summary className="px-4 py-4 hover:bg-muted/50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-              <div className="flex items-center justify-between w-full pr-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center shrink-0">
-                    <Car size={20} />
-                  </div>
-                  <div className="flex flex-col items-start text-right">
-                    <span className="font-bold text-base">{group.plate_number}</span>
-                    <span className="text-xs text-muted-foreground">{group.type} • {group.logs.length} عمليات صيانة</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 shrink-0">
-                  <Banknote size={16} className="shrink-0" />
-                  <span className="font-bold">{formatCurrency(group.total_cost)}</span>
-                </div>
-              </div>
-            </summary>
-            <div className="px-4 pb-4 pt-1 bg-muted/10 border-t border-border/40 shadow-inner group-open:block hidden">
-              <div className="space-y-3 mt-3">
-                {group.logs.map(log => {
-                  const colorClass = TYPE_COLORS[log.type] ?? TYPE_COLORS['أخرى'];
-                  const dateFormatted = log.maintenance_date
-                    ? new Date(log.maintenance_date).toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' })
-                    : '—';
-                  
-                  return (
-                    <div key={log.id} className="bg-background border border-border/60 rounded-lg p-3 shadow-sm">
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}`}>
-                            {log.type}
-                          </span>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Calendar size={12} />
-                            {dateFormatted}
-                          </div>
-                        </div>
-                        <span className="text-sm font-bold text-foreground">
-                          {formatCurrency(Number(log.total_cost))}
-                        </span>
-                      </div>
-                      {log.notes && (
-                        <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
-                          {log.notes}
-                        </p>
-                      )}
-                      {log.maintenance_parts && log.maintenance_parts.length > 0 && (
-                        <div className="space-y-1 border-t border-border/50 pt-2 mt-2">
-                          {log.maintenance_parts.map(p => (
-                            <div key={p.id} className="flex items-center justify-between text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Wrench size={10} />
-                                <span>{p.spare_parts?.name_ar ?? '—'}</span>
-                              </div>
-                              <span>
-                                {p.quantity_used} × {Number(p.cost_at_time).toLocaleString('en-US')}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </details>
+          <VehicleGroupCard key={group.vehicle_id} group={group} />
         ))}
       </div>
     );

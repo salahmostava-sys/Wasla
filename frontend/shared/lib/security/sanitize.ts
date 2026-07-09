@@ -46,8 +46,12 @@ export function sanitizeForLog(input: unknown): string {
     str = input;
   } else if (typeof input === 'object') {
     str = JSON.stringify(input);
-  } else {
+  } else if (typeof input === 'number' || typeof input === 'boolean' || typeof input === 'bigint') {
     str = String(input);
+  } else if (typeof input === 'symbol' || typeof input === 'function') {
+    str = input.toString();
+  } else {
+    str = '';
   }
   const stripped = stripControlCharacters(str.replaceAll(/[\r\n\t]/g, ' '));
   return maskSensitiveData(stripped).trim().slice(0, 1000);

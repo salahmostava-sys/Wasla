@@ -105,6 +105,16 @@ export function usePagePresence(pageKey: string, currentPath?: string) {
     if (!user?.id) return;
 
     const channelName = `presence:${pageKey}`;
+
+    // Find and remove any existing channel with the same topic to prevent reuse
+    // which can throw "cannot add 'presence' callbacks after subscribe" error
+    const existing = supabase.getChannels().find(
+      (c) => c.topic === `realtime:${channelName}` || c.topic === channelName
+    );
+    if (existing) {
+      supabase.removeChannel(existing).catch(() => {});
+    }
+
     const channel = supabase.channel(channelName, {
       config: { presence: { key: user.id } },
     });

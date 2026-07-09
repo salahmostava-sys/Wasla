@@ -11,23 +11,35 @@ type State = {
   error: Error | null;
 };
 
+function extractCauseMessage(cause: unknown): string {
+  if (cause instanceof Error) {
+    return cause.message;
+  }
+  if (typeof cause === 'object' && cause !== null) {
+    try {
+      return JSON.stringify(cause);
+    } catch {
+      return `[Object ${cause.constructor?.name || ''}]`.trim();
+    }
+  }
+  if (typeof cause === 'string') {
+    return cause;
+  }
+  if (typeof cause === 'number' || typeof cause === 'boolean' || typeof cause === 'bigint') {
+    return String(cause);
+  }
+  if (typeof cause === 'symbol' || typeof cause === 'function') {
+    return cause.toString();
+  }
+  return '';
+}
+
 function extractErrorMessage(error: Error): string {
   if (error.message) {
     return error.message;
   }
   if ('cause' in error && error.cause) {
-    const cause = error.cause;
-    if (cause instanceof Error) {
-      return cause.message;
-    }
-    if (typeof cause === 'object' && cause !== null) {
-      try {
-        return JSON.stringify(cause);
-      } catch {
-        // fallback
-      }
-    }
-    return String(cause);
+    return extractCauseMessage(error.cause) || String(error);
   }
   return String(error);
 }
