@@ -403,6 +403,7 @@ function KpiCard({
   color?: keyof typeof COLOR_MAP;
   onClick?: () => void;
 }>) {
+  const c = COLOR_MAP[color];
   if (onClick) {
     return (
       <button 

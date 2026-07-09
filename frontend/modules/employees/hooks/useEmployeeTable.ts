@@ -117,7 +117,7 @@ export function useEmployeeActions(params: {
       if (prev) applyPatch(id, prev);
       toast({ title: 'خطأ في الحفظ', description: message, variant: 'destructive' });
     }
-  }, [setData, toast, registerAction]);
+  }, [toast, registerAction, applyPatch]);
 
 
   const handleSaveStatusWithDate = async () => {
