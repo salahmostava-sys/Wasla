@@ -15,7 +15,7 @@ RETURNS BOOLEAN
 LANGUAGE sql
 IMMUTABLE
 AS $$
-  SELECT COALESCE(p_job_title, '') ~* '(admin|administrator|manager|supervisor|coordinator|accountant|finance|financial|hr|human resources|operations|operation|office|reception|support|customer service|it|logistics|fleet|procurement|purchasing|payroll|Ø¥Ø¯Ø§Ø±Ø©|Ø§Ø¯Ø§Ø±Ø©|Ø¥Ø¯Ø§Ø±ÙŠ|Ø§Ø¯Ø§Ø±ÙŠ|Ù…Ø¯ÙŠØ±|Ù…Ø´Ø±Ù|Ù…Ù†Ø³Ù‚|Ù…Ø­Ø§Ø³Ø¨|Ù…Ø§Ù„ÙŠØ©|Ù…Ø§Ù„ÙŠ|Ù…ÙˆØ§Ø±Ø¯|Ø´Ø¤ÙˆÙ†|Ø§Ø³ØªÙ‚Ø¨Ø§Ù„|Ø®Ø¯Ù…Ø© Ø¹Ù…Ù„Ø§Ø¡|Ø¯Ø¹Ù…|ØªÙ‚Ù†ÙŠØ©|Ø¹Ù…Ù„ÙŠØ§Øª|ØªØ´ØºÙŠÙ„|Ù„ÙˆØ¬Ø³Øª)';
+  SELECT COALESCE(p_job_title, '') ~* '(admin|administrator|manager|supervisor|coordinator|accountant|finance|financial|hr|human resources|operations|operation|office|reception|support|customer service|it|logistics|fleet|procurement|purchasing|payroll|Ø¥Ø¯Ø§Ø±Ø©|Ø§Ø¯Ø§Ø±Ø©|Ø¥Ø¯Ø§Ø±ÙŠ|Ø§Ø¯Ø§Ø±ÙŠ|Ù…Ø¯ÙŠØ±|Ù…Ø´Ø±Ù|Ù…Ù†Ø³Ù‚|Ù…ØØ§Ø³Ø¨|Ù…Ø§Ù„ÙŠØ©|Ù…Ø§Ù„ÙŠ|Ù…ÙˆØ§Ø±Ø¯|Ø´Ø¤ÙˆÙ†|Ø§Ø³ØªÙ‚Ø¨Ø§Ù„|Ø®Ø¯Ù…Ø© Ø¹Ù…Ù„Ø§Ø¡|Ø¯Ø¹Ù…|ØªÙ‚Ù†ÙŠØ©|Ø¹Ù…Ù„ÙŠØ§Øª|ØªØ´ØºÙŠÙ„|Ù„ÙˆØ¬Ø³Øª)';
 $$;
 
 CREATE OR REPLACE FUNCTION public.calculate_order_salary_for_app(

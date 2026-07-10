@@ -1,14 +1,14 @@
 ﻿-- Track which invoice a spare-parts purchase came from, and allow attaching
 -- a scan/photo of the invoice itself so reports can reference the source
--- document (Ø±Ù‚Ù… Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØªØ§Ø±ÙŠØ® Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØµÙˆØ±Ø© Ø§Ù„ÙØ§ØªÙˆØ±Ø©).
+-- document (Ø±Ù‚Ù… Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØªØ§Ø±ÙŠØ® Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØµÙˆØ±Ø© Ø§Ù„ÙØ§ØªÙˆØ±Ø©).
 
 ALTER TABLE public.spare_parts ADD COLUMN IF NOT EXISTS invoice_number TEXT;
 ALTER TABLE public.spare_parts ADD COLUMN IF NOT EXISTS invoice_date DATE;
 ALTER TABLE public.spare_parts ADD COLUMN IF NOT EXISTS invoice_attachment_url TEXT;
 
-COMMENT ON COLUMN public.spare_parts.invoice_number IS 'Ø±Ù‚Ù… Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø§Ù„ØªÙŠ Ø§Ø´ØªØ±ÙŠØª Ù…Ù†Ù‡Ø§ Ù‡Ø°Ù‡ Ø§Ù„Ù‚Ø·Ø¹Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)';
-COMMENT ON COLUMN public.spare_parts.invoice_date IS 'ØªØ§Ø±ÙŠØ® Ø§Ù„ÙØ§ØªÙˆØ±Ø©';
-COMMENT ON COLUMN public.spare_parts.invoice_attachment_url IS 'Ù…Ø³Ø§Ø± ØµÙˆØ±Ø©/Ù…Ù„Ù Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¯Ø§Ø®Ù„ bucket invoice-attachments';
+COMMENT ON COLUMN public.spare_parts.invoice_number IS 'Ø±Ù‚Ù… Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø§Ù„ØªÙŠ Ø§Ø´ØªØ±ÙŠØª Ù…Ù†Ù‡Ø§ Ù‡Ø°Ù‡ Ø§Ù„Ù‚Ø·Ø¹Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)';
+COMMENT ON COLUMN public.spare_parts.invoice_date IS 'ØªØ§Ø±ÙŠØ® Ø§Ù„ÙØ§ØªÙˆØ±Ø©';
+COMMENT ON COLUMN public.spare_parts.invoice_attachment_url IS 'Ù…Ø³Ø§Ø± ØµÙˆØ±Ø©/Ù…Ù„Ù Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¯Ø§Ø®Ù„ bucket invoice-attachments';
 
 -- Storage bucket for uploaded invoice scans (mirrors advance-attachments pattern)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

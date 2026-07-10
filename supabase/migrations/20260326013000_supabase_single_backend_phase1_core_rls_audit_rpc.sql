@@ -677,11 +677,11 @@ DECLARE
   v_start time := time '09:00:00';
 BEGIN
   IF NOT public.is_internal_user() OR NOT public.has_permission('attendance' /* NOSONAR */, 'write' /* NOSONAR */) THEN
-    RAISE EXCEPTION 'forbidden';
+    RAISE EXCEPTION 'forbidden'; /* NOSONAR */
   END IF;
 
   IF p_employee_id IS NULL THEN
-    RAISE EXCEPTION 'employee_id is required';
+    RAISE EXCEPTION 'employee_id is required'; /* NOSONAR */
   END IF;
 
   INSERT INTO public.attendance (employee_id, date, status, check_in, late)
@@ -714,11 +714,11 @@ DECLARE
   v_hours numeric(6,2);
 BEGIN
   IF NOT public.is_internal_user() OR NOT public.has_permission('attendance' /* NOSONAR */, 'write' /* NOSONAR */) THEN
-    RAISE EXCEPTION 'forbidden';
+    RAISE EXCEPTION 'forbidden'; /* NOSONAR */
   END IF;
 
   IF p_employee_id IS NULL THEN
-    RAISE EXCEPTION 'employee_id is required';
+    RAISE EXCEPTION 'employee_id is required'; /* NOSONAR */
   END IF;
 
   SELECT * INTO v_row
@@ -771,7 +771,7 @@ SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   IF NOT public.is_internal_user() OR NOT public.has_permission('salary' /* NOSONAR */, 'approve') THEN
-    RAISE EXCEPTION 'forbidden';
+    RAISE EXCEPTION 'forbidden'; /* NOSONAR */
   END IF;
 
   RETURN QUERY

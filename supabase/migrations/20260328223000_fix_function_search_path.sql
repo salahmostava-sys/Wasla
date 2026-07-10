@@ -32,7 +32,7 @@ BEGIN
   WHERE sp.id = NEW.part_id;
 
   IF (SELECT sp2.stock_quantity FROM public.spare_parts sp2 WHERE sp2.id = NEW.part_id) < 0 THEN
-    RAISE EXCEPTION 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ† ØºÙŠØ± ÙƒØ§ÙÙ Ù„Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
+    RAISE EXCEPTION 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ† ØºÙŠØ± ÙƒØ§ÙÙ Ù„Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
   END IF;
 
   RETURN NEW;

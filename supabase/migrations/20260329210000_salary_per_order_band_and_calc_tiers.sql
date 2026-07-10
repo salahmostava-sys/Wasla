@@ -1,4 +1,4 @@
-﻿-- 1) Allow per_order_band tier type (Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙƒÙ„ÙŠ Ã— Ø³Ø¹Ø± Ø§Ù„Ø´Ø±ÙŠØ­Ø© â€” Ø¨Ø¯ÙˆÙ† ØªØ±Ø§ÙƒÙ… Ø´Ø±Ø§Ø¦Ø­).
+﻿-- 1) Allow per_order_band tier type (Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙƒÙ„ÙŠ Ã— Ø³Ø¹Ø± Ø§Ù„Ø´Ø±ÙŠØØ© â€” Ø¨Ø¯ÙˆÙ† ØªØ±Ø§ÙƒÙ… Ø´Ø±Ø§Ø¦Ø).
 -- 2) Align calc_tier_salary with band model: 1â€“300Ã—3, 301â€“400Ã—4, 401â€“449Ã—5, 450â€“470 = 2500, >470 = 2500+(n-470)Ã—5
 
 BEGIN;
@@ -39,6 +39,6 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.calc_tier_salary(INTEGER) IS
-  'Default tier curve (single-band): 1â€“300Ã—3ØŒ 301â€“400Ã—4ØŒ 401â€“449Ã—5ØŒ 450â€“470 Ø«Ø§Ø¨Øª 2500ØŒ ÙÙˆÙ‚ 470: 2500+(n-470)Ã—5. Schemes UI may use per_order_band tiers for the same logic per app.';
+  'Default tier curve (single-band): 1â€“300Ã—3ØŒ 301â€“400Ã—4ØŒ 401â€“449Ã—5ØŒ 450â€“470 Ø«Ø§Ø¨Øª 2500ØŒ ÙÙˆÙ‚ 470: 2500+(n-470)Ã—5. Schemes UI may use per_order_band tiers for the same logic per app.';
 
 COMMIT;

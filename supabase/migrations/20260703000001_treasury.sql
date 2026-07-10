@@ -76,16 +76,16 @@ INSERT INTO public.treasury_categories (name, type) VALUES
 ('ØªØ¬Ø¯ÙŠØ¯ Ø§Ø´ØªØ±Ø§ÙƒØ§Øª', 'expense'),
 ('Ø¨Ù†Ø²ÙŠÙ†', 'expense'),
 ('ØµÙŠØ§Ù†Ø© Ø³ÙŠØ§Ø±Ø§Øª', 'expense'),
-('Ù…ØµØ±ÙˆÙØ§Øª Ù…ÙƒØªØ¨ÙŠØ©', 'expense'),
+('Ù…ØµØ±ÙˆÙØ§Øª Ù…ÙƒØªØ¨ÙŠØ©', 'expense'),
 ('Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ù…Ù†ØµØ§Øª', 'income'),
 ('Ø¥ÙŠØ±Ø§Ø¯Ø§Øª ÙƒØ§Ø´', 'income')
 ON CONFLICT DO NOTHING;
 
 -- Seed default accounts
 INSERT INTO public.treasury_accounts (name, type) VALUES
-('Ø¨Ù†Ùƒ Ø§Ù„Ø±Ø§Ø¬Ø­ÙŠ', 'bank'),
+('Ø¨Ù†Ùƒ Ø§Ù„Ø±Ø§Ø¬ØÙŠ', 'bank'),
 ('Ø¨Ù†Ùƒ Ø§Ù„Ø±ÙŠØ§Ø¶', 'bank'),
 ('Ø§Ù„ÙƒØ§Ø´', 'cash'),
 ('Ø¹Ù‡Ø¯Ø© Ø¹Ø¨Ø¯Ø§Ù„Ù„Ù‡', 'custody'),
-('Ø¹Ù‡Ø¯Ø© Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†', 'custody')
+('Ø¹Ù‡Ø¯Ø© Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†', 'custody')
 ON CONFLICT DO NOTHING;

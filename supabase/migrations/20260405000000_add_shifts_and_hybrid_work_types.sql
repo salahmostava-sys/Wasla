@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS daily_shifts (
   CONSTRAINT daily_shifts_unique_employee_app_date UNIQUE(employee_id, app_id, date)
 );
 
-COMMENT ON TABLE daily_shifts IS 'ØªØ³Ø¬ÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¯ÙˆØ§Ù… Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ†';
-COMMENT ON COLUMN daily_shifts.hours_worked IS 'Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ ÙÙŠ Ø§Ù„ÙŠÙˆÙ…';
+COMMENT ON TABLE daily_shifts IS 'ØªØ³Ø¬ÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¯ÙˆØ§Ù… Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ†';
+COMMENT ON COLUMN daily_shifts.hours_worked IS 'Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ ÙÙŠ Ø§Ù„ÙŠÙˆÙ…';
 
 CREATE INDEX IF NOT EXISTS idx_daily_shifts_employee_date ON daily_shifts(employee_id, date);
 CREATE INDEX IF NOT EXISTS idx_daily_shifts_app_date ON daily_shifts(app_id, date);
@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS app_hybrid_rules (
 );
 
 COMMENT ON TABLE app_hybrid_rules IS 'Ù‚ÙˆØ§Ø¹Ø¯ Ø§Ù„Ù…Ù†ØµØ§Øª Ø§Ù„Ù…Ø®ØªÙ„Ø·Ø© (Ø¯ÙˆØ§Ù… Ø£Ùˆ Ø·Ù„Ø¨Ø§Øª)';
-COMMENT ON COLUMN app_hybrid_rules.min_hours_for_shift IS 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ù„Ø§Ø­ØªØ³Ø§Ø¨ Ø§Ù„Ø¯ÙˆØ§Ù…';
+COMMENT ON COLUMN app_hybrid_rules.min_hours_for_shift IS 'Ø§Ù„ØØ¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ù„Ø§ØØªØ³Ø§Ø¨ Ø§Ù„Ø¯ÙˆØ§Ù…';
 COMMENT ON COLUMN app_hybrid_rules.shift_rate IS 'Ø³Ø¹Ø± Ø§Ù„Ø¯ÙˆØ§Ù… Ø§Ù„ÙŠÙˆÙ…ÙŠ Ø¨Ø§Ù„Ø±ÙŠØ§Ù„';
-COMMENT ON COLUMN app_hybrid_rules.fallback_to_orders IS 'Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø¹Ù†Ø¯ Ø¹Ø¯Ù… ØªØ­Ù‚ÙŠÙ‚ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
+COMMENT ON COLUMN app_hybrid_rules.fallback_to_orders IS 'Ø§Ù„ØªØÙˆÙŠÙ„ Ù„ØØ³Ø§Ø¨ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø¹Ù†Ø¯ Ø¹Ø¯Ù… ØªØÙ‚ÙŠÙ‚ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
 
 -- Function to prevent overlap between orders and shifts on same day
 CREATE OR REPLACE FUNCTION check_no_overlap_orders_shifts()
@@ -52,7 +52,7 @@ BEGIN
         AND app_id = NEW.app_id 
         AND date = NEW.date
     ) THEN
-      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø¯ÙˆØ§Ù… ÙÙŠ ÙŠÙˆÙ… ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ø§Øª Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
+      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø¯ÙˆØ§Ù… ÙÙŠ ÙŠÙˆÙ… ÙŠØØªÙˆÙŠ Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ø§Øª Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
     END IF;
   END IF;
   
@@ -64,7 +64,7 @@ BEGIN
         AND app_id = NEW.app_id 
         AND date = NEW.date
     ) THEN
-      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨Ø§Øª ÙÙŠ ÙŠÙˆÙ… ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø¯ÙˆØ§Ù… Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
+      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨Ø§Øª ÙÙŠ ÙŠÙˆÙ… ÙŠØØªÙˆÙŠ Ø¹Ù„Ù‰ Ø¯ÙˆØ§Ù… Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
     END IF;
   END IF;
   

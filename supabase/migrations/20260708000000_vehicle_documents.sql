@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS public.vehicle_documents (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-COMMENT ON TABLE public.vehicle_documents IS 'Ù…Ø³ØªÙ†Ø¯Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ¨Ø© (Ø±Ø®ØµØ©ØŒ ØªØ£Ù…ÙŠÙ†ØŒ ØªØ³Ø¬ÙŠÙ„ØŒ ØªÙÙˆÙŠØ¶ØŒ Ø£Ùˆ Ø£ÙŠ Ù…Ù„Ù Ø¢Ø®Ø±)';
+COMMENT ON TABLE public.vehicle_documents IS 'Ù…Ø³ØªÙ†Ø¯Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ¨Ø© (Ø±Ø®ØµØ©ØŒ ØªØ£Ù…ÙŠÙ†ØŒ ØªØ³Ø¬ÙŠÙ„ØŒ ØªÙÙˆÙŠØ¶ØŒ Ø£Ùˆ Ø£ÙŠ Ù…Ù„Ù Ø¢Ø®Ø±)';
 COMMENT ON COLUMN public.vehicle_documents.doc_type IS 'license | insurance | registration | authorization | other';
-COMMENT ON COLUMN public.vehicle_documents.file_path IS 'Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ù„Ù Ø¯Ø§Ø®Ù„ bucket vehicle-documents';
+COMMENT ON COLUMN public.vehicle_documents.file_path IS 'Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ù„Ù Ø¯Ø§Ø®Ù„ bucket vehicle-documents';
 
 CREATE INDEX IF NOT EXISTS idx_vehicle_documents_vehicle_id ON public.vehicle_documents(vehicle_id);
 
