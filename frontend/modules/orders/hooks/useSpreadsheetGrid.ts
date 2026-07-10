@@ -271,7 +271,7 @@ export function useSpreadsheetGrid() {
         await invalidateMonthDependencies();
       }
     },
-    [days, invalidateMonthDependencies, isMonthLocked, month, sq.apps, sq.employees, year],
+    [days, invalidateMonthDependencies, isMonthLocked, month, sq.apps, sq.employees, sq.spreadsheetMonthData, year],
   );
 
   const handleImportConfirm = async (targetAppId: string | undefined) => {

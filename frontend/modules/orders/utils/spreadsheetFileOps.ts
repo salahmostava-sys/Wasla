@@ -451,33 +451,16 @@ export function printSpreadsheetTable(params: {
   };
 }
 
-export async function saveSpreadsheetMonth(params: {
-  isMonthLocked: boolean;
-  year: number;
-  month: number;
-  days: number;
-  data: DailyData;
-  originalData?: DailyData;
-  setSaving: (v: boolean) => void;
-  employees: Employee[];
-  apps: App[];
-  saveMeta?: ReplaceMonthDataMeta;
-}): Promise<boolean> {
-  const { isMonthLocked, year, month, days, data, originalData, setSaving, employees, apps, saveMeta: _saveMeta } = params;
-  if (isMonthLocked) {
-    toast.error('الشهر مقفل', {
-      description: 'لا يمكن حفظ التغييرات في شهر مقفل'
-    });
-    return false;
-  }
-
-  setSaving(true);
-  const employeeNames = new Map(employees.map((employee) => [employee.id, employee.name]));
-  const appNames = new Map(apps.map((app) => [app.id, app.name]));
+function buildRows(
+  data: DailyData,
+  year: number,
+  month: number,
+  days: number,
+  employeeNames: Map<string, string>,
+  appNames: Map<string, string>
+) {
   const rows: { employee_id: string; app_id: string; date: string; orders_count: number }[] = [];
   const invalidRows: string[] = [];
-  const _monthKey = monthYear(year, month);
-  const isClearingMonth = Object.keys(data).length === 0;
 
   Object.entries(data).forEach(([key, count]) => {
     const [empId, appId, dayStr] = key.split('::');
@@ -508,6 +491,57 @@ export async function saveSpreadsheetMonth(params: {
     });
   });
 
+  return { rows, invalidRows };
+}
+
+function getDeletedKeys(data: DailyData, originalData: DailyData, year: number, month: number) {
+  const deletedKeys: { employeeId: string; appId: string; date: string }[] = [];
+  for (const key of Object.keys(originalData)) {
+    if (!data[key] || data[key] <= 0) {
+      const [empId, appId, dayStr] = key.split('::');
+      const day = Number.parseInt(dayStr, 10);
+      if (empId && appId && !Number.isNaN(day)) {
+        deletedKeys.push({
+          employeeId: empId,
+          appId,
+          date: dateStr(year, month, day),
+        });
+      }
+    }
+  }
+  return deletedKeys;
+}
+
+
+export async function saveSpreadsheetMonth(params: {
+  isMonthLocked: boolean;
+  year: number;
+  month: number;
+  days: number;
+  data: DailyData;
+  originalData?: DailyData;
+  setSaving: (v: boolean) => void;
+  employees: Employee[];
+  apps: App[];
+  saveMeta?: ReplaceMonthDataMeta;
+}): Promise<boolean> {
+  const { isMonthLocked, year, month, days, data, originalData, setSaving, employees, apps, saveMeta: _saveMeta } = params;
+  if (isMonthLocked) {
+    toast.error('الشهر مقفل', {
+      description: 'لا يمكن حفظ التغييرات في شهر مقفل'
+    });
+    return false;
+  }
+
+  setSaving(true);
+  const employeeNames = new Map(employees.map((employee) => [employee.id, employee.name]));
+  const appNames = new Map(apps.map((app) => [app.id, app.name]));
+  
+  const { rows, invalidRows } = buildRows(data, year, month, days, employeeNames, appNames);
+  
+  const _monthKey = monthYear(year, month);
+  const isClearingMonth = Object.keys(data).length === 0;
+
   if (invalidRows.length > 0) {
     logger.warn('تم تجاهل بيانات غير صحيحة', { meta: { invalidRows } });
     toast.warning('تم تجاهل بعض البيانات قبل الحفظ', {
@@ -531,20 +565,7 @@ export async function saveSpreadsheetMonth(params: {
 
     let deletedCount = 0;
     if (originalData) {
-      const deletedKeys: { employeeId: string; appId: string; date: string }[] = [];
-      for (const key of Object.keys(originalData)) {
-        if (!data[key] || data[key] <= 0) {
-          const [empId, appId, dayStr] = key.split('::');
-          const day = Number.parseInt(dayStr, 10);
-          if (empId && appId && !Number.isNaN(day)) {
-            deletedKeys.push({
-              employeeId: empId,
-              appId,
-              date: dateStr(year, month, day),
-            });
-          }
-        }
-      }
+      const deletedKeys = getDeletedKeys(data, originalData, year, month);
       if (deletedKeys.length > 0) {
         await orderService.deleteDailyOrders(deletedKeys);
         deletedCount = deletedKeys.length;
