@@ -2,7 +2,7 @@ import { formatStandardDateTime, formatCurrency } from '@shared/lib/formatters';
 
 import type React from 'react';
 import { Suspense, lazy, useEffect, useRef, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { Search, Plus, FolderOpen, Edit, Trash2, Bike, FileText, ChevronDown, ChevronUp, Car } from 'lucide-react';
+import { Search, Plus, FolderOpen, Edit, Trash2, Bike, FileText, Car } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@shared/components/ui/alert-dialog';
 import { vehicleService, VEHICLES_QUERY_MAX_ROWS } from '@services/vehicleService';
 import { useToast } from '@shared/hooks/use-toast';
-import { format, differenceInDays, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { Skeleton } from '@shared/components/ui/skeleton';
 import { useMotorcyclesData } from '@shared/hooks/useMotorcyclesData';
@@ -73,36 +73,12 @@ const typeLabels: Record<string, string> = { motorcycle: 'دباب', car: 'سي�
 
 const ALL_STATUSES: VehicleStatus[] = ['active', 'maintenance', 'breakdown', 'rental', 'inactive', 'ended'];
 
-const getDaysLeft = (date: string | null) => {
-  if (!date) return null;
-  return differenceInDays(parseISO(date), new Date());
+const displayCell = (value: string | number | null | undefined) => value || '—';
+
+const formatDateCell = (date: string | null | undefined) => {
+  if (!date) return '—';
+  return format(new Date(date), 'yyyy/MM/dd');
 };
-
-const daysStyle = (days: number | null) => {
-  if (days === null) return 'text-muted-foreground';
-  if (days < 0) return 'text-destructive font-semibold';
-  if (days <= 30) return 'text-destructive font-semibold';
-  if (days <= 60) return 'text-yellow-600 dark:text-yellow-400 font-medium';
-  return 'text-muted-foreground';
-};
-
-const daysLabel = (days: number | null) => {
-  if (days === null) return '—';
-  if (days < 0) return `منتهي منذ ${Math.abs(days)} يوم`;
-  return `${days} يوم`;
-};
-
-const _authBadge = (date: string | null) => {
-  if (!date) return null;
-  const days = getDaysLeft(date);
-  if (days === null) return null;
-  if (days < 0) return <span className="badge-urgent">منتهي</span>;
-  if (days <= 30) return <span className="badge-warning">ينتهي قريباً</span>;
-  return <span className="badge-success">ساري</span>;
-};
-
-
-
 
 const VEHICLE_TEMPLATE_HEADERS = MOTORCYCLE_IO_COLUMNS.map((c) => c.label);
 
@@ -376,16 +352,6 @@ const Motorcycles = () => {
   const [deleteVehicle, setDeleteVehicle] = useState<Vehicle | null>(null);
   const [deletingVehicle, setDeletingVehicle] = useState(false);
   const [detailsVehicle, setDetailsVehicle] = useState<Vehicle | null>(null);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const toggleRow = (id: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
 
   const importRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -449,6 +415,9 @@ const Motorcycles = () => {
     active: data.filter(v => v.status === 'active').length,
     maintenance: data.filter(v => v.status === 'maintenance').length,
     breakdown: data.filter(v => v.status === 'breakdown').length,
+    rental: data.filter(v => v.status === 'rental').length,
+    inactive: data.filter(v => v.status === 'inactive').length,
+    ended: data.filter(v => v.status === 'ended').length,
   };
 
   const exportCell = (v: Vehicle, key: (typeof MOTORCYCLE_IO_COLUMNS)[number]['key']): string | number => {
@@ -557,12 +526,15 @@ const Motorcycles = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
         {[
           { label: 'إجمالي المركبات', value: stats.total, icon: '🏍️', cls: 'text-foreground' },
           { label: 'نشطة', value: stats.active, icon: '✅', cls: 'text-success' },
           { label: 'في الصيانة', value: stats.maintenance, icon: '🔧', cls: 'text-yellow-600' },
           { label: 'أعطال', value: stats.breakdown, icon: '⚠️', cls: 'text-destructive' },
+          { label: 'إيجار', value: stats.rental, icon: '🚙', cls: 'text-blue-600' },
+          { label: 'غير نشطة', value: stats.inactive, icon: '⏸️', cls: 'text-muted-foreground' },
+          { label: 'منتهي', value: stats.ended, icon: '⛔', cls: 'text-slate-600 dark:text-slate-300' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-1">
@@ -639,256 +611,115 @@ const Motorcycles = () => {
             );
           }
           return (
-            <div className="space-y-3">
-              {filtered.map((v, _idx) => {
-                const isExpanded = expandedRows.has(v.id);
-                const insDays = getDaysLeft(v.insurance_expiry);
-                const regDays = getDaysLeft(v.registration_expiry);
-                const authDays = getDaysLeft(v.authorization_expiry);
-                const statusBadge = <SmartStatusBadge status={v.status} rider={v.current_rider} />;
-
-                const uniqueTypes = Array.from(new Set((v.maintenance_logs ?? []).map((l) => l.type)));
-                const typesText = uniqueTypes.join('، ') || 'لا توجد صيانات مسجلة';
-                const totalCost = v.total_maintenance_cost ?? 0;
-
-                return (
-                  <div
-                    key={v.id}
-                    className="bg-card border border-border/60 rounded-xl overflow-hidden shadow-sm hover:border-border transition-colors text-right"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between w-full p-4 gap-4">
-                      {/* 1. Vehicle info & Plate number */}
-                      <button
-                        type="button"
-                        onClick={() => toggleRow(v.id)}
-                        className="flex items-center gap-3 text-right min-w-[180px] shrink-0"
-                      >
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                            v.type === 'motorcycle'
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                              : 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                          }`}
-                        >
-                          {v.type === 'motorcycle' ? <Bike size={20} /> : <Car size={20} />}
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-base leading-tight hover:text-primary transition-colors">
-                            {v.plate_number}
-                          </span>
-                          <span className="text-xs text-muted-foreground mt-0.5">
-                            {v.brand ? `${v.brand} ${v.model ?? ''}` : typeLabels[v.type]}
-                          </span>
-                        </div>
-                      </button>
-
-                      {/* 2. Repairs summary */}
-                      <div className="flex-1 min-w-0 md:px-4">
-                        <span className="text-[10px] text-muted-foreground block mb-0.5">التصليحات والصيانة</span>
-                        <span className="text-sm font-semibold text-foreground truncate block" title={typesText}>
-                          {typesText}
-                        </span>
-                      </div>
-
-                      {/* 3. Rider & Badges */}
-                      <div className="flex flex-wrap items-center gap-3 min-w-[200px] md:justify-end">
-                        {v.current_rider ? (
-                          <div className="text-xs">
-                            <span className="text-muted-foreground">المندوب: </span>
-                            <Link
-                              to={`/vehicle-assignment?search=${encodeURIComponent(v.current_rider)}`}
-                              className="font-semibold text-primary hover:underline"
+            <div className="overflow-x-auto rounded-2xl border border-border/60 bg-card shadow-sm">
+              <table className="w-full min-w-[1700px] text-sm">
+                <thead className="bg-muted/70">
+                  <tr className="border-b border-border/60">
+                    <th className="ta-th">رقم اللوحة</th>
+                    <th className="ta-th">الشريحة</th>
+                    <th className="ta-th">المندوب</th>
+                    <th className="ta-th">حالة الدباب</th>
+                    <th className="ta-th">الماركة والموديل</th>
+                    <th className="ta-th">سنة الصنع</th>
+                    <th className="ta-th">الرقم التسلسلي</th>
+                    <th className="ta-th">رقم الهيكل</th>
+                    <th className="ta-th">التأمين</th>
+                    <th className="ta-th">التسجيل (الاستمارة)</th>
+                    <th className="ta-th">التفويض</th>
+                    <th className="ta-th">تكلفة الصيانة</th>
+                    <th className="ta-th">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((v) => {
+                    const totalCost = v.total_maintenance_cost ?? 0;
+                    return (
+                      <tr key={v.id} className="border-b border-border/40 transition-colors last:border-b-0 hover:bg-muted/30">
+                        <td className="ta-td">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                                v.type === 'motorcycle'
+                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                  : 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
+                              }`}
                             >
+                              {v.type === 'motorcycle' ? <Bike size={18} /> : <Car size={18} />}
+                            </div>
+                            <div>
+                              <p className="font-bold text-foreground">{v.plate_number}</p>
+                              <p className="text-[11px] text-muted-foreground" dir="ltr">{displayCell(v.plate_number_en)}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="ta-td">
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            v.has_fuel_chip ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+                          }`}>
+                            {v.has_fuel_chip ? 'شريحة' : 'بدون شريحة'}
+                          </span>
+                        </td>
+                        <td className="ta-td">
+                          {v.current_rider ? (
+                            <Link to={`/vehicle-assignment?search=${encodeURIComponent(v.current_rider)}`} className="font-semibold text-primary hover:underline">
                               {v.current_rider}
                             </Link>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-muted-foreground/50">بدون مندوب</span>
-                        )}
-                        {statusBadge}
-                        {v.has_fuel_chip && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">
-                            ⛽ شريحة
-                          </span>
-                        )}
-                      </div>
-
-                      {/* 4. Cost and Actions */}
-                      <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-border/30">
-                        <div className="text-right pl-2">
-                          <span className="text-[10px] text-muted-foreground block">تكلفة الصيانة</span>
-                          <span className="font-bold text-base text-rose-600 dark:text-rose-400">
-                            {formatCurrency(totalCost)}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setDetailsVehicle(v)}
-                            className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                            title="البيانات والمستندات"
-                          >
-                            <FileText size={15} />
-                          </button>
-                          {permissions.can_edit && (
+                          ) : (
+                            <span className="text-muted-foreground">بدون مندوب</span>
+                          )}
+                        </td>
+                        <td className="ta-td">
+                          <SmartStatusBadge status={v.status} rider={v.current_rider} />
+                        </td>
+                        <td className="ta-td font-medium">
+                          {[v.brand, v.model].filter(Boolean).join(' / ') || '—'}
+                        </td>
+                        <td className="ta-td">{displayCell(v.year)}</td>
+                        <td className="ta-td font-mono text-xs" dir="ltr">{displayCell(v.serial_number)}</td>
+                        <td className="ta-td font-mono text-xs" dir="ltr">{displayCell(v.chassis_number)}</td>
+                        <td className="ta-td whitespace-nowrap">{formatDateCell(v.insurance_expiry)}</td>
+                        <td className="ta-td whitespace-nowrap">{formatDateCell(v.registration_expiry)}</td>
+                        <td className="ta-td whitespace-nowrap">{formatDateCell(v.authorization_expiry)}</td>
+                        <td className="ta-td font-bold text-rose-600 dark:text-rose-400">
+                          {formatCurrency(totalCost)}
+                        </td>
+                        <td className="ta-td">
+                          <div className="flex items-center gap-1">
                             <button
                               type="button"
-                              onClick={() => openEditForm(v)}
-                              className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                              title="تعديل"
+                              onClick={() => setDetailsVehicle(v)}
+                              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                              title="البيانات والمستندات"
                             >
-                              <Edit size={15} />
+                              <FileText size={15} />
                             </button>
-                          )}
-                          {permissions.can_delete && (
-                            <button
-                              type="button"
-                              onClick={() => setDeleteVehicle(v)}
-                              className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
-                              title="حذف"
-                            >
-                              <Trash2 size={15} className="text-destructive" />
-                            </button>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => toggleRow(v.id)}
-                          className="p-1 rounded-lg hover:bg-muted transition-colors text-muted-foreground shrink-0"
-                        >
-                          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Expanded details */}
-                    {isExpanded && (
-                      <div className="border-t border-border/40 bg-muted/15 p-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* Specifications */}
-                          <div className="bg-card border border-border/50 rounded-xl p-3 space-y-2">
-                            <h4 className="text-xs font-bold text-foreground border-b border-border/30 pb-1 flex items-center gap-1">
-                              ⚙️ تفاصيل ومواصفات المركبة
-                            </h4>
-                            <div className="text-xs space-y-1.5 text-muted-foreground">
-                              <div className="flex justify-between">
-                                <span>الماركة والموديل:</span>
-                                <span className="text-foreground font-semibold">
-                                  {v.brand || '—'} / {v.model || '—'}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>سنة الصنع:</span>
-                                <span className="text-foreground font-semibold">{v.year || '—'}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>الرقم التسلسلي:</span>
-                                <span className="text-foreground font-mono" dir="ltr">
-                                  {v.serial_number || '—'}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>رقم الهيكل:</span>
-                                <span className="text-foreground font-mono" dir="ltr">
-                                  {v.chassis_number || '—'}
-                                </span>
-                              </div>
-                              {v.notes && (
-                                <div className="border-t border-border/30 pt-1.5 mt-1.5">
-                                  <span className="block text-[10px] text-muted-foreground">ملاحظات المركبة:</span>
-                                  <span className="text-foreground text-[11px] leading-relaxed block mt-0.5">
-                                    {v.notes}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
+                            {permissions.can_edit && (
+                              <button
+                                type="button"
+                                onClick={() => openEditForm(v)}
+                                className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                title="تعديل بيانات المركبة"
+                              >
+                                <Edit size={15} />
+                              </button>
+                            )}
+                            {permissions.can_delete && (
+                              <button
+                                type="button"
+                                onClick={() => setDeleteVehicle(v)}
+                                className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                title="حذف"
+                              >
+                                <Trash2 size={15} className="text-destructive" />
+                              </button>
+                            )}
                           </div>
-
-                          {/* Documents Status */}
-                          <div className="bg-card border border-border/50 rounded-xl p-3 space-y-2">
-                            <h4 className="text-xs font-bold text-foreground border-b border-border/30 pb-1 flex items-center gap-1">
-                              🛡️ صلاحية الوثائق
-                            </h4>
-                            <div className="space-y-2.5">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-muted-foreground">التأمين:</span>
-                                {v.insurance_expiry ? (
-                                  <div className={`text-left ${daysStyle(insDays)}`}>
-                                    <div>{format(parseISO(v.insurance_expiry), 'yyyy/MM/dd')}</div>
-                                    <div className="text-[10px] opacity-80">{daysLabel(insDays)}</div>
-                                  </div>
-                                ) : (
-                                  <span className="text-muted-foreground/50">—</span>
-                                )}
-                              </div>
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-muted-foreground">التسجيل (الاستمارة):</span>
-                                {v.registration_expiry ? (
-                                  <div className={`text-left ${daysStyle(regDays)}`}>
-                                    <div>{format(parseISO(v.registration_expiry), 'yyyy/MM/dd')}</div>
-                                    <div className="text-[10px] opacity-80">{daysLabel(regDays)}</div>
-                                  </div>
-                                ) : (
-                                  <span className="text-muted-foreground/50">—</span>
-                                )}
-                              </div>
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-muted-foreground">التفويض:</span>
-                                {v.authorization_expiry ? (
-                                  <div className={`text-left ${daysStyle(authDays)}`}>
-                                    <div>{format(parseISO(v.authorization_expiry), 'yyyy/MM/dd')}</div>
-                                    <div className="text-[10px] opacity-80">{daysLabel(authDays)}</div>
-                                  </div>
-                                ) : (
-                                  <span className="text-muted-foreground/50">—</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Maintenance History */}
-                          <div className="bg-card border border-border/50 rounded-xl p-3 space-y-2">
-                            <h4 className="text-xs font-bold text-foreground border-b border-border/30 pb-1 flex items-center gap-1">
-                              🔧 سجل الصيانات الأخيرة
-                            </h4>
-                            <div className="max-h-36 overflow-y-auto space-y-2 pr-1">
-                              {v.maintenance_logs && v.maintenance_logs.length > 0 ? (
-                                v.maintenance_logs.slice(0, 5).map((log) => (
-                                  <div
-                                    key={log.id}
-                                    className="text-xs border-b border-border/30 pb-1.5 last:border-0 last:pb-0"
-                                  >
-                                    <div className="flex justify-between items-center mb-0.5">
-                                      <span className="font-semibold text-foreground">{log.type}</span>
-                                      <span className="text-rose-600 font-bold">
-                                        {formatCurrency(log.total_cost)}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] text-muted-foreground">
-                                      <span>
-                                        {new Date(log.maintenance_date).toLocaleDateString('ar-SA')}
-                                      </span>
-                                      {log.notes && (
-                                        <span className="truncate max-w-[120px]">{log.notes}</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))
-                              ) : (
-                                <span className="text-xs text-muted-foreground/50 block text-center py-4">
-                                  لا توجد سجلات صيانة سابقة
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           );
         })()}

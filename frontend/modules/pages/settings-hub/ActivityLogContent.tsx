@@ -38,7 +38,10 @@ interface UserProfile {
   email: string | null;
 }
 
+type ReferenceLabels = Record<string, string>;
+
 const PAGE_SIZE = 25;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const actionColors: Record<string, string> = {
   INSERT: 'bg-success/10 text-success border-success/20',
@@ -128,7 +131,7 @@ const FIELD_LABELS: Record<string, string> = {
   amount: 'المبلغ',
   date: 'التاريخ',
   notes: 'ملاحظات',
-  employee_id: 'الموظف',
+  employee_id: 'اسم الموظف',
   app_id: 'التطبيق',
   hours_worked: 'ساعات العمل',
   attendance_status: 'حالة الحضور',
@@ -180,11 +183,12 @@ const toShortText = (value: unknown) => {
   return str.length > 30 ? `${str.slice(0, 30)}...` : str;
 };
 
-const toReadableValue = (value: unknown) => {
+const toReadableValue = (key: string, value: unknown, referenceLabels: ReferenceLabels = {}) => {
   if (value === null || value === undefined || value === '') return 'غير محدد';
   if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
   if (typeof value === 'number') return value.toLocaleString('en-US');
   if (typeof value === 'string') {
+    if ((key.endsWith('_id') || key === 'id') && referenceLabels[value]) return referenceLabels[value];
     if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return format(new Date(value), 'yyyy-MM-dd HH:mm');
     return value;
   }
@@ -196,7 +200,27 @@ const visibleEntries = (value: Record<string, unknown>) =>
 
 const fieldLabel = (key: string) => FIELD_LABELS[key] ?? key.replaceAll('_', ' ');
 
-const changedEntries = (log: AuditLog) => {
+const collectAuditReferenceIds = (logs: AuditLog[]) => {
+  const employeeIds = new Set<string>();
+  const appIds = new Set<string>();
+
+  logs.forEach((log) => {
+    [log.old_value, log.new_value].forEach((payload) => {
+      if (!payload) return;
+      const employeeId = payload.employee_id;
+      const appId = payload.app_id;
+      if (typeof employeeId === 'string' && UUID_PATTERN.test(employeeId)) employeeIds.add(employeeId);
+      if (typeof appId === 'string' && UUID_PATTERN.test(appId)) appIds.add(appId);
+    });
+  });
+
+  return {
+    employeeIds: Array.from(employeeIds),
+    appIds: Array.from(appIds),
+  };
+};
+
+const changedEntries = (log: AuditLog, referenceLabels: ReferenceLabels = {}) => {
   const oldValue = log.old_value || {};
   const newValue = log.new_value || {};
   const keys = Array.from(new Set([...Object.keys(oldValue), ...Object.keys(newValue)]));
@@ -206,28 +230,28 @@ const changedEntries = (log: AuditLog) => {
     .map((key) => ({
       key,
       label: fieldLabel(key),
-      before: toReadableValue(oldValue[key]),
-      after: toReadableValue(newValue[key]),
+      before: toReadableValue(key, oldValue[key], referenceLabels),
+      after: toReadableValue(key, newValue[key], referenceLabels),
     }));
 };
 
-const buildChangeSummary = (log: AuditLog) => {
+const buildChangeSummary = (log: AuditLog, referenceLabels: ReferenceLabels = {}) => {
   const oldV = log.old_value || {};
   const newV = log.new_value || {};
 
   if (log.action === 'INSERT') {
     return visibleEntries(newV)
       .slice(0, 3)
-      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(value))}`)
+      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(key, value, referenceLabels))}`)
       .join(' | ');
   }
   if (log.action === 'DELETE') {
     return visibleEntries(oldV)
       .slice(0, 3)
-      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(value))}`)
+      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(key, value, referenceLabels))}`)
       .join(' | ');
   }
-  return changedEntries(log)
+  return changedEntries(log, referenceLabels)
     .slice(0, 3)
     .map((entry) => `${entry.label}: ${entry.before} ← ${entry.after}`)
     .join(' | ');
@@ -316,14 +340,18 @@ export default function ActivityLogContent() {
         profiles.forEach((p) => { profileMap[p.id] = { name: p.name, email: p.email }; });
       }
 
+      const rows = (data || []).map((l) => ({
+        ...l,
+        old_value: l.old_value as Record<string, unknown> | null,
+        new_value: l.new_value as Record<string, unknown> | null,
+        profile: l.user_id ? (profileMap[l.user_id] ?? null) : null,
+      }));
+      const referenceLabels = await settingsHubService.getAuditReferenceLabels(collectAuditReferenceIds(rows));
+
       return {
-        rows: (data || []).map((l) => ({
-          ...l,
-          old_value: l.old_value as Record<string, unknown> | null,
-          new_value: l.new_value as Record<string, unknown> | null,
-          profile: l.user_id ? (profileMap[l.user_id] ?? null) : null,
-        })),
+        rows,
         total: count || 0,
+        referenceLabels,
       };
     },
     retry: defaultQueryRetry,
@@ -337,6 +365,8 @@ export default function ActivityLogContent() {
 
   useEffect(() => { setPage(0); }, [filterAction, filterTable, filterUserId, debouncedSearch]);
   useEffect(() => { setExpandedId(null); }, [page]);
+
+  const referenceLabels = logsData?.referenceLabels ?? {};
 
   const handleExport = async () => {
     try {
@@ -618,9 +648,9 @@ export default function ActivityLogContent() {
                             <p
                               className="text-[10px] font-mono truncate max-w-[220px] text-muted-foreground"
                               
-                              title={buildChangeSummary(log)}
+                              title={buildChangeSummary(log, referenceLabels)}
                             >
-                              {buildChangeSummary(log) || '—'}
+                              {buildChangeSummary(log, referenceLabels) || '—'}
                             </p>
                           )}
                           {log.record_id && (
@@ -668,14 +698,14 @@ export default function ActivityLogContent() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {changedEntries(log).map((entry) => (
+                                  {changedEntries(log, referenceLabels).map((entry) => (
                                     <tr key={entry.key} className="border-t border-border">
                                       <td className="p-2 font-medium text-foreground">{entry.label}</td>
                                       <td className="p-2 text-muted-foreground">{entry.before}</td>
                                       <td className="p-2 text-foreground">{entry.after}</td>
                                     </tr>
                                   ))}
-                                  {changedEntries(log).length === 0 && (
+                                  {changedEntries(log, referenceLabels).length === 0 && (
                                     <tr>
                                       <td colSpan={3} className="p-4 text-center text-muted-foreground">
                                         لا توجد تغييرات واضحة للعرض.
@@ -696,7 +726,7 @@ export default function ActivityLogContent() {
                                 {visibleEntries(log.new_value || {}).map(([key, value]) => (
                                   <div key={key} className="rounded-lg border border-border bg-muted/40 p-2">
                                     <p className="text-[10px] text-muted-foreground">{fieldLabel(key)}</p>
-                                    <p className="text-xs font-medium text-foreground">{toReadableValue(value)}</p>
+                                    <p className="text-xs font-medium text-foreground">{toReadableValue(key, value, referenceLabels)}</p>
                                   </div>
                                 ))}
                               </div>
@@ -712,7 +742,7 @@ export default function ActivityLogContent() {
                                 {visibleEntries(log.old_value || {}).map(([key, value]) => (
                                   <div key={key} className="rounded-lg border border-border bg-muted/40 p-2">
                                     <p className="text-[10px] text-muted-foreground">{fieldLabel(key)}</p>
-                                    <p className="text-xs font-medium text-foreground">{toReadableValue(value)}</p>
+                                    <p className="text-xs font-medium text-foreground">{toReadableValue(key, value, referenceLabels)}</p>
                                   </div>
                                 ))}
                               </div>

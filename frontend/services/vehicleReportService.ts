@@ -9,11 +9,13 @@ export interface VehicleReportRow {
   brand: string | null;
   model: string | null;
   year: number | null;
-  status: string;
+  status: 'active' | 'maintenance' | 'breakdown' | 'rental' | 'ended' | 'inactive';
   has_fuel_chip: boolean | null;
   insurance_expiry: string | null;
   registration_expiry: string | null;
   authorization_expiry: string | null;
+  serial_number: string | null;
+  chassis_number: string | null;
   notes: string | null;
   // computed from joins
   current_rider: string | null;
@@ -205,6 +207,8 @@ export async function getVehicleReport(filters: VehicleReportFilters = {}): Prom
       insurance_expiry: v.insurance_expiry ?? null,
       registration_expiry: v.registration_expiry ?? null,
       authorization_expiry: v.authorization_expiry ?? null,
+      serial_number: v.serial_number ?? null,
+      chassis_number: v.chassis_number ?? null,
       notes: v.notes ?? null,
       current_rider: riderMap[v.id] ?? null,
       total_maintenance_cost: vLogs.reduce((s, l) => s + l.total_cost, 0),

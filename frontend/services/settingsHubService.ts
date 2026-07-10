@@ -43,6 +43,22 @@ const BACKUP_TABLE_SET = new Set<string>(BACKUP_TABLES);
 const RESTORE_MAX_ROWS_PER_TABLE = 10_000;
 const RESTORE_BATCH_SIZE = 500;
 
+const getNameLabelsById = async (
+  table: 'employees' | 'apps',
+  ids: string[],
+  context: string,
+) => {
+  if (ids.length === 0) return {};
+
+  const { data, error } = await supabase
+    .from(table)
+    .select('id, name')
+    .in('id', ids);
+  if (error) throw toServiceError(error, context);
+
+  return Object.fromEntries((data ?? []).map((row) => [row.id, row.name] as const));
+};
+
 export const settingsHubService = {
   getCurrentUserId: async () => {
     const { data, error } = await supabase.auth.getSession();
@@ -89,6 +105,21 @@ export const settingsHubService = {
       .in('id', userIds);
     if (error) throw toServiceError(error, 'settingsHubService.getAuditProfilesByIds');
     return data ?? [];
+  },
+
+  getAuditReferenceLabels: async ({
+    employeeIds,
+    appIds,
+  }: {
+    employeeIds: string[];
+    appIds: string[];
+  }) => {
+    const [employeeLabels, appLabels] = await Promise.all([
+      getNameLabelsById('employees', employeeIds, 'settingsHubService.getAuditReferenceLabels.employees'),
+      getNameLabelsById('apps', appIds, 'settingsHubService.getAuditReferenceLabels.apps'),
+    ]);
+
+    return { ...employeeLabels, ...appLabels };
   },
 
   /**

@@ -101,6 +101,23 @@ describe('settingsHubService', () => {
     });
   });
 
+  describe('getAuditReferenceLabels', () => {
+    it('returns readable labels for employee and app ids', async () => {
+      tableMocks.employees = { data: [{ id: 'employee-1', name: 'Ahmed' }], error: null };
+      tableMocks.apps = { data: [{ id: 'app-1', name: 'HungerStation' }], error: null };
+
+      const res = await settingsHubService.getAuditReferenceLabels({
+        employeeIds: ['employee-1'],
+        appIds: ['app-1'],
+      });
+
+      expect(res).toEqual({
+        'employee-1': 'Ahmed',
+        'app-1': 'HungerStation',
+      });
+    });
+  });
+
   describe('getAuditUsers', () => {
     it('returns all profiles sorted alphabetically', async () => {
       fromMock.mockImplementation((table: string) => {
