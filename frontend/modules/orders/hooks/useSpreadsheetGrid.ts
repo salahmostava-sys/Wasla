@@ -261,6 +261,7 @@ export function useSpreadsheetGrid() {
         month,
         days,
         data: nextData,
+        originalData: sq.spreadsheetMonthData,
         setSaving,
         employees: sq.employees,
         apps: sq.apps,

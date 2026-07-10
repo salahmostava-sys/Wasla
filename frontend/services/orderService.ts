@@ -318,6 +318,21 @@ export const orderService = {
     if (error) throw toServiceError(error, 'orderService.delete');
   },
 
+  deleteDailyOrders: async (keys: { employeeId: string; appId: string; date: string }[]) => {
+    const CHUNK_SIZE = 20;
+    for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
+      const chunk = keys.slice(i, i + CHUNK_SIZE);
+      await Promise.all(
+        chunk.map((k) =>
+          supabase
+            .from('daily_orders')
+            .delete()
+            .match({ employee_id: k.employeeId, app_id: k.appId, date: k.date })
+        )
+      );
+    }
+  },
+
   getTotalByEmployee: async (employeeId: string, monthYear: string) => {
     const [year, month] = monthYear.split('-');
     const from = `${year}-${month}-01`;

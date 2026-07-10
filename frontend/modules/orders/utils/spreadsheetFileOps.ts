@@ -457,12 +457,13 @@ export async function saveSpreadsheetMonth(params: {
   month: number;
   days: number;
   data: DailyData;
+  originalData?: DailyData;
   setSaving: (v: boolean) => void;
   employees: Employee[];
   apps: App[];
   saveMeta?: ReplaceMonthDataMeta;
 }): Promise<boolean> {
-  const { isMonthLocked, year, month, days, data, setSaving, employees, apps, saveMeta: _saveMeta } = params;
+  const { isMonthLocked, year, month, days, data, originalData, setSaving, employees, apps, saveMeta: _saveMeta } = params;
   if (isMonthLocked) {
     toast.error('الشهر مقفل', {
       description: 'لا يمكن حفظ التغييرات في شهر مقفل'
@@ -528,6 +529,28 @@ export async function saveSpreadsheetMonth(params: {
     // when the grid state doesn't contain every platform's data.
     const { saved, failed } = await orderService.bulkUpsert(rows, SAVE_CHUNK_SIZE);
 
+    let deletedCount = 0;
+    if (originalData) {
+      const deletedKeys: { employeeId: string; appId: string; date: string }[] = [];
+      for (const key of Object.keys(originalData)) {
+        if (!data[key] || data[key] <= 0) {
+          const [empId, appId, dayStr] = key.split('::');
+          const day = Number.parseInt(dayStr, 10);
+          if (empId && appId && !Number.isNaN(day)) {
+            deletedKeys.push({
+              employeeId: empId,
+              appId,
+              date: dateStr(year, month, day),
+            });
+          }
+        }
+      }
+      if (deletedKeys.length > 0) {
+        await orderService.deleteDailyOrders(deletedKeys);
+        deletedCount = deletedKeys.length;
+      }
+    }
+
     if (failed.length > 0) {
       logger.error('فشل حفظ بعض السجلات', { meta: { failed: failed.slice(0, 10) } });
       const failedMessages = failed.map((failure) => (
@@ -537,11 +560,14 @@ export async function saveSpreadsheetMonth(params: {
         description: `تم حفظ ${saved} إدخال بنجاح، وتعذر حفظ ${failed.length} إدخال. ${summarizeMessages(failedMessages)}`
       });
     } else {
+      let desc = `تم حفظ ${saved} إدخال`;
+      if (deletedCount > 0) desc += ` ومسح ${deletedCount} إدخال`;
+      desc += ` - ${monthLabel(year, month)}`;
       toast.success(TOAST_SUCCESS_OPERATION, {
-        description: `تم حفظ ${saved} إدخال - ${monthLabel(year, month)}`
+        description: desc
       });
     }
-    return isClearingMonth || saved > 0;
+    return isClearingMonth || saved > 0 || deletedCount > 0;
   } catch (e: unknown) {
     const errorMsg = getErrorMessage(e, 'خطأ غير معروف');
     toast.error('فشل عملية الحفظ', {
