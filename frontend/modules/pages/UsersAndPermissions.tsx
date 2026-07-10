@@ -1,7 +1,16 @@
 import { BaseInput } from '@shared/components/ui/base-input';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, RefreshCw, AlertCircle, UserPlus, Trash2, Pencil, Search, ChevronLeft, ShieldAlert } from 'lucide-react';
+import {
+  Shield,
+  RefreshCw,
+  AlertCircle,
+  UserPlus,
+  Trash2,
+  Pencil,
+  Search,
+  ShieldAlert,
+} from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
@@ -36,7 +45,6 @@ import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGat
 import { usePermissions, DEFAULT_PERMISSIONS, type AppRole, type PagePermission } from '@shared/hooks/usePermissions';
 import { PERMISSION_PAGE_ENTRIES } from '@shared/constants/permissionPages';
 import { defaultQueryRetry } from '@shared/lib/query';
-import { ActiveUsersTab } from './components/ActiveUsersTab';
 import { cn } from '@shared/lib/utils';
 import { ScrollArea } from '@shared/components/ui/scroll-area';
 import { Input } from '@shared/components/ui/input';
@@ -72,6 +80,14 @@ const EMPTY_NEW_USER_FORM = {
   password: '',
   role: 'viewer' as AppRole,
 };
+
+type PermissionField = keyof PagePermission;
+
+const PERMISSION_COLUMNS: { field: PermissionField; label: string }[] = [
+  { field: 'can_view', label: 'عرض' },
+  { field: 'can_edit', label: 'تعديل' },
+  { field: 'can_delete', label: 'حذف' },
+];
 
 function mergeMatrix(
   role: AppRole,
@@ -255,7 +271,6 @@ function CreateUserDialog({
   );
 }
 
- 
 const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsProps>) => {
   const { toast } = useToast();
   const { user, role: authRole, loading: authLoading } = useAuth();
@@ -598,207 +613,197 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList className="grid w-full max-w-sm grid-cols-2">
-          <TabsTrigger value="users">المستخدمين والصلاحيات</TabsTrigger>
-          {canView && <TabsTrigger value="active_users">المستخدمين النشطين</TabsTrigger>}
+          <TabsTrigger value="users">المستخدمون</TabsTrigger>
+          <TabsTrigger value="permissions">الصلاحيات</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
-          <div className="flex flex-col lg:flex-row gap-6">
-            
-            {/* Master View: Users List */}
-            <div className="w-full lg:w-1/3 flex flex-col gap-4">
-              <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="ابحث بالاسم أو البريد..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-9"
-                />
-              </div>
-              
-              <div className="border bg-card rounded-2xl overflow-hidden flex flex-col h-[600px]">
-                <div className="bg-muted/40 p-3 border-b text-sm font-semibold flex justify-between items-center">
-                  <span>المستخدمون ({filteredRows.length})</span>
-                </div>
-                <ScrollArea className="flex-1">
-                  {filteredRows.length > 0 ? (
-                    <div className="divide-y">
-                      {filteredRows.map((row) => {
-                        const isSelected = row.id === permUserId;
-                        return (
-                          <button
-                            key={row.id}
-                            type="button"
-                            onClick={() => setPermUserId(row.id)}
-                            className={cn(
-                              "w-full p-3 cursor-pointer transition-colors flex items-center justify-between gap-3 group hover:bg-muted/50 text-right",
-                              isSelected ? "bg-primary/5 hover:bg-primary/10 border-r-4 border-primary" : "border-r-4 border-transparent"
-                            )}
-                          >
-                            <div className="flex-1 overflow-hidden">
-                              <p className="font-semibold text-sm truncate">{row.name}</p>
-                              <p className="text-xs text-muted-foreground truncate flex items-center gap-2 mt-0.5">
-                                <span className={cn("inline-block w-2 h-2 rounded-full", row.isActive ? "bg-green-500" : "bg-destructive")} />
-                                {ROLE_LABELS_AR[row.role]}
-                              </p>
-                            </div>
-                            <ChevronLeft className={cn("h-4 w-4 text-muted-foreground transition-transform", isSelected && "text-primary -translate-x-1")} />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="p-8 text-center text-sm text-muted-foreground">
-                      لا توجد نتائج للبحث.
-                    </div>
-                  )}
-                </ScrollArea>
-              </div>
+          <div className="space-y-4">
+            <div className="relative max-w-md">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="ابحث بالاسم أو البريد..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-9"
+              />
             </div>
 
-            {/* Detail View: User Permissions & Info */}
-            <div className="w-full lg:w-2/3">
-              {selectedUser ? (
-                <div className="border bg-card rounded-2xl p-5 flex flex-col h-[600px]">
-                  {/* Detail Header */}
-                  <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b">
-                    <div>
-                      <h3 className="text-lg font-bold flex items-center gap-2">
-                        {selectedUser.name}
-                        {!selectedUser.isActive && (
-                          <span className="text-xs font-normal bg-destructive/10 text-destructive px-2 py-0.5 rounded-full">موقوف</span>
-                        )}
-                      </h3>
-                      <p className="text-sm text-muted-foreground" dir="ltr">{selectedUser.email || 'لا يوجد بريد إلكتروني'}</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      {canEdit && (
-                        <Button variant="outline" size="sm" onClick={() => openEditModal(selectedUser)}>
-                          <Pencil size={14} className="me-1" /> تعديل
-                        </Button>
-                      )}
-                      {canDelete && selectedUser.id !== currentUserId && (
-                        <Button variant="outline" size="sm" onClick={() => setDeleteTarget(selectedUser)} className="text-destructive hover:text-destructive">
-                          <Trash2 size={14} className="me-1" /> حذف
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="py-4 border-b flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <Label>الدور الأساسي</Label>
-                      <p className="text-xs text-muted-foreground">يحدد الصلاحيات الافتراضية للمستخدم</p>
-                    </div>
-                    <Select
-                      value={selectedUser.role}
-                      onValueChange={(value) => updateRole(selectedUser.id, value as AppRole)}
-                      disabled={!canEdit || savingId === selectedUser.id}
-                    >
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="اختر الدور" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ROLES.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {ROLE_LABELS_AR[r]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Matrix */}
-                  <div className="flex-1 overflow-hidden flex flex-col pt-4">
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div>
-                        <h4 className="font-semibold text-sm">تخصيص الصلاحيات</h4>
-                        <p className="text-xs text-muted-foreground">لتجاوز الصلاحيات الافتراضية للدور الأساسي.</p>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => { saveMatrix(); }}
-                        disabled={savingMatrix || matrixLoading || !canEdit}
-                      >
-                        {savingMatrix ? 'جاري الحفظ...' : 'حفظ الصلاحيات'}
-                      </Button>
-                    </div>
-
-                    {matrixLoading ? (
-                      <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
-                        جاري تحميل الصلاحيات...
-                      </div>
+            <div className="rounded-2xl border bg-card overflow-hidden">
+              <ScrollArea className="w-full">
+                <table className="w-full min-w-[820px] text-sm">
+                  <thead className="bg-muted/40">
+                    <tr>
+                      <th className="ta-th text-start">الاسم</th>
+                      <th className="ta-th text-start">الدور</th>
+                      <th className="ta-th text-start">البريد</th>
+                      <th className="ta-th text-start">الحالة</th>
+                      <th className="ta-th text-start">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredRows.length > 0 ? (
+                      filteredRows.map((row) => (
+                        <tr
+                          key={row.id}
+                          className={cn(
+                            "border-b last:border-0 hover:bg-muted/20",
+                            row.id === permUserId && "bg-primary/5"
+                          )}
+                        >
+                          <td className="ta-td font-semibold">{row.name}</td>
+                          <td className="ta-td">
+                            <Select
+                              value={row.role}
+                              onValueChange={(value) => updateRole(row.id, value as AppRole)}
+                              disabled={!canEdit || savingId === row.id}
+                            >
+                              <SelectTrigger className="h-9 w-[170px]">
+                                <SelectValue placeholder="اختر الدور" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ROLES.map((roleOption) => (
+                                  <SelectItem key={roleOption} value={roleOption}>
+                                    {ROLE_LABELS_AR[roleOption]}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </td>
+                          <td className="ta-td text-muted-foreground" dir="ltr">
+                            {row.email || 'لا يوجد بريد إلكتروني'}
+                          </td>
+                          <td className="ta-td">
+                            <span className={cn(
+                              "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium",
+                              row.isActive ? "bg-green-500/10 text-green-700" : "bg-destructive/10 text-destructive"
+                            )}>
+                              <span className={cn("h-2 w-2 rounded-full", row.isActive ? "bg-green-500" : "bg-destructive")} />
+                              {row.isActive ? 'نشط' : 'موقوف'}
+                            </span>
+                          </td>
+                          <td className="ta-td">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {canEdit && (
+                                <Button variant="outline" size="sm" onClick={() => openEditModal(row)}>
+                                  <Pencil size={14} className="me-1" /> تعديل
+                                </Button>
+                              )}
+                              {canDelete && row.id !== currentUserId && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setDeleteTarget(row)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 size={14} className="me-1" /> حذف
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
                     ) : (
-                      <div className="flex-1 rounded-lg border overflow-hidden">
-                        <ScrollArea className="h-full">
-                          <table className="w-full text-sm">
-                            <thead className="bg-muted/40 sticky top-0 z-10 shadow-sm">
-                              <tr>
-                                <th className="ta-th text-start w-[40%]">الصفحة</th>
-                                <th className="ta-th">عرض</th>
-                                <th className="ta-th">تعديل</th>
-                                <th className="ta-th">حذف</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {PERMISSION_PAGE_ENTRIES.map(({ key, labelAr }) => {
-                                const m = matrix[key];
-                                if (!m) return null;
-                                return (
-                                  <tr key={key} className="border-b last:border-0 hover:bg-muted/20">
-                                    <td className="ta-td font-medium py-2.5">{labelAr}</td>
-                                    <td className="ta-td py-2.5 text-center">
-                                      <Checkbox
-                                        checked={m.can_view}
-                                        onCheckedChange={(v) => setCell(key, 'can_view', v === true)}
-                                        disabled={!canEdit}
-                                        className="mx-auto"
-                                      />
-                                    </td>
-                                    <td className="ta-td py-2.5 text-center">
-                                      <Checkbox
-                                        checked={m.can_edit}
-                                        onCheckedChange={(v) => setCell(key, 'can_edit', v === true)}
-                                        disabled={!canEdit}
-                                        className="mx-auto"
-                                      />
-                                    </td>
-                                    <td className="ta-td py-2.5 text-center">
-                                      <Checkbox
-                                        checked={m.can_delete}
-                                        onCheckedChange={(v) => setCell(key, 'can_delete', v === true)}
-                                        disabled={!canEdit}
-                                        className="mx-auto"
-                                      />
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </ScrollArea>
-                      </div>
+                      <tr>
+                        <td colSpan={5} className="ta-td py-10 text-center text-muted-foreground">
+                          لا توجد نتائج للبحث.
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                </div>
-              ) : (
-                <div className="border bg-card rounded-2xl p-5 flex flex-col items-center justify-center h-[600px] text-muted-foreground">
-                  <ShieldAlert className="h-12 w-12 opacity-20 mb-3" />
-                  <p>اختر مستخدماً من القائمة لعرض وتعديل صلاحياته</p>
-                </div>
-              )}
+                  </tbody>
+                </table>
+              </ScrollArea>
             </div>
           </div>
         </TabsContent>
 
-        {canView && (
-          <TabsContent value="active_users">
-            <ActiveUsersTab />
-          </TabsContent>
-        )}
+        <TabsContent value="permissions" className="space-y-4">
+          {selectedUser ? (
+            <div className="border bg-card rounded-2xl p-5 flex flex-col h-[600px]">
+              <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b">
+                <div>
+                  <h3 className="text-lg font-bold">{selectedUser.name}</h3>
+                  <p className="text-sm text-muted-foreground">تخصيص صلاحيات الوصول للصفحات</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={selectedUser.id}
+                    onValueChange={(value) => setPermUserId(value)}
+                    disabled={rows.length === 0 || matrixLoading || savingMatrix}
+                  >
+                    <SelectTrigger className="w-[240px]">
+                      <SelectValue placeholder="اختر المستخدم" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rows.map((row) => (
+                        <SelectItem key={row.id} value={row.id}>
+                          {row.name} - {ROLE_LABELS_AR[row.role]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => { saveMatrix(); }}
+                    disabled={savingMatrix || matrixLoading || !canEdit}
+                  >
+                    {savingMatrix ? 'جاري الحفظ...' : 'حفظ الصلاحيات'}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col pt-4">
+                {matrixLoading ? (
+                  <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+                    جاري تحميل الصلاحيات...
+                  </div>
+                ) : (
+                  <div className="flex-1 rounded-lg border overflow-hidden">
+                    <ScrollArea className="h-full">
+                      <table className="w-full text-sm">
+                        <thead className="bg-muted/40 sticky top-0 z-10 shadow-sm">
+                          <tr>
+                            <th className="ta-th text-start w-[40%]">الصفحة</th>
+                            {PERMISSION_COLUMNS.map(({ field, label }) => (
+                              <th key={field} className="ta-th">{label}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {PERMISSION_PAGE_ENTRIES.map(({ key, labelAr }) => {
+                            const m = matrix[key];
+                            if (!m) return null;
+                            return (
+                              <tr key={key} className="border-b last:border-0 hover:bg-muted/20">
+                                <td className="ta-td font-medium py-2.5">{labelAr}</td>
+                                {PERMISSION_COLUMNS.map(({ field }) => (
+                                  <td key={field} className="ta-td py-2.5 text-center">
+                                    <Checkbox
+                                      checked={m[field]}
+                                      onCheckedChange={(checked) => setCell(key, field, checked === true)}
+                                      disabled={!canEdit}
+                                      className="mx-auto"
+                                    />
+                                  </td>
+                                ))}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </ScrollArea>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="border bg-card rounded-2xl p-5 flex flex-col items-center justify-center h-[600px] text-muted-foreground">
+              <ShieldAlert className="h-12 w-12 opacity-20 mb-3" />
+              <p>لا يوجد مستخدمون لتعديل صلاحياتهم</p>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       <CreateUserDialog
