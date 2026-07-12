@@ -1,5 +1,6 @@
 import { Suspense, lazy, startTransition, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { performanceService } from '@services/performanceService';
 
 import { useAuth } from '@app/providers/AuthContext';
 import { useTemporalContext } from '@app/providers/TemporalContext';
