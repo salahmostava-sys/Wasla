@@ -4,7 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
-import { salaryEngineHandler, adminUpdateUserHandler, groqChatHandler, aiChatHandler, telegramWebhookHandler } from './lib/handlers.js';
+import { salaryEngineHandler, adminUpdateUserHandler, groqChatHandler, aiChatHandler } from './lib/handlers.js';
 
 const app = express();
 app.disable('x-powered-by'); // Fix: javascript:S5689 - Disable Express version disclosure
@@ -82,36 +82,10 @@ app.post('/api/functions/groq-chat', express.json({ limit: '2mb' }), groqChatHan
 // ── AI Chat (replaces ai-chat edge function) — larger body for AI payloads ──────
 app.post('/api/functions/ai-chat', express.json({ limit: '2mb' }), aiChatHandler);
 
-// Telegram cannot send the app Authorization header, so this webhook is outside
-// /api/functions and uses the Supabase service role internally.
-app.post('/api/telegram/webhook', telegramWebhookHandler);
-
-
-// ── Error Handling & Telegram Monitoring ──────────────────────────────────────
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-
-async function sendTelegramAlert(err, req) {
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
-  try {
-    const text = `🔴 *CRITICAL ERROR - Muhimmat API*\n*Path:* \`${req.method} ${req.originalUrl}\`\n*Error:* \`${err.message}\`\n*Time:* \`${new Date().toISOString()}\``;
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text,
-        parse_mode: 'Markdown'
-      })
-    });
-  } catch (e) {
-    console.error('[server] Failed to send Telegram alert:', e.message);
-  }
-}
+// ── Error Handling ────────────────────────────────────────────────────────────
 
 app.use(async (err, req, res, next) => {
   console.error('[server] Unhandled Error:', err);
-  await sendTelegramAlert(err, req);
   res.status(500).json({ error: 'Internal server error occurred.' });
 });
 

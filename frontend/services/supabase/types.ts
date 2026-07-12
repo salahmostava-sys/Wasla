@@ -2718,44 +2718,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_telegram_integrations: {
-        Row: {
-          created_at: string
-          id: string
-          is_linked: boolean
-          otp_code: string
-          phone_number: string
-          telegram_chat_id: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_linked?: boolean
-          otp_code: string
-          phone_number: string
-          telegram_chat_id?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_linked?: boolean
-          otp_code?: string
-          phone_number?: string
-          telegram_chat_id?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_telegram_integrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_by: string | null
