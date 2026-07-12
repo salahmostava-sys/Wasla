@@ -217,6 +217,33 @@ function generateMockHistory(
   return history;
 }
 
+const getTrendIcon = (trend: string) => {
+  if (trend === 'above_target') return <TrendingUp className="h-4 w-4 text-green-500" />;
+  if (trend === 'below_target') return <TrendingDown className="h-4 w-4 text-red-500" />;
+  return <Minus className="h-4 w-4 text-yellow-500" />;
+};
+
+const getTrendLabel = (trend: string) => {
+  if (trend === 'above_target') return 'أعلى من المستهدف';
+  if (trend === 'below_target') return 'أقل من المستهدف';
+  return 'ضمن المستهدف';
+};
+
+const getConfidenceBadge = (confidence: string) => {
+  const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    high: 'default',
+    medium: 'secondary',
+    low: 'outline',
+  };
+  const labels = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' };
+  return (
+    <Badge variant={variants[confidence] ?? 'default'}>
+      {labels[confidence as keyof typeof labels] ?? confidence}
+    </Badge>
+  );
+};
+
+/* eslint-disable sonarjs/cognitive-complexity */
 export function AIDashboard({
   currentOrders = null,
   daysPassed = 15,
@@ -353,32 +380,6 @@ export function AIDashboard({
   useEffect(() => {
     loadExtras();
   }, [loadExtras]);
-
-  const getTrendIcon = (trend: string) => {
-    if (trend === 'above_target') return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (trend === 'below_target') return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-yellow-500" />;
-  };
-
-  const getTrendLabel = (trend: string) => {
-    if (trend === 'above_target') return 'أعلى من المستهدف';
-    if (trend === 'below_target') return 'أقل من المستهدف';
-    return 'ضمن المستهدف';
-  };
-
-  const getConfidenceBadge = (confidence: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      high: 'default',
-      medium: 'secondary',
-      low: 'outline',
-    };
-    const labels = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' };
-    return (
-      <Badge variant={variants[confidence] ?? 'default'}>
-        {labels[confidence as keyof typeof labels] ?? confidence}
-      </Badge>
-    );
-  };
 
   const isLoading = loadingForecast || loadingBest || loadingExtras;
 
