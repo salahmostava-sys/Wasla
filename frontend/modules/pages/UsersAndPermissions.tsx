@@ -106,18 +106,23 @@ function mergeMatrix(
   return out;
 }
 
-function getPermissionUpdates(matrix: Record<string, PagePermission>, userId: string, roleDefaults: Record<string, PagePermission>) {
+function getPermissionUpserts(matrix: Record<string, PagePermission>, userId: string) {
   return PERMISSION_PAGE_ENTRIES.map(({ key }) => {
     const cur = matrix[key];
     if (!cur) return Promise.resolve();
-    const def = roleDefaults[key] ?? { can_view: false, can_edit: false, can_delete: false };
-    const same =
-      cur.can_view === def.can_view && cur.can_edit === def.can_edit && cur.can_delete === def.can_delete;
-    if (same) {
-      return userPermissionService.deletePermission(userId, key);
-    }
     return userPermissionService.upsertPermission(userId, key, cur);
   });
+}
+
+function getDefaultPermissionUpserts(userId: string, role: AppRole) {
+  const defaults = DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.viewer;
+  return PERMISSION_PAGE_ENTRIES.map(({ key }) =>
+    userPermissionService.upsertPermission(
+      userId,
+      key,
+      defaults[key] ?? { can_view: false, can_edit: false, can_delete: false },
+    )
+  );
 }
 
 function validateUserForm(name: string, email: string, password?: string): string | null {
@@ -420,9 +425,9 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     if (!canEdit || !selectedUser) return;
     setSavingMatrix(true);
     try {
-      const roleDefaults = DEFAULT_PERMISSIONS[selectedUser.role] || DEFAULT_PERMISSIONS.viewer;
-      // Execute all permission updates in parallel instead of sequentially
-      await Promise.all(getPermissionUpdates(matrix, selectedUser.id, roleDefaults));
+      // Persist the full frontend-selected matrix. Role defaults are only templates for
+      // first-time setup, not the source of truth after the admin saves permissions.
+      await Promise.all(getPermissionUpserts(matrix, selectedUser.id));
       await auditService.logAdminAction({
         action: 'permissions.update',
         table_name: 'user_permissions',
@@ -470,6 +475,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
         password,
         role: newUserForm.role,
       });
+      await Promise.all(getDefaultPermissionUpserts(created.user_id, newUserForm.role));
       toast({ title: 'تم إنشاء المستخدم بنجاح' });
       setCreateUserOpen(false);
       resetNewUserForm();

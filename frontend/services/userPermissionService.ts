@@ -31,7 +31,7 @@ export const userPermissionService = {
     return data ?? [];
   },
 
-  /** Upsert override; pass null to remove row when same as role default (caller handles delete). */
+  /** Persist the frontend-selected permission row. Roles are templates, not the saved source of truth. */
   upsertPermission: async (
     userId: string,
     permissionKey: string,

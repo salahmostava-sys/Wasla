@@ -160,16 +160,21 @@ describe('usePermissions hook', () => {
     });
   });
 
-  it('denies all when user exists but no role (treats as loading)', async () => {
+  it('reads frontend permissions when user exists even if role has not resolved yet', async () => {
     mockAuthState.user = { id: 'u1' };
+    permissionsServiceMock.getUserPermission.mockResolvedValue({
+      can_view: true,
+      can_edit: false,
+      can_delete: false,
+    });
 
     const { result } = renderHook(() => usePermissions('employees'), {
       wrapper: createWrapper(),
     });
 
-    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.permissions).toEqual({
-      can_view: false,
+      can_view: true,
       can_edit: false,
       can_delete: false,
     });

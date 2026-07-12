@@ -135,36 +135,32 @@ export const usePermissions = (pageKey: string) => {
   const { user, role } = useAuth();
 
   const query = useQuery({
-    queryKey: ['permissions', user?.id ?? '__none__', role ?? '__none__', pageKey] as const,
-    enabled: Boolean(user?.id && role),
+    queryKey: ['permissions', user?.id ?? '__none__', pageKey] as const,
+    enabled: Boolean(user?.id),
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<PagePermission> => {
-      if (!user?.id || !role) return DENY_ALL;
+      if (!user?.id) return DENY_ALL;
 
       const customPermission = await permissionsService.getUserPermission(user.id, pageKey);
       if (customPermission) return customPermission;
 
-      const defaults = DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.viewer;
+      const defaults = role ? DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.viewer : DEFAULT_PERMISSIONS.viewer;
       return defaults[pageKey] || DENY_ALL;
     },
   });
 
   const fallbackPermission =
-    role === null ? DENY_ALL : (DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.viewer)[pageKey] || DENY_ALL;
-
-  // While user exists but role hasn't resolved yet (auth race condition), treat as loading.
-  // This prevents PageGuard from immediately showing "Access Denied" before the role arrives.
-  const roleStillLoading = Boolean(user) && role === null;
+    role === null ? DEFAULT_PERMISSIONS.viewer[pageKey] || DENY_ALL : (DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.viewer)[pageKey] || DENY_ALL;
 
   // Hardening: while permissions are loading, do NOT render edit buttons based on
   // a permissive fallback. Default to deny-all until the query resolves.
   let permissions: PagePermission = DENY_ALL;
-  if (user && role && !query.isLoading) {
+  if (user && !query.isLoading) {
     // On DB error: Deny access to prevent unauthorized actions.
     permissions = query.isError ? DENY_ALL : (query.data ?? fallbackPermission);
   }
 
-  const loading = roleStillLoading || (Boolean(user && role) && query.isLoading);
+  const loading = Boolean(user) && query.isLoading;
 
   return { permissions, loading, isAdmin: role === 'admin' };
 };
