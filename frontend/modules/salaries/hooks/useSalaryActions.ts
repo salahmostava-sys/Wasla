@@ -10,7 +10,7 @@
  * (sorting, platform-order edits, employee-detail dialog).
  */
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type React from 'react';
 import type JSZip from 'jszip';
 import { toast as sonnerToast } from '@shared/components/ui/sonner';
@@ -125,6 +125,12 @@ export function useSalaryActions(params: UseSalaryActionsParams) {
   // The row is marked isDirty=true, and on approve the server recalculates authoritatively.
   // Additionally, we debounce-invalidate the preview query so the RPC values catch up.
   const previewInvalidateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (previewInvalidateTimer.current) {
+      clearTimeout(previewInvalidateTimer.current);
+    }
+  }, []);
 
   const updatePlatformOrders = (id: string, platform: string, value: number) => {
     setRows((prev) =>
