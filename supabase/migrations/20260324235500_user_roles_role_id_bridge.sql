@@ -1,4 +1,4 @@
--- Bridge migration: keep existing enum-based user_roles.role for compatibility
+﻿-- Bridge migration: keep existing enum-based user_roles.role for compatibility
 -- and introduce role_id FK to public.roles for normalized many-to-many role mapping.
 
 ALTER TABLE public.user_roles

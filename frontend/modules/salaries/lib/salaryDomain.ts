@@ -235,7 +235,7 @@ export const buildFuelCostMap = (rows: Array<{ employee_id: string; fuel_cost: n
   return fuelCostMap;
 };
 
-export const buildOrdersMap = (rows: OrderWithAppRow[] | null | undefined) => {
+const buildOrdersMap = (rows: OrderWithAppRow[] | null | undefined) => {
   const ordMap: Record<string, Record<string, number>> = {};
   (rows || []).forEach((r) => {
     const employeeId = r.employee_id ? String(r.employee_id) : '';
@@ -283,7 +283,7 @@ export const shouldIncludeEmployeeInSalaryMonth = (
   return isAdministrativeJobTitle(employee.job_title ?? null);
 };
 
-export const filterSalaryMonthEmployees = <T extends SalaryMonthVisibilityEmployee>(
+const filterSalaryMonthEmployees = <T extends SalaryMonthVisibilityEmployee>(
   employees: readonly T[],
   ordMap: Record<string, Record<string, number>>,
   attendanceDaysMap: Record<string, number>,
@@ -300,7 +300,7 @@ export const filterSalaryMonthEmployees = <T extends SalaryMonthVisibilityEmploy
     ),
   );
 
-export const resolveRowStatus = (
+const resolveRowStatus = (
   saved: { is_approved: boolean; net_salary: number } | undefined,
   pendingInstallmentsCount: number,
   deductedInstallmentsCount: number
@@ -312,7 +312,7 @@ export const resolveRowStatus = (
   return 'approved';
 };
 
-export const buildEmpPlatformSchemeMap = (
+const buildEmpPlatformSchemeMap = (
   employeeIds: string[],
   platformNames: string[],
   appSchemeMap: Record<string, SchemeData | null>
@@ -327,7 +327,7 @@ export const buildEmpPlatformSchemeMap = (
   return out;
 };
 
-export const buildAdvanceInstallmentMaps = async (
+const buildAdvanceInstallmentMaps = async (
   selectedMonth: string,
   allAdvances: Array<{ id: string; employee_id: string }> | null | undefined
 ) => {
@@ -595,7 +595,7 @@ const readLocalSalaryDraftMap = (storageKey?: string): Record<string, SalaryDraf
   }
 };
 
-export const hydrateRowsWithDraft = async (
+const hydrateRowsWithDraft = async (
   rows: SalaryRow[],
   monthYear: string,
   storageKey?: string,
@@ -622,7 +622,7 @@ export const hydrateRowsWithDraft = async (
   }
 };
 
-export const buildAppMaps = (appsWithScheme: AppWithSchemeRow[] | null | undefined) => {
+const buildAppMaps = (appsWithScheme: AppWithSchemeRow[] | null | undefined) => {
   const appSchemeMap: Record<string, SchemeData | null> = {};
   const appNameToId: Record<string, string> = {};
   const appWorkTypeMap: Record<string, WorkType> = {};

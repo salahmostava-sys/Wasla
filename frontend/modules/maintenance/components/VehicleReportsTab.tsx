@@ -31,14 +31,14 @@ type VehicleGroup = {
 };
 
 interface VehicleDropdownProps {
-  vehicleGroups: VehicleGroup[];
-  activeSelection: Set<string>;
-  toggleVehicle: (id: string) => void;
-  selectAll: () => void;
-  clearAll: () => void;
+  readonly vehicleGroups: VehicleGroup[];
+  readonly activeSelection: Set<string>;
+  readonly toggleVehicle: (id: string) => void;
+  readonly selectAll: () => void;
+  readonly clearAll: () => void;
 }
 
-function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, selectAll, clearAll }: VehicleDropdownProps) {
+function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, selectAll, clearAll }: Readonly<VehicleDropdownProps>) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -50,6 +50,13 @@ function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, select
   const selectedCount = activeSelection.size;
   const total = vehicleGroups.length;
   const allSelected = selectedCount === total;
+
+  let selectionText = `${selectedCount} من ${total} مركبة`;
+  if (allSelected) {
+    selectionText = 'جميع المركبات';
+  } else if (selectedCount === 0) {
+    selectionText = 'اختر المركبات…';
+  }
 
   // Close on outside click
   useEffect(() => {
@@ -67,15 +74,11 @@ function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, select
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className="flex items-center gap-2 h-9 px-3 rounded-xl border border-border bg-card text-sm hover:border-primary/50 transition-colors"
+          className="flex items-center gap-2 h-10 px-3 rounded-xl border border-border bg-card text-sm hover:border-primary/50 transition-colors whitespace-nowrap"
         >
           <Car size={14} className="text-muted-foreground shrink-0" />
           <span className="text-muted-foreground">
-            {allSelected
-              ? 'جميع المركبات'
-              : selectedCount === 0
-              ? 'اختر المركبات…'
-              : `${selectedCount} من ${total} مركبة`}
+            {selectionText}
           </span>
           <ChevronDown size={14} className={`text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
@@ -84,7 +87,7 @@ function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, select
           <button
             type="button"
             onClick={clearAll}
-            className="flex items-center gap-1 h-9 px-2.5 rounded-xl border border-border bg-card text-xs text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
+            className="flex items-center gap-1 h-10 px-2.5 rounded-xl border border-border bg-card text-xs text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
             title="إلغاء التحديد"
           >
             <X size={13} />
@@ -162,10 +165,10 @@ function VehicleDropdown({ vehicleGroups, activeSelection, toggleVehicle, select
 
 
 interface VehicleGroupCardProps {
-  group: VehicleGroup;
+  readonly group: VehicleGroup;
 }
 
-function VehicleGroupCard({ group }: VehicleGroupCardProps) {
+function VehicleGroupCard({ group }: Readonly<VehicleGroupCardProps>) {
   const uniqueTypes = useMemo(() => Array.from(new Set(group.logs.map(l => l.type))), [group.logs]);
   
   const uniqueParts = useMemo(() => {
@@ -588,81 +591,78 @@ export function VehicleReportsTab() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="flex gap-4">
-          <div className="bg-card border border-border/60 rounded-xl px-4 py-2 flex flex-col justify-center min-w-[120px]">
-            <span className="text-xs text-muted-foreground mb-1">المركبات التي تمت صيانتها</span>
-            <span className="text-lg font-bold text-foreground">
-              {logsQ.isLoading ? <Skeleton className="h-6 w-12" /> : vehicleGroups.length}
-            </span>
-          </div>
+      {/* Controls */}
+      <div className="flex flex-wrap xl:flex-nowrap items-center gap-2">
+        <div className="bg-card border border-border/60 rounded-xl px-4 py-2 flex flex-col justify-center h-20 min-w-[150px]">
+          <span className="text-xs text-muted-foreground mb-1 whitespace-nowrap">المركبات التي تمت صيانتها</span>
+          <span className="text-lg font-bold text-foreground">
+            {logsQ.isLoading ? <Skeleton className="h-6 w-12" /> : vehicleGroups.length}
+          </span>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto shrink-0">
-          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 bg-card border border-border/60 p-1 rounded-xl">
-            <Input 
-              type="date" 
-              value={fromDate}
-              onChange={e => setFromDate(e.target.value)}
-              className="h-8 text-xs bg-transparent border-none w-full sm:w-32 focus-visible:ring-0"
-              title="من تاريخ"
-            />
-            <span className="text-muted-foreground text-xs">-</span>
-            <Input 
-              type="date" 
-              value={toDate}
-              onChange={e => setToDate(e.target.value)}
-              className="h-8 text-xs bg-transparent border-none w-full sm:w-32 focus-visible:ring-0"
-              title="إلى تاريخ"
-            />
-          </div>
 
-          <div className="relative w-full sm:w-48 shrink-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input
-              placeholder="بحث برقم اللوحة..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pr-9 h-10 rounded-xl bg-card border-border/60"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="h-10 rounded-xl" disabled={logsQ.isLoading || filteredGroups.length === 0}>
-                  <Printer size={16} className="ml-2" />
-                  معاينة و PDF
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => printReport('combined')} className="py-3 cursor-pointer">
-                  <FileText size={16} className="ml-2 text-muted-foreground" />
-                  <span>طباعة مجمعة للمركبات</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => printReport('separated')} className="py-3 cursor-pointer">
-                  <Printer size={16} className="ml-2 text-muted-foreground" />
-                  <span>طباعة ملف لكل دباب منفصل</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline" className="h-10 rounded-xl" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
-              <Download size={16} className="ml-2" />
-              Excel
-            </Button>
-          </div>
+        {!logsQ.isLoading && vehicleGroups.length > 0 && (
+          <VehicleDropdown
+            vehicleGroups={vehicleGroups}
+            activeSelection={activeSelection}
+            toggleVehicle={toggleVehicle}
+            selectAll={selectAll}
+            clearAll={clearAll}
+          />
+        )}
+
+        <div className="flex items-center gap-2 shrink-0 bg-card border border-border/60 p-1 rounded-xl">
+          <Input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            className="h-8 text-xs bg-transparent border-none w-32 focus-visible:ring-0"
+            title="من تاريخ"
+          />
+          <span className="text-muted-foreground text-xs">-</span>
+          <Input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            className="h-8 text-xs bg-transparent border-none w-32 focus-visible:ring-0"
+            title="إلى تاريخ"
+          />
+        </div>
+
+        <div className="relative w-full sm:w-52 xl:w-60 shrink-0">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <Input
+            placeholder="بحث برقم اللوحة..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pr-9 h-10 rounded-xl bg-card border-border/60"
+          />
+        </div>
+
+        <div className="flex gap-2 flex-wrap xl:flex-nowrap xl:ms-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="h-10 rounded-xl whitespace-nowrap" disabled={logsQ.isLoading || filteredGroups.length === 0}>
+                <Printer size={16} className="ml-2" />
+                معاينة و PDF
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => printReport('combined')} className="py-3 cursor-pointer">
+                <FileText size={16} className="ml-2 text-muted-foreground" />
+                <span>طباعة مجمعة للمركبات</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => printReport('separated')} className="py-3 cursor-pointer">
+                <Printer size={16} className="ml-2 text-muted-foreground" />
+                <span>طباعة ملف لكل دباب منفصل</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" className="h-10 rounded-xl whitespace-nowrap" onClick={exportToExcel} disabled={logsQ.isLoading || filteredGroups.length === 0}>
+            <Download size={16} className="ml-2" />
+            Excel
+          </Button>
         </div>
       </div>
-
-      {/* Vehicle selection — compact dropdown */}
-      {!logsQ.isLoading && vehicleGroups.length > 0 && (
-        <VehicleDropdown
-          vehicleGroups={vehicleGroups}
-          activeSelection={activeSelection}
-          toggleVehicle={toggleVehicle}
-          selectAll={selectAll}
-          clearAll={clearAll}
-        />
-      )}
 
       {renderLogsList()}
     </div>

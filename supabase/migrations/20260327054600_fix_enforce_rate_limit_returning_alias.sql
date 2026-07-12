@@ -1,4 +1,4 @@
--- Fix RETURNING alias in enforce_rate_limit to avoid runtime SQL errors.
+﻿-- Fix RETURNING alias in enforce_rate_limit to avoid runtime SQL errors.
 CREATE OR REPLACE FUNCTION public.enforce_rate_limit(
   p_key text,
   p_limit integer,
@@ -11,7 +11,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_now timestamptz := now();

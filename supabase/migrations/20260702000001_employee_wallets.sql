@@ -1,4 +1,4 @@
--- Migration for Employee Wallet Transactions
+﻿-- Migration for Employee Wallet Transactions
 
 CREATE TABLE IF NOT EXISTS public.employee_wallet_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

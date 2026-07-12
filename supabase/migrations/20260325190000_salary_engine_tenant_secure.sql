@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Salary engine hardening:
 -- 1) Tenant-aware calculation in DB functions
 -- 2) Restrict direct RPC execution to service_role (Edge Function only)
@@ -26,7 +26,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -197,7 +197,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   r RECORD;

@@ -232,7 +232,8 @@ const EmployeeTiers = () => {
   const [savingNew, setSavingNew] = useState(false);
 
   // Delete
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Absconded alert
   const [abscondedAlert, setAbscondedAlert] = useState<{
@@ -320,12 +321,11 @@ const EmployeeTiers = () => {
       return;
     }
     const merged = { ...tier, ...editRows[tier.id] };
-    if (!merged.employee_id) { toast({ title: 'خطأ', description: 'اختر مندوباً', variant: 'destructive' }); return; }
     setSavingId(tier.id);
     try {
       await employeeTierService.updateTier(tier.id, {
         sim_number: merged.sim_number || null,
-        employee_id: merged.employee_id,
+        employee_id: merged.employee_id || null,
         package_type: merged.package_type,
         renewal_date: merged.renewal_date,
         delivery_status: merged.delivery_status,
@@ -350,12 +350,11 @@ const EmployeeTiers = () => {
       toast({ title: 'صلاحية غير كافية', description: 'ليس لديك صلاحية الإضافة', variant: 'destructive' });
       return;
     }
-    if (!newRow.employee_id) { toast({ title: 'خطأ', description: 'اختر مندوباً', variant: 'destructive' }); return; }
     setSavingNew(true);
     try {
       await employeeTierService.createTier({
         sim_number: newRow.sim_number || null,
-        employee_id: newRow.employee_id,
+        employee_id: newRow.employee_id || null,
         package_type: newRow.package_type ?? '',
         renewal_date: newRow.renewal_date || new Date().toISOString().slice(0, 10),
         delivery_status: newRow.delivery_status || STATUS_DELIVERED,
@@ -399,25 +398,24 @@ const EmployeeTiers = () => {
     }
   };
 
-  /* ── Delete ── */
-  const handleDelete = async () => {
-    if (!perms.can_delete) {
-      toast({ title: 'صلاحية غير كافية', description: 'ليس لديك صلاحية الحذف', variant: 'destructive' });
-      return;
-    }
-    if (!deleteId) return;
+  const bulkDelete = async () => {
+    if (!perms.can_delete || selectedIds.size === 0) return;
+    if (!confirm(`هل أنت متأكد من مسح ${selectedIds.size} شريحة؟`)) return;
+    setBulkDeleting(true);
     try {
-      await employeeTierService.deleteTier(deleteId);
-      toast({ title: 'تم الحذف' });
-      setDeleteId(null);
+      await employeeTierService.deleteTiers(Array.from(selectedIds));
+      toast({ title: '✅ تم مسح الشرائح المحددة' });
+      setSelectedIds(new Set());
       refetchTiersData().catch(() => {});
     } catch (err: unknown) {
-      const message = getErrorMessage(err, 'تعذر حذف الشريحة');
-      toast({ title: 'خطأ في الحذف', description: message, variant: 'destructive' });
+      logError('EmployeeTiers: Bulk delete error', err);
+      toast({ title: 'خطأ', description: getErrorMessage(err), variant: 'destructive' });
+    } finally {
+      setBulkDeleting(false);
     }
   };
 
-  /* ── Sort ── */
+  /* ── Print / Export ── */
   const handleSort = (field: string) => {
     if (sortField === field) {
       if (sortDir === 'asc') setSortDir('desc');
@@ -643,6 +641,12 @@ const EmployeeTiers = () => {
           <Input placeholder="بحث بالاسم أو رقم الشريحة..." className="pr-9 h-9 w-full" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-1">
+          {selectedIds.size > 0 && (
+            <Button variant="destructive" size="sm" onClick={bulkDelete} disabled={bulkDeleting || !perms.can_delete} className="h-9 px-3 gap-1">
+              {bulkDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              مسح ({selectedIds.size})
+            </Button>
+          )}
           {[{ v: 'all', l: 'الكل' }, { v: STATUS_DELIVERED, l: 'مسلّمة' }, { v: STATUS_NOT_DELIVERED, l: 'غير مسلّمة' }].map(s => (
             <button key={s.v} onClick={() => setStatusFilter(s.v)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${statusFilter === s.v ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
@@ -687,7 +691,14 @@ const EmployeeTiers = () => {
                   <ThSort field="package_type" label="نوع الباقة" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                   <ThSort field="delivery_status" label="الحالة" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                   <th className="ta-th border-b border-border/50 min-w-0">المنصات</th>
-                  <th className="ta-th border-b border-border/50">إجراءات</th>
+                  <th className="ta-th border-b border-border/50">
+                    <div className="flex items-center justify-center gap-2">
+                      <input type="checkbox" className="rounded border-border" 
+                             checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                             onChange={e => setSelectedIds(e.target.checked ? new Set(filtered.map(t => t.id)) : new Set())} />
+                      <span>إجراءات</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -838,14 +849,13 @@ const EmployeeTiers = () => {
                                 </button>
                               </>
                             ) : (
-                              <button
-                                onClick={() => setDeleteId(tier.id)}
-                                disabled={!perms.can_delete}
-                                className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                                title="حذف"
-                              >
-                                <Trash2 size={13} className="text-destructive" />
-                              </button>
+                               <input type="checkbox" className="rounded border-border w-4 h-4 cursor-pointer" 
+                                      checked={selectedIds.has(tier.id)}
+                                      onChange={e => {
+                                        const next = new Set(selectedIds);
+                                        if (e.target.checked) next.add(tier.id); else next.delete(tier.id);
+                                        setSelectedIds(next);
+                                      }} />
                             )}
                           </div>
                         </td>
@@ -885,20 +895,6 @@ const EmployeeTiers = () => {
               {updatingAbsconded ? <Loader2 size={14} className="animate-spin ml-1" /> : null}
               تأكيد التغيير
             </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* ── Delete confirm ── */}
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent dir="rtl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>حذف الشريحة</AlertDialogTitle>
-            <AlertDialogDescription>هل أنت متأكد من حذف هذا السجل؟</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={!perms.can_delete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed">حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,11 +1,11 @@
--- Fix "Function Search Path Mutable" security lint warnings on maintenance/spare-parts
+﻿-- Fix "Function Search Path Mutable" security lint warnings on maintenance/spare-parts
 -- trigger functions by pinning search_path explicitly.
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.fill_maintenance_employee()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   IF NEW.employee_id IS NULL THEN
@@ -23,7 +23,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.deduct_spare_part_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   UPDATE public.spare_parts sp
@@ -32,7 +32,7 @@ BEGIN
   WHERE sp.id = NEW.part_id;
 
   IF (SELECT sp2.stock_quantity FROM public.spare_parts sp2 WHERE sp2.id = NEW.part_id) < 0 THEN
-    RAISE EXCEPTION 'المخزون غير كافٍ للقطعة المطلوبة';
+    RAISE EXCEPTION 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ† ØºÙŠØ± ÙƒØ§ÙÙ Ù„Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
   END IF;
 
   RETURN NEW;
@@ -42,7 +42,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.restore_spare_part_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   UPDATE public.spare_parts sp
@@ -56,7 +56,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.update_maintenance_total_cost()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   log_id uuid;

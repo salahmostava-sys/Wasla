@@ -1,5 +1,5 @@
-
--- ─── Departments table ────────────────────────────────────────────────────────
+﻿
+-- â”€â”€â”€ Departments table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CREATE TABLE IF NOT EXISTS public.departments (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
@@ -27,7 +27,7 @@ CREATE TRIGGER update_departments_updated_at
   BEFORE UPDATE ON public.departments
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- ─── Positions table ──────────────────────────────────────────────────────────
+-- â”€â”€â”€ Positions table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CREATE TABLE IF NOT EXISTS public.positions (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
@@ -55,7 +55,7 @@ CREATE TRIGGER update_positions_updated_at
   BEFORE UPDATE ON public.positions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- ─── Add department_id and position_id to employees ──────────────────────────
+-- â”€â”€â”€ Add department_id and position_id to employees â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ALTER TABLE public.employees
   ADD COLUMN IF NOT EXISTS department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS position_id UUID REFERENCES public.positions(id) ON DELETE SET NULL;

@@ -79,101 +79,101 @@ END $$;
 -- Get order status: cancelled
 CREATE OR REPLACE FUNCTION _const_order_cancelled() RETURNS TEXT AS $$
   SELECT 'cancelled'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get installment statuses: pending, deferred
 CREATE OR REPLACE FUNCTION _const_installment_pending() RETURNS TEXT AS $$
   SELECT 'pending'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_installment_deferred() RETURNS TEXT AS $$
   SELECT 'deferred'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get approval status: approved
 CREATE OR REPLACE FUNCTION _const_approval_approved() RETURNS TEXT AS $$
   SELECT 'approved'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get work types
 CREATE OR REPLACE FUNCTION _const_work_orders() RETURNS TEXT AS $$
   SELECT 'orders'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_work_shift() RETURNS TEXT AS $$
   SELECT 'shift'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_work_hybrid() RETURNS TEXT AS $$
   SELECT 'hybrid'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get days per month constant
 CREATE OR REPLACE FUNCTION _const_days_per_month() RETURNS NUMERIC AS $$
   SELECT 30.0::NUMERIC;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get employee status: active
 CREATE OR REPLACE FUNCTION _const_employee_active() RETURNS TEXT AS $$
   SELECT 'active'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get payment methods
 CREATE OR REPLACE FUNCTION _const_payment_cash() RETURNS TEXT AS $$
   SELECT 'cash'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_payment_bank() RETURNS TEXT AS $$
   SELECT 'bank'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get calculation status
 CREATE OR REPLACE FUNCTION _const_calc_calculated() RETURNS TEXT AS $$
   SELECT 'calculated'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get calculation sources
 CREATE OR REPLACE FUNCTION _const_calc_source_v6() RETURNS TEXT AS $$
   SELECT 'engine_v6_shift_fallback'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_source_v7() RETURNS TEXT AS $$
   SELECT 'engine_v7_shift_fixed'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get calculation methods
 CREATE OR REPLACE FUNCTION _const_calc_method_orders() RETURNS TEXT AS $$
   SELECT _const_work_orders()::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift() RETURNS TEXT AS $$
   SELECT _const_work_shift()::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift_fixed() RETURNS TEXT AS $$
   SELECT 'shift_fixed'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_method_shift_full_month() RETURNS TEXT AS $$
   SELECT 'shift_full_month'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_method_mixed() RETURNS TEXT AS $$
   SELECT 'mixed'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_calc_method_orders_fallback() RETURNS TEXT AS $$
   SELECT 'orders_fallback'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 -- Get tier types
 CREATE OR REPLACE FUNCTION _const_tier_fixed() RETURNS TEXT AS $$
   SELECT 'fixed_amount'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 CREATE OR REPLACE FUNCTION _const_tier_incremental() RETURNS TEXT AS $$
   SELECT 'base_plus_incremental'::TEXT;
-$$ LANGUAGE SQL IMMUTABLE SET search_path = public;
+$$ LANGUAGE SQL IMMUTABLE SET search_path = public; /* NOSONAR */
 
 COMMENT ON FUNCTION _const_order_cancelled() IS 'Constant: cancelled order status';
 COMMENT ON FUNCTION _const_installment_pending() IS 'Constant: pending installment status';

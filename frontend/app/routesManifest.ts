@@ -32,7 +32,6 @@ export const toPagePermissionKey = (permission?: string): string | undefined => 
 export const routesManifest: AppRouteManifestItem[] = [
   /** عرض البيانات والمؤشرات */
   { id: 'dashboard', titleAr: 'لوحة التحكم', group: 'dashboard', path: '/', sidebar: true },
-  { id: 'ai_analytics', titleAr: 'تحليلات ذكية', group: 'dashboard', path: '/ai-analytics', permission: routePermission('ai_analytics'), sidebar: false },
 
   { id: 'employees', titleAr: 'الموظفون', group: 'hr', path: '/employees', permission: routePermission('employees'), sidebar: true },
   { id: 'attendance', titleAr: 'الحضور والانصراف', group: 'hr', path: '/attendance', permission: routePermission('attendance'), sidebar: true },
@@ -50,6 +49,7 @@ export const routesManifest: AppRouteManifestItem[] = [
   { id: 'salary_schemes', titleAr: 'مخططات الرواتب', group: 'finance', path: '/settings?tab=schemes', permission: routePermission('salary_schemes'), sidebar: false },
   { id: 'advances', titleAr: 'السلف', group: 'finance', path: '/advances', permission: routePermission('advances'), sidebar: true },
   { id: 'finance', titleAr: 'المصاريف والإيرادات', group: 'finance', path: '/finance', permission: routePermission('finance'), sidebar: true },
+  { id: 'wallet', titleAr: 'المحفظة والعهد', group: 'finance', path: '/wallet', permission: routePermission('finance'), sidebar: false },
 
   /** المركبات والحركة والصيانة */
   { id: 'motorcycles', titleAr: 'المركبات', group: 'fleet', path: '/motorcycles', permission: routePermission('vehicles'), sidebar: true },

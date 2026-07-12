@@ -41,7 +41,7 @@ async function deriveAesKey(): Promise<CryptoKey> {
   );
 }
 
-export async function encryptRememberedEmail(plain: string): Promise<string> {
+async function encryptRememberedEmail(plain: string): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveAesKey();
   const enc = new TextEncoder();
@@ -53,7 +53,7 @@ export async function encryptRememberedEmail(plain: string): Promise<string> {
   return bytesToBase64(combined);
 }
 
-export async function decryptRememberedEmail(b64: string): Promise<string | null> {
+async function decryptRememberedEmail(b64: string): Promise<string | null> {
   try {
     const combined = base64ToBytes(b64);
     if (combined.length < 13) return null;
@@ -68,7 +68,7 @@ export async function decryptRememberedEmail(b64: string): Promise<string | null
   }
 }
 
-export function getRememberFlag(): boolean {
+function getRememberFlag(): boolean {
   try {
     return localStorage.getItem(STORAGE_REMEMBER) !== '0';
   } catch (e) {
@@ -77,7 +77,7 @@ export function getRememberFlag(): boolean {
   }
 }
 
-export function setRememberFlag(active: boolean): void {
+function setRememberFlag(active: boolean): void {
   try {
     localStorage.setItem(STORAGE_REMEMBER, active ? '1' : '0');
   } catch (e) {

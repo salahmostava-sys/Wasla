@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- CRITICAL FIX: calculate_salary_for_employee_month currently INSERTs into
 -- columns that do not exist on public.salary_records:
 --   total_orders, total_shift_days, platform_breakdown, status
@@ -8,7 +8,7 @@
 -- currently fails outright with: column "total_orders" does not exist.
 --
 -- It was also missing ON CONFLICT (employee_id, month_year) DO UPDATE, even
--- though that unique constraint exists — so recalculating an already-saved
+-- though that unique constraint exists â€” so recalculating an already-saved
 -- month would additionally fail with a duplicate key error.
 --
 -- This migration restores the correct, real column list, adds the missing
@@ -239,7 +239,7 @@ BEGIN
     NULL
   )
   -- FIX: was missing this upsert clause, even though the table has a
-  -- UNIQUE(employee_id, month_year) constraint — recalculating an
+  -- UNIQUE(employee_id, month_year) constraint â€” recalculating an
   -- already-saved month previously failed with a duplicate key error.
   ON CONFLICT (employee_id, month_year)
   DO UPDATE SET
@@ -287,6 +287,6 @@ REVOKE EXECUTE ON FUNCTION public.calculate_salary_for_employee_month(UUID, TEXT
 GRANT EXECUTE ON FUNCTION public.calculate_salary_for_employee_month(UUID, TEXT, TEXT, NUMERIC, TEXT) TO service_role;
 
 COMMENT ON FUNCTION public.calculate_salary_for_employee_month IS
-  'v6: fixes INSERT column list (total_orders/total_shift_days/platform_breakdown/status did not exist on salary_records — every call failed), restores ON CONFLICT upsert, and restores the TABLE return shape expected by calculate_salary_for_month().';
+  'v6: fixes INSERT column list (total_orders/total_shift_days/platform_breakdown/status did not exist on salary_records â€” every call failed), restores ON CONFLICT upsert, and restores the TABLE return shape expected by calculate_salary_for_month().';
 
 COMMIT;

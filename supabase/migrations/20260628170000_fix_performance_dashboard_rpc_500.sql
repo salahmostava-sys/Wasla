@@ -1,27 +1,27 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: performance_dashboard_rpc returning 500
 -- ============================================================
--- الـ RPC تُرجع 500 عند بعض الحالات. الأسباب المحتملة:
--- 1. الـ view v_rider_monthly_performance لا تُوجد بيانات في الشهر المطلوب
--- 2. مشكلة في التحويل بين أنواع البيانات
--- الحل: لفّ الجسم الداخلي بـ EXCEPTION WHEN OTHERS لإعادة رسالة خطأ واضحة
+-- Ø§Ù„Ù€ RPC ØªÙØ±Ø¬Ø¹ 500 Ø¹Ù†Ø¯ Ø¨Ø¹Ø¶ Ø§Ù„ØØ§Ù„Ø§Øª. Ø§Ù„Ø£Ø³Ø¨Ø§Ø¨ Ø§Ù„Ù…ØØªÙ…Ù„Ø©:
+-- 1. Ø§Ù„Ù€ view v_rider_monthly_performance Ù„Ø§ ØªÙÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª ÙÙŠ Ø§Ù„Ø´Ù‡Ø± Ø§Ù„Ù…Ø·Ù„ÙˆØ¨
+-- 2. Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„ØªØÙˆÙŠÙ„ Ø¨ÙŠÙ† Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+-- Ø§Ù„ØÙ„: Ù„ÙÙ‘ Ø§Ù„Ø¬Ø³Ù… Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ Ø¨Ù€ EXCEPTION WHEN OTHERS Ù„Ø¥Ø¹Ø§Ø¯Ø© Ø±Ø³Ø§Ù„Ø© Ø®Ø·Ø£ ÙˆØ§Ø¶ØØ©
 
--- أولاً: إصلاح permission لـ authenticated users على الـ view
+-- Ø£ÙˆÙ„Ø§Ù‹: Ø¥ØµÙ„Ø§Ø permission Ù„Ù€ authenticated users Ø¹Ù„Ù‰ Ø§Ù„Ù€ view
 GRANT SELECT ON public.v_rider_monthly_performance TO authenticated;
 GRANT SELECT ON public.v_rider_daily_performance TO authenticated;
 
--- ثانياً: GRANT EXECUTE للـ RPCs الأساسية إذا لم تكن ممنوحة
+-- Ø«Ø§Ù†ÙŠØ§Ù‹: GRANT EXECUTE Ù„Ù„Ù€ RPCs Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† Ù…Ù…Ù†ÙˆØØ©
 DO $$
 BEGIN
-  -- تأكد من منح صلاحيات الدوال للمستخدمين المصادق عليهم
+  -- ØªØ£ÙƒØ¯ Ù…Ù† Ù…Ù†Ø ØµÙ„Ø§ØÙŠØ§Øª Ø§Ù„Ø¯ÙˆØ§Ù„ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ† Ø§Ù„Ù…ØµØ§Ø¯Ù‚ Ø¹Ù„ÙŠÙ‡Ù…
   EXECUTE 'GRANT EXECUTE ON FUNCTION public.performance_dashboard_rpc(TEXT, DATE) TO authenticated, service_role';
 EXCEPTION WHEN OTHERS THEN
-  -- تجاهل إذا كانت الدالة بـ signature مختلف
+  -- ØªØ¬Ø§Ù‡Ù„ Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø§Ù„Ø¯Ø§Ù„Ø© Ø¨Ù€ signature Ù…Ø®ØªÙ„Ù
   NULL;
 END;
 $$;
 
--- ثالثاً: إعادة بناء الـ RPC مع معالجة أخطاء أفضل
+-- Ø«Ø§Ù„Ø«Ø§Ù‹: Ø¥Ø¹Ø§Ø¯Ø© Ø¨Ù†Ø§Ø¡ Ø§Ù„Ù€ RPC Ù…Ø¹ Ù…Ø¹Ø§Ù„Ø¬Ø© Ø£Ø®Ø·Ø§Ø¡ Ø£ÙØ¶Ù„
 CREATE OR REPLACE FUNCTION public.performance_dashboard_rpc(
   p_month_year TEXT,
   p_today DATE DEFAULT CURRENT_DATE
@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION public.performance_dashboard_rpc(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -41,7 +41,7 @@ DECLARE
   v_prev_week_start DATE;
   v_result JSONB;
 BEGIN
-  -- فحص الصلاحيات
+  -- ÙØØµ Ø§Ù„ØµÙ„Ø§ØÙŠØ§Øª
   IF NOT (
     public.is_active_user(auth.uid())
     AND (
@@ -54,7 +54,7 @@ BEGIN
     RAISE EXCEPTION 'Not allowed: insufficient role';
   END IF;
 
-  -- فحص صحة التنسيق
+  -- ÙØØµ ØµØØ© Ø§Ù„ØªÙ†Ø³ÙŠÙ‚
   IF p_month_year !~ '^\d{4}-\d{2}$' THEN
     RAISE EXCEPTION 'Invalid month_year format. Expected YYYY-MM, got: %', p_month_year;
   END IF;
@@ -138,7 +138,7 @@ BEGIN
       )
     );
   EXCEPTION WHEN OTHERS THEN
-    -- إرجاع بيانات فارغة بدلاً من crash
+    -- Ø¥Ø±Ø¬Ø§Ø¹ Ø¨ÙŠØ§Ù†Ø§Øª ÙØ§Ø±ØºØ© Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù† crash
     v_result := jsonb_build_object(
       'month_year', p_month_year,
       'today', p_today,
@@ -154,7 +154,7 @@ BEGIN
 END;
 $$;
 
--- Revoke من public/anon وامنح للـ authenticated فقط
+-- Revoke Ù…Ù† public/anon ÙˆØ§Ù…Ù†Ø Ù„Ù„Ù€ authenticated ÙÙ‚Ø·
 REVOKE EXECUTE ON FUNCTION public.performance_dashboard_rpc(TEXT, DATE) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.performance_dashboard_rpc(TEXT, DATE) TO authenticated, service_role;
 

@@ -1,1 +1,1 @@
-ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS nationality text;
+﻿ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS nationality text;

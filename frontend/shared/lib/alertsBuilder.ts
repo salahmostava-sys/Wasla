@@ -1,4 +1,4 @@
-import { addDays, differenceInDays, format, parseISO } from "date-fns";
+import { differenceInDays, format, parseISO } from "date-fns";
 
 const ISO_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -299,5 +299,3 @@ export function buildAlertsFromResponses(
   generatedAlerts.sort((a, b) => a.daysLeft - b.daysLeft);
   return generatedAlerts;
 }
-
-export const daysFromTodayIso = (days: number) => format(addDays(new Date(), days), ISO_DATE_FORMAT);

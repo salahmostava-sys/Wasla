@@ -47,6 +47,80 @@ export interface SalaryAnalysisResponse {
   diff_percent: number;
 }
 
+export interface DayRecord {
+  date: string;
+  orders: number;
+  app_name?: string | null;
+  employee_id?: string | null;
+  employee_name?: string | null;
+}
+
+export interface PredictOrdersResponse {
+  daily_forecast: Record<string, unknown>[];
+  monthly_total_predicted: number;
+  trend: 'up' | 'down' | 'stable';
+  trend_percent: number;
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export interface DriverRank {
+  employee_id: string;
+  employee_name: string;
+  total_orders: number;
+  daily_avg: number;
+  trend: string;
+  trend_percent: number;
+  consistency_score: number;
+}
+
+export interface BestEmployeeResponse {
+  employees: EmployeeRank[];
+  best_employee: EmployeeRank | null;
+}
+
+export interface BestDriverResponse {
+  drivers: DriverRank[];
+}
+
+export interface PlatformRank {
+  app_name: string;
+  total_orders: number;
+  share_percent: number;
+  growth_percent: number;
+  avg_daily: number;
+}
+
+export interface TopPlatformResponse {
+  platforms: PlatformRank[];
+}
+
+export interface Alert {
+  type: string;
+  severity: 'warning' | 'critical' | 'info';
+  message: string;
+  value: number;
+  entity?: string | null;
+}
+
+export interface SmartAlertsResponse {
+  alerts: Alert[];
+}
+
+export interface Anomaly {
+  type: string;
+  severity: 'critical' | 'warning' | 'info';
+  message: string;
+  value: number;
+  threshold: number;
+  recommendation: string;
+}
+
+export interface AnomalyDetectionResponse {
+  anomalies: Anomaly[];
+  overall_risk_score: number;
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
+}
+
 class AIService {
   private readonly isConfiguredValue: boolean;
 
@@ -128,6 +202,61 @@ class AIService {
       });
     } catch (error) {
       console.error('[AIService] analyzeSalary failed:', error);
+      throw error;
+    }
+  }
+
+  async predictOrders(history: DayRecord[], forecast_days: number = 7): Promise<PredictOrdersResponse> {
+    try {
+      return await this.post<PredictOrdersResponse>('/predict-orders', { history, forecast_days });
+    } catch (error) {
+      console.error('[AIService] predictOrders failed:', error);
+      throw error;
+    }
+  }
+
+  async bestDriver(history: DayRecord[], top_n: number = 5): Promise<BestDriverResponse> {
+    try {
+      return await this.post<BestDriverResponse>('/best-driver', { history, top_n });
+    } catch (error) {
+      console.error('[AIService] bestDriver failed:', error);
+      throw error;
+    }
+  }
+
+  async topPlatform(history: DayRecord[]): Promise<TopPlatformResponse> {
+    try {
+      return await this.post<TopPlatformResponse>('/top-platform', { history });
+    } catch (error) {
+      console.error('[AIService] topPlatform failed:', error);
+      throw error;
+    }
+  }
+
+  async smartAlerts(history: DayRecord[], thresholds?: Record<string, number>): Promise<SmartAlertsResponse> {
+    try {
+      return await this.post<SmartAlertsResponse>('/smart-alerts', { history, thresholds: thresholds ?? {} });
+    } catch (error) {
+      console.error('[AIService] smartAlerts failed:', error);
+      throw error;
+    }
+  }
+
+  async detectAnomalies(params: {
+    employee_id: string;
+    employee_name: string;
+    current_salary: number;
+    expected_salary_min: number;
+    expected_salary_max: number;
+    monthly_orders: number;
+    previous_month_orders: number;
+    deductions: number;
+    deduction_reasons: string[];
+  }): Promise<AnomalyDetectionResponse> {
+    try {
+      return await this.post<AnomalyDetectionResponse>('/detect-anomalies', params);
+    } catch (error) {
+      console.error('[AIService] detectAnomalies failed:', error);
       throw error;
     }
   }

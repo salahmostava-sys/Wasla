@@ -43,6 +43,22 @@ const BACKUP_TABLE_SET = new Set<string>(BACKUP_TABLES);
 const RESTORE_MAX_ROWS_PER_TABLE = 10_000;
 const RESTORE_BATCH_SIZE = 500;
 
+const getNameLabelsById = async (
+  table: 'employees' | 'apps',
+  ids: string[],
+  context: string,
+) => {
+  if (ids.length === 0) return {};
+
+  const { data, error } = await supabase
+    .from(table)
+    .select('id, name')
+    .in('id', ids);
+  if (error) throw toServiceError(error, context);
+
+  return Object.fromEntries((data ?? []).map((row) => [row.id, row.name] as const));
+};
+
 export const settingsHubService = {
   getCurrentUserId: async () => {
     const { data, error } = await supabase.auth.getSession();
@@ -91,27 +107,30 @@ export const settingsHubService = {
     return data ?? [];
   },
 
+  getAuditReferenceLabels: async ({
+    employeeIds,
+    appIds,
+  }: {
+    employeeIds: string[];
+    appIds: string[];
+  }) => {
+    const [employeeLabels, appLabels] = await Promise.all([
+      getNameLabelsById('employees', employeeIds, 'settingsHubService.getAuditReferenceLabels.employees'),
+      getNameLabelsById('apps', appIds, 'settingsHubService.getAuditReferenceLabels.apps'),
+    ]);
+
+    return { ...employeeLabels, ...appLabels };
+  },
+
   /**
-   * Fetch distinct users who have at least one entry in audit_log.
-   * Used to populate the "filter by user" dropdown.
+   * Fetch all user profiles for the activity-log user filter.
    */
   getAuditUsers: async () => {
-    // Get distinct non-null user_ids from audit_log
-    const { data: logRows, error: logError } = await supabase
-      .from('audit_log')
-      .select('user_id')
-      .not('user_id', 'is', null)
-      .limit(500);
-    if (logError) throw toServiceError(logError, 'settingsHubService.getAuditUsers');
-
-    const uniqueIds = [...new Set((logRows ?? []).map(r => r.user_id).filter(Boolean))] as string[];
-    if (uniqueIds.length === 0) return [];
-
-    const { data: profiles, error: profError } = await supabase
+    const { data: profiles, error } = await supabase
       .from('profiles')
       .select('id, name, email')
-      .in('id', uniqueIds);
-    if (profError) throw toServiceError(profError, 'settingsHubService.getAuditUsers.profiles');
+      .order('name', { ascending: true });
+    if (error) throw toServiceError(error, 'settingsHubService.getAuditUsers');
 
     return (profiles ?? []).sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '', 'ar'));
   },

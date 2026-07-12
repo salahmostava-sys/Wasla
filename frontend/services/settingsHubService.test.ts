@@ -101,23 +101,34 @@ describe('settingsHubService', () => {
     });
   });
 
+  describe('getAuditReferenceLabels', () => {
+    it('returns readable labels for employee and app ids', async () => {
+      tableMocks.employees = { data: [{ id: 'employee-1', name: 'Ahmed' }], error: null };
+      tableMocks.apps = { data: [{ id: 'app-1', name: 'HungerStation' }], error: null };
+
+      const res = await settingsHubService.getAuditReferenceLabels({
+        employeeIds: ['employee-1'],
+        appIds: ['app-1'],
+      });
+
+      expect(res).toEqual({
+        'employee-1': 'Ahmed',
+        'app-1': 'HungerStation',
+      });
+    });
+  });
+
   describe('getAuditUsers', () => {
-    it('returns unique users from audit_log', async () => {
+    it('returns all profiles sorted alphabetically', async () => {
       fromMock.mockImplementation((table: string) => {
-        if (table === 'audit_log') {
-          return {
-            select: vi.fn().mockReturnThis(),
-            not: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockResolvedValue({ data: [{ user_id: 'user-1' }], error: null })
-          };
-        }
+        expect(table).toBe('profiles');
         return {
           select: vi.fn().mockReturnThis(),
-          in: vi.fn().mockResolvedValue({ data: [{ id: 'user-1', name: 'Z' }, { id: 'user-2', name: 'A' }], error: null })
+          order: vi.fn().mockResolvedValue({ data: [{ id: 'user-1', name: 'Z' }, { id: 'user-2', name: 'A' }], error: null }),
         };
       });
       const res = await settingsHubService.getAuditUsers();
-      expect(res[0].name).toBe('A'); // sorted alphabetically
+      expect(res[0].name).toBe('A');
     });
   });
 

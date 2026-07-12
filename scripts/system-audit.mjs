@@ -25,6 +25,14 @@ function getNpmCommand() {
 }
 
 function getPythonCommand() {
+  const venvPath = process.platform === 'win32'
+    ? path.join(repoRoot, 'ai-backend', 'venv', 'Scripts', 'python.exe')
+    : path.join(repoRoot, 'ai-backend', 'venv', 'bin', 'python');
+
+  if (existsSync(venvPath)) {
+    return venvPath;
+  }
+
   const candidates = process.platform === 'win32' ? ['python'] : ['python3', 'python'];
 
   for (const candidate of candidates) {
@@ -88,7 +96,7 @@ if (!skipBackend) {
   const pythonCommand = getPythonCommand();
   const dependencyCheck = spawnSync(
     pythonCommand,
-    ['-c', 'import fastapi, pandas, sklearn, google.cloud.vision'],
+    ['-c', 'import fastapi, pandas, sklearn'],
     { stdio: 'ignore', cwd: repoRoot },
   );
 

@@ -2,7 +2,7 @@ import { employeeService } from '@services/employeeService';
 import { useAuthedQuery } from '@shared/hooks/useAuthedQuery';
 
 /** TanStack Query key factory for the employees list. */
-export const employeesQueryKey = (userId: string) => ['employees', userId] as const;
+const employeesQueryKey = (userId: string) => ['employees', userId] as const;
 
 const EMPLOYEES_FETCH_TIMEOUT_MS = 12_000;
 

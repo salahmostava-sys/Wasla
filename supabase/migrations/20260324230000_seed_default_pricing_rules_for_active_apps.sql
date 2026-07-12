@@ -1,4 +1,4 @@
--- Seed a default pricing rule for every active app that has no rules yet.
+﻿-- Seed a default pricing rule for every active app that has no rules yet.
 -- Idempotent: only inserts for apps without any existing pricing_rules.
 
 INSERT INTO public.pricing_rules (

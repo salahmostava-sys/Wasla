@@ -1,4 +1,4 @@
--- Restore salary RPC functions after single-org company_id removal.
+﻿-- Restore salary RPC functions after single-org company_id removal.
 -- These definitions remove company_id dependencies that were left from tenant-era functions.
 
 DROP FUNCTION IF EXISTS public.calculate_salary_for_employee_month(uuid, text, text, numeric, text) CASCADE;
@@ -27,7 +27,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -184,7 +184,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   r RECORD;
@@ -221,7 +221,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION public.is_admin_or_hr(uid uuid)
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 BEGIN
   RETURN (

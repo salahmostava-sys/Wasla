@@ -3,7 +3,7 @@ import { toServiceError } from '@services/serviceError';
 import { buildVerifiedAvatarObjectKey, parseVerifiedAvatarObjectKey } from '@shared/lib/storagePath';
 import { validateUploadFile } from '@shared/lib/validation';
 
-export const INVALID_AVATAR_OBJECT_KEY = 'INVALID_AVATAR_OBJECT_KEY';
+const INVALID_AVATAR_OBJECT_KEY = 'INVALID_AVATAR_OBJECT_KEY';
 
 const ALLOWED_AVATAR_EXT = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp']);
 

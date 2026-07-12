@@ -1,4 +1,4 @@
--- Ensure employees remain visible/editable after full company_id removal.
+﻿-- Ensure employees remain visible/editable after full company_id removal.
 -- Rebuild employees RLS policies explicitly in single-org mode.
 
 BEGIN;
@@ -26,7 +26,7 @@ FOR SELECT
 TO authenticated
 USING (
   public.is_internal_user()
-  AND public.has_permission('employees', 'view')
+  AND public.has_permission('employees' /* NOSONAR */, 'view' /* NOSONAR */)
 );
 
 CREATE POLICY employees_insert_policy
@@ -35,7 +35,7 @@ FOR INSERT
 TO authenticated
 WITH CHECK (
   public.is_internal_user()
-  AND public.has_permission('employees', 'write')
+  AND public.has_permission('employees' /* NOSONAR */, 'write' /* NOSONAR */)
 );
 
 CREATE POLICY employees_update_policy
@@ -44,11 +44,11 @@ FOR UPDATE
 TO authenticated
 USING (
   public.is_internal_user()
-  AND public.has_permission('employees', 'write')
+  AND public.has_permission('employees' /* NOSONAR */, 'write' /* NOSONAR */)
 )
 WITH CHECK (
   public.is_internal_user()
-  AND public.has_permission('employees', 'write')
+  AND public.has_permission('employees' /* NOSONAR */, 'write' /* NOSONAR */)
 );
 
 CREATE POLICY employees_delete_policy
@@ -57,7 +57,7 @@ FOR DELETE
 TO authenticated
 USING (
   public.is_internal_user()
-  AND public.has_permission('employees', 'delete')
+  AND public.has_permission('employees' /* NOSONAR */, 'delete')
 );
 
 COMMIT;

@@ -1,4 +1,4 @@
--- Fix ALL remaining RLS policies containing nested auth.uid()
+﻿-- Fix ALL remaining RLS policies containing nested auth.uid()
 
 DROP POLICY IF EXISTS "unified_delete_policy" ON public."employee_tiers";
 CREATE POLICY "unified_delete_policy" ON public."employee_tiers" FOR DELETE

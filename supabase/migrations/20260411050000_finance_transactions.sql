@@ -1,4 +1,4 @@
--- Finance transactions: revenues and expenses tracking
+﻿-- Finance transactions: revenues and expenses tracking
 -- Salaries auto-feed as expenses each month
 
 CREATE TABLE IF NOT EXISTS public.finance_transactions (

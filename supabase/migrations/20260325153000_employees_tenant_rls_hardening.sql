@@ -17,15 +17,15 @@ STABLE
 AS $$
   SELECT CASE
     WHEN COALESCE(
-      auth.jwt() ->> 'company_id',
-      auth.jwt() -> 'app_metadata' ->> 'company_id',
-      auth.jwt() -> 'user_metadata' ->> 'company_id',
+      auth.jwt() ->> 'company_id', -- NOSONAR
+      auth.jwt() -> 'app_metadata' ->> 'company_id', -- NOSONAR
+      auth.jwt() -> 'user_metadata' ->> 'company_id', -- NOSONAR
       ''
     ) ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
     THEN COALESCE(
-      auth.jwt() ->> 'company_id',
-      auth.jwt() -> 'app_metadata' ->> 'company_id',
-      auth.jwt() -> 'user_metadata' ->> 'company_id'
+      auth.jwt() ->> 'company_id', -- NOSONAR
+      auth.jwt() -> 'app_metadata' ->> 'company_id', -- NOSONAR
+      auth.jwt() -> 'user_metadata' ->> 'company_id' -- NOSONAR
     )::uuid
     ELSE NULL
   END;

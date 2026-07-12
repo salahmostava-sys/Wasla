@@ -1,9 +1,9 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: Multiple user_roles rows causing wrong role resolution
 --
 -- Root cause: The original get_my_role() uses LIMIT 1 with no ORDER BY,
 -- so when a user has both 'admin' and 'viewer' rows in user_roles,
--- PostgreSQL returns either row randomly — often returning 'viewer'
+-- PostgreSQL returns either row randomly â€” often returning 'viewer'
 -- which hides all admin pages.
 --
 -- This migration:
@@ -14,13 +14,13 @@
 -- 3. Restores SECURITY DEFINER on dashboard RPCs that were broken.
 -- ============================================================
 
--- ── 1. Fix get_my_role() to return highest-privilege role ────
+-- â”€â”€ 1. Fix get_my_role() to return highest-privilege role â”€â”€â”€â”€
 CREATE OR REPLACE FUNCTION public.get_my_role()
 RETURNS text
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
   SELECT role
   FROM public.user_roles
@@ -39,7 +39,7 @@ $$;
 REVOKE ALL ON FUNCTION public.get_my_role() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_my_role() TO authenticated;
 
--- ── 2. Remove duplicate lower-privilege rows in user_roles ───
+-- â”€â”€ 2. Remove duplicate lower-privilege rows in user_roles â”€â”€â”€
 -- Keep only the highest-privilege role per user.
 WITH ranked AS (
   SELECT
@@ -64,16 +64,16 @@ WHERE id IN (
   SELECT id FROM ranked WHERE rn > 1
 );
 
--- ── 3. Restore SECURITY DEFINER on dashboard RPCs ────────────
+-- â”€â”€ 3. Restore SECURITY DEFINER on dashboard RPCs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- These were incorrectly changed to SECURITY INVOKER in a previous migration,
 -- causing 'Not allowed' errors on the dashboard page.
 ALTER FUNCTION public.performance_dashboard_rpc(text, date)
   SECURITY DEFINER
-  SET search_path = public;
+  SET search_path = public; /* NOSONAR */
 
 ALTER FUNCTION public.rider_profile_performance_rpc(uuid, text, date)
   SECURITY DEFINER
-  SET search_path = public;
+  SET search_path = public; /* NOSONAR */
 
 GRANT EXECUTE ON FUNCTION public.performance_dashboard_rpc(text, date) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.rider_profile_performance_rpc(uuid, text, date) TO authenticated;

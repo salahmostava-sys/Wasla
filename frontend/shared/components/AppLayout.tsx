@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState, type CSSProperties } from 'react';
 import AppSidebar from './AppSidebar';
 import ErrorBoundary from './ErrorBoundary';
 import { useLanguage } from '@app/providers/LanguageContext';
@@ -40,6 +40,11 @@ const roleBadgeClass: Record<string, string> = {
   operations: 'text-orange-700 dark:text-orange-300 bg-orange-500/12',
   viewer: 'text-muted-foreground bg-muted',
 };
+
+const SIDEBAR_WIDTH_CLASS = 'lg:mr-[var(--app-sidebar-width)]';
+const SIDEBAR_WIDTH_CLASS_LTR = 'lg:ml-[var(--app-sidebar-width)]';
+const SIDEBAR_WIDTH_EXPANDED = '260px';
+const SIDEBAR_WIDTH_COLLAPSED = '64px';
 
 const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR: layout wiring for route/theme/sidebar states
   const { isRTL } = useLanguage();
@@ -97,25 +102,14 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
   const roleLabel = role ? roleLabelsMap[role] || role : '';
   const roleBadgeCls = role ? roleBadgeClass[role] || 'text-muted-foreground bg-muted' : '';
 
-  // Avoid nested ternary operators (Sonar S3358) by using plain branching.
-  let sidebarOffsetCls: string;
-  if (isRTL) {
-    if (sidebarCollapsed) {
-      sidebarOffsetCls = 'lg:mr-[64px]';
-    } else {
-      sidebarOffsetCls = 'lg:mr-[260px]';
-    }
-  } else if (sidebarCollapsed) {
-    sidebarOffsetCls = 'lg:ml-[64px]';
-  } else {
-    sidebarOffsetCls = 'lg:ml-[260px]';
-  }
+  const sidebarOffsetCls = isRTL ? SIDEBAR_WIDTH_CLASS : SIDEBAR_WIDTH_CLASS_LTR;
+  const sidebarWidth = sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   return (
     <div
       className="min-h-screen"
       dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ background: 'var(--ds-surface)' }}
+      style={{ background: 'var(--ds-surface)', '--app-sidebar-width': sidebarWidth } as CSSProperties}
     >
       <ErrorBoundary>
         <AppSidebar />
@@ -129,7 +123,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
 
         {/* ── Glass Header ─────────────────────────────────── */}
         <header
-          className="min-h-[64px] flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 px-4 lg:px-6 py-2.5 sticky top-0 z-40"
+          className="min-h-[60px] lg:min-h-[62px] flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 px-3 sm:px-4 lg:px-5 py-2 sticky top-0 z-40"
           style={{
             background: 'var(--header-glass-bg)',
             backdropFilter: 'blur(12px)',
@@ -143,7 +137,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
             <button
               type="button"
               onClick={toggle}
-              className="h-9 w-9 flex items-center justify-center border border-border/60 bg-card/80 flex-shrink-0 rounded-2xl"
+              className="h-9 w-9 flex items-center justify-center border border-border/60 bg-card/80 flex-shrink-0 rounded-xl"
               style={{ color: 'var(--ds-on-surface-variant)' }}
               aria-label="Toggle sidebar"
             >
@@ -170,9 +164,9 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
           </div>
 
           {/* مسار الصفحة + بحث */}
-          <div className="order-last sm:order-none w-full sm:w-auto flex-1 flex items-center justify-center gap-3 lg:gap-4 min-w-0 basis-full sm:basis-auto px-4">
+          <div className="order-last sm:order-none w-full sm:w-auto flex-1 flex items-center justify-center gap-2 lg:gap-3 min-w-0 basis-full sm:basis-auto px-0 sm:px-2">
             <div
-              className="hidden lg:flex items-center gap-1.5 text-[11px] min-w-0 max-w-[220px] lg:max-w-[280px] px-3 py-2 rounded-full bg-muted border border-border/50 shrink-0"
+              className="hidden lg:flex h-9 items-center gap-1.5 text-[11px] min-w-0 max-w-[220px] lg:max-w-[260px] px-3 rounded-xl bg-muted border border-border/50 shrink-0"
               style={{ color: 'var(--ds-on-surface-variant)' }}
               aria-label="مسار الصفحة الحالية"
             >
@@ -191,7 +185,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                 {pageTitle}
               </span>
             </div>
-            <div className="w-full max-w-2xl lg:max-w-3xl mx-auto flex-1">
+            <div className="w-full max-w-xl lg:max-w-2xl mx-auto flex-1">
               <GlobalSearch />
             </div>
           </div>
@@ -214,8 +208,8 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className={cn(
-                    'flex items-center gap-2 h-10 ps-1.5 pe-2.5 rounded-full transition-colors border shadow-sm',
+                className={cn(
+                    'flex items-center gap-2 h-9 ps-1 pe-2 rounded-xl transition-colors border shadow-sm',
                     'border-border/70 bg-card/95 hover:bg-muted/70',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                   )}
@@ -225,11 +219,11 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                       src={profileAvatarUrl}
                       alt={displayName}
                       title={displayName}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-2 ring-background"
+                      className="w-7 h-7 rounded-full object-cover flex-shrink-0 ring-2 ring-background"
                     />
                   ) : (
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ring-2 ring-background"
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ring-2 ring-background"
                       style={{ background: 'linear-gradient(135deg, #2642e6, #465fff)' }}
                       title={displayName}
                     >
@@ -305,7 +299,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
         {/* ── Page content ─────────────────────────────────── */}
         <div
           key={pageKey}
-          className="flex-1 overflow-auto p-4 sm:p-5 lg:p-6 xl:p-8 min-h-0 flex flex-col page-enter"
+          className="app-content-shell flex-1 overflow-auto min-h-0 flex flex-col page-enter"
           style={{ background: 'var(--ds-surface)' }}
         >
           {children}

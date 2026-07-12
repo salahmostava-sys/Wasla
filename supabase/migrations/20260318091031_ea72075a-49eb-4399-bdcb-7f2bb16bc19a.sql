@@ -1,1 +1,1 @@
-ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS health_insurance_expiry date;
+﻿ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS health_insurance_expiry date;

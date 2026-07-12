@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- Security findings fix:
 -- 1) Open signup auto-assigns 'viewer' role + profiles defaulted to is_active=true
 --    which caused any new authenticated user to pass `is_active_user()` and read PII.
@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, name, is_active)

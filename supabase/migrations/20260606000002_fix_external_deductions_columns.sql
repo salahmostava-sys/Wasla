@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: calculate_employee_salary - wrong column names on
 --      external_deductions table.
 --
@@ -36,7 +36,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_employee RECORD;

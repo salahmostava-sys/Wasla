@@ -2,13 +2,6 @@
 type MonthlyRowLike = { employee_name: string; km_total: number; fuel_cost: number; orders_count: number };
 type DailyRowLike = { km_total: number; fuel_cost: number; employee?: { name: string } };
 
-export const costPerKmColor = (v: number | null) => {
-  if (v === null || v === 0) return 'text-muted-foreground';
-  if (v < 0.2) return 'text-success font-semibold';
-  if (v <= 0.35) return 'text-warning font-semibold';
-  return 'text-destructive font-semibold';
-};
-
 export const fuelPerOrderBadgeClass = (v: number | null) => {
   if (v === null || !Number.isFinite(v)) return null;
   if (v < 0.5) return { label: 'ممتاز', className: 'badge-success' };

@@ -1,4 +1,4 @@
--- Migration: Add platform breakdown to salary preview
+﻿-- Migration: Add platform breakdown to salary preview
 -- Date: 2026-04-07
 -- Description: Extends preview_salary_for_month with per-platform earnings
 --              breakdown so the salaries UI can reflect shift/hybrid schema changes.
@@ -22,7 +22,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

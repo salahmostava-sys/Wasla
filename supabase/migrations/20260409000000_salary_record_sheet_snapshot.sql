@@ -1,4 +1,4 @@
-ALTER TABLE public.salary_records
+﻿ALTER TABLE public.salary_records
 ADD COLUMN IF NOT EXISTS sheet_snapshot JSONB;
 
 COMMENT ON COLUMN public.salary_records.sheet_snapshot IS

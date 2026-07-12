@@ -1,4 +1,4 @@
--- Align salary engine with the salaries sheet:
+﻿-- Align salary engine with the salaries sheet:
 -- 1. Orders earnings use per-app pricing rules and attached salary schemes.
 -- 2. Fixed monthly schemes are prorated once per shared scheme id.
 -- 3. Month-wide salary calculations include active admin titles and any employee
@@ -15,7 +15,7 @@ RETURNS BOOLEAN
 LANGUAGE sql
 IMMUTABLE
 AS $$
-  SELECT COALESCE(p_job_title, '') ~* '(admin|administrator|manager|supervisor|coordinator|accountant|finance|financial|hr|human resources|operations|operation|office|reception|support|customer service|it|logistics|fleet|procurement|purchasing|payroll|إدارة|ادارة|إداري|اداري|مدير|مشرف|منسق|محاسب|مالية|مالي|موارد|شؤون|استقبال|خدمة عملاء|دعم|تقنية|عمليات|تشغيل|لوجست)';
+  SELECT COALESCE(p_job_title, '') ~* '(admin|administrator|manager|supervisor|coordinator|accountant|finance|financial|hr|human resources|operations|operation|office|reception|support|customer service|it|logistics|fleet|procurement|purchasing|payroll|Ø¥Ø¯Ø§Ø±Ø©|Ø§Ø¯Ø§Ø±Ø©|Ø¥Ø¯Ø§Ø±ÙŠ|Ø§Ø¯Ø§Ø±ÙŠ|Ù…Ø¯ÙŠØ±|Ù…Ø´Ø±Ù|Ù…Ù†Ø³Ù‚|Ù…ØØ§Ø³Ø¨|Ù…Ø§Ù„ÙŠØ©|Ù…Ø§Ù„ÙŠ|Ù…ÙˆØ§Ø±Ø¯|Ø´Ø¤ÙˆÙ†|Ø§Ø³ØªÙ‚Ø¨Ø§Ù„|Ø®Ø¯Ù…Ø© Ø¹Ù…Ù„Ø§Ø¡|Ø¯Ø¹Ù…|ØªÙ‚Ù†ÙŠØ©|Ø¹Ù…Ù„ÙŠØ§Øª|ØªØ´ØºÙŠÙ„|Ù„ÙˆØ¬Ø³Øª)';
 $$;
 
 CREATE OR REPLACE FUNCTION public.calculate_order_salary_for_app(
@@ -32,7 +32,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_orders INTEGER := GREATEST(COALESCE(p_orders, 0), 0);
@@ -179,7 +179,7 @@ CREATE OR REPLACE FUNCTION public.is_salary_month_visible_employee(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE := to_date(p_month_year || '-01', 'YYYY-MM-DD');
@@ -264,7 +264,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -553,7 +553,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_emp RECORD;
@@ -598,7 +598,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

@@ -345,7 +345,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -515,7 +515,7 @@ CREATE OR REPLACE FUNCTION public.capture_salary_month_snapshot(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_snapshot JSONB;

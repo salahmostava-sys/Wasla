@@ -1,7 +1,7 @@
 import { appService } from '@services/appService';
 import { useAuthedQuery } from '@shared/hooks/useAuthedQuery';
 
-export const appsDataQueryKey = (userId: string) => ['apps', userId, 'list-with-counts'] as const;
+const appsDataQueryKey = (userId: string) => ['apps', userId, 'list-with-counts'] as const;
 
 type AppWithCount = {
   id: string;

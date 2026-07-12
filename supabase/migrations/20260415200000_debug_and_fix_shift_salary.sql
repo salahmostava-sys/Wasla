@@ -1,4 +1,4 @@
--- Debug and fix: the preview function reads scheme but monthly_amount returns NULL
+﻿-- Debug and fix: the preview function reads scheme but monthly_amount returns NULL
 -- Possible cause: RLS blocks the read even with SECURITY DEFINER
 -- Fix: use explicit schema and bypass RLS
 
@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION public.test_shift_salary()
 RETURNS TABLE (app_name TEXT, scheme_name TEXT, monthly_amount NUMERIC, daily_rate NUMERIC)
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
   SELECT a.name, s.name, s.monthly_amount, s.monthly_amount / _const_days_per_month()
   FROM apps a

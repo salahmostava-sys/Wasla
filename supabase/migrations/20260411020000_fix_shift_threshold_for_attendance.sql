@@ -1,4 +1,4 @@
--- Fix shift day threshold: count any day with hours_worked > 0 as a shift day.
+﻿-- Fix shift day threshold: count any day with hours_worked > 0 as a shift day.
 -- Previously required >= 8 hours, but the UI now uses 1 = present / 0 = absent.
 
 CREATE OR REPLACE FUNCTION public.calculate_employee_salary(
@@ -26,7 +26,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_employee RECORD;

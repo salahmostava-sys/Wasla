@@ -38,7 +38,10 @@ interface UserProfile {
   email: string | null;
 }
 
+type ReferenceLabels = Record<string, string>;
+
 const PAGE_SIZE = 25;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const actionColors: Record<string, string> = {
   INSERT: 'bg-success/10 text-success border-success/20',
@@ -55,23 +58,49 @@ const actionLabels: Record<string, { ar: string; en: string }> = {
 const tableLabels: Record<string, { ar: string; en: string }> = {
   // Core HR
   employees:              { ar: 'الموظفون', en: 'Employees' },
+  employee_scheme:        { ar: 'سكيم الموظف', en: 'Employee Scheme' },
+  employee_tiers:         { ar: 'شرائح الموظفين', en: 'Employee Tiers' },
+  employee_roles:         { ar: 'أدوار الموظفين', en: 'Employee Roles' },
+  employee_targets:       { ar: 'أهداف الموظفين', en: 'Employee Targets' },
   attendance:             { ar: 'الحضور', en: 'Attendance' },
+  attendance_status_configs: { ar: 'إعدادات حالات الحضور', en: 'Attendance Status Settings' },
   daily_shifts:           { ar: 'الدوام', en: 'Shifts' },
+  leave_requests:         { ar: 'طلبات الإجازة', en: 'Leave Requests' },
+  hr_performance_reviews: { ar: 'تقييمات الأداء', en: 'Performance Reviews' },
+  departments:            { ar: 'الأقسام', en: 'Departments' },
+  positions:              { ar: 'المسميات الوظيفية', en: 'Positions' },
   advances:               { ar: 'السلف', en: 'Advances' },
+  advance_installments:   { ar: 'أقساط السلف', en: 'Advance Installments' },
   salary_records:         { ar: 'الرواتب', en: 'Salaries' },
   salary_deductions:      { ar: 'خصومات الرواتب', en: 'Salary Deductions' },
   external_deductions:    { ar: 'الخصومات الخارجية', en: 'External Deductions' },
   // Orders
   daily_orders:           { ar: 'الطلبات', en: 'Orders' },
+  order_import_batches:   { ar: 'دفعات استيراد الطلبات', en: 'Order Import Batches' },
   apps:                   { ar: 'التطبيقات', en: 'Apps' },
+  app_monthly_activations:{ ar: 'تفعيل التطبيقات الشهري', en: 'Monthly App Activations' },
+  app_targets:            { ar: 'أهداف التطبيقات', en: 'App Targets' },
   employee_apps:          { ar: 'تعيينات التطبيقات', en: 'Employee Apps' },
+  platform_accounts:      { ar: 'حسابات المنصات', en: 'Platform Accounts' },
+  account_assignments:    { ar: 'تعيين الحسابات', en: 'Account Assignments' },
   // Vehicles
   vehicles:               { ar: 'المركبات', en: 'Vehicles' },
   vehicle_assignments:    { ar: 'تسليم العهد', en: 'Vehicle Assignments' },
+  vehicle_documents:      { ar: 'مستندات المركبات', en: 'Vehicle Documents' },
+  vehicle_mileage:        { ar: 'عداد المركبات', en: 'Vehicle Mileage' },
+  vehicle_mileage_daily:  { ar: 'عداد المركبات اليومي', en: 'Daily Vehicle Mileage' },
   fuel_records:           { ar: 'سجل الوقود', en: 'Fuel Records' },
   maintenance_records:    { ar: 'صيانة المركبات', en: 'Maintenance' },
+  maintenance_logs:       { ar: 'سجلات الصيانة', en: 'Maintenance Logs' },
+  maintenance_parts:      { ar: 'قطع الصيانة', en: 'Maintenance Parts' },
   spare_parts:            { ar: 'قطع الغيار', en: 'Spare Parts' },
   vehicle_fines:          { ar: 'مخالفات المركبات', en: 'Vehicle Fines' },
+  // Finance
+  employee_wallet_transactions: { ar: 'حركات محفظة الموظف', en: 'Employee Wallet Transactions' },
+  treasury_accounts:      { ar: 'حسابات الخزينة', en: 'Treasury Accounts' },
+  treasury_categories:    { ar: 'تصنيفات الخزينة', en: 'Treasury Categories' },
+  treasury_transactions:  { ar: 'حركات الخزينة', en: 'Treasury Transactions' },
+  finance_transactions:   { ar: 'الحركات المالية', en: 'Finance Transactions' },
   // System
   alerts:                 { ar: 'التنبيهات', en: 'Alerts' },
   profiles:               { ar: 'الملفات الشخصية', en: 'Profiles' },
@@ -79,8 +108,18 @@ const tableLabels: Record<string, { ar: string; en: string }> = {
   user_permissions:       { ar: 'الصلاحيات', en: 'Permissions' },
   system_settings:        { ar: 'إعدادات النظام', en: 'System Settings' },
   trade_registers:        { ar: 'السجل التجاري', en: 'Trade Registers' },
+  commercial_records:     { ar: 'السجلات التجارية', en: 'Commercial Records' },
   salary_slips:           { ar: 'قسائم الرواتب', en: 'Salary Slips' },
   slip_templates:         { ar: 'قوالب القسائم', en: 'Slip Templates' },
+  salary_schemes:         { ar: 'سكيمات الرواتب', en: 'Salary Schemes' },
+  salary_scheme_tiers:    { ar: 'شرائح سكيمات الرواتب', en: 'Salary Scheme Tiers' },
+  salary_tiers:           { ar: 'شرائح الرواتب', en: 'Salary Tiers' },
+  salary_drafts:          { ar: 'مسودات الرواتب', en: 'Salary Drafts' },
+  salary_month_snapshots: { ar: 'لقطات الرواتب الشهرية', en: 'Salary Month Snapshots' },
+  salary_slip_templates:  { ar: 'قوالب قسائم الرواتب', en: 'Salary Slip Templates' },
+  scheme_month_snapshots: { ar: 'لقطات السكيم الشهرية', en: 'Scheme Month Snapshots' },
+  pricing_rules:          { ar: 'قواعد التسعير', en: 'Pricing Rules' },
+  locked_months:          { ar: 'الشهور المقفلة', en: 'Locked Months' },
 };
 
 /** Arabic labels for common DB field names */
@@ -92,7 +131,7 @@ const FIELD_LABELS: Record<string, string> = {
   amount: 'المبلغ',
   date: 'التاريخ',
   notes: 'ملاحظات',
-  employee_id: 'الموظف',
+  employee_id: 'اسم الموظف',
   app_id: 'التطبيق',
   hours_worked: 'ساعات العمل',
   attendance_status: 'حالة الحضور',
@@ -112,7 +151,31 @@ const FIELD_LABELS: Record<string, string> = {
   phone: 'الجوال',
   email: 'البريد الإلكتروني',
   role: 'الدور',
+  orders_count: 'عدد الطلبات',
+  source: 'المصدر',
+  month_year: 'الشهر',
+  payment_method: 'طريقة الدفع',
+  manual_deduction: 'خصم يدوي',
+  manual_deduction_note: 'ملاحظة الخصم',
+  license_plate: 'رقم اللوحة',
+  model: 'الموديل',
+  year: 'السنة',
+  color: 'اللون',
+  is_active: 'الحالة',
+  can_view: 'صلاحية العرض',
+  can_edit: 'صلاحية التعديل',
+  can_delete: 'صلاحية الحذف',
+  permission_key: 'الصفحة',
 };
+
+const TECHNICAL_FIELDS = new Set([
+  'id',
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by',
+  'import_batch_id',
+]);
 
 const toShortText = (value: unknown) => {
   if (value === null || value === undefined) return '—';
@@ -120,43 +183,78 @@ const toShortText = (value: unknown) => {
   return str.length > 30 ? `${str.slice(0, 30)}...` : str;
 };
 
-const buildChangeSummary = (log: AuditLog) => {
+const toReadableValue = (key: string, value: unknown, referenceLabels: ReferenceLabels = {}) => {
+  if (value === null || value === undefined || value === '') return 'غير محدد';
+  if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
+  if (typeof value === 'number') return value.toLocaleString('en-US');
+  if (typeof value === 'string') {
+    if ((key.endsWith('_id') || key === 'id') && referenceLabels[value]) return referenceLabels[value];
+    if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return format(new Date(value), 'yyyy-MM-dd HH:mm');
+    return value;
+  }
+  return JSON.stringify(value);
+};
+
+const visibleEntries = (value: Record<string, unknown>) =>
+  Object.entries(value).filter(([key]) => !TECHNICAL_FIELDS.has(key));
+
+const fieldLabel = (key: string) => FIELD_LABELS[key] ?? key.replaceAll('_', ' ');
+
+const collectAuditReferenceIds = (logs: AuditLog[]) => {
+  const employeeIds = new Set<string>();
+  const appIds = new Set<string>();
+
+  logs.forEach((log) => {
+    [log.old_value, log.new_value].forEach((payload) => {
+      if (!payload) return;
+      const employeeId = payload.employee_id;
+      const appId = payload.app_id;
+      if (typeof employeeId === 'string' && UUID_PATTERN.test(employeeId)) employeeIds.add(employeeId);
+      if (typeof appId === 'string' && UUID_PATTERN.test(appId)) appIds.add(appId);
+    });
+  });
+
+  return {
+    employeeIds: Array.from(employeeIds),
+    appIds: Array.from(appIds),
+  };
+};
+
+const changedEntries = (log: AuditLog, referenceLabels: ReferenceLabels = {}) => {
+  const oldValue = log.old_value || {};
+  const newValue = log.new_value || {};
+  const keys = Array.from(new Set([...Object.keys(oldValue), ...Object.keys(newValue)]));
+  return keys
+    .filter((key) => !TECHNICAL_FIELDS.has(key))
+    .filter((key) => JSON.stringify(oldValue[key]) !== JSON.stringify(newValue[key]))
+    .map((key) => ({
+      key,
+      label: fieldLabel(key),
+      before: toReadableValue(key, oldValue[key], referenceLabels),
+      after: toReadableValue(key, newValue[key], referenceLabels),
+    }));
+};
+
+const buildChangeSummary = (log: AuditLog, referenceLabels: ReferenceLabels = {}) => {
   const oldV = log.old_value || {};
   const newV = log.new_value || {};
 
-  const label = (k: string) => FIELD_LABELS[k] ?? k;
-
   if (log.action === 'INSERT') {
-    return Object.entries(newV)
-      .filter(([k]) => !['id', 'created_at', 'updated_at'].includes(k))
+    return visibleEntries(newV)
       .slice(0, 3)
-      .map(([k, v]) => `${label(k)}: ${toShortText(v)}`)
+      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(key, value, referenceLabels))}`)
       .join(' | ');
   }
   if (log.action === 'DELETE') {
-    return Object.entries(oldV)
-      .filter(([k]) => !['id', 'created_at', 'updated_at'].includes(k))
+    return visibleEntries(oldV)
       .slice(0, 3)
-      .map(([k, v]) => `${label(k)}: ${toShortText(v)}`)
+      .map(([key, value]) => `${fieldLabel(key)}: ${toShortText(toReadableValue(key, value, referenceLabels))}`)
       .join(' | ');
   }
-  const keys = Array.from(new Set([...Object.keys(oldV), ...Object.keys(newV)]));
-  const changed = keys
-    .filter((k) => !['id', 'created_at', 'updated_at'].includes(k))
-    .filter((k) => JSON.stringify(oldV[k]) !== JSON.stringify(newV[k]))
+  return changedEntries(log, referenceLabels)
     .slice(0, 3)
-    .map((k) => `${label(k)}: ${toShortText(oldV[k])} ← ${toShortText(newV[k])}`);
-  return changed.join(' | ');
-};
-
-const formatJson = (obj: Record<string, unknown> | null) => {
-  if (!obj || Object.keys(obj).length === 0) return '—';
-  try {
-    return JSON.stringify(obj, null, 2);
-  } catch (e) {
-    logError('[ActivityLog] formatJson failed', e);
-    return '[unserializable-object]';
-  }
+    .map((entry) => `${entry.label}: ${entry.before} ← ${entry.after}`)
+    .join(' | ');
 };
 
 const SKELETON_ROWS = Array.from({ length: 6 }, (_, i) => `skeleton-row-${i}`);
@@ -242,14 +340,18 @@ export default function ActivityLogContent() {
         profiles.forEach((p) => { profileMap[p.id] = { name: p.name, email: p.email }; });
       }
 
+      const rows = (data || []).map((l) => ({
+        ...l,
+        old_value: l.old_value as Record<string, unknown> | null,
+        new_value: l.new_value as Record<string, unknown> | null,
+        profile: l.user_id ? (profileMap[l.user_id] ?? null) : null,
+      }));
+      const referenceLabels = await settingsHubService.getAuditReferenceLabels(collectAuditReferenceIds(rows));
+
       return {
-        rows: (data || []).map((l) => ({
-          ...l,
-          old_value: l.old_value as Record<string, unknown> | null,
-          new_value: l.new_value as Record<string, unknown> | null,
-          profile: l.user_id ? (profileMap[l.user_id] ?? null) : null,
-        })),
+        rows,
         total: count || 0,
+        referenceLabels,
       };
     },
     retry: defaultQueryRetry,
@@ -263,6 +365,8 @@ export default function ActivityLogContent() {
 
   useEffect(() => { setPage(0); }, [filterAction, filterTable, filterUserId, debouncedSearch]);
   useEffect(() => { setExpandedId(null); }, [page]);
+
+  const referenceLabels = logsData?.referenceLabels ?? {};
 
   const handleExport = async () => {
     try {
@@ -544,9 +648,9 @@ export default function ActivityLogContent() {
                             <p
                               className="text-[10px] font-mono truncate max-w-[220px] text-muted-foreground"
                               
-                              title={buildChangeSummary(log)}
+                              title={buildChangeSummary(log, referenceLabels)}
                             >
-                              {buildChangeSummary(log) || '—'}
+                              {buildChangeSummary(log, referenceLabels) || '—'}
                             </p>
                           )}
                           {log.record_id && (
@@ -584,61 +688,64 @@ export default function ActivityLogContent() {
                           </div>
 
                           {log.action === 'UPDATE' && (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                              <div>
-                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
-                                  <span className="text-rose-500">●</span> قبل التعديل
-                                </p>
-                                <pre
-                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
-                                  
-                                  dir="ltr"
-                                >
-                                  {formatJson(log.old_value)}
-                                </pre>
-                              </div>
-                              <div>
-                                <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
-                                  <span className="text-emerald-500">●</span> بعد التعديل
-                                </p>
-                                <pre
-                                  className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
-                                  
-                                  dir="ltr"
-                                >
-                                  {formatJson(log.new_value)}
-                                </pre>
-                              </div>
+                            <div className="rounded-lg border border-border overflow-hidden">
+                              <table className="w-full text-xs">
+                                <thead className="bg-muted">
+                                  <tr>
+                                    <th className="p-2 text-start font-semibold">البيان</th>
+                                    <th className="p-2 text-start font-semibold">قبل التعديل</th>
+                                    <th className="p-2 text-start font-semibold">بعد التعديل</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {changedEntries(log, referenceLabels).map((entry) => (
+                                    <tr key={entry.key} className="border-t border-border">
+                                      <td className="p-2 font-medium text-foreground">{entry.label}</td>
+                                      <td className="p-2 text-muted-foreground">{entry.before}</td>
+                                      <td className="p-2 text-foreground">{entry.after}</td>
+                                    </tr>
+                                  ))}
+                                  {changedEntries(log, referenceLabels).length === 0 && (
+                                    <tr>
+                                      <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                                        لا توجد تغييرات واضحة للعرض.
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
                             </div>
                           )}
 
                           {log.action === 'INSERT' && (
                             <div>
                               <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
-                                <span className="text-emerald-500">●</span> البيانات المضافة
+                                <span className="text-emerald-500">●</span> البيانات التي تمت إضافتها
                               </p>
-                              <pre
-                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
-                                
-                                dir="ltr"
-                              >
-                                {formatJson(log.new_value)}
-                              </pre>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {visibleEntries(log.new_value || {}).map(([key, value]) => (
+                                  <div key={key} className="rounded-lg border border-border bg-muted/40 p-2">
+                                    <p className="text-[10px] text-muted-foreground">{fieldLabel(key)}</p>
+                                    <p className="text-xs font-medium text-foreground">{toReadableValue(key, value, referenceLabels)}</p>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
                           {log.action === 'DELETE' && (
                             <div>
                               <p className="text-[10px] font-semibold mb-1.5 flex items-center gap-1 text-foreground" >
-                                <span className="text-rose-500">●</span> البيانات المحذوفة
+                                <span className="text-rose-500">●</span> البيانات التي تم حذفها
                               </p>
-                              <pre
-                                className="text-[10px] font-mono p-2 rounded-lg overflow-x-auto max-h-72 overflow-y-auto whitespace-pre-wrap break-all bg-muted border border-border text-muted-foreground"
-                                
-                                dir="ltr"
-                              >
-                                {formatJson(log.old_value)}
-                              </pre>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {visibleEntries(log.old_value || {}).map(([key, value]) => (
+                                  <div key={key} className="rounded-lg border border-border bg-muted/40 p-2">
+                                    <p className="text-[10px] text-muted-foreground">{fieldLabel(key)}</p>
+                                    <p className="text-xs font-medium text-foreground">{toReadableValue(key, value, referenceLabels)}</p>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>

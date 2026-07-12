@@ -5,11 +5,15 @@
     "server"
   ],
   "devDependencies": {
+    "concurrently": "^9.2.4",
     "husky": "^9.1.7",
     "shx": "^0.4.0"
   },
   "scripts": {
     "prepare": "husky || true",
+    "dev": "concurrently -n api,web -c cyan,green \"npm run dev -w server\" \"npm run dev -w frontend -- --host 0.0.0.0 --port 5173\"",
+    "dev:server": "npm run dev -w server",
+    "dev:frontend": "npm run dev -w frontend -- --host 0.0.0.0 --port 5173",
     "build": "cd frontend && npm run build && shx rm -rf ../public && shx cp -r dist ../public"
   },
   "dependencies": {

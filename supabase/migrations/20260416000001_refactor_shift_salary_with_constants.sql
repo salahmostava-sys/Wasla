@@ -1,4 +1,4 @@
--- Refactored: Shift salary with constants (fixes SonarCloud CRITICAL issues)
+﻿-- Refactored: Shift salary with constants (fixes SonarCloud CRITICAL issues)
 -- Original: 20260415220000_shift_salary_always_full_month.sql
 -- Changes: Replace duplicated literals with constants
 
@@ -193,7 +193,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

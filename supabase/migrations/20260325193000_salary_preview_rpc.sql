@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Read-only salary preview RPC (no persistence)
 -- Used by edge function to power Salaries table preview from backend engine.
 -- ============================================================================
@@ -16,7 +16,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

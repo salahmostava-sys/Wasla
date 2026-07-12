@@ -10,6 +10,7 @@
  */
 
 import { createRequire } from 'node:module';
+import { randomUUID } from 'node:crypto';
 
 const require = createRequire(import.meta.url);
 
@@ -91,7 +92,7 @@ async function executeSalaryEngineMode(adminClient, payload) {
 }
 
 export async function salaryEngineHandler(req, res) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
   try {
     const auth = await requireAuth(req, res);
     if (!auth) return;
@@ -139,12 +140,11 @@ export async function salaryEngineHandler(req, res) {
 async function handleCreateUser(supabaseAdmin, { email, password, name, role }) {
   const normalizedEmail = String(email ?? '').trim().toLowerCase();
   const normalizedName = String(name ?? '').trim();
-  const normalizedRole = String(role ?? 'viewer').trim();
+  const normalizedRole = normalizeAppRole(role);
 
   if (!normalizedEmail?.includes('@')) throw new Error('Invalid email');
   if (!password || String(password).length < 8) throw new Error('Password must be at least 8 characters');
   if (!normalizedName) throw new Error('name is required');
-  if (!VALID_ROLES.has(normalizedRole)) throw new Error('Invalid role');
 
   let createdUserId = null;
   try {
@@ -223,14 +223,17 @@ async function updateProfileLayer(supabaseAdmin, user_id, { email, name, is_acti
 
 async function updateRoleLayer(supabaseAdmin, user_id, role) {
   if (role === undefined) return;
-  const normalizedRole = role.toLowerCase().trim();
-  if (!['admin', 'operations', 'supervisor', 'accountant'].includes(normalizedRole)) {
-    throw new Error('Invalid role specified');
-  }
-  const { error: roleError } = await supabaseAdmin.from('user_roles')
+  const normalizedRole = normalizeAppRole(role);
+  const { data: updatedRows, error: roleError } = await supabaseAdmin.from('user_roles')
     .update({ role: normalizedRole })
-    .eq('user_id', user_id);
+    .eq('user_id', user_id)
+    .select('id');
   if (roleError) throw roleError;
+  if (updatedRows?.length) return;
+
+  const { error: insertRoleError } = await supabaseAdmin.from('user_roles')
+    .insert({ user_id, role: normalizedRole });
+  if (insertRoleError) throw insertRoleError;
 }
 
 async function handleUpdateUser(supabaseAdmin, user_id, { email, password, name, role, is_active }) {
@@ -238,6 +241,12 @@ async function handleUpdateUser(supabaseAdmin, user_id, { email, password, name,
   await updateProfileLayer(supabaseAdmin, user_id, { email, name, is_active });
   await updateRoleLayer(supabaseAdmin, user_id, role);
   return { success: true };
+}
+
+function normalizeAppRole(role) {
+  const normalizedRole = String(role ?? 'viewer').trim().toLowerCase();
+  if (!VALID_ROLES.has(normalizedRole)) throw new Error('Invalid role');
+  return normalizedRole;
 }
 
 async function dispatchAction(supabaseAdmin, normalizedAction, { user_id, password, email, name, role, is_active }, callerId) {
@@ -258,22 +267,38 @@ function classifyAdminError(message) {
   return { status: 500, safeMessage: 'Internal server error' };
 }
 
+async function checkUserManagementAccess(callerClient, callerUserId) {
+  const { data: roleRows, error: roleError } = await callerClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', callerUserId);
+  if (roleError) throw new Error(roleError.message);
+
+  const callerRoles = new Set((roleRows ?? []).map(r => r.role));
+  if (callerRoles.has('admin')) return true;
+
+  // Delegated access: a non-admin can be granted "settings" edit permission via the
+  // permissions matrix (user_permissions), which unlocks user/permission management too.
+  const { data: settingsPerm, error: settingsPermError } = await callerClient
+    .from('user_permissions')
+    .select('can_edit')
+    .eq('user_id', callerUserId)
+    .eq('permission_key', 'settings')
+    .maybeSingle();
+  if (settingsPermError) throw new Error(settingsPermError.message);
+  return Boolean(settingsPerm?.can_edit);
+}
+
 export async function adminUpdateUserHandler(req, res) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
   try {
     const auth = await requireAuth(req, res);
     if (!auth) return;
     const { user: callerUser, callerClient } = auth;
 
-    const { data: roleRows, error: roleError } = await callerClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', callerUser.id);
-    if (roleError) throw new Error(roleError.message);
-
-    const callerRoles = new Set((roleRows ?? []).map(r => r.role));
-    if (!callerRoles.has('admin')) {
-      return res.status(403).json({ error: 'Only admins can update users' });
+    const hasUserManagementAccess = await checkUserManagementAccess(callerClient, callerUser.id);
+    if (!hasUserManagementAccess) {
+      return res.status(403).json({ error: 'Only admins or users with settings management access can update users' });
     }
 
     const supabaseAdmin = getAdminClient();
@@ -284,8 +309,7 @@ export async function adminUpdateUserHandler(req, res) {
     }
 
     const { user_id, password, email, name, role, is_active, action } = req.body;
-    let normalizedAction = action;
-    if (!normalizedAction && password) normalizedAction = 'update_password';
+    const normalizedAction = action || (password ? 'update_password' : undefined);
     if (!normalizedAction) throw new Error('action is required');
 
     if (normalizedAction !== 'create_user') {
@@ -308,7 +332,7 @@ export async function adminUpdateUserHandler(req, res) {
 // ─── Groq Chat ────────────────────────────────────────────────────────────────
 
 export async function groqChatHandler(req, res) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
   try {
     if (!GROQ_API_KEY) {
       logError('GROQ_API_KEY not configured', { request_id: requestId });
@@ -398,7 +422,7 @@ async function handleAiToolCalls(responseMessage, conversation, callerClient, us
 }
 
 export async function aiChatHandler(req, res) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomUUID();
   try {
     if (!GROQ_API_KEY) {
       return res.status(500).json({ error: 'GROQ_API_KEY not configured' });

@@ -1,7 +1,7 @@
 import { orderService } from '@services/orderService';
 import { useAuthedQuery } from '@shared/hooks/useAuthedQuery';
 
-export const ordersQueryKey = (userId: string) => ['orders', userId] as const;
+const ordersQueryKey = (userId: string) => ['orders', userId] as const;
 
 export const useOrders = () => {
   return useAuthedQuery({

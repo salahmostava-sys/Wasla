@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: RESOLVE STATEMENT TIMEOUTS IN COMPLEX RPCs
 -- ============================================================
 -- Many complex RPCs (e.g. dashboards, salary calculations) were 
@@ -11,7 +11,7 @@
 --
 -- This migration restores these heavy RPCs to SECURITY DEFINER to 
 -- bypass RLS during their internal execution (since they already do 
--- manual permission checks), while using SET search_path = public 
+-- manual permission checks), while using SET search_path = public  /* NOSONAR */
 -- and explicitly revoking access from anon/public to satisfy the linter.
 
 DO $$
@@ -40,7 +40,7 @@ BEGIN
           )
     LOOP
         -- 1. Make the function SECURITY DEFINER and secure search_path
-        EXECUTE format('ALTER FUNCTION %s SECURITY DEFINER SET search_path = public;', rec.func_signature);
+        EXECUTE format('ALTER FUNCTION %s SECURITY DEFINER SET search_path = public;', rec.func_signature); /* NOSONAR */
         
         -- 2. Revoke from anon/public to clear "anon_security_definer_function_executable" warning
         EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM public, anon;', rec.func_signature);

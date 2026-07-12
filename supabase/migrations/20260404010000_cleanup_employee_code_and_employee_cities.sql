@@ -1,4 +1,4 @@
-BEGIN;
+﻿BEGIN;
 
 UPDATE public.employees
 SET preferred_language = 'ar'
@@ -55,6 +55,6 @@ ALTER TABLE public.employees
   DROP COLUMN IF EXISTS employee_code;
 
 COMMENT ON COLUMN public.employees.cities IS
-  'قائمة المدن المسموح للموظف العمل فيها، وأول عنصر منها يمثل المدينة الرئيسية.';
+  'Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…Ø¯Ù† Ø§Ù„Ù…Ø³Ù…ÙˆØ Ù„Ù„Ù…ÙˆØ¸Ù Ø§Ù„Ø¹Ù…Ù„ ÙÙŠÙ‡Ø§ØŒ ÙˆØ£ÙˆÙ„ Ø¹Ù†ØµØ± Ù…Ù†Ù‡Ø§ ÙŠÙ…Ø«Ù„ Ø§Ù„Ù…Ø¯ÙŠÙ†Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©.';
 
 COMMIT;

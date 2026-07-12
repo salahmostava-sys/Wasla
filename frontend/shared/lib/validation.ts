@@ -10,7 +10,7 @@ export const DEFAULT_ALLOWED_UPLOAD_TYPES = [
   'application/pdf',
 ];
 
-export const DEFAULT_MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB
+const DEFAULT_MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB
 
 export function validateUploadFile(
   file: File,

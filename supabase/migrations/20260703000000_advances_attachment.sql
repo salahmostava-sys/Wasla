@@ -1,4 +1,4 @@
--- Add attachment_url column to advances table
+﻿-- Add attachment_url column to advances table
 ALTER TABLE public.advances ADD COLUMN IF NOT EXISTS attachment_url TEXT;
 
 -- Create the advance-attachments bucket

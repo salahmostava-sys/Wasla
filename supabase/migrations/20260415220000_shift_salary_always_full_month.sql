@@ -1,4 +1,4 @@
--- Shift salary = always full monthly_amount
+﻿-- Shift salary = always full monthly_amount
 -- Attendance/daily_shifts are completely decoupled from salary calculation.
 -- Only orders-based platforms use daily data for salary.
 
@@ -78,7 +78,7 @@ BEGIN
 
           v_total_shift_days := v_total_shift_days + v_app_shift_days;
 
-          -- Salary = (monthly_amount / 30) × actual shift days
+          -- Salary = (monthly_amount / 30) Ã— actual shift days
           v_monthly_amount := COALESCE(v_app.monthly_amount, 0);
           IF v_monthly_amount > 0 AND v_app_shift_days > 0 THEN
             v_app_earnings := ROUND((v_monthly_amount / _const_days_per_month()) * v_app_shift_days);
@@ -187,7 +187,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -247,7 +247,7 @@ BEGIN
 
     ELSIF v_app.work_type = _const_work_shift() THEN
       -- === SHIFT: salary from daily_shifts (NOT attendance table) ===
-      -- Salary = (monthly_amount / 30) × actual shift days from daily_shifts
+      -- Salary = (monthly_amount / 30) Ã— actual shift days from daily_shifts
       IF EXISTS(
         SELECT 1 FROM public.employee_apps ea
         WHERE ea.employee_id = p_employee_id AND ea.app_id = v_app.id

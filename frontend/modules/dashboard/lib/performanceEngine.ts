@@ -66,6 +66,11 @@ export interface FleetPerformanceSummary {
   totalOrdersDelta: ComparisonResult;
   activeRiders: number;
   avgOrdersPerRider: number;
+  avgOrdersPerActiveDay: number;
+  projectedOrders: number | null;
+  targetHitProjected: boolean | null;
+  dailyRunRate: number;
+  dailyRunRateDelta: ComparisonResult;
   avgOrdersDelta: ComparisonResult;
   avgPerformanceScore: number;
   topPerformer: RiderPerformanceProfile | null;
@@ -73,14 +78,6 @@ export interface FleetPerformanceSummary {
   mostImproved: RiderPerformanceProfile | null;
   mostDeclined: RiderPerformanceProfile | null;
   distribution: { excellent: number; good: number; average: number; weak: number };
-}
-
-export interface MonthTrendPoint {
-  monthYear: string;
-  totalOrders: number;
-  activeRiders: number;
-  avgOrdersPerRider: number;
-  growthPct: number;
 }
 
 // ─── Weights for Performance Score ───────────────────────────────────────────
@@ -244,42 +241,6 @@ export function compareValues(current: number, previous: number): ComparisonResu
   };
 }
 
-/**
- * Produce a comparison result from dashboard month comparison data.
- */
-export function buildMonthComparison(
-  comparison: PerformanceDashboardResponse['comparison'],
-): { month: ComparisonResult; week: ComparisonResult } {
-  return {
-    month: compareValues(comparison.month.currentOrders, comparison.month.previousOrders),
-    week: compareValues(comparison.week.currentOrders, comparison.week.previousOrders),
-  };
-}
-
-/**
- * Build monthly trend data from dashboard response.
- */
-export function buildMonthlyTrend(
-  monthlyTrend: PerformanceDashboardResponse['monthlyTrend'],
-): MonthTrendPoint[] {
-  if (!monthlyTrend || monthlyTrend.length === 0) return [];
-
-  return monthlyTrend.map((m, i) => {
-    const prev = i > 0 ? monthlyTrend[i - 1] : null;
-    const growthPct = prev
-      ? computeGrowthRate(m.totalOrders, prev.totalOrders).rate
-      : 0;
-
-    return {
-      monthYear: m.monthYear,
-      totalOrders: m.totalOrders,
-      activeRiders: m.activeRiders,
-      avgOrdersPerRider: m.avgOrdersPerRider,
-      growthPct,
-    };
-  });
-}
-
 // ─── Enrichment ─────────────────────────────────────────────────────────────
 
 /**
@@ -356,6 +317,46 @@ export function buildRiderProfiles(
   });
 }
 
+function calculateTargetProjections(dashboard: PerformanceDashboardResponse): { projectedOrders: number | null; targetHitProjected: boolean | null; dailyRunRate: number; previousDailyRunRate: number } {
+  let projectedOrders: number | null = null;
+  let targetHitProjected: boolean | null = null;
+  let dailyRunRate = 0;
+  let previousDailyRunRate = 0;
+  if (!dashboard.monthYear) {
+    return { projectedOrders, targetHitProjected, dailyRunRate, previousDailyRunRate };
+  }
+
+  const parts = dashboard.monthYear.split('-');
+  if (parts.length !== 2) {
+    return { projectedOrders, targetHitProjected };
+  }
+
+  const year = Number.parseInt(parts[0], 10);
+  const month = Number.parseInt(parts[1], 10);
+  const now = new Date();
+  const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
+  
+  const totalDays = new Date(year, month, 0).getDate();
+  let elapsedDays = totalDays;
+  if (isCurrentMonth) {
+    elapsedDays = Math.max(1, now.getDate());
+  }
+  
+  dailyRunRate = elapsedDays > 0 ? dashboard.summary.totalOrders / elapsedDays : 0;
+  projectedOrders = Math.round(dailyRunRate * totalDays);
+  
+  if (dashboard.targets.totalTargetOrders > 0) {
+    targetHitProjected = projectedOrders >= dashboard.targets.totalTargetOrders;
+  }
+  
+  const previousYear = month === 1 ? year - 1 : year;
+  const previousMonth = month === 1 ? 12 : month - 1;
+  const totalDaysPrev = new Date(previousYear, previousMonth, 0).getDate();
+  previousDailyRunRate = totalDaysPrev > 0 ? dashboard.comparison.month.previousOrders / totalDaysPrev : 0;
+
+  return { projectedOrders, targetHitProjected, dailyRunRate, previousDailyRunRate };
+}
+
 /**
  * Build a comprehensive fleet summary from dashboard data.
  */
@@ -394,6 +395,14 @@ export function buildFleetSummary(
   const improvedProfiles = buildRiderProfiles(rankings.mostImproved);
   const declinedProfiles = buildRiderProfiles(rankings.mostDeclined);
 
+  const currentActiveDays = comparison.month.currentActiveDays || 0;
+  const avgOrdersPerActiveDay = currentActiveDays > 0 ? summary.totalOrders / currentActiveDays : 0;
+
+  const { projectedOrders, targetHitProjected, dailyRunRate, previousDailyRunRate } = calculateTargetProjections(dashboard);
+
+  const previousActiveDays = comparison.month.previousActiveDays || 0;
+  const previousAvgOrdersPerActiveDay = previousActiveDays > 0 ? comparison.month.previousOrders / previousActiveDays : 0;
+
   return {
     totalOrders: summary.totalOrders,
     totalOrdersDelta: compareValues(
@@ -402,11 +411,14 @@ export function buildFleetSummary(
     ),
     activeRiders: summary.activeRiders,
     avgOrdersPerRider: summary.avgOrdersPerRider,
+    avgOrdersPerActiveDay,
+    projectedOrders,
+    targetHitProjected,
+    dailyRunRate,
+    dailyRunRateDelta: compareValues(dailyRunRate, previousDailyRunRate),
     avgOrdersDelta: compareValues(
-      summary.avgOrdersPerRider,
-      comparison.month.previousOrders > 0
-        ? Math.round(comparison.month.previousOrders / Math.max(summary.activeRiders, 1))
-        : 0,
+      avgOrdersPerActiveDay,
+      previousAvgOrdersPerActiveDay
     ),
     avgPerformanceScore: avgScore,
     topPerformer: topProfile,

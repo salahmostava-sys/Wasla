@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- Enable Realtime on profiles table
 -- Required so the frontend can detect is_active changes
 -- and force-sign-out deactivated users in real-time.

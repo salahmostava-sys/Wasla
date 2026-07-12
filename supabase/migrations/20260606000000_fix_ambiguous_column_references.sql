@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: Ambiguous column references in salary functions
 --
 -- Root causes identified by supabase db lint:
@@ -18,7 +18,7 @@
 --    Fix: remove unused variable.
 -- ============================================================
 
--- ── 1. Fix calculate_employee_salary ─────────────────────────
+-- â”€â”€ 1. Fix calculate_employee_salary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CREATE OR REPLACE FUNCTION public.calculate_employee_salary(
   p_employee_id UUID,
   p_month_year TEXT,
@@ -44,7 +44,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_employee RECORD;
@@ -232,7 +232,7 @@ BEGIN
 END;
 $$;
 
--- ── 2. Fix preview_salary_for_month ──────────────────────────
+-- â”€â”€ 2. Fix preview_salary_for_month â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 DROP FUNCTION IF EXISTS public.preview_salary_for_month(text);
 
 CREATE OR REPLACE FUNCTION public.preview_salary_for_month(p_month_year TEXT)
@@ -395,7 +395,7 @@ BEGIN
 END;
 $$;
 
--- ── 3. Fix preview_salary_for_month_v2 (unused variable) ─────
+-- â”€â”€ 3. Fix preview_salary_for_month_v2 (unused variable) â”€â”€â”€â”€â”€
 CREATE OR REPLACE FUNCTION public.preview_salary_for_month_v2(p_month_year TEXT)
 RETURNS TABLE (
   employee_id UUID,
@@ -418,7 +418,7 @@ DECLARE
   v_base_salary NUMERIC;
   v_deduction NUMERIC;
   v_net NUMERIC;
-  -- Constants (c_days_per_month removed — was declared but never used)
+  -- Constants (c_days_per_month removed â€” was declared but never used)
   c_cancelled TEXT := _const_order_cancelled();
   c_active TEXT := _const_employee_active();
   c_approved TEXT := _const_approval_approved();

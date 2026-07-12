@@ -1,4 +1,4 @@
--- Treasury
+﻿-- Treasury
 DROP TRIGGER IF EXISTS audit_treasury_transactions ON public.treasury_transactions;
 CREATE TRIGGER audit_treasury_transactions
 AFTER INSERT OR UPDATE OR DELETE ON public.treasury_transactions

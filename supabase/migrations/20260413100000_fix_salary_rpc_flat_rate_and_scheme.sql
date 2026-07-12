@@ -1,9 +1,9 @@
--- Fix calc_tier_salary: use FLAT RATE (total_orders × tier_rate) instead of cumulative.
+﻿-- Fix calc_tier_salary: use FLAT RATE (total_orders Ã— tier_rate) instead of cumulative.
 -- Fix preview_salary_for_month: read salary_schemes.monthly_amount for shift platforms.
 -- Remove hardcoded 150/day fallback.
 
 -- ============================================================================
--- 1. calc_tier_salary — flat rate per tier
+-- 1. calc_tier_salary â€” flat rate per tier
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.calc_tier_salary(INTEGER) CASCADE;
 CREATE OR REPLACE FUNCTION public.calc_tier_salary(p_orders INTEGER)
@@ -17,7 +17,7 @@ DECLARE
 BEGIN
   IF p_orders <= 0 THEN RETURN 0; END IF;
 
-  -- Find the matching tier (flat rate: entire order count × that tier's rate)
+  -- Find the matching tier (flat rate: entire order count Ã— that tier's rate)
   FOR v_tier IN
     SELECT * FROM public.salary_scheme_tiers
     WHERE from_orders <= p_orders
@@ -31,7 +31,7 @@ BEGIN
         + GREATEST(p_orders - COALESCE(v_tier.incremental_threshold, v_tier.from_orders), 0)
         * COALESCE(v_tier.incremental_price, 0);
     ELSE
-      -- Default: flat rate — total_orders × rate
+      -- Default: flat rate â€” total_orders Ã— rate
       v_salary := p_orders * v_tier.price_per_order;
     END IF;
   END LOOP;
@@ -41,7 +41,7 @@ END;
 $$;
 
 -- ============================================================================
--- 2. preview_salary_for_month — read scheme, no hardcoded 150
+-- 2. preview_salary_for_month â€” read scheme, no hardcoded 150
 -- ============================================================================
 CREATE OR REPLACE FUNCTION public.preview_salary_for_month(
   p_month_year TEXT
@@ -58,7 +58,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

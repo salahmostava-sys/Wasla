@@ -1,4 +1,4 @@
--- Fix all recursive and potentially recursive constant functions in the database to prevent statement timeouts and stack depth limit errors.
+﻿-- Fix all recursive and potentially recursive constant functions in the database to prevent statement timeouts and stack depth limit errors.
 CREATE OR REPLACE FUNCTION public._const_order_cancelled() RETURNS TEXT LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS 'SELECT ''cancelled''::TEXT;';
 CREATE OR REPLACE FUNCTION public._const_installment_pending() RETURNS TEXT LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS 'SELECT ''pending''::TEXT;';
 CREATE OR REPLACE FUNCTION public._const_installment_deferred() RETURNS TEXT LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS 'SELECT ''deferred''::TEXT;';

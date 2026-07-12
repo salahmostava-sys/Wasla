@@ -191,5 +191,3 @@ export const commercialRecordService = {
   },
 };
 
-export { normalizeCommercialRecordName, isMissingCommercialRecordsTable };
-

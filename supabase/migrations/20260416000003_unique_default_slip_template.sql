@@ -1,4 +1,4 @@
--- FIX #9: Prevent multiple default salary slip templates.
+﻿-- FIX #9: Prevent multiple default salary slip templates.
 -- Only one row can have is_default = true at a time.
 -- This replaces the application-level "unset others first" logic with a DB constraint.
 

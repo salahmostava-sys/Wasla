@@ -8,7 +8,6 @@ export type {
 } from './import/sharedTypes';
 
 export {
-  getEmployeeAssignedApps,
   clearEmployeeAppMonthData,
   resolveImportTargetAppsForEmployee,
   validateCellValue,

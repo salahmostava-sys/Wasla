@@ -1,8 +1,8 @@
--- Fix Supabase Linter warnings:
--- 1. security_definer_view → security_invoker IS TRUE
--- 2. function_search_path_mutable → SET search_path = 'public'
+﻿-- Fix Supabase Linter warnings:
+-- 1. security_definer_view â†’ security_invoker IS TRUE
+-- 2. function_search_path_mutable â†’ SET search_path = 'public'
 
--- ── Views: security_invoker ──
+-- â”€â”€ Views: security_invoker â”€â”€
 
 CREATE OR REPLACE VIEW public.v_rider_daily_platform_orders
 WITH (security_invoker = true)
@@ -13,7 +13,7 @@ SELECT
   e.city,
   d.date,
   d.app_id,
-  COALESCE(a.name, '—') AS app_name,
+  COALESCE(a.name, 'â€”') AS app_name,
   COALESCE(a.brand_color, '#2563eb') AS brand_color,
   SUM(d.orders_count)::INTEGER AS total_orders
 FROM public.daily_orders AS d
@@ -28,7 +28,7 @@ GROUP BY d.employee_id, e.name, e.city, d.date, d.app_id, a.name, a.brand_color;
 -- Their definitions are in 20260410000000_performance_engine_foundation.sql.
 -- We only need to add the WITH clause.
 
--- ── Functions: search_path ──
+-- â”€â”€ Functions: search_path â”€â”€
 
 ALTER FUNCTION public.is_salary_admin_job_title(TEXT)
   SET search_path = 'public';

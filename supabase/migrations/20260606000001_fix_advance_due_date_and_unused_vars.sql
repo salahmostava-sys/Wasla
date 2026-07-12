@@ -1,9 +1,9 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: Remaining lint errors after 20260606000000
 --
 -- 1. public.calculate_employee_salary:
 --    ERROR: column ai.due_date does not exist (42703)
---    advance_installments has no due_date column — it uses month_year TEXT.
+--    advance_installments has no due_date column â€” it uses month_year TEXT.
 --    Fix: replace `ai.due_date BETWEEN v_start AND v_end`
 --         with `ai.month_year = p_month_year`
 --
@@ -12,7 +12,7 @@
 --    Fix: remove the v_tier RECORD declaration.
 -- ============================================================
 
--- ── 1. Fix calculate_employee_salary (due_date → month_year) ─
+-- â”€â”€ 1. Fix calculate_employee_salary (due_date â†’ month_year) â”€
 CREATE OR REPLACE FUNCTION public.calculate_employee_salary(
   p_employee_id UUID,
   p_month_year TEXT,
@@ -38,7 +38,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_employee RECORD;
@@ -206,7 +206,7 @@ BEGIN
 END;
 $$;
 
--- ── 2. Fix preview_salary_for_month (remove unused v_tier) ───
+-- â”€â”€ 2. Fix preview_salary_for_month (remove unused v_tier) â”€â”€â”€
 DROP FUNCTION IF EXISTS public.preview_salary_for_month(text);
 
 CREATE OR REPLACE FUNCTION public.preview_salary_for_month(p_month_year TEXT)
@@ -358,6 +358,6 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.calculate_employee_salary(UUID, TEXT, TEXT, NUMERIC, TEXT) IS
-  'Fixed: ai.due_date → ai.month_year (advance_installments has no due_date column)';
+  'Fixed: ai.due_date â†’ ai.month_year (advance_installments has no due_date column)';
 COMMENT ON FUNCTION public.preview_salary_for_month(TEXT) IS
   'Fixed: removed unused v_tier variable (lint warning)';

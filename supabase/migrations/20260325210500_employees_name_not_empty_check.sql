@@ -1,4 +1,4 @@
--- Enforce non-empty employee names at the database level.
+﻿-- Enforce non-empty employee names at the database level.
 DO $$
 DECLARE
   v_invalid_count bigint;

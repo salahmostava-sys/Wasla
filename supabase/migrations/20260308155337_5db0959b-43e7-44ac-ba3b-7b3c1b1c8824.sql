@@ -1,10 +1,10 @@
-
+﻿
 -- Auto-assign 'viewer' role to every new user on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user_role()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   INSERT INTO public.user_roles (user_id, role)

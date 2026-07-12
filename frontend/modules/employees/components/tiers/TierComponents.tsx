@@ -69,7 +69,7 @@ export const EmployeeSelect = ({
       <button onClick={() => setOpen(o => !o)}
         className="w-full min-w-[160px] flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border border-border/50 bg-background hover:border-primary/50 transition-colors text-sm">
         <span className={chosen ? 'text-foreground' : 'text-muted-foreground'}>
-          {chosen ? chosen.name : 'اختر...'}
+          {chosen ? chosen.name : 'بدون مندوب'}
         </span>
         <ChevronsUpDown size={12} className="text-muted-foreground flex-shrink-0" />
       </button>
@@ -79,6 +79,11 @@ export const EmployeeSelect = ({
             <Input value={q} onChange={e => setQ(e.target.value)} placeholder="بحث..." className="h-7 text-xs" autoFocus />
           </div>
           <div className="max-h-48 overflow-y-auto">
+            <button onClick={() => { onChange(''); setOpen(false); setQ(''); }}
+              className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-muted transition-colors text-sm text-start border-b border-border mb-1">
+              <Check size={13} className={!value ? 'text-primary' : 'opacity-0'} />
+              <span className="text-muted-foreground italic">بدون مندوب</span>
+            </button>
             {filtered.map(e => (
               <button key={e.id} onClick={() => { onChange(e.id); setOpen(false); setQ(''); }}
                 className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-muted transition-colors text-sm text-start">

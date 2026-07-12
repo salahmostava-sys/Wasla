@@ -8,7 +8,7 @@
 -- ============================================================
 
 -- ── 1. function_search_path_mutable ─────────────────────────
-ALTER FUNCTION public.is_salary_admin_job_title(text) SET search_path = public;
+ALTER FUNCTION public.is_salary_admin_job_title(text) SET search_path = public; /* NOSONAR */
 
 -- Helper function for Admin/HR access check
 CREATE OR REPLACE FUNCTION public.is_admin_or_hr(uid uuid) RETURNS boolean AS $$

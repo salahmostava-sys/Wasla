@@ -1,4 +1,4 @@
-
+﻿
 -- Add new vehicle status values to the enum
 ALTER TYPE public.vehicle_status ADD VALUE IF NOT EXISTS 'breakdown';
 ALTER TYPE public.vehicle_status ADD VALUE IF NOT EXISTS 'rental';

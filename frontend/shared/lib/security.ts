@@ -22,8 +22,6 @@ export function escapeHtml(value: unknown): string {
     str = String(value);
   } else if (typeof value === 'symbol' || typeof value === 'function') {
     str = value.toString();
-  } else {
-    str = '';
   }
   return str
     .replaceAll('&', '&amp;')

@@ -1,4 +1,4 @@
--- Migration to consolidate ALL permissive RLS policies into 1 per action
+﻿-- Migration to consolidate ALL permissive RLS policies into 1 per action
 
 -- Table: public.account_assignments
 DROP POLICY IF EXISTS "account_assignments_insert_update" ON "public"."account_assignments";

@@ -5,12 +5,11 @@
 
 import { useMemo } from 'react';
 import {
-  AlertTriangle,
+  Activity,
   Target,
   TrendingDown,
   TrendingUp,
   Trophy,
-  Users,
   Zap,
 } from 'lucide-react';
 
@@ -38,10 +37,6 @@ function formatPercent(value: number) {
   return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}%`;
 }
 
-function getFirstTwoNames(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts.slice(0, 2).join(' ');
-}
 
 function alertLabel(alert: PerformanceAlert) {
   switch (alert.alertType) {
@@ -68,12 +63,6 @@ function scoreTier(score: number): 'good' | 'average' | 'weak' {
   if (score >= 70) return 'good';
   if (score >= 50) return 'average';
   return 'weak';
-}
-
-function alertsTier(count: number): 'weak' | 'average' | 'excellent' {
-  if (count > 3) return 'weak';
-  if (count > 0) return 'average';
-  return 'excellent';
 }
 
 function ComparisonCard(props: Readonly<{
@@ -187,40 +176,37 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
   }
 
   const { summary, comparison, distribution, ordersByApp, ordersByCity, rankings, alerts, targets } = dashboard;
-  const bestToday = summary.topPerformerToday?.employeeName ? getFirstTwoNames(summary.topPerformerToday.employeeName) : 'لا يوجد';
-  const bestTodayOrders = summary.topPerformerToday?.totalOrders ?? 0;
+
+  const projectedText =
+    fleetSummary.projectedOrders !== null
+      ? ` • متوقع: ${fleetSummary.projectedOrders.toLocaleString('en-US')} ${fleetSummary.targetHitProjected ? '✅' : '⚠️'}`
+      : '';
+
 
   return (
     <div className="space-y-6">
       {/* ── Top KPIs Row (Enriched) ───────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <EnrichedStatCard
           label="إجمالي الطلبات"
           value={summary.totalOrders.toLocaleString('en-US')}
-          delta={fleetSummary.totalOrdersDelta}
-          sub={`${summary.activeRiders} مندوب نشط`}
+          sub="طلبات مكتملة"
           icon={Target}
-        />
-        <EnrichedStatCard
-          label="متوسط الطلبات/مندوب"
-          value={summary.avgOrdersPerRider.toFixed(1)}
-          delta={fleetSummary.avgOrdersDelta}
-          sub={`${summary.activeEmployees} موظف مسجل`}
-          icon={Users}
+          tier="excellent"
         />
         <EnrichedStatCard
           label="تحقيق الهدف"
           value={`${targets.targetAchievementPct.toFixed(0)}%`}
-          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString('en-US')} طلب`}
+          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString('en-US')} طلب${projectedText}`}
           icon={Trophy}
           tier={targetTier(targets.targetAchievementPct)}
         />
         <EnrichedStatCard
-          label="أفضل مندوب اليوم"
-          value={bestToday}
-          sub={`${bestTodayOrders.toLocaleString('en-US')} طلب`}
-          icon={TrendingUp}
-          tier="excellent"
+          label="المتوسط اليومي للطلبات"
+          value={fleetSummary.dailyRunRate.toFixed(1)}
+          delta={fleetSummary.dailyRunRateDelta}
+          sub={`${dashboard.comparison.month.currentActiveDays || 0} إجمالي أيام العمل`}
+          icon={Activity}
         />
         <EnrichedStatCard
           label="متوسط التقييم"
@@ -228,13 +214,6 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           sub={`${distribution.excellent} ممتاز • ${distribution.weak} ضعيف`}
           icon={Zap}
           tier={scoreTier(fleetSummary.avgPerformanceScore)}
-        />
-        <EnrichedStatCard
-          label="تنبيهات ذكية"
-          value={`${alerts.length + aiInsights.alerts.length}`}
-          sub={alerts[0] ? alertLabel(alerts[0]) : 'لا تنبيهات'}
-          icon={AlertTriangle}
-          tier={alertsTier(alerts.length)}
         />
       </div>
 

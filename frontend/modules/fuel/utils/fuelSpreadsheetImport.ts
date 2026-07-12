@@ -8,7 +8,7 @@ import type { Employee, DailyRow } from '@modules/fuel/types/fuel.types';
 export type FuelMetric = 'km' | 'fuel';
 
 /** Builds the strict header row for the fuel/km bulk-import template & validation. */
-export function buildFuelIoHeaders(dayArr: number[]): string[] {
+function buildFuelIoHeaders(dayArr: number[]): string[] {
   return ['اسم المندوب', ...dayArr.map((d) => `اليوم ${d}`)];
 }
 

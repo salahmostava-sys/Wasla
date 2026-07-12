@@ -1,4 +1,4 @@
--- Enable RLS on edge_rate_limits as defense-in-depth.
+﻿-- Enable RLS on edge_rate_limits as defense-in-depth.
 -- Table privileges already REVOKE from anon/authenticated;
 -- this adds RLS so even if grants change, rows stay protected.
 ALTER TABLE public.edge_rate_limits ENABLE ROW LEVEL SECURITY;

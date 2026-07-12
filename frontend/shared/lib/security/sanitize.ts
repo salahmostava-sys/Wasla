@@ -50,8 +50,6 @@ export function sanitizeForLog(input: unknown): string {
     str = String(input);
   } else if (typeof input === 'symbol' || typeof input === 'function') {
     str = input.toString();
-  } else {
-    str = '';
   }
   const stripped = stripControlCharacters(str.replaceAll(/[\r\n\t]/g, ' '));
   return maskSensitiveData(stripped).trim().slice(0, 1000);

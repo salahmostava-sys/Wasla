@@ -20,7 +20,10 @@ const TAB_LABELS: Record<DashboardPerformanceTabKey, string> = {
   analytics_ranking: 'التحليلات والمراكز',
 };
 
-const DASHBOARD_TABS: readonly DashboardPerformanceTabKey[] = ['overview', 'analytics_ranking'];
+const DASHBOARD_TABS: readonly DashboardPerformanceTabKey[] = [
+  'overview',
+  'analytics_ranking',
+];
 
 export function DashboardPerformanceHeader({
   activeTab,

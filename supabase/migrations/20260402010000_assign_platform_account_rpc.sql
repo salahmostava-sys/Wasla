@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION public.assign_platform_account(
 RETURNS public.account_assignments
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_assignment public.account_assignments;

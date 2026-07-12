@@ -1,4 +1,4 @@
--- Fix: calc_tier_salary now takes scheme_id to read the correct tiers.
+﻿-- Fix: calc_tier_salary now takes scheme_id to read the correct tiers.
 -- Previously read from ALL tiers without filtering by scheme.
 
 DROP FUNCTION IF EXISTS public.calc_tier_salary(integer);
@@ -55,7 +55,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

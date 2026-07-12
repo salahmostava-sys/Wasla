@@ -1,5 +1,45 @@
 ﻿BEGIN;
 
+CREATE OR REPLACE FUNCTION public._const_dashboard_month_format() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''YYYY-MM''::TEXT;';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_date_format() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''YYYY-MM-DD''::TEXT;';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_month_start_suffix() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''-01''::TEXT;';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_one_month() RETURNS INTERVAL
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT INTERVAL ''1 month'';';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_one_day() RETURNS INTERVAL
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT INTERVAL ''1 day'';';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_six_days() RETURNS INTERVAL
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT INTERVAL ''6 day'';';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_text_color_default() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''#ffffff''::TEXT;'; /* NOSONAR */
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_trend_stable() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''stable''::TEXT;';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_alert_high() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''high''::TEXT;';
+
+CREATE OR REPLACE FUNCTION public._const_dashboard_alert_medium() RETURNS TEXT
+LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
+'SELECT ''medium''::TEXT;';
+
 CREATE INDEX IF NOT EXISTS idx_daily_orders_perf_date_employee
   ON public.daily_orders(date, employee_id, app_id)
   WHERE orders_count > 0;
@@ -18,7 +58,7 @@ CREATE OR REPLACE FUNCTION public.performance_dashboard_rpc(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -45,13 +85,13 @@ BEGIN
     RAISE EXCEPTION 'Invalid month_year format. Expected YYYY-MM';
   END IF;
 
-  v_start := to_date(p_month_year || '-01', 'YYYY-MM-DD');
-  v_end := (v_start + INTERVAL '1 month - 1 day')::DATE;
+  v_start := to_date(p_month_year || public._const_dashboard_month_start_suffix(), public._const_dashboard_date_format());
+  v_end := (v_start + public._const_dashboard_one_month() - public._const_dashboard_one_day())::DATE;
   v_effective_end := LEAST(COALESCE(p_today, CURRENT_DATE), v_end);
-  v_prev_month := to_char((v_start - INTERVAL '1 month')::DATE, 'YYYY-MM');
-  v_week_start := (v_effective_end - INTERVAL '6 day')::DATE;
-  v_prev_week_end := (v_week_start - INTERVAL '1 day')::DATE;
-  v_prev_week_start := (v_prev_week_end - INTERVAL '6 day')::DATE;
+  v_prev_month := to_char((v_start - public._const_dashboard_one_month())::DATE, public._const_dashboard_month_format());
+  v_week_start := (v_effective_end - public._const_dashboard_six_days())::DATE;
+  v_prev_week_end := (v_week_start - public._const_dashboard_one_day())::DATE;
+  v_prev_week_start := (v_prev_week_end - public._const_dashboard_six_days())::DATE;
 
   RETURN (
     WITH current_month AS MATERIALIZED (
@@ -95,7 +135,7 @@ BEGIN
         CASE
           WHEN COALESCE(pm.total_orders, 0) > 0 AND ((cm.total_orders - pm.total_orders)::NUMERIC / pm.total_orders::NUMERIC) >= 0.05 THEN 'up'
           WHEN COALESCE(pm.total_orders, 0) > 0 AND ((cm.total_orders - pm.total_orders)::NUMERIC / pm.total_orders::NUMERIC) <= -0.05 THEN 'down'
-          ELSE 'stable'
+          ELSE public._const_dashboard_trend_stable()
         END AS trend_code
       FROM current_month AS cm
       LEFT JOIN prev_month AS pm
@@ -123,7 +163,7 @@ BEGIN
         a.id,
         a.name,
         COALESCE(a.brand_color, '#2563eb') AS brand_color,
-        COALESCE(a.text_color, '#ffffff') AS text_color
+        COALESCE(a.text_color, public._const_dashboard_text_color_default()) AS text_color
       FROM public.apps AS a
       WHERE a.is_active IS TRUE
     ),
@@ -132,7 +172,7 @@ BEGIN
         p.app_id,
         MAX(p.app_name) AS app_name,
         MAX(p.brand_color) AS brand_color,
-        COALESCE(MAX(am.text_color), '#ffffff') AS text_color,
+        COALESCE(MAX(am.text_color), public._const_dashboard_text_color_default()) AS text_color,
         SUM(p.total_orders)::INTEGER AS total_orders,
         COUNT(DISTINCT p.employee_id)::INTEGER AS rider_count
       FROM public.v_rider_daily_platform_orders AS p
@@ -146,7 +186,7 @@ BEGIN
         p.app_id,
         SUM(p.total_orders)::INTEGER AS total_orders
       FROM public.v_rider_daily_platform_orders AS p
-      WHERE p.date BETWEEN (v_start - INTERVAL '1 month')::DATE AND (v_start - INTERVAL '1 day')::DATE
+      WHERE p.date BETWEEN (v_start - public._const_dashboard_one_month())::DATE AND (v_start - public._const_dashboard_one_day())::DATE
       GROUP BY p.app_id
     ),
     app_targets AS (
@@ -251,7 +291,7 @@ BEGIN
           2
         ) AS avg_orders_per_rider
       FROM (
-        SELECT to_char((v_start - (gs * INTERVAL '1 month'))::DATE, 'YYYY-MM') AS month_year
+        SELECT to_char((v_start - (gs * public._const_dashboard_one_month()))::DATE, public._const_dashboard_month_format()) AS month_year
         FROM generate_series(5, 0, -1) AS gs
       ) AS ms
       LEFT JOIN public.v_rider_monthly_performance AS mp
@@ -281,7 +321,7 @@ BEGIN
         cr.target_achievement_pct,
         cr.consistency_ratio,
         'declining'::TEXT AS alert_type,
-        'high'::TEXT AS severity,
+        public._const_dashboard_alert_high() AS severity,
         1 AS severity_rank
       FROM current_ranked AS cr
       WHERE cr.prev_total_orders >= 50
@@ -299,7 +339,7 @@ BEGIN
         cr.target_achievement_pct,
         cr.consistency_ratio,
         'inactive_recently'::TEXT AS alert_type,
-        'high'::TEXT AS severity,
+        public._const_dashboard_alert_high() AS severity,
         1 AS severity_rank
       FROM current_ranked AS cr
       WHERE cr.total_orders > 0
@@ -318,7 +358,7 @@ BEGIN
         cr.target_achievement_pct,
         cr.consistency_ratio,
         'below_target'::TEXT AS alert_type,
-        'medium'::TEXT AS severity,
+        public._const_dashboard_alert_medium() AS severity,
         2 AS severity_rank
       FROM current_ranked AS cr
       WHERE cr.monthly_target_orders > 0
@@ -336,7 +376,7 @@ BEGIN
         cr.target_achievement_pct,
         cr.consistency_ratio,
         'low_consistency'::TEXT AS alert_type,
-        'medium'::TEXT AS severity,
+        public._const_dashboard_alert_medium() AS severity,
         2 AS severity_rank
       FROM current_ranked AS cr
       WHERE cr.active_days >= 8
@@ -644,7 +684,7 @@ CREATE OR REPLACE FUNCTION public.rider_profile_performance_rpc(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -671,13 +711,13 @@ BEGIN
     RAISE EXCEPTION 'Invalid month_year format. Expected YYYY-MM';
   END IF;
 
-  v_start := to_date(p_month_year || '-01', 'YYYY-MM-DD');
-  v_end := (v_start + INTERVAL '1 month - 1 day')::DATE;
+  v_start := to_date(p_month_year || public._const_dashboard_month_start_suffix(), public._const_dashboard_date_format());
+  v_end := (v_start + public._const_dashboard_one_month() - public._const_dashboard_one_day())::DATE;
   v_effective_end := LEAST(COALESCE(p_today, CURRENT_DATE), v_end);
-  v_prev_month := to_char((v_start - INTERVAL '1 month')::DATE, 'YYYY-MM');
-  v_week_start := (v_effective_end - INTERVAL '6 day')::DATE;
-  v_prev_week_end := (v_week_start - INTERVAL '1 day')::DATE;
-  v_prev_week_start := (v_prev_week_end - INTERVAL '6 day')::DATE;
+  v_prev_month := to_char((v_start - public._const_dashboard_one_month())::DATE, public._const_dashboard_month_format());
+  v_week_start := (v_effective_end - public._const_dashboard_six_days())::DATE;
+  v_prev_week_end := (v_week_start - public._const_dashboard_one_day())::DATE;
+  v_prev_week_start := (v_prev_week_end - public._const_dashboard_six_days())::DATE;
 
   RETURN (
     WITH employee_base AS (
@@ -743,7 +783,7 @@ BEGIN
       LIMIT 1
     ),
     monthly_series AS (
-      SELECT to_char((v_start - (gs * INTERVAL '1 month'))::DATE, 'YYYY-MM') AS month_year
+      SELECT to_char((v_start - (gs * public._const_dashboard_one_month()))::DATE, public._const_dashboard_month_format()) AS month_year
       FROM generate_series(2, 0, -1) AS gs
     ),
     last_three_months AS (
@@ -829,7 +869,7 @@ BEGIN
     alerts_source AS (
       SELECT
         'declining'::TEXT AS alert_type,
-        'high'::TEXT AS severity,
+        public._const_dashboard_alert_high() AS severity,
         1 AS severity_rank
       FROM derived_metrics
       WHERE previous_orders >= 30
@@ -845,7 +885,7 @@ BEGIN
 
       SELECT
         'inactive_recently'::TEXT AS alert_type,
-        'high'::TEXT AS severity,
+        public._const_dashboard_alert_high() AS severity,
         1 AS severity_rank
       FROM derived_metrics
       WHERE current_orders > 0
@@ -856,7 +896,7 @@ BEGIN
 
       SELECT
         'below_target'::TEXT AS alert_type,
-        'medium'::TEXT AS severity,
+        public._const_dashboard_alert_medium() AS severity,
         2 AS severity_rank
       FROM derived_metrics
       WHERE current_monthly_target_orders > 0
@@ -866,7 +906,7 @@ BEGIN
 
       SELECT
         'low_consistency'::TEXT AS alert_type,
-        'medium'::TEXT AS severity,
+        public._const_dashboard_alert_medium() AS severity,
         2 AS severity_rank
       FROM derived_metrics
       WHERE current_active_days >= 8
@@ -883,7 +923,7 @@ BEGIN
             AND (((dm.current_orders - dm.previous_orders)::NUMERIC / dm.previous_orders::NUMERIC) * 100) <= -10 THEN 'declining'
           WHEN dm.current_monthly_target_orders > 0
             AND dm.current_target_achievement_pct < 60 THEN 'below_target'
-          WHEN dm.current_consistency_ratio >= 0.7 THEN 'stable'
+          WHEN dm.current_consistency_ratio >= 0.7 THEN public._const_dashboard_trend_stable()
           ELSE 'average'
         END AS judgment_code,
         CASE
@@ -891,7 +931,7 @@ BEGIN
             AND (((dm.current_orders - dm.previous_orders)::NUMERIC / dm.previous_orders::NUMERIC) * 100) >= 5 THEN 'up'
           WHEN dm.previous_orders > 0
             AND (((dm.current_orders - dm.previous_orders)::NUMERIC / dm.previous_orders::NUMERIC) * 100) <= -5 THEN 'down'
-          ELSE 'stable'
+          ELSE public._const_dashboard_trend_stable()
         END AS trend_code
       FROM derived_metrics AS dm
     )

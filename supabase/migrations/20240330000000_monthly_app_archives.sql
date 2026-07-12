@@ -1,4 +1,4 @@
--- Phase 1: Soft Delete Support
+﻿-- Phase 1: Soft Delete Support
 -- We add is_archived so that deleting an app doesn't remove its records from the past.
 ALTER TABLE public.apps ADD COLUMN IF NOT EXISTS is_archived BOOLEAN DEFAULT FALSE;
 

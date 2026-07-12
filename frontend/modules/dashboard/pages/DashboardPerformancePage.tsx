@@ -1,12 +1,12 @@
 import { Suspense, lazy, startTransition, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { performanceService } from '@services/performanceService';
 
 import { useAuth } from '@app/providers/AuthContext';
 import { useTemporalContext } from '@app/providers/TemporalContext';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { REALTIME_TABLES_DASHBOARD, useRealtimePostgresChanges } from '@shared/hooks/useRealtimePostgresChanges';
-import { performanceService } from '@services/performanceService';
 import {
   DashboardPerformanceHeader,
   type DashboardPerformanceTabKey,
@@ -34,6 +34,12 @@ const LazyDashboardPerformanceAnalyticsTab = lazy(loadAnalyticsTab);
 const LazyDashboardRankingTab = lazy(loadRankingTab);
 const LazyDashboardPlatformsTab = lazy(loadPlatformsTab);
 
+const REALTIME_TABLES_PERFORMANCE_PAGE = [
+  ...REALTIME_TABLES_DASHBOARD,
+  'employee_apps',
+  'vehicle_assignments',
+] as const;
+
 function TabFallback() {
   return <Skeleton  className="bg-card h-80 shadow-card rounded-2xl" />;
 }
@@ -47,7 +53,7 @@ export default function DashboardPerformancePage() {
   const [activeTab, setActiveTab] = useState<DashboardPerformanceTabKey>('overview');
   const [selectedRiderId, setSelectedRiderId] = useState<string | null>(null);
 
-  useRealtimePostgresChanges('performance-dashboard-realtime', REALTIME_TABLES_DASHBOARD, () => {
+  useRealtimePostgresChanges('performance-dashboard-realtime', REALTIME_TABLES_PERFORMANCE_PAGE, () => {
     if (!user?.id) return;
     queryClient.invalidateQueries({ queryKey: ['performance-dashboard', uid, currentMonth] });
   });
@@ -121,8 +127,6 @@ export default function DashboardPerformancePage() {
           </div>
         </div>
       ) : null}
-
-      {/* المساعد الذكي */}
 
       <DashboardRiderProfileModal riderId={selectedRiderId} onClose={() => setSelectedRiderId(null)} />
     </div>

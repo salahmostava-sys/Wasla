@@ -20,7 +20,7 @@ export interface AppColorData {
 
 const FALLBACK_COLORS = ['#2563eb', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#dc2626'];
 
-export const appColorsQueryKey = (userId: string) => ['apps', userId, 'colors'] as const;
+const appColorsQueryKey = (userId: string) => ['apps', userId, 'colors'] as const;
 
 // Re-use the canonical parser from appsModel to avoid duplication
 import { normalizeCustomColumns } from '@modules/apps/lib/appsModel';

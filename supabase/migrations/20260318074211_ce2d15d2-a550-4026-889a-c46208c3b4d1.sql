@@ -1,4 +1,4 @@
-
+﻿
 -- Add scheme_type and monthly_amount to salary_schemes
 ALTER TABLE public.salary_schemes
   ADD COLUMN IF NOT EXISTS scheme_type TEXT NOT NULL DEFAULT 'order_based',

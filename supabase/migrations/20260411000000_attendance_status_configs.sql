@@ -1,7 +1,7 @@
 ﻿CREATE TABLE IF NOT EXISTS public.attendance_status_configs (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   name text NOT NULL,
-  color text NOT NULL DEFAULT '#6366f1',
+  color text NOT NULL DEFAULT '#6366f1', /* NOSONAR */
   created_at timestamptz DEFAULT now()
 );
 

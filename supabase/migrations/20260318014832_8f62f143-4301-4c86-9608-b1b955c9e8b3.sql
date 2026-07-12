@@ -1,10 +1,10 @@
-
+﻿
 -- Function to insert into audit_log
 CREATE OR REPLACE FUNCTION public.log_audit_event()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   INSERT INTO public.audit_log (user_id, table_name, action, record_id, old_value, new_value)

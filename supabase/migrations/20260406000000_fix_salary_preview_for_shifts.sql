@@ -1,4 +1,4 @@
--- Migration: Fix salary preview to support shifts and hybrid platforms
+﻿-- Migration: Fix salary preview to support shifts and hybrid platforms
 -- Date: 2026-04-06
 -- Description: Updates preview_salary_for_month to match calculate_salary_for_employee_month logic
 
@@ -19,7 +19,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

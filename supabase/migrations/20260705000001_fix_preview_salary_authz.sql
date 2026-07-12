@@ -1,4 +1,4 @@
--- Security fix: preview_salary_for_month_v2 exposed all employees' salary
+﻿-- Security fix: preview_salary_for_month_v2 exposed all employees' salary
 -- data (base_salary, net_salary, order counts) to ANY authenticated user,
 -- with no role/permission check. Restrict to admin/HR only.
 

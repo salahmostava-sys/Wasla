@@ -1,12 +1,12 @@
--- Fix: when no daily_shifts records exist for an employee+app in a given month,
+﻿-- Fix: when no daily_shifts records exist for an employee+app in a given month,
 -- fall back to full monthly_amount (assume full attendance).
 -- This ensures months before the attendance system was introduced (April 2026)
 -- still calculate correctly.
 --
 -- Logic:
 --   1. Check if ANY daily_shifts rows exist for this employee+app in the date range
---   2. If YES → count days with hours_worked > 0, calculate proportionally
---   3. If NO  → use full monthly_amount (no attendance data = full month assumed)
+--   2. If YES â†’ count days with hours_worked > 0, calculate proportionally
+--   3. If NO  â†’ use full monthly_amount (no attendance data = full month assumed)
 
 -- Also fix: the version in 20260415100000 uses SELECT INTO which can fail under RLS.
 -- This version uses direct JOINs (same fix as 20260415200000).
@@ -86,7 +86,7 @@ BEGIN
         ) INTO v_has_shift_records;
 
         IF v_has_shift_records THEN
-          -- Has attendance data → count present days, calculate proportionally
+          -- Has attendance data â†’ count present days, calculate proportionally
           SELECT COUNT(*)::INTEGER INTO v_app_shift_days
           FROM daily_shifts ds
           WHERE ds.employee_id = v_emp.id AND ds.app_id = v_app.app_id
@@ -99,7 +99,7 @@ BEGIN
             v_app_earnings := v_app_shift_days * v_shift_daily_rate;
           END IF;
         ELSE
-          -- No attendance data for this month → fallback: full monthly salary
+          -- No attendance data for this month â†’ fallback: full monthly salary
           -- This handles months before the attendance system was introduced
           -- Check if employee is assigned to this app
           IF EXISTS(
@@ -189,8 +189,8 @@ $$;
 -- Also update calculate_salary_for_employee_month with same fallback logic
 -- (This is the function that saves to salary_records)
 -- Fixes:
---   1. hours_worked >= 8 → hours_worked > 0 (attendance is present/absent, not hours)
---   2. No fallback when no shift records → now uses full monthly_amount
+--   1. hours_worked >= 8 â†’ hours_worked > 0 (attendance is present/absent, not hours)
+--   2. No fallback when no shift records â†’ now uses full monthly_amount
 --   3. Uses salary_schemes.monthly_amount via JOIN instead of pricing_rules
 -- =============================================================================
 
@@ -218,7 +218,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -295,7 +295,7 @@ BEGIN
       ) INTO v_has_shift_records;
 
       IF v_has_shift_records THEN
-        -- Has attendance data → count present days (hours_worked > 0, not >= 8)
+        -- Has attendance data â†’ count present days (hours_worked > 0, not >= 8)
         SELECT COUNT(*)::INTEGER INTO v_app_shifts
         FROM public.daily_shifts AS s
         WHERE s.employee_id = p_employee_id AND s.app_id = v_app.id
@@ -308,7 +308,7 @@ BEGIN
           v_app_earnings := v_app_shifts * v_shift_daily_rate;
         END IF;
       ELSE
-        -- No shift records → fallback to full monthly salary
+        -- No shift records â†’ fallback to full monthly salary
         IF EXISTS(
           SELECT 1 FROM public.employee_apps ea
           WHERE ea.employee_id = p_employee_id AND ea.app_id = v_app.id

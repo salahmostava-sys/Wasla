@@ -26,25 +26,25 @@ import { UndoProvider } from "@shared/context/UndoContext";
 
 const Login = lazy(() => import("@modules/pages/Login"));
 
-const Dashboard = lazy(() => import("@modules/pages/Dashboard"));
+const Dashboard = lazy(() => import("@modules/dashboard/pages/DashboardPage"));
 const Employees = lazy(() => import("@modules/employees/pages/EmployeesPage"));
-const Attendance = lazy(() => import("@modules/pages/Attendance"));
+const Attendance = lazy(() => import("@modules/attendance/pages/AttendancePage"));
 const Orders = lazy(() => import("@modules/orders/pages/OrdersPage"));
 const Salaries = lazy(() => import("@modules/salaries/pages/SalariesPage"));
 const Advances = lazy(() => import("@modules/advances/pages/AdvancesPage"));
 const FuelPage = lazy(() => import("@modules/fuel/pages/FuelPage"));
 const MaintenancePage = lazy(() => import("@modules/maintenance/pages/MaintenancePage"));
 const VehicleReportPage = lazy(() => import("@modules/maintenance/pages/VehicleReportPage"));
-const Apps = lazy(() => import("@modules/pages/Apps"));
+const Apps = lazy(() => import("@modules/apps/pages/AppsPage"));
 const AppSettingsPage = lazy(() => import("@modules/apps/pages/AppSettingsPage").then(m => ({ default: m.AppSettingsPage })));
 const Alerts = lazy(() => import("@modules/pages/Alerts"));
 const SettingsHub = lazy(() => import("@modules/pages/SettingsHub"));
 const ViolationResolverPage = lazy(() => import("@modules/violations/pages/ViolationResolverPage"));
 const FinancePage = lazy(() => import("@modules/finance/pages/FinancePage"));
+const WalletPage = lazy(() => import("@modules/wallet/pages/WalletPage"));
 const Motorcycles = lazy(() => import("@modules/pages/Motorcycles"));
 const VehicleAssignment = lazy(() => import("@modules/pages/VehicleAssignment"));
 const EmployeeTiers = lazy(() => import("@modules/pages/EmployeeTiers"));
-const AiAnalytics = lazy(() => import("@modules/pages/AiAnalyticsPage"));
 const ProfilePage = lazy(() => import("@modules/pages/ProfilePage"));
 const NotFound = lazy(() => import("@modules/pages/NotFound"));
 
@@ -137,6 +137,7 @@ const router = createBrowserRouter([
           { path: "salary-schemes", element: <Navigate to="/settings?tab=schemes" replace /> },
           { path: "advances", element: <PageGuard pageKey="advances"><Advances /></PageGuard> },
           { path: "finance", element: <PageGuard pageKey="finance"><FinancePage /></PageGuard> },
+          { path: "wallet", element: <PageGuard pageKey="finance"><WalletPage /></PageGuard> },
           { path: "motorcycles", element: <PageGuard pageKey="vehicles"><Motorcycles /></PageGuard> },
           {
             path: "vehicle-assignment",
@@ -149,7 +150,6 @@ const router = createBrowserRouter([
           { path: "apps/settings", element: <PageGuard pageKey="apps"><AppSettingsPage /></PageGuard> },
           { path: "alerts", element: <PageGuard pageKey="alerts"><Alerts /></PageGuard> },
           { path: "employee-tiers", element: <PageGuard pageKey="employee_tiers"><EmployeeTiers /></PageGuard> },
-          { path: "ai-analytics", element: <PageGuard pageKey="ai_analytics"><AiAnalytics /></PageGuard> },
           { path: "profile", element: <ProfilePage /> },
           { path: "profile-page", element: <Navigate to="/profile" replace /> },
           { path: "settings", element: <PageGuard pageKey="settings"><SettingsHub /></PageGuard> },

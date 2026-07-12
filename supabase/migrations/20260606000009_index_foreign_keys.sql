@@ -1,4 +1,4 @@
--- Migration to index all unindexed foreign keys for performance
+﻿-- Migration to index all unindexed foreign keys for performance
 
 CREATE INDEX IF NOT EXISTS "idx_salary_scheme_tiers_scheme_id" ON public."salary_scheme_tiers" ("scheme_id");
 CREATE INDEX IF NOT EXISTS "idx_employee_scheme_employee_id" ON public."employee_scheme" ("employee_id");

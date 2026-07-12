@@ -92,6 +92,7 @@ const iconByRouteId: Record<string, ComponentType<{ size?: string | number; clas
   alerts: Bell,
   apps: Smartphone,
   salaries: Wallet,
+  wallet: Wallet,
   advances: CreditCard,
   orders: Package,
   ai_analytics: Sparkles,
@@ -150,7 +151,7 @@ const SidebarNavLink = memo(function SidebarNavLink({
       to={item.path}
       title={collapsed ? item.label : undefined}
       className={cn(
-        'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-medium transition-all duration-150 overflow-hidden',
+        'relative flex h-10 items-center gap-2.5 px-3 rounded-xl text-sm font-medium transition-all duration-150 overflow-hidden',
         collapsed && 'justify-center px-0',
       )}
       style={
@@ -178,7 +179,7 @@ const SidebarNavLink = memo(function SidebarNavLink({
         />
       )}
       <Icon size={16} className="flex-shrink-0" />
-      {!collapsed && <span>{item.label}</span>}
+      {!collapsed && <span className="min-w-0 truncate">{item.label}</span>}
     </Link>
   );
 });
@@ -317,7 +318,7 @@ const AppSidebar = () => {
 
         {/* ── Logo / Brand ───────────────────────────────────── */}
         <div className={cn(
-          'h-[70px] flex items-center justify-between flex-shrink-0',
+          'h-[62px] flex items-center justify-between flex-shrink-0',
           collapsed ? 'px-3 justify-center' : 'px-5',
         )}>
           <Link to="/" className="flex items-center gap-3 min-w-0">
@@ -359,13 +360,13 @@ const AppSidebar = () => {
         {/* ── Nav ──────────────────────────────────────────── */}
         <nav 
           dir={isRTL ? 'rtl' : 'ltr'}
-          className={cn('flex-1 overflow-y-auto py-3 space-y-0.5 custom-sidebar-scroll', collapsed ? 'px-2' : 'px-3')}
+          className={cn('flex-1 overflow-y-auto py-2.5 space-y-0.5 custom-sidebar-scroll', collapsed ? 'px-2' : 'px-3')}
         >
 
           {navGroups.map((group, groupIdx) => {
             if (collapsed) {
               return (
-                <div key={group.key} className={cn('space-y-0.5', groupIdx > 0 && 'mt-3')}>
+                <div key={group.key} className={cn('space-y-0.5', groupIdx > 0 && 'mt-2')}>
                   {group.items.map((item) => (
                     <SidebarNavLink
                       key={item.path}
@@ -409,19 +410,19 @@ const AppSidebar = () => {
                     return n;
                   });
                 }}
-                className={cn(groupIdx > 0 && 'mt-3')}
+                className={cn(groupIdx > 0 && 'mt-2.5')}
               >
                 <CollapsibleTrigger
                   type="button"
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start transition-colors',
+                    'flex h-9 w-full items-center gap-2 rounded-lg px-3 text-start transition-colors',
                     'hover:bg-[var(--ds-surface-container)]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     isOpen ? 'text-[var(--ds-primary)]' : 'text-[var(--ds-on-surface-variant)]'
                   )}
                 >
                   {group.groupIcon && <group.groupIcon size={16} className={cn("flex-shrink-0", isOpen ? "text-[var(--ds-primary)]" : "opacity-70")} />}
-                  <span className="min-w-0 flex-1 text-sm font-bold uppercase tracking-wider">
+                  <span className="min-w-0 flex-1 truncate text-xs font-bold">
                     {group.sectionLabel}
                   </span>
                   <ChevronDown
@@ -457,7 +458,7 @@ const AppSidebar = () => {
 
         {/* ── Collapse toggle — desktop only ────────────────── */}
         <div
-          className="hidden lg:flex px-3 py-3 flex-shrink-0 justify-end"
+          className="hidden lg:flex px-3 py-2.5 flex-shrink-0 justify-end"
           style={{ borderTop: '1px solid var(--ds-surface-container)' }}
         >
           <button
@@ -484,14 +485,14 @@ function SidebarLogo({ logoSrc }: Readonly<{ logoSrc?: string }>) {
       <img
         src={logoSrc}
         alt="logo"
-        className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
+        className="w-8 h-8 rounded-xl object-cover flex-shrink-0"
         onError={() => setFailed(true)}
       />
     );
   }
   return (
     <div
-      className="w-9 h-9 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-brand-sm"
+      className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-brand-sm"
       style={{ background: 'linear-gradient(135deg, #2642e6, #465fff)' }}
     >
       <Sparkles size={18} aria-hidden />

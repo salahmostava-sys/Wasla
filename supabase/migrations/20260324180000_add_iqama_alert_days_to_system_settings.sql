@@ -1,4 +1,4 @@
-ALTER TABLE public.system_settings
+﻿ALTER TABLE public.system_settings
   ADD COLUMN IF NOT EXISTS iqama_alert_days INTEGER NOT NULL DEFAULT 90;
 
 UPDATE public.system_settings

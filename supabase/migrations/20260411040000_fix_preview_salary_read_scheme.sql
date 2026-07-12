@@ -1,4 +1,4 @@
--- Fix: preview_salary_for_month now reads salary_schemes.monthly_amount
+﻿-- Fix: preview_salary_for_month now reads salary_schemes.monthly_amount
 -- for shift apps instead of only checking pricing_rules.
 -- This matches how the UI configures shift rates via the Schemes page.
 
@@ -19,7 +19,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -93,7 +93,7 @@ BEGIN
 
         v_total_shift_days := v_total_shift_days + v_app_shift_days;
 
-        -- Determine daily rate: salary_schemes → pricing_rules → fallback
+        -- Determine daily rate: salary_schemes â†’ pricing_rules â†’ fallback
         v_shift_daily_rate := NULL;
 
         -- 1. Try salary_schemes (monthly_amount / 30)

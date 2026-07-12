@@ -5,13 +5,13 @@ import {
   isValidEmployeePhone,
 } from '@modules/employees/model/employeeFieldValidation';
 
-export const phoneSchema = z
+const phoneSchema = z
   .string()
   .trim()
   .min(1, 'رقم الهاتف مطلوب')
   .refine(isValidEmployeePhone, 'رقم هاتف غير صحيح');
 
-export const nationalIdSchema = z
+const nationalIdSchema = z
   .string()
   .trim()
   .min(1, 'رقم الهوية مطلوب')

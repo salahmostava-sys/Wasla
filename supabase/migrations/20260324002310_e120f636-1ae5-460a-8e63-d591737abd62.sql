@@ -1,7 +1,7 @@
-
--- ══════════════════════════════════════════════════════════════
+﻿
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- 1. platform_accounts
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 CREATE TABLE IF NOT EXISTS public.platform_accounts (
   id                      UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   app_id                  UUID        NOT NULL REFERENCES public.apps(id) ON DELETE CASCADE,
@@ -37,9 +37,9 @@ CREATE TRIGGER update_platform_accounts_updated_at
   BEFORE UPDATE ON public.platform_accounts
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- 2. account_assignments
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 CREATE TABLE IF NOT EXISTS public.account_assignments (
   id          UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   account_id  UUID        NOT NULL REFERENCES public.platform_accounts(id) ON DELETE CASCADE,
@@ -71,9 +71,9 @@ CREATE INDEX IF NOT EXISTS idx_account_assignments_account_id ON public.account_
 CREATE INDEX IF NOT EXISTS idx_account_assignments_employee_id ON public.account_assignments(employee_id);
 CREATE INDEX IF NOT EXISTS idx_account_assignments_open ON public.account_assignments(end_date) WHERE end_date IS NULL;
 
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- 3. vehicle_mileage_daily
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 CREATE TABLE IF NOT EXISTS public.vehicle_mileage_daily (
   id          UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   employee_id UUID        NOT NULL REFERENCES public.employees(id) ON DELETE CASCADE,
@@ -110,9 +110,9 @@ CREATE TRIGGER update_vehicle_mileage_daily_updated_at
 CREATE INDEX IF NOT EXISTS idx_vehicle_mileage_daily_employee_date
   ON public.vehicle_mileage_daily(employee_id, date);
 
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- 4. locked_months
--- ══════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 CREATE TABLE IF NOT EXISTS public.locked_months (
   id          UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   month_year  TEXT        NOT NULL UNIQUE,

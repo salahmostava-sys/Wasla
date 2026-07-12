@@ -20,9 +20,6 @@ Security:
 
 import hmac
 import os
-import json
-import tempfile
-from google.cloud import vision
 import time
 import hashlib
 import threading
@@ -46,30 +43,6 @@ from model import (
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
-# Set Google Cloud Vision credentials.
-# Priority 1: GOOGLE_APPLICATION_CREDENTIALS_JSON env var (cloud/Vercel — JSON string).
-# Priority 2: GOOGLE_APPLICATION_CREDENTIALS env var already points to a file (explicit).
-# Priority 3: Local dev fallback — ./credentials/vision-key.json.
-_gac_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-if _gac_json and "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-    try:
-        _parsed = json.loads(_gac_json)
-        # Write to a temp file so the SDK can load it normally
-        _tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        )
-        json.dump(_parsed, _tmp)
-        _tmp.flush()
-        _tmp.close()
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _tmp.name
-        print("[vision] Loaded credentials from GOOGLE_APPLICATION_CREDENTIALS_JSON")
-    except (json.JSONDecodeError, OSError) as _e:
-        print(f"[vision] WARNING: Failed to parse GOOGLE_APPLICATION_CREDENTIALS_JSON: {_e}")
-elif "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-    _local_key = "./credentials/vision-key.json"
-    if os.path.exists(_local_key):
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _local_key
-        print("[vision] Loaded credentials from local ./credentials/vision-key.json")
 
 # If set, every protected endpoint MUST include this value in X-Internal-Key.
 # When unset (dev default), auth is SKIPPED and a warning is printed at startup.

@@ -25,7 +25,7 @@ export const statusLabel = (s: string) => {
   return 'غير مسلم';
 };
 
-export const _statusCls = (s: string) =>
+const _statusCls = (s: string) =>
   s === STATUS_DELIVERED
     ? 'bg-success/10 text-success border border-success/20'
     : 'bg-muted text-muted-foreground border border-border';

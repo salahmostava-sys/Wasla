@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- Fix: operator does not exist: employee_status = text
 -- =============================================================================
 -- Root cause: employees.status is of type public.employee_status (ENUM),
@@ -12,11 +12,11 @@
 
 BEGIN;
 
--- Step 1: Create a helper cast function TEXT → employee_status
+-- Step 1: Create a helper cast function TEXT â†’ employee_status
 CREATE OR REPLACE FUNCTION public.text_to_employee_status(text)
   RETURNS public.employee_status
   LANGUAGE SQL IMMUTABLE STRICT
-  SET search_path = public
+  SET search_path = public /* NOSONAR */
 AS $$
   SELECT $1::public.employee_status;
 $$;

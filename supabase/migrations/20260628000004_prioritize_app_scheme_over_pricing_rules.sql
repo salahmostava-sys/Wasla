@@ -1,4 +1,4 @@
--- Prioritize App Salary Schemes over legacy Pricing Rules
+﻿-- Prioritize App Salary Schemes over legacy Pricing Rules
 -- Fixes an issue where apps with a new `scheme_id` would still be calculated using 
 -- the old `pricing_rules` if both were present.
 
@@ -18,7 +18,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_orders INTEGER := GREATEST(COALESCE(p_orders, 0), 0);

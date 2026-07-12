@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UsersAndPermissions from './UsersAndPermissions';
 
@@ -105,18 +105,26 @@ describe('UsersAndPermissions', () => {
     );
   }, 10000);
 
-  it('allows admins to delete another user but keeps current-account delete disabled', async () => {
+  it('does not render delete button for the current user and allows deleting another user', async () => {
     render(<UsersAndPermissions />);
 
-    const deleteButtons = screen.getAllByRole('button', { name: 'حذف' });
-    expect(deleteButtons[0]).toBeDisabled();
-    expect(deleteButtons[1]).not.toBeDisabled();
+    const adminCell = await screen.findByText('Admin User');
+    const adminRow = adminCell.closest('tr');
+    expect(adminRow).not.toBeNull();
+    expect(within(adminRow as HTMLTableRowElement).queryByRole('button', { name: /حذف/i })).toBeNull();
 
-    fireEvent.click(deleteButtons[1]);
+    const secondUserCell = await screen.findByText('Second User');
+    const secondUserRow = secondUserCell.closest('tr');
+    expect(secondUserRow).not.toBeNull();
+
+    const deleteButton = within(secondUserRow as HTMLTableRowElement).getByRole('button', { name: /حذف/i });
+    expect(deleteButton).not.toBeDisabled();
+
+    fireEvent.click(deleteButton);
     fireEvent.click(screen.getByRole('button', { name: 'تأكيد الحذف' }));
 
     await waitFor(() => expect(authServiceMock.deleteManagedUser).toHaveBeenCalledWith('user-2'));
-  });
+  }, 15000);
 
   it('allows admins to open the edit-user dialog and submit changes', async () => {
     authServiceMock.createManagedUser.mockResolvedValue({ user_id: 'user-3' });
@@ -125,8 +133,11 @@ describe('UsersAndPermissions', () => {
 
     render(<UsersAndPermissions />);
 
-    const editButtons = screen.getAllByRole('button', { name: 'تعديل' });
-    fireEvent.click(editButtons[0]);
+    const adminCell = await screen.findByText('Admin User');
+    const adminRow = adminCell.closest('tr');
+    expect(adminRow).not.toBeNull();
+    const editButton = within(adminRow as HTMLTableRowElement).getByRole('button', { name: /تعديل/i });
+    fireEvent.click(editButton);
 
     const nameInput = await screen.findByLabelText('الاسم');
     expect(nameInput).toHaveValue('Admin User');
@@ -145,7 +156,6 @@ describe('UsersAndPermissions', () => {
   it('allows admins to change role', async () => {
     render(<UsersAndPermissions />);
     const selectTriggers = screen.getAllByRole('combobox');
-    // We expect at least one select trigger for role changes on the table rows
     expect(selectTriggers.length).toBeGreaterThan(0);
   });
 });

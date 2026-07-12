@@ -1,1 +1,1 @@
-ALTER TABLE public.salary_records ADD COLUMN IF NOT EXISTS payment_method text DEFAULT _const_payment_cash() NOT NULL;
+﻿ALTER TABLE public.salary_records ADD COLUMN IF NOT EXISTS payment_method text DEFAULT _const_payment_cash() NOT NULL;

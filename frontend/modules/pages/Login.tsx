@@ -186,72 +186,69 @@ function LoginBrandingPanel({
 
   return (
     <section
-      className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 overflow-hidden"
-      style={{ background: 'linear-gradient(225deg, #00288e 0%, #1e40af 60%, #1d4ed8 100%)' }}
+      className="hidden lg:flex lg:w-[52%] relative flex-col justify-between overflow-hidden px-12 py-10 xl:px-16 xl:py-12"
+      style={{
+        background:
+          'linear-gradient(225deg, #0f2f9b 0%, #1d4ed8 54%, #17358f 100%)',
+      }}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute -top-24 ${isRtl ? '-right-24' : '-left-24'} w-96 h-96 rounded-full opacity-10 animate-float-slow`}
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)' }} />
-        <div className={`absolute top-1/3 ${isRtl ? '-left-16' : '-right-16'} w-64 h-64 rounded-full opacity-[0.07] animate-float-medium`}
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)', animationDelay: '2s' }} />
-        <div className={`absolute bottom-16 ${isRtl ? 'right-1/3' : 'left-1/3'} w-48 h-48 rounded-full opacity-[0.06] animate-float-slow`}
-          style={{ background: 'radial-gradient(circle, rgba(99,179,237,0.8) 0%, transparent 70%)', animationDelay: '3.5s' }} />
-        <div className={`absolute top-1/2 ${isRtl ? 'right-1/4' : 'left-1/4'} w-32 h-32 rounded-full border border-white/10 animate-float-medium`}
-          style={{ animationDelay: '1s' }} />
-        <div className={`absolute bottom-1/3 ${isRtl ? 'left-1/4' : 'right-1/4'} w-20 h-20 rounded-full border border-white/8 animate-float-slow`}
-          style={{ animationDelay: '4s' }} />
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-      </div>
-
-
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.045]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.55) 1px, transparent 1px)',
+          backgroundSize: '44px 44px',
+        }}
+      />
 
       <div className={`relative z-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-7">
           {settings?.logo_url ? (
-            <img
-              src={brandLogoSrc(settings.logo_url, settings.updated_at)}
-              alt=""
-              className="w-24 h-24 -2xl object-contain bg-white/10 backdrop-blur-sm p-2.5 ring-1 ring-white/20 shadow-card rounded-2xl"
-            />
+            <span className="w-20 h-20 overflow-hidden bg-white ring-1 ring-white/35 shadow-card rounded-xl flex items-center justify-center shrink-0">
+              <img
+                src={brandLogoSrc(settings.logo_url, settings.updated_at)}
+                alt=""
+                className="h-full w-full object-contain scale-150"
+              />
+            </span>
           ) : (
-            <div className="w-24 h-24 -2xl bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-2xl">
-              <span className="material-symbols-outlined text-6xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-xl shrink-0">
+              <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
               <span className={`absolute -top-1 ${isRtl ? '-right-1' : '-left-1'} w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30`} />
             </div>
           )}
-          <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight leading-tight">{projectName}</h1>
-            <p className="text-blue-200/80 text-sm mt-1">{projectSubtitle}</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl xl:text-3xl font-extrabold text-white leading-tight max-w-lg drop-shadow-md">{projectName}</h1>
+            <p className="text-white/90 text-sm mt-1 truncate max-w-md drop-shadow-sm">{projectSubtitle}</p>
           </div>
         </div>
-        <p className="text-blue-100/70 text-lg max-w-md leading-relaxed">
+        <p className="text-white/90 text-lg max-w-xl leading-8 drop-shadow-sm">
           {t('systemSubtitleDesc')}
         </p>
       </div>
 
-      <div className="relative z-10 grid grid-cols-2 gap-4 mt-12">
+      <div className="relative z-10 grid grid-cols-2 gap-3 mt-10">
         {features.map((f, i) => (
           <div
             key={f.icon}
-            className="group bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-sm border border-white/10 hover:border-white/20 p-5 rounded-2xl flex flex-col gap-2.5 transition-all duration-300 cursor-default card-lift"
+            className="group min-h-[132px] bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-sm border border-white/10 hover:border-white/20 p-4 rounded-2xl flex flex-col gap-2 transition-all duration-300 cursor-default"
             style={{
               animationDelay: `${i * 80 + 200}ms`,
               opacity: mounted ? 1 : 0,
               transform: mounted ? 'none' : 'translateY(16px)',
-              transition: `opacity 500ms ${i * 80 + 200}ms, transform 500ms ${i * 80 + 200}ms cubic-bezier(0.22,1,0.36,1), box-shadow 200ms`,
+              transition: `opacity 500ms ${i * 80 + 200}ms, transform 500ms ${i * 80 + 200}ms cubic-bezier(0.22,1,0.36,1), background-color 200ms, border-color 200ms`,
             }}
           >
-            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/15 transition-colors">
-              <span className="material-symbols-outlined text-blue-200 text-xl">{f.icon}</span>
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/15 transition-colors">
+              <span className="material-symbols-outlined text-white text-lg">{f.icon}</span>
             </div>
-            <h3 className="text-white font-bold text-sm">{f.title}</h3>
-            <p className="text-blue-100/60 text-xs leading-relaxed">{f.desc}</p>
+            <h3 className="text-white font-bold text-base drop-shadow-sm">{f.title}</h3>
+            <p className="text-white/90 text-sm leading-relaxed drop-shadow-sm">{f.desc}</p>
           </div>
         ))}
       </div>
 
-      <p className={`relative z-10 text-blue-200/40 text-xs tracking-widest uppercase mt-8 ${isRtl ? 'text-right' : 'text-left'}`}>
+      <p className={`relative z-10 text-white/80 text-sm mt-8 drop-shadow-sm ${isRtl ? 'text-right' : 'text-left'}`}>
         {`© ${new Date().getFullYear()} ${projectName}`}
       </p>
     </section>
@@ -287,8 +284,8 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
 
   return (
     <div className="relative group">
-      <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-5' : 'left-0 pl-5'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
-        <span className="material-symbols-outlined text-2xl">lock</span>
+      <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-4' : 'left-0 pl-4'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
+        <span className="material-symbols-outlined text-xl">lock</span>
       </div>
       <input
         id="login-password"
@@ -299,19 +296,20 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
         onKeyUp={e => setCapsLock(e.getModifierState('CapsLock'))}
         placeholder="••••••••"
         required
+        dir="ltr"
         autoComplete="current-password"
         autoFocus={!!email}
         aria-invalid={!!loginError}
-        className={`block w-full ${isRtl ? 'pr-14 pl-14' : 'pl-14 pr-14'} py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
-        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.2em' : 'normal', fontSize: !showPw ? '1.5rem' : '1.125rem' }} // NOSONAR
+        className={`block h-12 w-full ${isRtl ? 'pr-14 pl-14' : 'pl-14 pr-14'} text-base bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
+        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.12em' : 'normal', textAlign: 'left', direction: 'ltr' }} // NOSONAR
       />
       <button
         type="button"
         onClick={() => setShowPw(v => !v)}
-        className={`absolute inset-y-0 ${isRtl ? 'left-0 pl-5' : 'right-0 pr-5'} flex items-center text-muted-foreground hover:text-foreground transition-colors duration-200`}
+        className={`absolute inset-y-0 ${isRtl ? 'left-0 pl-4' : 'right-0 pr-4'} flex items-center text-muted-foreground hover:text-foreground transition-colors duration-200`}
         aria-label={showPw ? t('hidePassword') : t('showPassword')}
       >
-        {showPw ? <EyeOff size={22} /> : <Eye size={22} />}
+        {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
       </button>
       {capsLock && (
         <div className={`flex items-center gap-2 text-amber-600 dark:text-amber-400 px-1 animate-slide-up mt-2`}>
@@ -328,7 +326,7 @@ function LoginErrorAlert({ loginError }: Readonly<{ loginError: string }>) {
   return (
     <div className="flex items-center gap-2 bg-destructive/10 border border-destructive/25 rounded-xl px-4 py-3 animate-slide-up">
       <span className="material-symbols-outlined text-destructive text-lg flex-shrink-0">error</span>
-      <p className="text-destructive text-sm">{loginError}</p>
+      <p className="text-destructive text-sm font-medium">{loginError}</p>
     </div>
   );
 }
@@ -359,43 +357,45 @@ function LoginFormSection(props: LoginFormSectionProps) {
   const isRtl = i18n.language === 'ar';
 
   return (
-    <section className="w-full lg:w-[45%] flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-background relative min-h-screen lg:min-h-0">
+    <section className="w-full lg:w-[48%] flex flex-col justify-center items-center px-6 py-8 sm:px-10 lg:px-12 xl:px-16 bg-background relative min-h-screen lg:min-h-0">
 
       <div className={`absolute top-5 ${isRtl ? 'left-5' : 'right-5'} flex gap-2`}>
-        <ThemeToggle className="w-10 h-10 hover:scale-105 active:scale-95" />
-        <LanguageToggle className="w-10 h-10 hover:scale-105 active:scale-95" />
+        <ThemeToggle className="w-9 h-9 hover:scale-105 active:scale-95" />
+        <LanguageToggle className="w-9 h-9 hover:scale-105 active:scale-95" />
       </div>
 
       <div
-        className="lg:hidden flex flex-col items-center mb-12"
+        className="lg:hidden flex flex-col items-center mb-10 pt-6"
         style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(-12px)', transition: 'opacity 500ms, transform 500ms cubic-bezier(0.22,1,0.36,1)' }}
       >
         {settings?.logo_url ? (
-          <img
-            src={brandLogoSrc(settings.logo_url, settings.updated_at)}
-            alt=""
-            className="w-24 h-24 -2xl object-contain shadow-card border border-border bg-card p-1 mb-3 rounded-2xl"
-          />
+          <span className="w-20 h-20 overflow-hidden shadow-card border border-border bg-card mb-3 rounded-xl flex items-center justify-center">
+            <img
+              src={brandLogoSrc(settings.logo_url, settings.updated_at)}
+              alt=""
+              className="h-full w-full object-contain scale-150"
+            />
+          </span>
         ) : (
-          <div className="w-24 h-24 rounded-2xl mb-3 flex items-center justify-center shadow-brand" style={{ background: 'linear-gradient(225deg, #00288e, #1e40af)' }}>
+          <div className="w-20 h-20 rounded-xl mb-3 flex items-center justify-center shadow-brand" style={{ background: 'linear-gradient(225deg, #00288e, #1e40af)' }}>
             <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
           </div>
         )}
-        <h1 className="text-2xl font-extrabold text-foreground">{projectName}</h1>
-        <p className="text-sm text-muted-foreground">{projectSubtitle}</p>
+        <h1 className="text-lg font-extrabold text-foreground text-center leading-tight max-w-[17rem]">{projectName}</h1>
+        <p className="text-xs text-muted-foreground mt-1">{projectSubtitle}</p>
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-[420px]">
 
         <div
-          className="mb-10"
+          className="mb-8"
           style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(12px)', transition: 'opacity 450ms 50ms, transform 450ms 50ms cubic-bezier(0.22,1,0.36,1)' }}
         >
-          <h2 className="text-3xl font-extrabold text-foreground mb-2">{t('login')}</h2>
-          <p className="text-muted-foreground">{t('welcomeBack')}</p>
+          <h2 className="text-2xl font-extrabold text-foreground mb-2">{t('login')}</h2>
+          <p className="text-sm text-muted-foreground">{t('welcomeBack')}</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-4">
 
           <div
             className="space-y-2"
@@ -403,8 +403,8 @@ function LoginFormSection(props: LoginFormSectionProps) {
           >
             <label htmlFor="login-email" className="block text-sm font-medium text-muted-foreground">{t('email')}</label>
             <div className="relative group">
-              <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-5' : 'left-0 pl-5'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
-                <span className="material-symbols-outlined text-2xl">mail</span>
+              <div className={`absolute inset-y-0 ${isRtl ? 'right-0 pr-4' : 'left-0 pl-4'} flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors duration-200`}>
+                <span className="material-symbols-outlined text-xl">mail</span>
               </div>
               <input
                 id="login-email"
@@ -418,7 +418,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
                 autoComplete="email"
                 autoFocus={!email}
                 aria-invalid={!!loginError}
-                className={`block w-full ${isRtl ? 'pr-14 pl-5' : 'pl-14 pr-5'} py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
+                className={`block h-12 w-full ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} text-base bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
               />
             </div>
           </div>
@@ -463,7 +463,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
             <button
               type="submit"
               disabled={loading}
-              className="relative w-full py-4 px-6 text-white font-bold rounded-xl overflow-hidden shadow-brand hover:shadow-brand active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group"
+              className="relative h-12 w-full px-5 text-white font-bold rounded-xl overflow-hidden shadow-brand hover:shadow-brand active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group"
               style={{ background: 'linear-gradient(135deg, #00288e 0%, #1e40af 50%, #2563eb 100%)' }}
             >
               <span
@@ -508,7 +508,7 @@ const Login = () => {
     : settings?.project_subtitle_en || t('appSubtitle');
 
   return (
-    <div className="min-h-screen flex" dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex bg-background" dir={isRtl ? 'rtl' : 'ltr'}>
 
       <LoginBrandingPanel
         settings={settings}
@@ -538,7 +538,7 @@ const Login = () => {
       />
 
       {/* Security badge */}
-      <div className={`fixed bottom-6 ${isRtl ? 'left-6' : 'right-6'} hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-4 shadow-card border border-border/40 rounded-2xl`}>
+      <div className={`fixed bottom-5 ${isRtl ? 'left-5' : 'right-5'} hidden lg:flex items-center gap-2 bg-card/90 backdrop-blur-sm py-2 px-3.5 shadow-card border border-border/40 rounded-xl`}>
         <span className="material-symbols-outlined text-emerald-500 text-lg">verified_user</span>
         <span className="text-xs font-semibold text-muted-foreground">{t('secureConnection')}</span>
       </div>

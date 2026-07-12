@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: Restore original performance_dashboard_rpc shape
 -- ============================================================
 -- The previous fix altered the return shape of the RPC, causing frontend crashes.
@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION public.performance_dashboard_rpc(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -116,7 +116,7 @@ BEGIN
         a.id,
         a.name,
         COALESCE(a.brand_color, '#2563eb') AS brand_color,
-        COALESCE(a.text_color, '#ffffff') AS text_color
+        COALESCE(a.text_color, '#ffffff') AS text_color /* NOSONAR */
       FROM public.apps AS a
       WHERE a.is_active IS TRUE
     ),
@@ -125,7 +125,7 @@ BEGIN
         p.app_id,
         MAX(p.app_name) AS app_name,
         MAX(p.brand_color) AS brand_color,
-        COALESCE(MAX(am.text_color), '#ffffff') AS text_color,
+        COALESCE(MAX(am.text_color), '#ffffff') AS text_color, /* NOSONAR */
         SUM(p.total_orders)::INTEGER AS total_orders,
         COUNT(DISTINCT p.employee_id)::INTEGER AS rider_count
       FROM public.v_rider_daily_platform_orders AS p

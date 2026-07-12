@@ -1,4 +1,4 @@
--- Phase 2: Salary engine in DB (month-level calculation + persistence)
+﻿-- Phase 2: Salary engine in DB (month-level calculation + persistence)
 
 -- Piecewise tier function:
 -- <=300: x3
@@ -50,7 +50,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -201,7 +201,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   r RECORD;

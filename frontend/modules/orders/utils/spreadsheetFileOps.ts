@@ -21,6 +21,7 @@ import {
   mergeImportedOrdersFromMatrixWithMapping,
   type AppEmployeeIdsMap,
 } from '@modules/orders/utils/spreadsheetImportModel';
+import { ImportFactory } from '@modules/orders/utils/import/importFactory';
 import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { matchEmployeeNames, type UnmatchedEmployeeName } from '@shared/lib/nameMatching';
 
@@ -322,7 +323,6 @@ export async function runSpreadsheetImport(params: {
 
     const actualHeaders = (matrix[0] || []).map((h) => String(h ?? '').trim());
 
-    const { ImportFactory } = await import('./import/importFactory');
     const strategy = ImportFactory.detectStrategy(actualHeaders);
 
     if (!strategy) {
@@ -451,32 +451,16 @@ export function printSpreadsheetTable(params: {
   };
 }
 
-export async function saveSpreadsheetMonth(params: {
-  isMonthLocked: boolean;
-  year: number;
-  month: number;
-  days: number;
-  data: DailyData;
-  setSaving: (v: boolean) => void;
-  employees: Employee[];
-  apps: App[];
-  saveMeta?: ReplaceMonthDataMeta;
-}): Promise<boolean> {
-  const { isMonthLocked, year, month, days, data, setSaving, employees, apps, saveMeta: _saveMeta } = params;
-  if (isMonthLocked) {
-    toast.error('الشهر مقفل', {
-      description: 'لا يمكن حفظ التغييرات في شهر مقفل'
-    });
-    return false;
-  }
-
-  setSaving(true);
-  const employeeNames = new Map(employees.map((employee) => [employee.id, employee.name]));
-  const appNames = new Map(apps.map((app) => [app.id, app.name]));
+function buildRows(
+  data: DailyData,
+  year: number,
+  month: number,
+  days: number,
+  employeeNames: Map<string, string>,
+  appNames: Map<string, string>
+) {
   const rows: { employee_id: string; app_id: string; date: string; orders_count: number }[] = [];
   const invalidRows: string[] = [];
-  const _monthKey = monthYear(year, month);
-  const isClearingMonth = Object.keys(data).length === 0;
 
   Object.entries(data).forEach(([key, count]) => {
     const [empId, appId, dayStr] = key.split('::');
@@ -507,6 +491,57 @@ export async function saveSpreadsheetMonth(params: {
     });
   });
 
+  return { rows, invalidRows };
+}
+
+function getDeletedKeys(data: DailyData, originalData: DailyData, year: number, month: number) {
+  const deletedKeys: { employeeId: string; appId: string; date: string }[] = [];
+  for (const key of Object.keys(originalData)) {
+    if (!data[key] || data[key] <= 0) {
+      const [empId, appId, dayStr] = key.split('::');
+      const day = Number.parseInt(dayStr, 10);
+      if (empId && appId && !Number.isNaN(day)) {
+        deletedKeys.push({
+          employeeId: empId,
+          appId,
+          date: dateStr(year, month, day),
+        });
+      }
+    }
+  }
+  return deletedKeys;
+}
+
+
+export async function saveSpreadsheetMonth(params: {
+  isMonthLocked: boolean;
+  year: number;
+  month: number;
+  days: number;
+  data: DailyData;
+  originalData?: DailyData;
+  setSaving: (v: boolean) => void;
+  employees: Employee[];
+  apps: App[];
+  saveMeta?: ReplaceMonthDataMeta;
+}): Promise<boolean> {
+  const { isMonthLocked, year, month, days, data, originalData, setSaving, employees, apps, saveMeta: _saveMeta } = params;
+  if (isMonthLocked) {
+    toast.error('الشهر مقفل', {
+      description: 'لا يمكن حفظ التغييرات في شهر مقفل'
+    });
+    return false;
+  }
+
+  setSaving(true);
+  const employeeNames = new Map(employees.map((employee) => [employee.id, employee.name]));
+  const appNames = new Map(apps.map((app) => [app.id, app.name]));
+  
+  const { rows, invalidRows } = buildRows(data, year, month, days, employeeNames, appNames);
+  
+  const _monthKey = monthYear(year, month);
+  const isClearingMonth = Object.keys(data).length === 0;
+
   if (invalidRows.length > 0) {
     logger.warn('تم تجاهل بيانات غير صحيحة', { meta: { invalidRows } });
     toast.warning('تم تجاهل بعض البيانات قبل الحفظ', {
@@ -528,6 +563,15 @@ export async function saveSpreadsheetMonth(params: {
     // when the grid state doesn't contain every platform's data.
     const { saved, failed } = await orderService.bulkUpsert(rows, SAVE_CHUNK_SIZE);
 
+    let deletedCount = 0;
+    if (originalData) {
+      const deletedKeys = getDeletedKeys(data, originalData, year, month);
+      if (deletedKeys.length > 0) {
+        await orderService.deleteDailyOrders(deletedKeys);
+        deletedCount = deletedKeys.length;
+      }
+    }
+
     if (failed.length > 0) {
       logger.error('فشل حفظ بعض السجلات', { meta: { failed: failed.slice(0, 10) } });
       const failedMessages = failed.map((failure) => (
@@ -537,11 +581,14 @@ export async function saveSpreadsheetMonth(params: {
         description: `تم حفظ ${saved} إدخال بنجاح، وتعذر حفظ ${failed.length} إدخال. ${summarizeMessages(failedMessages)}`
       });
     } else {
+      let desc = `تم حفظ ${saved} إدخال`;
+      if (deletedCount > 0) desc += ` ومسح ${deletedCount} إدخال`;
+      desc += ` - ${monthLabel(year, month)}`;
       toast.success(TOAST_SUCCESS_OPERATION, {
-        description: `تم حفظ ${saved} إدخال - ${monthLabel(year, month)}`
+        description: desc
       });
     }
-    return isClearingMonth || saved > 0;
+    return isClearingMonth || saved > 0 || deletedCount > 0;
   } catch (e: unknown) {
     const errorMsg = getErrorMessage(e, 'خطأ غير معروف');
     toast.error('فشل عملية الحفظ', {

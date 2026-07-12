@@ -11,7 +11,14 @@ import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { BaseTable, type TableColumn } from '@shared/components/ui/base-table';
 import WalletTransactionModal from '../components/WalletTransactionModal';
 import WalletHistoryModal from '../components/WalletHistoryModal';
-import type { EmployeeWalletBalance } from '@modules/wallet/types/wallet.types';
+
+type EmployeeWalletBalance = {
+  employee_id: string;
+  employee_name: string;
+  employee_status: string;
+  balance: number;
+};
+
 const WalletPage = () => {
   const { isRTL } = useLanguage();
   const { enabled } = useAuthQueryGate();

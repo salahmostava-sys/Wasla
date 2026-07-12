@@ -4,7 +4,7 @@ import {
   isValidEmployeePhone,
 } from '@modules/employees/model/employeeFieldValidation';
 
-export const isValidImportPhone = (value: string) => isValidEmployeePhone(value);
+const isValidImportPhone = (value: string) => isValidEmployeePhone(value);
 
 export const validateImportRow = (row: EmployeeArabicRow, rowIndex: number) => {
   const issues: Array<{ rowIndex: number; issue: string }> = [];

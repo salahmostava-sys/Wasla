@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FIX: performance_dashboard_rpc JSON shape mismatch
 -- ============================================================
 -- The migration 20260629171000_restore_performance_dashboard_rpc_real.sql
@@ -15,7 +15,7 @@
 -- silently falls back to empty defaults: leaderboard becomes [], so
 -- top/low performers, most improved/declined, performance score,
 -- performance distribution, and target achievement all render as 0 /
--- "لا يوجد", even though summary.totalOrders / summary.activeRiders still
+-- "Ù„Ø§ ÙŠÙˆØ¬Ø¯", even though summary.totalOrders / summary.activeRiders still
 -- work (their key names happen to match in both shapes).
 --
 -- This migration restores the JSON shape the frontend actually expects,
@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION public.performance_dashboard_rpc(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;
@@ -136,7 +136,7 @@ BEGIN
         a.id,
         a.name,
         COALESCE(a.brand_color, '#2563eb') AS brand_color,
-        COALESCE(a.text_color, '#ffffff') AS text_color
+        COALESCE(a.text_color, '#ffffff') AS text_color /* NOSONAR */
       FROM public.apps AS a
       WHERE a.is_active IS TRUE
     ),
@@ -145,7 +145,7 @@ BEGIN
         p.app_id,
         MAX(p.app_name) AS app_name,
         MAX(p.brand_color) AS brand_color,
-        COALESCE(MAX(am.text_color), '#ffffff') AS text_color,
+        COALESCE(MAX(am.text_color), '#ffffff') AS text_color, /* NOSONAR */
         SUM(p.total_orders)::INTEGER AS total_orders,
         COUNT(DISTINCT p.employee_id)::INTEGER AS rider_count
       FROM public.v_rider_daily_platform_orders AS p

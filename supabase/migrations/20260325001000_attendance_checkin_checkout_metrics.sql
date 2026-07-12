@@ -1,4 +1,4 @@
--- Attendance enhancement: explicit work session metrics
+﻿-- Attendance enhancement: explicit work session metrics
 -- Adds total_hours, late and early_leave to support check-in/check-out analytics.
 
 ALTER TABLE public.attendance

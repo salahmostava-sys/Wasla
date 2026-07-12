@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- Fix Supabase Linter Warnings: SECURITY DEFINER Function Permissions
 -- =============================================================================
 -- This migration addresses security warnings about SECURITY DEFINER functions
@@ -86,9 +86,9 @@ GRANT EXECUTE ON FUNCTION public._const_tier_incremental() TO anon, authenticate
 
 -- Function Type                    | anon | authenticated | service_role
 -- ---------------------------------|------|---------------|-------------
--- Salary Calculations              |  ❌  |      ❌       |      ✅
--- Permission/Role Checks           |  ❌  |      ✅       |      ✅
--- Constants (read-only)            |  ✅  |      ✅       |      ✅
+-- Salary Calculations              |  âŒ  |      âŒ       |      âœ…
+-- Permission/Role Checks           |  âŒ  |      âœ…       |      âœ…
+-- Constants (read-only)            |  âœ…  |      âœ…       |      âœ…
 
 COMMENT ON FUNCTION public.calculate_salary_for_employee_month(UUID, TEXT, TEXT, NUMERIC, TEXT) IS 
   'SECURITY DEFINER - service_role only. Calculates and saves salary for an employee.';

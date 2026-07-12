@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TemporalProvider, useTemporalContext } from '../TemporalContext';
 import { format } from 'date-fns';
 
+const missingProviderError = 'useTemporalContext must be used within a TemporalProvider';
+
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <TemporalProvider>{children}</TemporalProvider>
 );
@@ -15,10 +17,18 @@ describe('TemporalContext', () => {
   });
 
   it('throws an error if used outside provider', () => {
-    // Suppress console.error for expected React errors
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => renderHook(() => useTemporalContext())).toThrow('useTemporalContext must be used within a TemporalProvider');
-    consoleError.mockRestore();
+    const suppressExpectedError = (event: ErrorEvent) => {
+      if (event.error instanceof Error && event.error.message === missingProviderError) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('error', suppressExpectedError);
+    try {
+      expect(() => renderHook(() => useTemporalContext())).toThrow(missingProviderError);
+    } finally {
+      window.removeEventListener('error', suppressExpectedError);
+    }
   });
 
   it('initializes with current month if sessionStorage is empty', () => {

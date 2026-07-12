@@ -1,5 +1,5 @@
--- 20260703000001_treasury_accounts.sql
--- Create Treasury (الخزينة) tracking system: Accounts, Categories, Transactions
+﻿-- 20260703000001_treasury_accounts.sql
+-- Create Treasury (Ø§Ù„Ø®Ø²ÙŠÙ†Ø©) tracking system: Accounts, Categories, Transactions
 
 -- 1. treasury_accounts
 CREATE TABLE IF NOT EXISTS public.treasury_accounts (
@@ -72,20 +72,20 @@ CREATE TRIGGER treasury_transactions_updated_at BEFORE UPDATE ON public.treasury
 
 -- Seed some default basic categories
 INSERT INTO public.treasury_categories (name, type) VALUES 
-('رواتب', 'expense'),
-('تجديد اشتراكات', 'expense'),
-('بنزين', 'expense'),
-('صيانة سيارات', 'expense'),
-('مصروفات مكتبية', 'expense'),
-('إيرادات منصات', 'income'),
-('إيرادات كاش', 'income')
+('Ø±ÙˆØ§ØªØ¨', 'expense'),
+('ØªØ¬Ø¯ÙŠØ¯ Ø§Ø´ØªØ±Ø§ÙƒØ§Øª', 'expense'),
+('Ø¨Ù†Ø²ÙŠÙ†', 'expense'),
+('ØµÙŠØ§Ù†Ø© Ø³ÙŠØ§Ø±Ø§Øª', 'expense'),
+('Ù…ØµØ±ÙˆÙØ§Øª Ù…ÙƒØªØ¨ÙŠØ©', 'expense'),
+('Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ù…Ù†ØµØ§Øª', 'income'),
+('Ø¥ÙŠØ±Ø§Ø¯Ø§Øª ÙƒØ§Ø´', 'income')
 ON CONFLICT DO NOTHING;
 
 -- Seed default accounts
 INSERT INTO public.treasury_accounts (name, type) VALUES
-('بنك الراجحي', 'bank'),
-('بنك الرياض', 'bank'),
-('الكاش', 'cash'),
-('عهدة عبدالله', 'custody'),
-('عهدة المشرفين', 'custody')
+('Ø¨Ù†Ùƒ Ø§Ù„Ø±Ø§Ø¬ØÙŠ', 'bank'),
+('Ø¨Ù†Ùƒ Ø§Ù„Ø±ÙŠØ§Ø¶', 'bank'),
+('Ø§Ù„ÙƒØ§Ø´', 'cash'),
+('Ø¹Ù‡Ø¯Ø© Ø¹Ø¨Ø¯Ø§Ù„Ù„Ù‡', 'custody'),
+('Ø¹Ù‡Ø¯Ø© Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†', 'custody')
 ON CONFLICT DO NOTHING;

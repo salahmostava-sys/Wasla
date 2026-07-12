@@ -13,10 +13,6 @@ export const REALTIME_TABLES_DASHBOARD = [
   'app_targets',
 ] as const;
 
-export const REALTIME_TABLES_ALERTS_PAGE = ['employees', 'vehicles', 'platform_accounts', 'alerts'] as const;
-
-export const REALTIME_TABLES_ALERTS_WIDGET = ['employees', 'vehicles'] as const;
-
 /** Subscribe to postgres_changes on the given tables; cleanup on unmount. */
 export function useRealtimePostgresChanges(
   channelName: string,

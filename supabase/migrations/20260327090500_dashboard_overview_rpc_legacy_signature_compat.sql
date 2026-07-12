@@ -1,4 +1,4 @@
--- Backward compatibility for older dashboard RPC call signatures.
+﻿-- Backward compatibility for older dashboard RPC call signatures.
 -- Some deployed clients still call month/year argument variants.
 
 CREATE OR REPLACE FUNCTION public.dashboard_overview_rpc(
@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION public.dashboard_overview_rpc(
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_month_year text;
@@ -32,7 +32,7 @@ CREATE OR REPLACE FUNCTION public.dashboard_overview_rpc(
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   RETURN public.dashboard_overview_rpc(p_month, p_year, COALESCE(p_today, CURRENT_DATE));
@@ -47,7 +47,7 @@ CREATE OR REPLACE FUNCTION public.dashboard_overview(
 RETURNS jsonb
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
   SELECT public.dashboard_overview_rpc(p_month, p_year, COALESCE(p_today, CURRENT_DATE));
 $$;
@@ -61,7 +61,7 @@ CREATE OR REPLACE FUNCTION public.dashboard_overview(
 RETURNS jsonb
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
   SELECT public.dashboard_overview_rpc(p_cip, p_month, p_year, COALESCE(p_today, CURRENT_DATE));
 $$;

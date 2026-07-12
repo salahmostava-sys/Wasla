@@ -32,6 +32,11 @@ export const employeeTierService = {
     const { error } = await supabase.from('employee_tiers').delete().eq('id', id);
     throwIfError(error, 'employeeTierService.deleteTier');
   },
+  deleteTiers: async (ids: string[]) => {
+    if (!ids.length) return;
+    const { error } = await supabase.from('employee_tiers').delete().in('id', ids);
+    throwIfError(error, 'employeeTierService.deleteTiers');
+  },
   getActiveAssignmentWithVehicleByEmployee: async (employeeId: string) => {
     const { data, error } = await supabase
       .from('vehicle_assignments')

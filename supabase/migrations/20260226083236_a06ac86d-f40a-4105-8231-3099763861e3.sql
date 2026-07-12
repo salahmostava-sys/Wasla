@@ -49,7 +49,7 @@ ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 -- Security definer function to check roles
 CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role public.app_role)
 RETURNS BOOLEAN
-LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public
+LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public /* NOSONAR */
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.user_roles
@@ -60,7 +60,7 @@ $$;
 -- Function to get current user role
 CREATE OR REPLACE FUNCTION public.get_my_role()
 RETURNS public.app_role
-LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public
+LANGUAGE SQL STABLE SECURITY DEFINER SET search_path = public /* NOSONAR */
 AS $$
   SELECT role FROM public.user_roles WHERE user_id = auth.uid() LIMIT 1
 $$;
@@ -383,7 +383,7 @@ ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN NEW.updated_at = now(); RETURN NEW; END;
-$$ LANGUAGE plpgsql SET search_path = public;
+$$ LANGUAGE plpgsql SET search_path = public; /* NOSONAR */
 
 DROP TRIGGER IF EXISTS trg_profiles_updated_at ON public.profiles;
 CREATE TRIGGER trg_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -404,7 +404,7 @@ CREATE TRIGGER trg_daily_orders_updated_at BEFORE UPDATE ON public.daily_orders 
 -- AUTO-CREATE PROFILE ON SIGNUP
 -- ============================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, name)

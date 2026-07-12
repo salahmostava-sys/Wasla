@@ -1,4 +1,4 @@
--- Fix salary preview so unlinked apps do not keep showing activity or salary
+﻿-- Fix salary preview so unlinked apps do not keep showing activity or salary
 -- on the payroll sheet after their scheme link is removed.
 
 BEGIN;
@@ -18,7 +18,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

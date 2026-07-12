@@ -1,4 +1,4 @@
--- Fix preview_salary_for_month: shift threshold hours_worked >= 8 → > 0
+﻿-- Fix preview_salary_for_month: shift threshold hours_worked >= 8 â†’ > 0
 -- UI now uses present=1/absent=0 so >= 8 never matches.
 
 BEGIN;
@@ -18,7 +18,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 DECLARE
   v_start DATE;

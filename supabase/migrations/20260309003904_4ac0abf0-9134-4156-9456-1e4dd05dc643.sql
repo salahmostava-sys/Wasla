@@ -1,4 +1,4 @@
-
+﻿
 -- Fix storage: make employee-documents private and fix UPDATE policy
 UPDATE storage.buckets SET public = FALSE WHERE id = 'employee-documents'; -- NOSONAR
 

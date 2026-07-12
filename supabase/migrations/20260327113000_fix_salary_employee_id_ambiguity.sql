@@ -1,4 +1,4 @@
--- Fix ambiguous employee_id references in salary RPC path.
+﻿-- Fix ambiguous employee_id references in salary RPC path.
 -- Recreates salary functions with fully-qualified column references.
 
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_employee_month(
@@ -23,7 +23,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_start date;
@@ -180,7 +180,7 @@ RETURNS TABLE(
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public' /* NOSONAR */
 AS $$
 DECLARE
   v_emp record;
@@ -226,7 +226,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public /* NOSONAR */
 AS $$
 BEGIN
   IF NOT public.is_internal_user() OR NOT public.has_permission('salary', 'approve') THEN

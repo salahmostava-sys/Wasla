@@ -1,8 +1,8 @@
--- Add work_type to apps table
+﻿-- Add work_type to apps table
 ALTER TABLE apps ADD COLUMN IF NOT EXISTS work_type TEXT DEFAULT _const_work_orders() 
   CHECK (work_type IN (_const_work_orders(), _const_work_shift(), _const_work_hybrid()));
 
-COMMENT ON COLUMN apps.work_type IS 'نوع العمل: orders (طلبات), shift (دوام), hybrid (مختلط)';
+COMMENT ON COLUMN apps.work_type IS 'Ù†ÙˆØ¹ Ø§Ù„Ø¹Ù…Ù„: orders (Ø·Ù„Ø¨Ø§Øª), shift (Ø¯ÙˆØ§Ù…), hybrid (Ù…Ø®ØªÙ„Ø·)';
 
 -- Create daily_shifts table for shift-based work
 CREATE TABLE IF NOT EXISTS daily_shifts (
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS daily_shifts (
   CONSTRAINT daily_shifts_unique_employee_app_date UNIQUE(employee_id, app_id, date)
 );
 
-COMMENT ON TABLE daily_shifts IS 'تسجيل ساعات الدوام اليومية للموظفين';
-COMMENT ON COLUMN daily_shifts.hours_worked IS 'عدد ساعات العمل في اليوم';
+COMMENT ON TABLE daily_shifts IS 'ØªØ³Ø¬ÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¯ÙˆØ§Ù… Ø§Ù„ÙŠÙˆÙ…ÙŠØ© Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ†';
+COMMENT ON COLUMN daily_shifts.hours_worked IS 'Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ ÙÙŠ Ø§Ù„ÙŠÙˆÙ…';
 
 CREATE INDEX IF NOT EXISTS idx_daily_shifts_employee_date ON daily_shifts(employee_id, date);
 CREATE INDEX IF NOT EXISTS idx_daily_shifts_app_date ON daily_shifts(app_id, date);
@@ -35,10 +35,10 @@ CREATE TABLE IF NOT EXISTS app_hybrid_rules (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-COMMENT ON TABLE app_hybrid_rules IS 'قواعد المنصات المختلطة (دوام أو طلبات)';
-COMMENT ON COLUMN app_hybrid_rules.min_hours_for_shift IS 'الحد الأدنى من الساعات لاحتساب الدوام';
-COMMENT ON COLUMN app_hybrid_rules.shift_rate IS 'سعر الدوام اليومي بالريال';
-COMMENT ON COLUMN app_hybrid_rules.fallback_to_orders IS 'التحويل لحساب الطلبات عند عدم تحقيق الساعات المطلوبة';
+COMMENT ON TABLE app_hybrid_rules IS 'Ù‚ÙˆØ§Ø¹Ø¯ Ø§Ù„Ù…Ù†ØµØ§Øª Ø§Ù„Ù…Ø®ØªÙ„Ø·Ø© (Ø¯ÙˆØ§Ù… Ø£Ùˆ Ø·Ù„Ø¨Ø§Øª)';
+COMMENT ON COLUMN app_hybrid_rules.min_hours_for_shift IS 'Ø§Ù„ØØ¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ù„Ø§ØØªØ³Ø§Ø¨ Ø§Ù„Ø¯ÙˆØ§Ù…';
+COMMENT ON COLUMN app_hybrid_rules.shift_rate IS 'Ø³Ø¹Ø± Ø§Ù„Ø¯ÙˆØ§Ù… Ø§Ù„ÙŠÙˆÙ…ÙŠ Ø¨Ø§Ù„Ø±ÙŠØ§Ù„';
+COMMENT ON COLUMN app_hybrid_rules.fallback_to_orders IS 'Ø§Ù„ØªØÙˆÙŠÙ„ Ù„ØØ³Ø§Ø¨ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø¹Ù†Ø¯ Ø¹Ø¯Ù… ØªØÙ‚ÙŠÙ‚ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©';
 
 -- Function to prevent overlap between orders and shifts on same day
 CREATE OR REPLACE FUNCTION check_no_overlap_orders_shifts()
@@ -52,7 +52,7 @@ BEGIN
         AND app_id = NEW.app_id 
         AND date = NEW.date
     ) THEN
-      RAISE EXCEPTION 'لا يمكن تسجيل دوام في يوم يحتوي على طلبات لنفس الموظف والمنصة';
+      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø¯ÙˆØ§Ù… ÙÙŠ ÙŠÙˆÙ… ÙŠØØªÙˆÙŠ Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ø§Øª Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
     END IF;
   END IF;
   
@@ -64,7 +64,7 @@ BEGIN
         AND app_id = NEW.app_id 
         AND date = NEW.date
     ) THEN
-      RAISE EXCEPTION 'لا يمكن تسجيل طلبات في يوم يحتوي على دوام لنفس الموظف والمنصة';
+      RAISE EXCEPTION 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨Ø§Øª ÙÙŠ ÙŠÙˆÙ… ÙŠØØªÙˆÙŠ Ø¹Ù„Ù‰ Ø¯ÙˆØ§Ù… Ù„Ù†ÙØ³ Ø§Ù„Ù…ÙˆØ¸Ù ÙˆØ§Ù„Ù…Ù†ØµØ©';
     END IF;
   END IF;
   

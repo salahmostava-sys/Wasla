@@ -20,7 +20,7 @@ This document is the **single source of truth** for architectural decisions in t
 #### Supabase Backend Logic
 - **Simple reads/writes**: Supabase JS client directly.
 - **Complex aggregation / reporting**: PostgreSQL SQL Functions (RPC).
-- **Third-party integrations** (WhatsApp/webhooks/n8n): Supabase Edge Functions only.
+- **Third-party integrations** (webhooks/n8n): Supabase Edge Functions only.
 
 #### State Management
 - **Server state**: React Query.
