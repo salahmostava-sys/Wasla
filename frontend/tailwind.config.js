@@ -84,17 +84,17 @@ const config = {
         },
         /* ── MD3 surface tokens ─────────────────────────────────── */
         surface: {
-          DEFAULT: "#f9f9fb",
+          DEFAULT: "#ffffff",
           lowest: "#ffffff",
-          low: "#f3f3f5",
-          container: "#edeef0",
-          high: "#e8e8ea",
+          low: "#fafbfc",
+          container: "#f4f6fa",
+          high: "#eef2f7",
         },
         "on-surface": {
           DEFAULT: "#1a1c1d",
-          variant: "#444656",
+          variant: "#485166",
         },
-        "outline-variant": "#c5c5d8",
+        "outline-variant": "#dce2eb",
         /* ── Brand palette ────────────────────────────────────────── */
         brand: {
           25:  '#f0f2ff',

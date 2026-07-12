@@ -218,8 +218,8 @@ function LoginBrandingPanel({
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight max-w-xl drop-shadow-md">{projectName}</h1>
-            <p className="text-white/90 text-base mt-1 truncate max-w-md drop-shadow-sm">{projectSubtitle}</p>
+            <h1 className="text-2xl xl:text-3xl font-extrabold text-white leading-tight max-w-lg drop-shadow-md">{projectName}</h1>
+            <p className="text-white/90 text-sm mt-1 truncate max-w-md drop-shadow-sm">{projectSubtitle}</p>
           </div>
         </div>
         <p className="text-white/90 text-lg max-w-xl leading-8 drop-shadow-sm">
@@ -381,7 +381,7 @@ function LoginFormSection(props: LoginFormSectionProps) {
             <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
           </div>
         )}
-        <h1 className="text-xl font-extrabold text-foreground text-center leading-tight max-w-xs">{projectName}</h1>
+        <h1 className="text-lg font-extrabold text-foreground text-center leading-tight max-w-[17rem]">{projectName}</h1>
         <p className="text-xs text-muted-foreground mt-1">{projectSubtitle}</p>
       </div>
 
