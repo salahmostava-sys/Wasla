@@ -375,8 +375,8 @@ function calculateTargetProjections(dashboard: PerformanceDashboardResponse): { 
     return { projectedOrders, targetHitProjected };
   }
 
-  const year = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10);
+  const year = Number.parseInt(parts[0], 10);
+  const month = Number.parseInt(parts[1], 10);
   const now = new Date();
   const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
   

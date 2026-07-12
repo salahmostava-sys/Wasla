@@ -1,14 +1,14 @@
-import fs from 'fs';
+import fs from 'node:fs';
 
-const filePath = 'd:\\MuhimmatAltawseel\\frontend\\modules\\ai-dashboard\\components\\AIDashboard.tsx';
+const filePath = String.raw`d:\MuhimmatAltawseel\frontend\modules\ai-dashboard\components\AIDashboard.tsx`;
 let content = fs.readFileSync(filePath, 'utf-8');
 
 // 1. Move helpers out
-const helpersRegex = /  const getTrendIcon = [\s\S]*?  };\n/m;
+const helpersRegex = / {2}const getTrendIcon = [\s\S]*? {2}};\n/m;
 const helpersMatch = content.match(helpersRegex);
 if (helpersMatch) {
   content = content.replace(helpersMatch[0], '');
-  content = content.replace('export function AIDashboard({', helpersMatch[0].replace(/^  /gm, '') + '\nexport function AIDashboard({');
+  content = content.replace('export function AIDashboard({', helpersMatch[0].replace(/^ {2}/gm, '') + '\nexport function AIDashboard({');
 }
 
 // 2. Extract Data Summary rendering

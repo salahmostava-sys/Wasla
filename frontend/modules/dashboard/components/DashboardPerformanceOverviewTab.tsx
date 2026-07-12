@@ -186,9 +186,16 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         <EnrichedStatCard
           label="إجمالي الطلبات"
           value={summary.totalOrders.toLocaleString('en-US')}
-          delta={fleetSummary.totalOrdersDelta}
-          sub={`${summary.activeRiders} مندوب نشط`}
+          sub="طلبات مكتملة"
           icon={Target}
+          tier="excellent"
+        />
+        <EnrichedStatCard
+          label="تحقيق الهدف"
+          value={`${targets.targetAchievementPct.toFixed(0)}%`}
+          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString('en-US')} طلب${projectedText}`}
+          icon={Trophy}
+          tier={targetTier(targets.targetAchievementPct)}
         />
         <EnrichedStatCard
           label="المتوسط اليومي للطلبات"
@@ -196,17 +203,6 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           delta={fleetSummary.dailyRunRateDelta}
           sub={`${dashboard.comparison.month.currentActiveDays || 0} إجمالي أيام العمل`}
           icon={Activity}
-        />
-        <EnrichedStatCard
-          label="تحقيق الهدف"
-          value={`${targets.targetAchievementPct.toFixed(0)}%`}
-          sub={`الهدف: ${targets.totalTargetOrders.toLocaleString('en-US')} طلب${
-            fleetSummary.projectedOrders
-              ? ` • المتوقع: ${fleetSummary.projectedOrders.toLocaleString('en-US')}`
-              : ''
-          }`}
-          icon={Trophy}
-          tier={targetTier(targets.targetAchievementPct)}
         />
         <EnrichedStatCard
           label="متوسط التقييم"
