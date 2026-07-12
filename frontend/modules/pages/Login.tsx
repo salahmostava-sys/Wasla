@@ -204,14 +204,16 @@ function LoginBrandingPanel({
       <div className={`relative z-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
         <div className="flex items-center gap-4 mb-7">
           {settings?.logo_url ? (
-            <img
-              src={brandLogoSrc(settings.logo_url, settings.updated_at)}
-              alt=""
-              className="w-24 h-24 object-contain bg-white p-1 ring-1 ring-white/30 shadow-card rounded-xl"
-            />
+            <span className="w-20 h-20 overflow-hidden bg-white ring-1 ring-white/35 shadow-card rounded-xl flex items-center justify-center shrink-0">
+              <img
+                src={brandLogoSrc(settings.logo_url, settings.updated_at)}
+                alt=""
+                className="h-full w-full object-contain scale-150"
+              />
+            </span>
           ) : (
-            <div className="w-24 h-24 bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-xl">
-              <span className="material-symbols-outlined text-6xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-xl shrink-0">
+              <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
               <span className={`absolute -top-1 ${isRtl ? '-right-1' : '-left-1'} w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30`} />
             </div>
           )}
@@ -238,15 +240,15 @@ function LoginBrandingPanel({
             }}
           >
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/15 transition-colors">
-              <span className="material-symbols-outlined text-blue-100 text-lg">{f.icon}</span>
+              <span className="material-symbols-outlined text-white text-lg">{f.icon}</span>
             </div>
             <h3 className="text-white font-bold text-base drop-shadow-sm">{f.title}</h3>
-            <p className="text-white/80 text-sm leading-relaxed drop-shadow-sm">{f.desc}</p>
+            <p className="text-white/90 text-sm leading-relaxed drop-shadow-sm">{f.desc}</p>
           </div>
         ))}
       </div>
 
-      <p className={`relative z-10 text-white/70 text-sm mt-8 drop-shadow-sm ${isRtl ? 'text-right' : 'text-left'}`}>
+      <p className={`relative z-10 text-white/80 text-sm mt-8 drop-shadow-sm ${isRtl ? 'text-right' : 'text-left'}`}>
         {`© ${new Date().getFullYear()} ${projectName}`}
       </p>
     </section>
@@ -298,8 +300,8 @@ function PasswordField({ password, setPassword, showPw, setShowPw, capsLock, set
         autoComplete="current-password"
         autoFocus={!!email}
         aria-invalid={!!loginError}
-        className={`block w-full ${isRtl ? 'pr-14 pl-14' : 'pl-14 pr-14'} py-5 text-lg bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
-        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.2em' : 'normal', fontSize: !showPw ? '1.5rem' : '1.125rem', textAlign: 'left' }} // NOSONAR
+        className={`block h-12 w-full ${isRtl ? 'pr-14 pl-14' : 'pl-14 pr-14'} text-base bg-muted/40 border border-border/60 rounded-xl focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-border transition-all duration-200 outline-none text-foreground placeholder:text-muted-foreground/50 dark:bg-muted/20 dark:hover:border-border/80`}
+        style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: !showPw ? '0.12em' : 'normal', textAlign: 'left', direction: 'ltr' }} // NOSONAR
       />
       <button
         type="button"
@@ -367,13 +369,15 @@ function LoginFormSection(props: LoginFormSectionProps) {
         style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(-12px)', transition: 'opacity 500ms, transform 500ms cubic-bezier(0.22,1,0.36,1)' }}
       >
         {settings?.logo_url ? (
-          <img
-            src={brandLogoSrc(settings.logo_url, settings.updated_at)}
-            alt=""
-            className="w-24 h-24 object-contain shadow-card border border-border bg-card p-1 mb-3 rounded-xl"
-          />
+          <span className="w-20 h-20 overflow-hidden shadow-card border border-border bg-card mb-3 rounded-xl flex items-center justify-center">
+            <img
+              src={brandLogoSrc(settings.logo_url, settings.updated_at)}
+              alt=""
+              className="h-full w-full object-contain scale-150"
+            />
+          </span>
         ) : (
-          <div className="w-24 h-24 rounded-xl mb-3 flex items-center justify-center shadow-brand" style={{ background: 'linear-gradient(225deg, #00288e, #1e40af)' }}>
+          <div className="w-20 h-20 rounded-xl mb-3 flex items-center justify-center shadow-brand" style={{ background: 'linear-gradient(225deg, #00288e, #1e40af)' }}>
             <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
           </div>
         )}

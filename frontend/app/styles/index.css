@@ -258,13 +258,59 @@
     max-width: 100%;
   }
 
+  .app-content-shell input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  .app-content-shell select,
+  .app-content-shell textarea,
+  .app-content-shell [role='combobox'] {
+    min-height: 2.5rem;
+    border-radius: 0.75rem;
+  }
+
+  .app-content-shell input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  .app-content-shell textarea {
+    max-width: 100%;
+  }
+
+  .app-content-shell [role='tablist'] {
+    min-height: 2.5rem;
+    border-radius: 0.875rem;
+    gap: 0.25rem;
+  }
+
+  .app-content-shell [role='tab'] {
+    min-height: 2rem;
+    border-radius: 0.625rem;
+    white-space: nowrap;
+  }
+
   .app-content-shell table {
     table-layout: auto;
+    min-width: max-content;
   }
 
   .app-content-shell th,
   .app-content-shell td {
     height: 2.75rem;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    line-height: 1.45;
+  }
+
+  .app-content-shell th {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .app-content-shell td {
+    font-size: 0.875rem;
+  }
+
+  .app-content-shell :is(.overflow-x-auto, .table-wrapper, .data-table-wrapper) {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-content-shell :is(.overflow-x-auto, .table-wrapper, .data-table-wrapper) > table {
+    width: 100%;
   }
 
   /* ─── Editorial card ─────────────────────────────────────────── */
