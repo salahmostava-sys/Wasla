@@ -5,6 +5,7 @@
 
 import { useMemo } from 'react';
 import {
+  Activity,
   AlertTriangle,
   Target,
   TrendingDown,
@@ -202,11 +203,11 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           icon={Target}
         />
         <EnrichedStatCard
-          label="متوسط الطلبات/يوم عمل"
-          value={fleetSummary.avgOrdersPerActiveDay.toFixed(1)}
-          delta={fleetSummary.avgOrdersDelta}
+          label="المتوسط اليومي للطلبات"
+          value={fleetSummary.dailyRunRate.toFixed(1)}
+          delta={fleetSummary.dailyRunRateDelta}
           sub={`${dashboard.comparison.month.currentActiveDays || 0} إجمالي أيام العمل`}
-          icon={Users}
+          icon={Activity}
         />
         <EnrichedStatCard
           label="تحقيق الهدف"
