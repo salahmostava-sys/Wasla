@@ -61,8 +61,8 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
   });
 
   const { register, reset, formState, getValues } = formApi;
-  const popRef = useRef<HTMLDialogElement>(null);
-  const [pos, setPos] = useState({ top: state.y + 6, left: state.x });
+  const popRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: state.y + 6, left: state.x, arrowLeft: 0 });
 
   useLayoutEffect(() => {
     if (!popRef.current) return;
@@ -72,7 +72,9 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
     if (left < 8) left = 8;
     if (left + rect.width > globalThis.innerWidth - 8) left = globalThis.innerWidth - rect.width - 8;
     if (top + rect.height > globalThis.innerHeight - 8) top = state.y - rect.height - 6;
-    setPos({ top, left });
+    if (top < 8) top = 8;
+    const arrowLeft = Math.min(Math.max(state.x - left, 12), rect.width - 12);
+    setPos({ top, left, arrowLeft });
   }, [state.x, state.y]);
 
   useEffect(() => {
@@ -99,13 +101,17 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
   };
 
   return createPortal(
-    <dialog
+    <div
+      role="dialog"
+      aria-modal="false"
       ref={popRef}
-      open
       className="fixed z-50 bg-popover border border-border rounded-xl shadow-xl p-3 min-w-[140px] max-w-none m-0 text-inherit"
       style={{ top: pos.top, left: pos.left }}
     >
-      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-popover border-t border-l border-border rotate-45" />
+      <div
+        className="absolute -top-1.5 -translate-x-1/2 w-3 h-3 bg-popover border-t border-l border-border rotate-45"
+        style={{ left: pos.arrowLeft }}
+      />
       <div className="flex items-center justify-between mb-2.5 relative z-10">
         <span className="text-xs font-semibold text-foreground">يوم {state.day}</span>
         <button aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground p-0.5 rounded">
@@ -153,7 +159,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
           <Check size={12} /> تطبيق
         </Button>
       )}
-    </dialog>,
+    </div>,
     document.body
   );
 };
