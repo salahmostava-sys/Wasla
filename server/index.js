@@ -4,7 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
-import { salaryEngineHandler, adminUpdateUserHandler, groqChatHandler, aiChatHandler } from './lib/handlers.js';
+import { salaryEngineHandler, adminUpdateUserHandler, groqChatHandler, aiChatHandler, telegramWebhookHandler } from './lib/handlers.js';
 
 const app = express();
 app.disable('x-powered-by'); // Fix: javascript:S5689 - Disable Express version disclosure
@@ -81,6 +81,10 @@ app.post('/api/functions/groq-chat', express.json({ limit: '2mb' }), groqChatHan
 
 // ── AI Chat (replaces ai-chat edge function) — larger body for AI payloads ──────
 app.post('/api/functions/ai-chat', express.json({ limit: '2mb' }), aiChatHandler);
+
+// Telegram cannot send the app Authorization header, so this webhook is outside
+// /api/functions and uses the Supabase service role internally.
+app.post('/api/telegram/webhook', telegramWebhookHandler);
 
 
 // ── Error Handling & Telegram Monitoring ──────────────────────────────────────

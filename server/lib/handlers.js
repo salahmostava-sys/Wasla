@@ -21,6 +21,10 @@ const {
   AI_CHAT_SYSTEM_PROMPT, AI_CHAT_TOOLS, executeAiTool, callGroqChat,
 } = require('../../api/_lib.js');
 
+const { telegramWebhookHandler } = require('../../api/_telegramWebhook.js');
+
+export { telegramWebhookHandler };
+
 // ─── Rate Limiting Helper ───────────────────────────────────────────────────
 // Uses Supabase RPC only — no in-memory fallback (unreliable on serverless).
 

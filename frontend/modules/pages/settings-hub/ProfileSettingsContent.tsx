@@ -12,6 +12,7 @@ import { settingsHubService } from '@services/settingsHubService';
 import { validateUploadFile } from '@shared/lib/validation';
 import { useQuery } from '@tanstack/react-query';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
+import { TelegramConnectCard } from '@shared/components/telegram/TelegramConnectCard';
 
 const getStrength = (pw: string) => {
   if (!pw) return 0;
@@ -273,6 +274,8 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
           )}
         </Button>
       </div>
+
+      {user?.id && <TelegramConnectCard userId={user.id} />}
 
       {/* Change Password */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
