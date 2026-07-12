@@ -61,7 +61,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
   });
 
   const { register, reset, formState, getValues } = formApi;
-  const popRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDialogElement>(null);
   const [pos, setPos] = useState({ top: state.y + 6, left: state.x, arrowLeft: 0 });
 
   useLayoutEffect(() => {
@@ -101,8 +101,8 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
   };
 
   return createPortal(
-    <div
-      role="dialog"
+    <dialog
+      open
       aria-modal="false"
       ref={popRef}
       className="fixed z-50 bg-popover border border-border rounded-xl shadow-xl p-3 min-w-[140px] max-w-none m-0 text-inherit"
@@ -159,7 +159,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
           <Check size={12} /> تطبيق
         </Button>
       )}
-    </div>,
+    </dialog>,
     document.body
   );
 };

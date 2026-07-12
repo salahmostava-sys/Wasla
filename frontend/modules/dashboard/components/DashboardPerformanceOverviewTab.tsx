@@ -177,10 +177,11 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 
   const { summary, comparison, distribution, ordersByApp, ordersByCity, rankings, alerts, targets } = dashboard;
 
-  const projectedText =
-    fleetSummary.projectedOrders !== null
-      ? ` • متوقع: ${fleetSummary.projectedOrders.toLocaleString('en-US')} ${fleetSummary.targetHitProjected ? '✅' : '⚠️'}`
-      : '';
+  let projectedText = '';
+  if (fleetSummary.projectedOrders !== null) {
+    const icon = fleetSummary.targetHitProjected ? '✅' : '⚠️';
+    projectedText = ` • متوقع: ${fleetSummary.projectedOrders.toLocaleString('en-US')} ${icon}`;
+  }
 
 
   return (
