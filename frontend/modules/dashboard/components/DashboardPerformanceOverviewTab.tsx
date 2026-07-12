@@ -353,20 +353,22 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           <p className="text-sm text-muted-foreground text-center py-6">لا توجد تنبيهات حالياً ✅</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {alerts.map((alert) => (
-              <div
-                key={alert.employeeId}
-                className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-bold text-foreground">{alert.employeeName ?? 'فريق التشغيل'}</p>
-                  <span className={`text-[11px] font-bold ${alert.severity === 'high' ? 'text-rose-500' : 'text-amber-600'}`}>  
-                    {alert.severity === 'high' ? 'عالي' : 'متوسط'}
-                  </span>
+            {alerts.map((alert) => {
+              const isHigh = alert.severity === 'high';
+              const severityClass = isHigh ? 'text-rose-500' : 'text-amber-600';
+              const severityLabel = isHigh ? 'عالي' : 'متوسط';
+              return (
+                <div key={alert.employeeId} className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-foreground">{alert.employeeName ?? 'فريق التشغيل'}</p>
+                    <span className={`text-[11px] font-bold ${severityClass}`}>
+                      {severityLabel}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground mt-2">{alertLabel(alert)}</p>
                 </div>
-                <p className="text-[12px] text-muted-foreground mt-2">{alertLabel(alert)}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
