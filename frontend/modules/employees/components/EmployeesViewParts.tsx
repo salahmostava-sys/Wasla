@@ -87,9 +87,9 @@ export const SortIcon = ({
   sortField: string | null;
   sortDir: 'asc' | 'desc' | null;
 }) => {
-  if (sortField !== field) return <ChevronsUpDown size={11} className="text-white/40 inline ms-1" />;
-  if (sortDir === 'asc') return <ChevronUp size={11} className="text-white inline ms-1" />;
-  return <ChevronDown size={11} className="text-white inline ms-1" />;
+  if (sortField !== field) return <ChevronsUpDown size={11} className="inline ms-1 text-current opacity-45" />;
+  if (sortDir === 'asc') return <ChevronUp size={11} className="inline ms-1 text-current" />;
+  return <ChevronDown size={11} className="inline ms-1 text-current" />;
 };
 
 export interface ColFilterPopoverProps {
@@ -106,12 +106,12 @@ export const ColFilterPopover = ({ label, active, children, onClear }: Readonly<
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className={`inline-flex items-center gap-0.5 rounded transition-colors ${active ? 'text-white' : 'text-white/40 hover:text-white'}`}
+          className={`inline-flex items-center gap-0.5 rounded transition-colors text-current ${active ? 'opacity-100' : 'opacity-45 hover:opacity-80'}`}
           title={`فلترة ${label}`}
           onClick={(e) => e.stopPropagation()}
         >
-          <FilterIcon size={10} className={active ? 'text-white' : ''} />
-          {active && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+          <FilterIcon size={10} />
+          {active && <span className="w-1.5 h-1.5 rounded-full bg-current" />}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-3 space-y-2 max-h-80 overflow-y-auto" align="start" onClick={(e) => e.stopPropagation()}>

@@ -494,9 +494,14 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                 البنزين <SalarySortIcon field="fuelCost" sortField={sortField} sortDir={sortDir} />
               </th>
               {platforms.map(p => {
+                const pc = platformColors[p];
                 return (
                   <th key={`${p}-col`}
-                    className="ta-th border-b border-l border-border/30 cursor-pointer select-none hover:opacity-90 transition-opacity"
+                    className="ta-th salary-platform-th border-b border-l border-border/30 cursor-pointer select-none hover:opacity-90 transition-opacity"
+                    style={{
+                      '--salary-platform-header-bg': pc?.header,
+                      '--salary-platform-header-text': pc?.headerText,
+                    } as React.CSSProperties}
                     onClick={() => handleSort(p)}>
                     <div className="flex flex-col items-center gap-0">
                       <span>{p}</span>

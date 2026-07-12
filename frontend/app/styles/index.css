@@ -501,6 +501,11 @@
     color: var(--ds-table-header-text) !important;
   }
 
+  .salary-platform-th {
+    background: var(--salary-platform-header-bg, var(--ds-table-header-bg)) !important;
+    color: var(--salary-platform-header-text, var(--ds-table-header-text)) !important;
+  }
+
   .ta-th-center {
     @apply px-2 py-2.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-center;
     background: var(--ds-table-header-bg) !important;

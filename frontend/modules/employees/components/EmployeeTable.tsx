@@ -204,7 +204,7 @@ function EmployeeDetailedTableInner() {
                       {col.sortable ? (
                         <button
                           type="button"
-                          className="flex min-w-0 items-center justify-center gap-1 bg-transparent cursor-pointer text-white hover:text-white/80"
+                          className="flex min-w-0 items-center justify-center gap-1 bg-transparent cursor-pointer text-current hover:opacity-80"
                           onClick={() => handleSort(col.key)}
                         >
                           <span className="truncate">{col.label}</span>
