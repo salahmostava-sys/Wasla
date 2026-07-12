@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import {
   Activity,
   Target,
+  TrendingDown,
+  TrendingUp,
   Trophy,
   Zap,
 } from 'lucide-react';
@@ -35,10 +37,6 @@ function formatPercent(value: number) {
   return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}%`;
 }
 
-function getFirstTwoNames(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  return parts.slice(0, 2).join(' ');
-}
 
 function alertLabel(alert: PerformanceAlert) {
   switch (alert.alertType) {
