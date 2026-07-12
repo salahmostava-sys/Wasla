@@ -357,12 +357,12 @@ export function renderEmployeeCell(ctx: CellContext): React.ReactNode {
   switch (col.key) {
     case "seq": return renderSeqCell(ctx);
     case "name": return renderNameCell(ctx);
-    case "name_en": return <td key="name_en" className="ta-td !px-1" dir="ltr">{renderEditableTextCell(emp.id, "name_en", emp.name_en, { dir: "ltr", placeholder: "الاسم بالإنجليزية" })}</td>;
-    case "national_id": return <td key="national_id" className="ta-td !px-1" dir="ltr">{renderTextValue(emp.national_id, { dir: "ltr", className: "tabular-nums" })}</td>;
-    case "phone": return <td key="phone" className="ta-td !px-1" dir="ltr">{renderEditableTextCell(emp.id, "phone", emp.phone, { dir: "ltr", placeholder: "رقم الهاتف" })}</td>;
+    case "name_en": return <td key="name_en" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderEditableTextCell(emp.id, "name_en", emp.name_en, { dir: "ltr", className: "employee-ltr-value", placeholder: "الاسم بالإنجليزية" })}</td>;
+    case "national_id": return <td key="national_id" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderTextValue(emp.national_id, { dir: "ltr", className: "employee-ltr-value tabular-nums" })}</td>;
+    case "phone": return <td key="phone" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderEditableTextCell(emp.id, "phone", emp.phone, { dir: "ltr", className: "employee-ltr-value", placeholder: "رقم الهاتف" })}</td>;
     case "email": return (
-      <td key="email" className="ta-td !px-1" dir="ltr">
-        {emp.email ? <a href={`mailto:${emp.email}`} className="text-primary hover:underline text-sm">{emp.email}</a> : emptyCell}
+      <td key="email" className="ta-td employee-ltr-cell !px-1" dir="ltr">
+        {emp.email ? <a href={`mailto:${emp.email}`} className="employee-ltr-value text-primary hover:underline text-sm">{emp.email}</a> : emptyCell}
       </td>
     );
     case "job_title":
@@ -382,7 +382,7 @@ export function renderEmployeeCell(ctx: CellContext): React.ReactNode {
     case "health_insurance_expiry":
     case "license_expiry":
       return renderEmployeeDatesCell(ctx);
-    case "bank_account_number": return <td key="bank_account_number" className="ta-td !px-1" dir="ltr">{renderTextValue(emp.bank_account_number, { dir: "ltr", className: "tabular-nums" })}</td>;
+    case "bank_account_number": return <td key="bank_account_number" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderTextValue(emp.bank_account_number, { dir: "ltr", className: "employee-ltr-value tabular-nums" })}</td>;
     case "actions": return renderActionsCell(ctx);
     default: return <td key={(col as { key: string }).key} className="ta-td !px-1">{EMPTY_DATA_PLACEHOLDER}</td>;
   }

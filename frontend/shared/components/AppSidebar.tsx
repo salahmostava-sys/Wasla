@@ -122,8 +122,8 @@ function setHoverStylesIf(
   enter: boolean
 ) {
   if (!shouldApply) return;
-  el.style.background = enter ? 'var(--ds-surface-container)' : 'transparent';
-  el.style.color = enter ? 'var(--ds-on-surface)' : 'var(--ds-on-surface-variant)';
+  el.style.background = enter ? 'rgba(255, 255, 255, 0.10)' : 'transparent';
+  el.style.color = '#ffffff';
 }
 
 type SidebarNavItemData = {
@@ -157,12 +157,11 @@ const SidebarNavLink = memo(function SidebarNavLink({
       style={
         active
           ? {
-              background: 'linear-gradient(135deg, #2642e6 0%, #465fff 100%)',
+              background: 'rgba(255, 255, 255, 0.16)',
               color: '#ffffff',
               fontWeight: 600,
-              boxShadow: '0 4px 14px rgba(38,66,230,0.25)',
             }
-          : { color: 'var(--ds-on-surface-variant)', fontWeight: 400 }
+          : { color: '#ffffff', fontWeight: 500 }
       }
       onMouseEnter={(e) => {
         setHoverStylesIf(e.currentTarget, !active, true);
@@ -311,8 +310,8 @@ const AppSidebar = () => {
           'lg:translate-x-0',
         )}
         style={{
-          background: 'var(--ds-surface-low)',
-          boxShadow: '4px 0 24px rgba(26,28,29,0.06)',
+          background: 'linear-gradient(180deg, #111c44 0%, #172554 48%, #0f1f3f 100%)',
+          boxShadow: '4px 0 28px rgba(15, 23, 42, 0.18)',
         }}
       >
 
@@ -327,14 +326,14 @@ const AppSidebar = () => {
               <div className="min-w-0">
                 <span
                   className="text-sm font-bold leading-tight block truncate"
-                  style={{ color: 'var(--ds-on-surface)' }}
+                  style={{ color: '#ffffff' }}
                 >
                   {projectName}
                 </span>
                 {projectSubtitle && (
                   <span
                     className="text-[11px] block truncate leading-tight mt-0.5"
-                    style={{ color: 'var(--ds-on-surface-variant)' }}
+                    style={{ color: '#ffffff' }}
                   >
                     {projectSubtitle}
                   </span>
@@ -348,8 +347,8 @@ const AppSidebar = () => {
             <button
               onClick={close}
               className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
-              style={{ color: 'var(--ds-on-surface-variant)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--ds-surface-container)')}
+              style={{ color: '#ffffff' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
               <X size={15} />
@@ -416,19 +415,19 @@ const AppSidebar = () => {
                   type="button"
                   className={cn(
                     'flex h-9 w-full items-center gap-2 rounded-lg px-3 text-start transition-colors',
-                    'hover:bg-[var(--ds-surface-container)]',
+                    'hover:bg-white/10',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    isOpen ? 'text-[var(--ds-primary)]' : 'text-[var(--ds-on-surface-variant)]'
+                    'text-white'
                   )}
                 >
-                  {group.groupIcon && <group.groupIcon size={16} className={cn("flex-shrink-0", isOpen ? "text-[var(--ds-primary)]" : "opacity-70")} />}
+                  {group.groupIcon && <group.groupIcon size={16} className="flex-shrink-0 text-white" />}
                   <span className="min-w-0 flex-1 truncate text-xs font-bold">
                     {group.sectionLabel}
                   </span>
                   <ChevronDown
                     size={16}
                     className={cn(
-                      'flex-shrink-0 opacity-70 transition-transform duration-200',
+                      'flex-shrink-0 text-white transition-transform duration-200',
                       isOpen && '-rotate-180',
                     )}
                     aria-hidden
@@ -459,14 +458,14 @@ const AppSidebar = () => {
         {/* ── Collapse toggle — desktop only ────────────────── */}
         <div
           className="hidden lg:flex px-3 py-2.5 flex-shrink-0 justify-end"
-          style={{ borderTop: '1px solid var(--ds-surface-container)' }}
+          style={{ borderTop: '1px solid rgba(255,255,255,0.10)' }}
         >
           <button
             onClick={toggleCollapse}
             title={collapsed ? 'توسيع القائمة' : 'تصغير القائمة'}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-            style={{ color: 'var(--ds-on-surface-variant)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--ds-surface-container)')}
+            style={{ color: '#ffffff' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <CollapseChevronIcon size={16} />
@@ -492,7 +491,7 @@ function SidebarLogo({ logoSrc }: Readonly<{ logoSrc?: string }>) {
   }
   return (
     <div
-      className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-brand-sm"
+      className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0"
       style={{ background: 'linear-gradient(135deg, #2642e6, #465fff)' }}
     >
       <Sparkles size={18} aria-hidden />

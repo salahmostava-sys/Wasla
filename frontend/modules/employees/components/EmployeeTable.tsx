@@ -20,6 +20,7 @@ import {
   dayColorByThreshold,
   GRID_SKELETON_IDS,
   EMPTY_DATA_PLACEHOLDER,
+  type ColKey,
 } from "@modules/employees/types/employee.types";
 
 import { buildColumnFilter } from "./table/EmployeeTableFilters";
@@ -31,6 +32,31 @@ import { EmployeeTableProvider, useEmployeeTable, type EmployeeTableContextValue
 
 
 type EmployeeDetailedTableProps = EmployeeTableContextValue;
+
+const EMPLOYEE_COLUMN_WIDTHS: Partial<Record<ColKey, string>> = {
+  seq: "44px",
+  name: "168px",
+  name_en: "150px",
+  national_id: "124px",
+  job_title: "132px",
+  city: "112px",
+  phone: "118px",
+  nationality: "96px",
+  platform_apps: "132px",
+  commercial_record: "138px",
+  sponsorship_status: "124px",
+  status: "112px",
+  join_date: "108px",
+  birth_date: "108px",
+  probation_end_date: "138px",
+  residency_combined: "136px",
+  health_insurance_expiry: "144px",
+  license_status: "116px",
+  license_expiry: "118px",
+  bank_account_number: "150px",
+  email: "190px",
+  actions: "72px",
+};
 
 function EmployeeDetailedTableInner() {
   const {
@@ -89,7 +115,7 @@ function EmployeeDetailedTableInner() {
     options?: Readonly<{ dir?: "rtl" | "ltr" | "auto"; className?: string }>,
   ) => (
     <span
-      className={`text-sm text-muted-foreground whitespace-nowrap ${options?.className || ""}`}
+      className={`text-xs text-muted-foreground whitespace-nowrap ${options?.className || ""}`}
       dir={options?.dir}
     >
       {cellText(value)}
@@ -143,10 +169,15 @@ function EmployeeDetailedTableInner() {
   };
 
   return (
-    <div className="ta-table-wrap">
+    <div className="ta-table-wrap employees-table-wrap">
       <div className="overflow-x-auto">
-        <table className="w-full text-center align-middle whitespace-nowrap" ref={tableRef}>
-          <thead className="bg-yellow-400">
+        <table className="employees-table text-center align-middle whitespace-nowrap" ref={tableRef}>
+          <colgroup>
+            {activeCols.map((col) => (
+              <col key={col.key} style={{ width: EMPLOYEE_COLUMN_WIDTHS[col.key] ?? "120px" }} />
+            ))}
+          </colgroup>
+          <thead>
             <tr className="ta-thead">
               {activeCols.map((col) => {
                 const isFilterable = !["seq", "actions"].includes(col.key);
@@ -169,14 +200,14 @@ function EmployeeDetailedTableInner() {
                     key={col.key}
                     className={`ta-th !px-1 select-none whitespace-nowrap text-center text-black ${col.key === "seq" ? "w-10 !px-1" : ""}`}
                   >
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex min-w-0 items-center justify-center gap-1">
                       {col.sortable ? (
                         <button
                           type="button"
-                          className="flex items-center gap-1 bg-transparent cursor-pointer hover:text-gray-800"
+                          className="flex min-w-0 items-center justify-center gap-1 bg-transparent cursor-pointer hover:text-foreground"
                           onClick={() => handleSort(col.key)}
                         >
-                          <span>{col.label}</span>
+                          <span className="truncate">{col.label}</span>
                           <SortIcon
                             field={col.key}
                             sortField={sortField}

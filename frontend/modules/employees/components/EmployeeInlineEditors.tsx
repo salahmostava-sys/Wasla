@@ -20,18 +20,18 @@ const InlineEditTrigger = forwardRef<HTMLButtonElement, Readonly<{
       ref={ref}
       type="button"
       title={title}
-      className="group flex h-full w-full min-h-[32px] items-center justify-center gap-1.5 rounded-sm px-2 py-1 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-text"
+      className="group relative flex h-full w-full min-h-[28px] items-center justify-center rounded-sm px-1.5 py-0.5 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-text"
       onClick={(event) => {
         event.stopPropagation();
         onClick?.(event);
       }}
       {...(rest)}
     >
-      <div className="min-w-0 flex-1 flex items-center justify-center pointer-events-none">{children}</div>
+      <div className="min-w-0 w-full flex items-center justify-center pointer-events-none">{children}</div>
       {saving ? (
-        <Loader2 size={12} className="animate-spin text-muted-foreground shrink-0" />
+        <Loader2 size={12} className="absolute end-1.5 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground" />
       ) : (
-        <Edit size={12} className="shrink-0 text-muted-foreground/0 transition-opacity group-hover:text-muted-foreground/60" />
+        <Edit size={12} className="absolute end-1.5 top-1/2 -translate-y-1/2 text-muted-foreground/0 transition-opacity group-hover:text-muted-foreground/60" />
       )}
     </button>
   );

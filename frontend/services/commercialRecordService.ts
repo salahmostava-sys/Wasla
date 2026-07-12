@@ -7,6 +7,8 @@ export const COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE =
 export type CommercialRecordItem = {
   id: string | null;
   name: string;
+  registration_number: string | null;
+  residency_renewal_monthly_cost: number | null;
   usage_count: number;
   source: 'managed' | 'legacy';
 };
@@ -16,15 +18,49 @@ export type CommercialRecordCatalog = {
   records: CommercialRecordItem[];
 };
 
+export type CommercialRecordInput = {
+  name: string;
+  registration_number?: string | null;
+  residency_renewal_monthly_cost?: number | null;
+};
+
 type CommercialRecordRow = {
   id: string;
   name: string;
+  registration_number: string | null;
+  residency_renewal_monthly_cost: number | null;
 };
 
 const normalizeCommercialRecordName = (value: string | null | undefined) => value?.trim() ?? '';
 
 const normalizeCommercialRecordKey = (value: string | null | undefined) =>
   normalizeCommercialRecordName(value).toLocaleLowerCase();
+
+const normalizeOptionalText = (value: string | null | undefined) => {
+  const normalizedText = value?.trim() ?? '';
+  return normalizedText || null;
+};
+
+const normalizeResidencyRenewalMonthlyCost = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return null;
+  if (!Number.isFinite(value) || value < 0) {
+    throw new ServiceError('تكلفة تجديد الإقامة الشهرية يجب أن تكون رقماً موجباً أو صفراً');
+  }
+  return value;
+};
+
+const buildCommercialRecordPayload = (record: CommercialRecordInput) => {
+  const normalizedName = normalizeCommercialRecordName(record.name);
+  if (!normalizedName) {
+    throw new ServiceError('اسم السجل التجاري مطلوب');
+  }
+
+  return {
+    name: normalizedName,
+    registration_number: normalizeOptionalText(record.registration_number),
+    residency_renewal_monthly_cost: normalizeResidencyRenewalMonthlyCost(record.residency_renewal_monthly_cost),
+  };
+};
 
 const isMissingCommercialRecordsTable = (error: unknown) => {
   const message =
@@ -42,7 +78,7 @@ const isMissingCommercialRecordsTable = (error: unknown) => {
 async function listManagedCommercialRecords(): Promise<CommercialRecordRow[]> {
   const { data, error } = await supabase
     .from('commercial_records')
-    .select('id, name')
+    .select('id, name, registration_number, residency_renewal_monthly_cost')
     .order('name', { ascending: true });
 
   if (error) throw error;
@@ -94,6 +130,8 @@ export const commercialRecordService = {
       managedByKey.set(key, {
         id: row.id,
         name: normalizeCommercialRecordName(row.name),
+        registration_number: row.registration_number,
+        residency_renewal_monthly_cost: row.residency_renewal_monthly_cost,
         usage_count: usageMap.get(key)?.count ?? 0,
         source: 'managed',
       });
@@ -105,6 +143,8 @@ export const commercialRecordService = {
       records.push({
         id: null,
         name: usage.name,
+        registration_number: null,
+        residency_renewal_monthly_cost: null,
         usage_count: usage.count,
         source: 'legacy',
       });
@@ -118,16 +158,13 @@ export const commercialRecordService = {
     return { tableAvailable, records };
   },
 
-  async createRecord(name: string) {
-    const normalizedName = normalizeCommercialRecordName(name);
-    if (!normalizedName) {
-      throw new ServiceError('اسم السجل التجاري مطلوب');
-    }
+  async createRecord(record: CommercialRecordInput) {
+    const payload = buildCommercialRecordPayload(record);
 
     const { data, error } = await supabase
       .from('commercial_records')
-      .insert({ name: normalizedName })
-      .select('id, name')
+      .insert(payload)
+      .select('id, name, registration_number, residency_renewal_monthly_cost')
       .single();
 
     if (error) {
@@ -140,17 +177,15 @@ export const commercialRecordService = {
     return data;
   },
 
-  async updateRecord(recordId: string, nextName: string, previousName: string) {
-    const normalizedName = normalizeCommercialRecordName(nextName);
-    const normalizedPrevious = normalizeCommercialRecordName(previousName);
-
-    if (!normalizedName) {
-      throw new ServiceError('اسم السجل التجاري مطلوب');
-    }
+  async updateRecord(recordId: string, record: CommercialRecordInput, previousRecord: CommercialRecordInput) {
+    const payload = buildCommercialRecordPayload(record);
+    const previousPayload = buildCommercialRecordPayload(previousRecord);
+    const normalizedName = payload.name;
+    const normalizedPrevious = previousPayload.name;
 
     const { error: updateRecordError } = await supabase
       .from('commercial_records')
-      .update({ name: normalizedName })
+      .update(payload)
       .eq('id', recordId);
 
     if (updateRecordError) {
@@ -169,7 +204,7 @@ export const commercialRecordService = {
       if (syncEmployeesError) {
         await supabase
           .from('commercial_records')
-          .update({ name: normalizedPrevious })
+          .update(previousPayload)
           .eq('id', recordId);
         throw toServiceError(syncEmployeesError, 'commercialRecordService.updateRecord.syncEmployees');
       }

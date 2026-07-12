@@ -27,7 +27,12 @@ describe('commercialRecordService', () => {
   describe('listCatalog', () => {
     it('merges managed and legacy commercial records with usage counts', async () => {
       tableResults.commercial_records = {
-        data: [{ id: 'cr-1', name: 'سجل مكة' }],
+        data: [{
+          id: 'cr-1',
+          name: 'سجل مكة',
+          registration_number: '1010',
+          residency_renewal_monthly_cost: 650,
+        }],
         error: null,
       };
       tableResults.employees = {
@@ -43,8 +48,22 @@ describe('commercialRecordService', () => {
 
       expect(result.tableAvailable).toBe(true);
       expect(result.records).toEqual([
-        { id: 'cr-1', name: 'سجل مكة', usage_count: 2, source: 'managed' },
-        { id: null, name: 'سجل جدة', usage_count: 1, source: 'legacy' },
+        {
+          id: 'cr-1',
+          name: 'سجل مكة',
+          registration_number: '1010',
+          residency_renewal_monthly_cost: 650,
+          usage_count: 2,
+          source: 'managed',
+        },
+        {
+          id: null,
+          name: 'سجل جدة',
+          registration_number: null,
+          residency_renewal_monthly_cost: null,
+          usage_count: 1,
+          source: 'legacy',
+        },
       ]);
     });
 
@@ -62,7 +81,14 @@ describe('commercialRecordService', () => {
 
       expect(result.tableAvailable).toBe(false);
       expect(result.records).toEqual([
-        { id: null, name: 'سجل رئيسي', usage_count: 1, source: 'legacy' },
+        {
+          id: null,
+          name: 'سجل رئيسي',
+          registration_number: null,
+          residency_renewal_monthly_cost: null,
+          usage_count: 1,
+          source: 'legacy',
+        },
       ]);
     });
 
@@ -80,23 +106,47 @@ describe('commercialRecordService', () => {
 
   describe('createRecord', () => {
     it('creates record successfully', async () => {
-      tableResults.commercial_records = { data: { id: 'cr-1', name: 'New' }, error: null };
-      const res = await commercialRecordService.createRecord('New');
-      expect(res).toEqual({ id: 'cr-1', name: 'New' });
+      tableResults.commercial_records = {
+        data: {
+          id: 'cr-1',
+          name: 'New',
+          registration_number: '123',
+          residency_renewal_monthly_cost: 900,
+        },
+        error: null,
+      };
+      const res = await commercialRecordService.createRecord({
+        name: 'New',
+        registration_number: '123',
+        residency_renewal_monthly_cost: 900,
+      });
+      expect(res).toEqual({
+        id: 'cr-1',
+        name: 'New',
+        registration_number: '123',
+        residency_renewal_monthly_cost: 900,
+      });
     });
 
     it('throws when name is empty', async () => {
-      await expect(commercialRecordService.createRecord('   ')).rejects.toThrow('اسم السجل التجاري مطلوب');
+      await expect(commercialRecordService.createRecord({ name: '   ' })).rejects.toThrow('اسم السجل التجاري مطلوب');
+    });
+
+    it('throws when residency renewal cost is negative', async () => {
+      await expect(commercialRecordService.createRecord({
+        name: 'New',
+        residency_renewal_monthly_cost: -1,
+      })).rejects.toThrow('تكلفة تجديد الإقامة الشهرية يجب أن تكون رقماً موجباً أو صفراً');
     });
 
     it('throws migration error when table is missing', async () => {
       tableResults.commercial_records = { data: null, error: new Error('commercial_records does not exist') };
-      await expect(commercialRecordService.createRecord('New')).rejects.toThrow(COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE);
+      await expect(commercialRecordService.createRecord({ name: 'New' })).rejects.toThrow(COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE);
     });
 
     it('throws normal error when db fails', async () => {
       tableResults.commercial_records = { data: null, error: new Error('db error') };
-      await expect(commercialRecordService.createRecord('New')).rejects.toThrow('db error');
+      await expect(commercialRecordService.createRecord({ name: 'New' })).rejects.toThrow('db error');
     });
   });
 
@@ -104,30 +154,38 @@ describe('commercialRecordService', () => {
     it('updates record successfully', async () => {
       tableResults.commercial_records = { data: null, error: null };
       tableResults.employees = { data: null, error: null };
-      await commercialRecordService.updateRecord('cr-1', 'New Name', 'Old Name');
+      await commercialRecordService.updateRecord(
+        'cr-1',
+        { name: 'New Name', registration_number: '222', residency_renewal_monthly_cost: 800 },
+        { name: 'Old Name', registration_number: '111', residency_renewal_monthly_cost: 600 },
+      );
       expect(fromMock).toHaveBeenCalledWith('commercial_records');
       expect(fromMock).toHaveBeenCalledWith('employees');
     });
 
     it('updates without sync if name is unchanged', async () => {
       tableResults.commercial_records = { data: null, error: null };
-      await commercialRecordService.updateRecord('cr-1', 'Old Name', 'Old Name');
+      await commercialRecordService.updateRecord(
+        'cr-1',
+        { name: 'Old Name', registration_number: '222', residency_renewal_monthly_cost: 800 },
+        { name: 'Old Name', registration_number: '111', residency_renewal_monthly_cost: 600 },
+      );
       expect(fromMock).toHaveBeenCalledWith('commercial_records');
       expect(fromMock).not.toHaveBeenCalledWith('employees');
     });
 
     it('throws when name is empty', async () => {
-      await expect(commercialRecordService.updateRecord('cr-1', '  ', 'Old')).rejects.toThrow('اسم السجل التجاري مطلوب');
+      await expect(commercialRecordService.updateRecord('cr-1', { name: '  ' }, { name: 'Old' })).rejects.toThrow('اسم السجل التجاري مطلوب');
     });
 
     it('throws migration error when table is missing', async () => {
       tableResults.commercial_records = { data: null, error: new Error('commercial_records does not exist') };
-      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow(COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE);
+      await expect(commercialRecordService.updateRecord('cr-1', { name: 'New' }, { name: 'Old' })).rejects.toThrow(COMMERCIAL_RECORDS_MIGRATION_REQUIRED_MESSAGE);
     });
 
     it('throws when record update fails', async () => {
       tableResults.commercial_records = { data: null, error: new Error('db error') };
-      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('db error');
+      await expect(commercialRecordService.updateRecord('cr-1', { name: 'New' }, { name: 'Old' })).rejects.toThrow('db error');
     });
 
     it('throws and rolls back when employee sync fails', async () => {
@@ -146,7 +204,11 @@ describe('commercialRecordService', () => {
         return createQueryBuilder({ data: null, error: null });
       });
 
-      await expect(commercialRecordService.updateRecord('cr-1', 'New', 'Old')).rejects.toThrow('sync fail');
+      await expect(commercialRecordService.updateRecord(
+        'cr-1',
+        { name: 'New', registration_number: '222', residency_renewal_monthly_cost: 800 },
+        { name: 'Old', registration_number: '111', residency_renewal_monthly_cost: 600 },
+      )).rejects.toThrow('sync fail');
       expect(mockUpdate).toHaveBeenCalledTimes(3);
       fromMock.mockImplementation(originalImpl as any);
     });
