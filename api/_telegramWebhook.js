@@ -167,8 +167,105 @@ async function fetchLinkedTelegramAccess(adminClient, chatId) {
   return access;
 }
 
-async function handleUserChat(text, role) {
-  return `I received your message: "${text}". As a ${role}, I am checking the system data for you...`;
+function currentMonthKey() {
+  return new Date().toISOString().slice(0, 7);
+}
+
+function todayIsoRange() {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  return {
+    start: today.toISOString().slice(0, 10),
+    end: tomorrow.toISOString().slice(0, 10),
+  };
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat('ar-SA').format(value);
+}
+
+async function handleUserChat(supabaseAdmin, text, role) {
+  const normalizedText = String(text ?? '').trim();
+
+  try {
+    switch (normalizedText) {
+      case 'الرواتب': {
+        const { data, error } = await supabaseAdmin
+          .from('payroll')
+          .select('salary_amount, status')
+          .eq('payment_month', currentMonthKey());
+
+        if (error) throw error;
+
+        const rows = data ?? [];
+        const totalSalaries = rows.reduce((sum, row) => sum + Number(row.salary_amount ?? 0), 0);
+        const pendingPayments = rows.filter((row) => row.status === 'pending').length;
+
+        return [
+          '📊 تقرير الرواتب:',
+          `إجمالي رواتب الشهر: ${formatNumber(totalSalaries)} ريال`,
+          `المدفوعات المعلقة: ${formatNumber(pendingPayments)}`,
+        ].join('\n');
+      }
+
+      case 'حالة الأسطول': {
+        const { data, error } = await supabaseAdmin
+          .from('fleet_drivers')
+          .select('status');
+
+        if (error) throw error;
+
+        const rows = data ?? [];
+        const activeDrivers = rows.filter((row) => row.status === 'active').length;
+        const inactiveDrivers = rows.filter((row) => row.status === 'inactive').length;
+        const onLeaveDrivers = rows.filter((row) => row.status === 'on_leave').length;
+
+        return [
+          '🚚 تقرير حالة الأسطول:',
+          `السائقون النشطون: ${formatNumber(activeDrivers)}`,
+          `غير النشطين: ${formatNumber(inactiveDrivers)}`,
+          `في إجازة: ${formatNumber(onLeaveDrivers)}`,
+        ].join('\n');
+      }
+
+      case 'الطلبات': {
+        const { start, end } = todayIsoRange();
+        const { data, error } = await supabaseAdmin
+          .from('deliveries')
+          .select('status')
+          .gte('delivery_date', start)
+          .lt('delivery_date', end);
+
+        if (error) throw error;
+
+        const rows = data ?? [];
+        const completedDeliveries = rows.filter((row) => row.status === 'completed').length;
+        const pendingDeliveries = rows.filter((row) => row.status === 'pending').length;
+
+        return [
+          '📦 تقرير طلبات اليوم:',
+          `الطلبات المكتملة: ${formatNumber(completedDeliveries)}`,
+          `الطلبات المعلقة: ${formatNumber(pendingDeliveries)}`,
+        ].join('\n');
+      }
+
+      default:
+        return [
+          'لم أفهم الطلب بشكل واضح.',
+          `صلاحيتك الحالية: ${role}`,
+          'من فضلك اختر خيارا صحيحا من القائمة: الرواتب، حالة الأسطول، الطلبات.',
+        ].join('\n');
+    }
+  } catch (error) {
+    logError('Telegram chat query failed', {
+      error: getErrorMessage(error),
+      query: normalizedText,
+      role,
+    });
+    return 'تعذر جلب البيانات حاليا. حاول مرة أخرى بعد قليل.';
+  }
 }
 
 async function handleGenericTextMessage(adminClient, chatId, text) {
@@ -179,7 +276,7 @@ async function handleGenericTextMessage(adminClient, chatId, text) {
     return;
   }
 
-  const replyText = await handleUserChat(text.trim(), access.role);
+  const replyText = await handleUserChat(adminClient, text.trim(), access.role);
   await sendTelegramMessage(chatId, replyText);
 }
 
