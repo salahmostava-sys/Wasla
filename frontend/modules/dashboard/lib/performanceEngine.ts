@@ -359,6 +359,39 @@ export function buildRiderProfiles(
   });
 }
 
+function calculateTargetProjections(dashboard: PerformanceDashboardResponse): { projectedOrders: number | null; targetHitProjected: boolean | null } {
+  let projectedOrders: number | null = null;
+  let targetHitProjected: boolean | null = null;
+  if (!dashboard.monthYear) {
+    return { projectedOrders, targetHitProjected };
+  }
+
+  const parts = dashboard.monthYear.split('-');
+  if (parts.length !== 2) {
+    return { projectedOrders, targetHitProjected };
+  }
+
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const now = new Date();
+  const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
+  
+  const totalDays = new Date(year, month, 0).getDate();
+  let elapsedDays = totalDays;
+  if (isCurrentMonth) {
+    elapsedDays = Math.max(1, now.getDate());
+  }
+  
+  const dailyRunRate = elapsedDays > 0 ? dashboard.summary.totalOrders / elapsedDays : 0;
+  projectedOrders = Math.round(dailyRunRate * totalDays);
+  
+  if (dashboard.targets.totalTargetOrders > 0) {
+    targetHitProjected = projectedOrders >= dashboard.targets.totalTargetOrders;
+  }
+
+  return { projectedOrders, targetHitProjected };
+}
+
 /**
  * Build a comprehensive fleet summary from dashboard data.
  */
@@ -400,30 +433,7 @@ export function buildFleetSummary(
   const currentActiveDays = comparison.month.currentActiveDays || 0;
   const avgOrdersPerActiveDay = currentActiveDays > 0 ? summary.totalOrders / currentActiveDays : 0;
 
-  let projectedOrders: number | null = null;
-  let targetHitProjected: boolean | null = null;
-  if (dashboard.monthYear) {
-    const parts = dashboard.monthYear.split('-');
-    if (parts.length === 2) {
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10);
-      const now = new Date();
-      const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
-      
-      const totalDays = new Date(year, month, 0).getDate();
-      let elapsedDays = totalDays;
-      if (isCurrentMonth) {
-        elapsedDays = Math.max(1, now.getDate());
-      }
-      
-      const dailyRunRate = elapsedDays > 0 ? summary.totalOrders / elapsedDays : 0;
-      projectedOrders = Math.round(dailyRunRate * totalDays);
-      
-      if (dashboard.targets.totalTargetOrders > 0) {
-        targetHitProjected = projectedOrders >= dashboard.targets.totalTargetOrders;
-      }
-    }
-  }
+  const { projectedOrders, targetHitProjected } = calculateTargetProjections(dashboard);
 
   return {
     totalOrders: summary.totalOrders,
