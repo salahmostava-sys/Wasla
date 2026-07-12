@@ -416,14 +416,15 @@ const AppSidebar = () => {
                 <CollapsibleTrigger
                   type="button"
                   className={cn(
-                    'flex h-9 w-full items-center gap-2 rounded-lg px-3 text-start transition-colors',
+                    'flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-start transition-all duration-150',
                     'hover:bg-[#0b276b]/[0.08]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     'text-[#061735]'
                   )}
+                  style={{ fontWeight: 600 }}
                 >
                   {group.groupIcon && <group.groupIcon size={16} className="flex-shrink-0 text-[#0b276b]" />}
-                  <span className="min-w-0 flex-1 truncate text-xs font-bold">
+                  <span className="min-w-0 flex-1 truncate text-sm">
                     {group.sectionLabel}
                   </span>
                   <ChevronDown
