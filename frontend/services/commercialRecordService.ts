@@ -9,6 +9,7 @@ export type CommercialRecordItem = {
   name: string;
   registration_number: string | null;
   residency_renewal_monthly_cost: number | null;
+  residency_renewal_cost_period: 'monthly' | 'yearly';
   usage_count: number;
   source: 'managed' | 'legacy';
 };
@@ -22,6 +23,7 @@ export type CommercialRecordInput = {
   name: string;
   registration_number?: string | null;
   residency_renewal_monthly_cost?: number | null;
+  residency_renewal_cost_period?: 'monthly' | 'yearly';
 };
 
 type CommercialRecordRow = {
@@ -29,6 +31,7 @@ type CommercialRecordRow = {
   name: string;
   registration_number: string | null;
   residency_renewal_monthly_cost: number | null;
+  residency_renewal_cost_period: 'monthly' | 'yearly' | null;
 };
 
 const normalizeCommercialRecordName = (value: string | null | undefined) => value?.trim() ?? '';
@@ -49,6 +52,9 @@ const normalizeResidencyRenewalMonthlyCost = (value: number | null | undefined) 
   return value;
 };
 
+const normalizeRenewalCostPeriod = (value: CommercialRecordInput['residency_renewal_cost_period']) =>
+  value === 'yearly' ? 'yearly' : 'monthly';
+
 const buildCommercialRecordPayload = (record: CommercialRecordInput) => {
   const normalizedName = normalizeCommercialRecordName(record.name);
   if (!normalizedName) {
@@ -59,6 +65,7 @@ const buildCommercialRecordPayload = (record: CommercialRecordInput) => {
     name: normalizedName,
     registration_number: normalizeOptionalText(record.registration_number),
     residency_renewal_monthly_cost: normalizeResidencyRenewalMonthlyCost(record.residency_renewal_monthly_cost),
+    residency_renewal_cost_period: normalizeRenewalCostPeriod(record.residency_renewal_cost_period),
   };
 };
 
@@ -78,7 +85,7 @@ const isMissingCommercialRecordsTable = (error: unknown) => {
 async function listManagedCommercialRecords(): Promise<CommercialRecordRow[]> {
   const { data, error } = await supabase
     .from('commercial_records')
-    .select('id, name, registration_number, residency_renewal_monthly_cost')
+    .select('id, name, registration_number, residency_renewal_monthly_cost, residency_renewal_cost_period')
     .order('name', { ascending: true });
 
   if (error) throw error;
@@ -88,13 +95,18 @@ async function listManagedCommercialRecords(): Promise<CommercialRecordRow[]> {
 async function listEmployeeCommercialRecordUsage(): Promise<Map<string, { name: string; count: number }>> {
   const { data, error } = await supabase
     .from('employees')
-    .select('commercial_record')
-    .not('commercial_record', 'is', null);
+    .select('commercial_record, status, sponsorship_status')
+    .not('commercial_record', 'is', null)
+    .eq('status', 'active');
 
   if (error) throw toServiceError(error, 'commercialRecordService.listEmployeeCommercialRecordUsage');
 
+  const excludedSponsorshipStatuses = new Set(['absconded', 'terminated', 'final_exit', 'expired', 'inactive', 'canceled']);
   const counts = new Map<string, { name: string; count: number }>();
   for (const row of data ?? []) {
+    const sponsorshipStatus = String((row as { sponsorship_status?: string | null }).sponsorship_status ?? '').toLowerCase();
+    if (excludedSponsorshipStatuses.has(sponsorshipStatus)) continue;
+
     const name = normalizeCommercialRecordName((row as { commercial_record?: string | null }).commercial_record);
     if (!name) continue;
     const key = normalizeCommercialRecordKey(name);
@@ -132,6 +144,7 @@ export const commercialRecordService = {
         name: normalizeCommercialRecordName(row.name),
         registration_number: row.registration_number,
         residency_renewal_monthly_cost: row.residency_renewal_monthly_cost,
+        residency_renewal_cost_period: row.residency_renewal_cost_period ?? 'monthly',
         usage_count: usageMap.get(key)?.count ?? 0,
         source: 'managed',
       });
@@ -145,6 +158,7 @@ export const commercialRecordService = {
         name: usage.name,
         registration_number: null,
         residency_renewal_monthly_cost: null,
+        residency_renewal_cost_period: 'monthly',
         usage_count: usage.count,
         source: 'legacy',
       });
@@ -164,7 +178,7 @@ export const commercialRecordService = {
     const { data, error } = await supabase
       .from('commercial_records')
       .insert(payload)
-      .select('id, name, registration_number, residency_renewal_monthly_cost')
+      .select('id, name, registration_number, residency_renewal_monthly_cost, residency_renewal_cost_period')
       .single();
 
     if (error) {

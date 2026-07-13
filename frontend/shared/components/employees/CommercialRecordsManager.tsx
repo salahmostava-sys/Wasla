@@ -4,6 +4,7 @@ import { Building2, Loader2, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
 import { useToast } from '@shared/hooks/use-toast';
 import { useCommercialRecords } from '@shared/hooks/useCommercialRecords';
 import {
@@ -23,12 +24,14 @@ type CommercialRecordFormState = {
   name: string;
   registrationNumber: string;
   residencyRenewalMonthlyCost: string;
+  residencyRenewalCostPeriod: 'monthly' | 'yearly';
 };
 
 const emptyCommercialRecordForm: CommercialRecordFormState = {
   name: '',
   registrationNumber: '',
   residencyRenewalMonthlyCost: '',
+  residencyRenewalCostPeriod: 'monthly',
 };
 
 const RESIDENCY_RENEWAL_MINIMUM_MONTHS = 3;
@@ -46,26 +49,36 @@ const toCommercialRecordInput = (form: CommercialRecordFormState): CommercialRec
   name: form.name,
   registration_number: form.registrationNumber,
   residency_renewal_monthly_cost: parseOptionalMoney(form.residencyRenewalMonthlyCost),
+  residency_renewal_cost_period: form.residencyRenewalCostPeriod,
 });
 
 const toCommercialRecordForm = (record: CommercialRecordItem): CommercialRecordFormState => ({
   name: record.name,
   registrationNumber: record.registration_number ?? '',
   residencyRenewalMonthlyCost: record.residency_renewal_monthly_cost?.toString() ?? '',
+  residencyRenewalCostPeriod: record.residency_renewal_cost_period,
 });
 
 const formatOptionalMoney = (value: number | null) =>
   value === null ? 'غير محدد' : `${moneyFormatter.format(value)} ر.س`;
 
-const calculateMinimumRenewalTotal = (record: CommercialRecordItem) =>
-  record.residency_renewal_monthly_cost === null
-    ? null
-    : record.residency_renewal_monthly_cost * RESIDENCY_RENEWAL_MINIMUM_MONTHS * record.usage_count;
+const getRenewalCostPerEmployee = (record: CommercialRecordItem) => {
+  if (record.residency_renewal_monthly_cost === null) return null;
+  return record.residency_renewal_cost_period === 'yearly'
+    ? record.residency_renewal_monthly_cost
+    : record.residency_renewal_monthly_cost * RESIDENCY_RENEWAL_MINIMUM_MONTHS;
+};
+
+const calculateMinimumRenewalTotal = (record: CommercialRecordItem) => {
+  const costPerEmployee = getRenewalCostPerEmployee(record);
+  return costPerEmployee === null ? null : costPerEmployee * record.usage_count;
+};
 
 const calculateMinimumRenewalCostPerEmployee = (record: CommercialRecordItem) =>
-  record.residency_renewal_monthly_cost === null
-    ? null
-    : record.residency_renewal_monthly_cost * RESIDENCY_RENEWAL_MINIMUM_MONTHS;
+  getRenewalCostPerEmployee(record);
+
+const renewalPeriodLabel = (period: CommercialRecordItem['residency_renewal_cost_period']) =>
+  period === 'yearly' ? 'سنوي' : 'شهري';
 
 function RecordMetric({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
@@ -196,7 +209,7 @@ export function CommercialRecordsManager({
           )}
 
           <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
-            <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr_auto] lg:items-end">
+            <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr_0.8fr_auto] lg:items-end">
               <label>
                 <FieldLabel>اسم السجل التجاري</FieldLabel>
                 <Input
@@ -217,7 +230,7 @@ export function CommercialRecordsManager({
                 />
               </label>
               <label>
-                <FieldLabel>تكلفة الشهر للفرد</FieldLabel>
+                <FieldLabel>تكلفة التجديد للفرد</FieldLabel>
                 <Input
                   value={draftForm.residencyRenewalMonthlyCost}
                   onChange={(event) => setDraftForm((current) => ({ ...current, residencyRenewalMonthlyCost: event.target.value }))}
@@ -230,6 +243,27 @@ export function CommercialRecordsManager({
                   dir="ltr"
                 />
               </label>
+              <label>
+                <FieldLabel>دورية التكلفة</FieldLabel>
+                <Select
+                  value={draftForm.residencyRenewalCostPeriod}
+                  onValueChange={(value) =>
+                    setDraftForm((current) => ({
+                      ...current,
+                      residencyRenewalCostPeriod: value === 'yearly' ? 'yearly' : 'monthly',
+                    }))
+                  }
+                  disabled={!tableAvailable || busyAction === 'create'}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">شهري</SelectItem>
+                    <SelectItem value="yearly">سنوي</SelectItem>
+                  </SelectContent>
+                </Select>
+              </label>
               <Button
                 type="button"
                 className="h-10 gap-2"
@@ -241,7 +275,7 @@ export function CommercialRecordsManager({
               </Button>
             </div>
             <p className="mt-3 rounded-xl bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-              تكلفة الإقامة تُدخل شهرياً، والنظام يحسب أقل تجديد على 3 شهور مرة واحدة. تعديل اسم السجل من هنا يحدّث أيضًا السجل النصي المرتبط بالموظفين الحاليين بنفس الاسم.
+              للشركات يمكن إدخال التكلفة الشهرية ليحسب النظام أقل تجديد على 3 شهور. للمؤسسات الفردية استخدم الدورية السنوية حتى تظهر تكلفة التنبيه كتكلفة سنة واحدة.
             </p>
           </div>
 
@@ -281,7 +315,7 @@ export function CommercialRecordsManager({
                         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                           <div className="min-w-0 flex-1">
                           {isEditing ? (
-                            <div className="grid gap-3 md:grid-cols-3">
+                            <div className="grid gap-3 md:grid-cols-4">
                               <label>
                                 <FieldLabel>اسم السجل</FieldLabel>
                                 <Input
@@ -302,7 +336,7 @@ export function CommercialRecordsManager({
                                 />
                               </label>
                               <label>
-                                <FieldLabel>تكلفة الشهر للفرد</FieldLabel>
+                                <FieldLabel>تكلفة التجديد للفرد</FieldLabel>
                                 <Input
                                   value={editingForm.residencyRenewalMonthlyCost}
                                   onChange={(event) => setEditingForm((current) => ({ ...current, residencyRenewalMonthlyCost: event.target.value }))}
@@ -315,6 +349,27 @@ export function CommercialRecordsManager({
                                   dir="ltr"
                                 />
                               </label>
+                              <label>
+                                <FieldLabel>دورية التكلفة</FieldLabel>
+                                <Select
+                                  value={editingForm.residencyRenewalCostPeriod}
+                                  onValueChange={(value) =>
+                                    setEditingForm((current) => ({
+                                      ...current,
+                                      residencyRenewalCostPeriod: value === 'yearly' ? 'yearly' : 'monthly',
+                                    }))
+                                  }
+                                  disabled={rowBusy}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="monthly">شهري</SelectItem>
+                                    <SelectItem value="yearly">سنوي</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </label>
                             </div>
                           ) : (
                             <div className="space-y-3">
@@ -326,9 +381,9 @@ export function CommercialRecordsManager({
                               </div>
                               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                                 <RecordMetric label="رقم السجل" value={record.registration_number || 'غير محدد'} />
-                                <RecordMetric label="الشهر للفرد" value={formatOptionalMoney(record.residency_renewal_monthly_cost)} />
-                                <RecordMetric label="3 شهور للفرد" value={formatOptionalMoney(renewalCostPerEmployee)} />
-                                <RecordMetric label="3 شهور للجميع" value={formatOptionalMoney(renewalTotal)} />
+                                <RecordMetric label={`التكلفة (${renewalPeriodLabel(record.residency_renewal_cost_period)})`} value={formatOptionalMoney(record.residency_renewal_monthly_cost)} />
+                                <RecordMetric label="تكلفة التنبيه للفرد" value={formatOptionalMoney(renewalCostPerEmployee)} />
+                                <RecordMetric label="تكلفة التنبيه للجميع" value={formatOptionalMoney(renewalTotal)} />
                               </div>
                             </div>
                           )}
@@ -439,8 +494,8 @@ export function CommercialRecordsManager({
                         {record.source === 'managed' && (
                           <div className="grid gap-2 sm:grid-cols-2">
                             <RecordMetric label="رقم السجل" value={record.registration_number || 'غير محدد'} />
-                            <RecordMetric label="3 شهور للفرد" value={formatOptionalMoney(renewalCostPerEmployee)} />
-                            <RecordMetric label="3 شهور للحاليين" value={formatOptionalMoney(renewalTotal)} />
+                            <RecordMetric label="تكلفة التنبيه للفرد" value={formatOptionalMoney(renewalCostPerEmployee)} />
+                            <RecordMetric label="تكلفة التنبيه للحاليين" value={formatOptionalMoney(renewalTotal)} />
                           </div>
                         )}
                       </div>

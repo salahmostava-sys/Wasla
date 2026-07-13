@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildAlertsFromResponses } from './alertsBuilder';
 
 describe('buildAlertsFromResponses', () => {
-  it('includes commercial record name in employee expiry alerts when present', () => {
+  it('includes commercial record name and renewal cost in employee expiry alerts when present', () => {
     const alerts = buildAlertsFromResponses(
       {
         employeesRes: {
@@ -23,6 +23,13 @@ describe('buildAlertsFromResponses', () => {
         dbAlertsRes: { data: [] },
         sparePartsRes: { data: [] },
         abscondedRes: { data: [] },
+        commercialRecordsRes: {
+          data: [{
+            name: 'سجل مكة',
+            residency_renewal_monthly_cost: 650,
+            residency_renewal_cost_period: 'yearly',
+          }],
+        },
       },
       '2026-04-30',
       new Date('2026-04-07T00:00:00Z'),
@@ -30,9 +37,12 @@ describe('buildAlertsFromResponses', () => {
 
     expect(alerts[0]).toMatchObject({
       id: 'res-emp-1',
-      entityName: 'أحمد • السجل: سجل مكة',
       type: 'residency',
+      residencyRenewalCost: 650,
+      residencyRenewalCostPeriod: 'yearly',
     });
+    expect(alerts[0]?.entityName).toContain('أحمد • السجل: سجل مكة');
+    expect(alerts[0]?.entityName).toContain('650');
   });
 });
 

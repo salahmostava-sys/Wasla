@@ -18,6 +18,7 @@ import { format, differenceInDays, parseISO, addDays } from 'date-fns';
 import { cityLabel } from '@modules/employees/model/employeeCity';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { loadXlsx } from '@modules/orders/utils/xlsx';
+import { fmtNum } from '@shared/lib/utils';
 
 function severityColor(severity: string): string {
   if (severity === 'urgent') return 'hsl(var(--destructive))';
@@ -93,7 +94,15 @@ export interface Alert {
   daysLeft: number;
   severity: 'urgent' | 'warning' | 'info';
   resolved: boolean;
+  residencyRenewalCost?: number | null;
+  residencyRenewalCostPeriod?: 'monthly' | 'yearly' | null;
 }
+
+type CommercialRecordRenewalCost = {
+  name: string;
+  residency_renewal_monthly_cost: number | null;
+  residency_renewal_cost_period?: 'monthly' | 'yearly' | null;
+};
 
 const severityStyles: Record<string, string> = { urgent: 'badge-urgent', warning: 'badge-warning', info: 'badge-info' };
 const severityLabels: Record<string, string> = { urgent: '🔴 عاجل', warning: '🟡 تحذير', info: '🔵 معلومات' };
@@ -134,15 +143,29 @@ function buildEmployeeAlerts(
   today: Date,
   threshold: string,
 ): Alert[] {
+  const sponsorshipStatus = toSafeText(emp.sponsorship_status).toLowerCase();
+  if (['absconded', 'terminated', 'final_exit', 'expired', 'inactive', 'canceled'].includes(sponsorshipStatus)) {
+    return [];
+  }
+
   const alerts: Alert[] = [];
   const empDisplay = empAlertName(emp);
   const resExpiry = emp.residency_expiry as string | null;
   const probEnd = emp.probation_end_date as string | null;
   if (resExpiry && resExpiry <= threshold) {
     const daysLeft = differenceInDays(parseISO(resExpiry), today);
+    const renewalCost = typeof emp.residency_renewal_alert_cost === 'number'
+      ? emp.residency_renewal_alert_cost
+      : null;
+    const renewalPeriod = emp.residency_renewal_cost_period === 'yearly' ? 'yearly' : 'monthly';
+    const renewalCostLabel = renewalCost === null
+      ? ''
+      : ` — تكلفة التجديد: ${fmtNum(renewalCost)} ر.س (${renewalPeriod === 'yearly' ? 'سنوي' : '3 شهور'})`;
     alerts.push({
-      id: `res-${emp.id}`, type: 'residency', entityName: empDisplay,
+      id: `res-${emp.id}`, type: 'residency', entityName: `${empDisplay}${renewalCostLabel}`,
       dueDate: resExpiry, daysLeft, severity: residencySeverity(daysLeft), resolved: false,
+      residencyRenewalCost: renewalCost,
+      residencyRenewalCostPeriod: renewalPeriod,
     });
   }
   if (probEnd && probEnd <= threshold) {
@@ -225,10 +248,10 @@ async function fetchAlertsRaw(iqamaAlertDays: number) {
   const threshold = format(endOfCurrentMonth, 'yyyy-MM-dd');
   const iqamaThreshold = format(addDays(today, iqamaAlertDays), 'yyyy-MM-dd');
 
-  const [employeesRes, vehiclesRes, platformAccountsRes] = await Promise.all([
+  const [employeesRes, vehiclesRes, platformAccountsRes, commercialRecordsRes] = await Promise.all([
     supabase
       .from('employees')
-      .select('id, name, residency_expiry, probation_end_date, city, cities, commercial_record')
+      .select('id, name, residency_expiry, probation_end_date, city, cities, commercial_record, sponsorship_status')
       .eq('status', 'active')
       .or(`residency_expiry.lte.${threshold},probation_end_date.lte.${threshold}`),
     supabase
@@ -241,14 +264,34 @@ async function fetchAlertsRaw(iqamaAlertDays: number) {
       .eq('status', 'active')
       .not('iqama_expiry_date', 'is', null)
       .lte('iqama_expiry_date', iqamaThreshold),
+    supabase
+      .from('commercial_records')
+      .select('name, residency_renewal_monthly_cost, residency_renewal_cost_period'),
   ]);
 
   if (employeesRes.error) throw new Error(employeesRes.error.message);
   if (vehiclesRes.error) throw new Error(vehiclesRes.error.message);
+  if (commercialRecordsRes.error) throw new Error(commercialRecordsRes.error.message);
   // platform_accounts error is non-fatal — log and continue
 
+  const renewalCostByRecord = new Map(
+    ((commercialRecordsRes.data ?? []) as CommercialRecordRenewalCost[])
+      .map((record) => [record.name.trim().toLocaleLowerCase(), record] as const)
+  );
+  const employees = ((employeesRes.data ?? []) as Record<string, unknown>[]).map((employee) => {
+    const recordCost = renewalCostByRecord.get(toSafeText(employee.commercial_record).trim().toLocaleLowerCase());
+    const rawCost = recordCost?.residency_renewal_monthly_cost ?? null;
+    const period = recordCost?.residency_renewal_cost_period === 'yearly' ? 'yearly' : 'monthly';
+    const alertCost = rawCost === null ? null : period === 'yearly' ? rawCost : rawCost * 3;
+    return {
+      ...employee,
+      residency_renewal_alert_cost: alertCost,
+      residency_renewal_cost_period: period,
+    };
+  });
+
   return {
-    employees: (employeesRes.data ?? []) as Record<string, unknown>[],
+    employees,
     vehicles: (vehiclesRes.data ?? []) as Record<string, string | null>[],
     platformAccounts: (platformAccountsRes.data ?? []) as Record<string, unknown>[],
   };
@@ -307,7 +350,10 @@ const Alerts = () => {
   )].sort((a, b) => a.localeCompare(b));
 
   const filtered = localAlerts.filter(a => {
-    const matchType = typeFilter === 'all' || a.type === typeFilter;
+    const matchType =
+      typeFilter === 'all' ||
+      a.type === typeFilter ||
+      (typeFilter === 'expired_residency_cost' && a.type === 'residency' && a.daysLeft < 0 && (a.residencyRenewalCost ?? 0) > 0);
     const matchSeverity = severityFilter === 'all' || a.severity === severityFilter;
     const matchSearch = a.entityName.includes(search);
     const matchCr = crFilter === 'all' || a.entityName.includes(`سجل: ${crFilter}`);
@@ -389,7 +435,7 @@ const Alerts = () => {
     XLSX.writeFile(wb, 'template_alerts.xlsx');
   };
 
-  const typeOptions = ['all', 'residency', 'insurance', 'authorization', 'probation', 'platform_account'];
+  const typeOptions = ['all', 'expired_residency_cost', 'residency', 'insurance', 'authorization', 'probation', 'platform_account'];
 
   if (!enabled) return null;
 
@@ -543,7 +589,11 @@ const Alerts = () => {
           {typeOptions.map(t => (
             <button key={t} onClick={() => setTypeFilter(t)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
-              {t === 'all' ? 'كل الأنواع' : `${typeIcons[t] || '🔔'} ${alertTypeLabels[t] || t}`}
+              {t === 'all'
+                ? 'كل الأنواع'
+                : t === 'expired_residency_cost'
+                  ? 'تكلفة الإقامات المنتهية'
+                  : `${typeIcons[t] || '🔔'} ${alertTypeLabels[t] || t}`}
             </button>
           ))}
         </div>

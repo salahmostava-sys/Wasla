@@ -1,4 +1,5 @@
 import { differenceInDays, format, parseISO } from "date-fns";
+import { fmtNum } from "@shared/lib/utils";
 
 const ISO_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -10,6 +11,8 @@ export interface Alert {
   daysLeft: number;
   severity: "urgent" | "warning" | "info";
   resolved: boolean;
+  residencyRenewalCost?: number | null;
+  residencyRenewalCostPeriod?: "monthly" | "yearly" | null;
 }
 
 export type EmployeeAlertRow = {
@@ -70,6 +73,29 @@ export type LowStockSparePartAlertRow = {
   unit: string;
 };
 
+export type CommercialRecordRenewalCostRow = {
+  name: string;
+  residency_renewal_monthly_cost: number | null;
+  residency_renewal_cost_period?: "monthly" | "yearly" | null;
+};
+
+const commercialRecordKey = (value: string | null | undefined) => (value ?? "").trim().toLocaleLowerCase();
+
+const getResidencyRenewalCost = (
+  emp: EmployeeAlertRow,
+  renewalCostByRecord: Map<string, CommercialRecordRenewalCostRow>
+) => {
+  const record = renewalCostByRecord.get(commercialRecordKey(emp.commercial_record));
+  const rawCost = record?.residency_renewal_monthly_cost ?? null;
+  if (rawCost === null) return { cost: null, period: null };
+
+  const period = record?.residency_renewal_cost_period === "yearly" ? "yearly" : "monthly";
+  return {
+    cost: period === "yearly" ? rawCost : rawCost * 3,
+    period,
+  };
+};
+
 const getStandardSeverity = (daysLeft: number): Alert["severity"] => {
   if (daysLeft <= 7) return "urgent";
   if (daysLeft <= 14) return "warning";
@@ -86,7 +112,8 @@ const pushEmployeeExpiryAlerts = (
   generatedAlerts: Alert[],
   emp: EmployeeAlertRow,
   threshold: string,
-  today: Date
+  today: Date,
+  renewalCostByRecord: Map<string, CommercialRecordRenewalCostRow>
 ) => {
   // Ignore inactive or terminated employees
   if (emp.status && emp.status.toLowerCase() !== 'active') {
@@ -105,14 +132,20 @@ const pushEmployeeExpiryAlerts = (
 
   if (emp.residency_expiry && emp.residency_expiry <= threshold) {
     const daysLeft = differenceInDays(parseISO(emp.residency_expiry), today);
+    const renewal = getResidencyRenewalCost(emp, renewalCostByRecord);
+    const renewalLabel = renewal.cost === null
+      ? ""
+      : ` — تكلفة التجديد: ${fmtNum(renewal.cost)} ر.س (${renewal.period === "yearly" ? "سنوي" : "3 شهور"})`;
     generatedAlerts.push({
       id: `res-${emp.id}`,
       type: "residency",
-      entityName: employeeLabel,
+      entityName: `${employeeLabel}${renewalLabel}`,
       dueDate: emp.residency_expiry,
       daysLeft,
       severity: getStandardSeverity(daysLeft),
       resolved: false,
+      residencyRenewalCost: renewal.cost,
+      residencyRenewalCostPeriod: renewal.period,
     });
   }
 
@@ -277,6 +310,7 @@ export type AlertSourceResponses = {
   dbAlertsRes: { data: PersistedAlertRow[] | null };
   sparePartsRes: { data: LowStockSparePartAlertRow[] | null };
   abscondedRes: { data: AbscondedEmployeeAlertRow[] | null };
+  commercialRecordsRes: { data: CommercialRecordRenewalCostRow[] | null };
 };
 
 export function buildAlertsFromResponses(
@@ -284,13 +318,18 @@ export function buildAlertsFromResponses(
   threshold: string,
   today: Date
 ): Alert[] {
-  const { employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes: _sparePartsRes, abscondedRes } = responses;
+  const { employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes: _sparePartsRes, abscondedRes, commercialRecordsRes } = responses;
   const generatedAlerts: Alert[] = [];
   const employees = employeesRes.data ?? [];
   const platformAccounts = platformAccountsRes.data ?? [];
   const dbAlerts = dbAlertsRes.data ?? [];
   const absconded = abscondedRes.data ?? [];
-  employees.forEach((emp) => pushEmployeeExpiryAlerts(generatedAlerts, emp, threshold, today));
+  const renewalCostByRecord = new Map(
+    (commercialRecordsRes.data ?? [])
+      .filter((record) => record.name?.trim())
+      .map((record) => [commercialRecordKey(record.name), record] as const)
+  );
+  employees.forEach((emp) => pushEmployeeExpiryAlerts(generatedAlerts, emp, threshold, today, renewalCostByRecord));
   pushVehicleExpiryAlerts(generatedAlerts, vehiclesRes.data, threshold, today);
   pushPlatformAccountAlerts(generatedAlerts, platformAccounts, today);
   // Inventory alerts disabled per user request

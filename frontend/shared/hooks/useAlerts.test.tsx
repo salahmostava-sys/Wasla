@@ -49,6 +49,7 @@ describe('useAlerts', () => {
       { data: [], error: null },
       { data: [], error: null },
       { data: [], error: null },
+      { data: [], error: null },
     ] as unknown as Awaited<ReturnType<typeof alertsService.fetchAlertsDataWithTimeout>>);
     vi.mocked(buildAlertsFromResponses).mockReturnValue([
       {

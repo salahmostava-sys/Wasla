@@ -12,6 +12,7 @@ import {
   type PersistedAlertRow,
   type LowStockSparePartAlertRow,
   type AbscondedEmployeeAlertRow,
+  type CommercialRecordRenewalCostRow,
 } from '@shared/lib/alertsBuilder';
 import { filterVisibleEmployeesInMonth } from '@shared/lib/employeeVisibility';
 import { defaultQueryRetry } from '@shared/lib/query';
@@ -34,7 +35,7 @@ export const useAlerts = () => {
       const today = new Date();
       /** كل التنبيهات الزمنية ضمن N يومًا من اليوم (يُضبط من إعدادات المشروع: أيام تنبيه الإقامة/المنصات) */
       const expiryHorizon = format(addDays(today, iqamaAlertDays), 'yyyy-MM-dd');
-      const [employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes, abscondedRes] =
+      const [employeesRes, vehiclesRes, platformAccountsRes, dbAlertsRes, sparePartsRes, abscondedRes, commercialRecordsRes] =
         await alertsService.fetchAlertsDataWithTimeout(expiryHorizon, FETCH_ALERTS_TIMEOUT_MS);
       const employeesVisibleRes = {
         ...employeesRes,
@@ -52,6 +53,7 @@ export const useAlerts = () => {
           dbAlertsRes: dbAlertsRes as { data: PersistedAlertRow[] | null },
           sparePartsRes: sparePartsRes as { data: LowStockSparePartAlertRow[] | null },
           abscondedRes: abscondedRes as { data: AbscondedEmployeeAlertRow[] | null },
+          commercialRecordsRes: commercialRecordsRes as { data: CommercialRecordRenewalCostRow[] | null },
         },
         expiryHorizon, today,
       );

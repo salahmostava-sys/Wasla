@@ -518,6 +518,7 @@ export type Database = {
           id: string
           name: string
           registration_number: string | null
+          residency_renewal_cost_period: string
           residency_renewal_monthly_cost: number | null
           updated_at: string
         }
@@ -526,6 +527,7 @@ export type Database = {
           id?: string
           name: string
           registration_number?: string | null
+          residency_renewal_cost_period?: string
           residency_renewal_monthly_cost?: number | null
           updated_at?: string
         }
@@ -534,6 +536,7 @@ export type Database = {
           id?: string
           name?: string
           registration_number?: string | null
+          residency_renewal_cost_period?: string
           residency_renewal_monthly_cost?: number | null
           updated_at?: string
         }
