@@ -565,10 +565,14 @@
 
   .employees-table {
     width: max-content;
-    min-width: 100%;
+    min-width: max-content;
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
+  }
+
+  .app-content-shell .employees-table-wrap .overflow-x-auto > .employees-table {
+    width: max-content;
   }
 
   .employees-table .ta-th {

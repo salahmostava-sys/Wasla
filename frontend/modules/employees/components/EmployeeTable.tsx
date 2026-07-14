@@ -200,32 +200,36 @@ function EmployeeDetailedTableInner() {
                     key={col.key}
                     className={`ta-th !px-1 select-none whitespace-nowrap text-center ${col.key === "seq" ? "w-10 !px-1" : ""}`}
                   >
-                    <div className="flex min-w-0 items-center justify-center gap-1">
+                    <div className="relative flex min-w-0 items-center justify-center">
                       {col.sortable ? (
                         <button
                           type="button"
-                          className="flex min-w-0 items-center justify-center gap-1 bg-transparent cursor-pointer text-current hover:opacity-80"
+                          className="flex w-full min-w-0 items-center justify-center bg-transparent px-4 text-current cursor-pointer hover:opacity-80"
                           onClick={() => handleSort(col.key)}
                         >
                           <span className="truncate">{col.label}</span>
-                          <SortIcon
-                            field={col.key}
-                            sortField={sortField}
-                            sortDir={sortDir}
-                          />
+                          <span className="absolute start-0 flex items-center justify-center">
+                            <SortIcon
+                              field={col.key}
+                              sortField={sortField}
+                              sortDir={sortDir}
+                            />
+                          </span>
                         </button>
                       ) : (
-                        <span>{col.label}</span>
+                        <span className="px-4">{col.label}</span>
                       )}
                       {isFilterable && filterContent && (
-                        <ColFilterPopover
-                          colKey={col.key}
-                          label={col.label}
-                          active={isActive}
-                          onClear={() => setColFilter(col.key, "")}
-                        >
-                          {filterContent}
-                        </ColFilterPopover>
+                        <span className="absolute end-0 flex items-center justify-center">
+                          <ColFilterPopover
+                            colKey={col.key}
+                            label={col.label}
+                            active={isActive}
+                            onClear={() => setColFilter(col.key, "")}
+                          >
+                            {filterContent}
+                          </ColFilterPopover>
+                        </span>
                       )}
                     </div>
                   </th>
