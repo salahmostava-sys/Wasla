@@ -63,6 +63,12 @@ rg -n "CREATE TRIGGER|CREATE OR REPLACE FUNCTION|CREATE POLICY|ALTER TABLE .* EN
 
 ## المرحلة 2: التصنيف
 
+الحالة: مكتملة بتاريخ 2026-07-14.
+
+- التقرير القابل لإعادة التوليد: `SUPABASE_USAGE_CLASSIFICATION.md`.
+- تقييم دمج المايجريشن: `SUPABASE_MIGRATION_BASELINE_ASSESSMENT.md`.
+- لم يتم حذف أو تعطيل أي عنصر خلال التصنيف.
+
 تصنيف كل عنصر:
 
 - مستخدم بوضوح: يظهر في الكود أو في RPC مستخدم.
@@ -162,6 +168,16 @@ npx supabase migration list
 - `VACUUM` لا يوضع داخل migration عادية إذا كانت تعمل داخل transaction. يفضل تنفيذه يدويًا كـ maintenance script عند الحاجة.
 
 ## سجل القرارات
+
+```text
+Date: 2026-07-14
+Target: Supabase objects and 224 applied migrations
+Decision: Complete classification; keep applied migration history unchanged
+Reason: Local and remote histories match, while no isolated clean-room baseline test is available
+Risk: None to runtime; reports and audit tooling only
+Rollback: Remove the generated report, audit script, and package command
+Status: Phase 2 complete
+```
 
 أضف أي قرار جديد هنا قبل التنفيذ:
 
