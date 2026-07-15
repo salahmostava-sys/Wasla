@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildPlatformSetupWarnings, buildSalaryRows, shouldIncludeEmployeeInSalaryMonth } from './salaryDomain';
+import {
+  allocateSalaryByPlatformOrders,
+  buildPlatformSetupWarnings,
+  buildSalaryRows,
+  shouldIncludeEmployeeInSalaryMonth,
+} from './salaryDomain';
 import type { AppWithSchemeRow, SalaryRow } from '@modules/salaries/types/salary.types';
 import type { PricingRule } from '@services/salaryService';
 
@@ -34,6 +39,30 @@ const buildRow = (registeredApps: string[]): SalaryRow => ({
   fuelCost: 0,
   kilometers: 0,
   platformIncome: 0,
+});
+
+describe('allocateSalaryByPlatformOrders', () => {
+  it('distributes one grouped scheme salary by each platform order share', () => {
+    const allocation = allocateSalaryByPlatformOrders(2400, {
+      Keeta: 200,
+      Hunger: 100,
+    });
+
+    expect(allocation).toEqual({ Keeta: 1600, Hunger: 800 });
+    expect(Object.values(allocation).reduce((sum, value) => sum + value, 0)).toBe(2400);
+  });
+
+  it('keeps the exact total when cents cannot be divided evenly', () => {
+    const allocation = allocateSalaryByPlatformOrders(0.03, {
+      Keeta: 1,
+      Hunger: 1,
+      Jahez: 1,
+      ToYou: 1,
+    });
+
+    expect(Object.values(allocation).every((value) => value >= 0)).toBe(true);
+    expect(Object.values(allocation).reduce((sum, value) => sum + value, 0)).toBe(0.03);
+  });
 });
 
 describe('buildPlatformSetupWarnings', () => {
@@ -244,6 +273,72 @@ describe('buildSalaryRows', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0].platformSalaries.Keeta).toBe(2910);
     expect(rows[0].platformMetrics.Keeta.salary).toBe(2910);
+  });
+
+  it('distributes one shared scheme result without calculating each platform separately', () => {
+    const rows = buildSalaryRows({
+      employees: [
+        {
+          id: 'emp-1',
+          name: 'Employee One',
+          job_title: 'Driver',
+          national_id: '1234567890',
+          city: 'makkah',
+          iban: 'SA123456',
+          preferred_language: 'ar',
+          phone: '0550000000',
+        },
+      ],
+      selectedMonth: '2026-07',
+      platformNames: ['Keeta', 'Hunger'],
+      appNameToId: { Keeta: 'keeta-id', Hunger: 'hunger-id' },
+      appWorkTypeMap: { Keeta: 'orders', Hunger: 'orders' },
+      rulesMap: { 'keeta-id': [], 'hunger-id': [] },
+      appSchemeMap: {},
+      ordMap: { 'emp-1': { Keeta: 200, Hunger: 100 } },
+      attendanceDaysMap: {},
+      savedMap: {},
+      previewMap: {
+        'emp-1': {
+          base_salary: 2400,
+          advance_deduction: 0,
+          external_deduction: 0,
+          total_shift_days: 0,
+          platform_breakdown: {
+            Keeta: {
+              appName: 'Keeta',
+              schemeId: 'shared-scheme',
+              schemeTotalOrders: 300,
+              workType: 'orders',
+              calculationMethod: 'orders',
+              ordersCount: 200,
+              shiftDays: 0,
+              salary: 2400,
+            },
+            Hunger: {
+              appName: 'Hunger',
+              schemeId: 'shared-scheme',
+              schemeTotalOrders: 300,
+              workType: 'orders',
+              calculationMethod: 'orders',
+              ordersCount: 100,
+              shiftDays: 0,
+              salary: 0,
+            },
+          },
+        },
+      },
+      advInstIds: {},
+      deductedInstIds: {},
+      advRemainingMap: {},
+      fuelCostMap: {},
+    });
+
+    expect(rows[0].platformOrders).toEqual({ Keeta: 200, Hunger: 100 });
+    expect(rows[0].platformSalaries).toEqual({ Keeta: 1600, Hunger: 800 });
+    expect(Object.values(rows[0].platformSalaries).reduce((sum, salary) => sum + salary, 0))
+      .toBe(2400);
+    expect(rows[0].engineBaseSalary).toBe(2400);
   });
 
   it('restores approved salary rows from the saved sheet snapshot', () => {

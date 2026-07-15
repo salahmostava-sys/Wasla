@@ -212,7 +212,7 @@ export const allocateSalaryByPlatformOrders = (
   entries.forEach(([name, orders], index) => {
     const cents = index === entries.length - 1
       ? totalCents - allocatedCents
-      : Math.round((totalCents * orders) / totalOrders);
+      : Math.floor((totalCents * orders) / totalOrders);
     allocation[name] = cents / 100;
     allocatedCents += cents;
   });

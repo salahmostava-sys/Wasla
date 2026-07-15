@@ -144,13 +144,16 @@ export function useSalaryActions(params: UseSalaryActionsParams) {
         const scheme = platformSchemes[platform];
         if (scheme?.id && scheme.salary_scheme_tiers?.length) {
           const groupedPlatforms = Object.keys(newOrders).filter(
-            (name) => platformSchemes[name]?.id === scheme.id,
+            (name) => platformSchemes[name]?.id === scheme.id
+              && (r.platformMetrics[name]?.workType ?? 'orders') === 'orders',
           );
           const groupedOrders = Object.fromEntries(
             groupedPlatforms.map((name) => [name, newOrders[name] ?? 0]),
           );
+          const groupedTotalOrders = Object.values(groupedOrders)
+            .reduce((sum, orders) => sum + orders, 0);
           const groupedSalary = salaryService.calculateTierSalary(
-            Object.values(groupedOrders).reduce((sum, orders) => sum + orders, 0),
+            groupedTotalOrders,
             scheme.salary_scheme_tiers,
             scheme.target_orders,
             scheme.target_bonus,
@@ -163,7 +166,7 @@ export function useSalaryActions(params: UseSalaryActionsParams) {
             newMetrics[name] = {
               appName: name,
               schemeId: scheme.id,
-              schemeTotalOrders: Object.values(groupedOrders).reduce((sum, orders) => sum + orders, 0),
+              schemeTotalOrders: groupedTotalOrders,
               workType: metric?.workType || 'orders',
               calculationMethod: metric?.calculationMethod ?? null,
               ordersCount: groupedOrders[name],
