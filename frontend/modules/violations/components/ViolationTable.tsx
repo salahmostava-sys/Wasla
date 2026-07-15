@@ -54,7 +54,7 @@ export default function ViolationTable({
   }
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[980px] text-sm">
         <thead className="bg-muted/40 border-b border-border">
           <tr>
             <th onClick={() => toggleVSort('employee_name')} className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground whitespace-nowrap cursor-pointer hover:text-foreground select-none">
@@ -92,7 +92,7 @@ export default function ViolationTable({
                 <td className="ta-td text-muted-foreground">{v.incident_date || '—'}</td>
                 <td className="ta-td font-medium">{v.amount?.toLocaleString('en-US')} ر.س</td>
                 <td className="ta-td">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-[11px] ${statusBadge}`}>
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${statusBadge}`}>
                     {violationApprovalStatusLabel(v.status)}
                   </span>
                 </td>

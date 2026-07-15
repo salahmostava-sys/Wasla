@@ -591,6 +591,9 @@ const EmployeeTiers = () => {
   const total      = tiers.length;
   const delivered  = tiers.filter(r => r.delivery_status === STATUS_DELIVERED).length;
   const notDelivered = tiers.filter(r => r.delivery_status === STATUS_NOT_DELIVERED).length;
+  const unassignedOrUnusedNumbers = tiers.filter((tier) =>
+    Boolean(tier.sim_number?.trim()) && (!tier.employee_id || tier.delivery_status !== STATUS_DELIVERED)
+  ).length;
   const renewingSoon = tiers.filter(r => {
     const days = differenceInDays(parseISO(r.renewal_date), new Date());
     return days >= 0 && days <= 30;
@@ -617,11 +620,12 @@ const EmployeeTiers = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
         {[
           { label: 'إجمالي الشرائح', val: total, icon: <Layers size={17} className="text-primary" />, bg: 'bg-primary/10', color: 'text-foreground' },
           { label: 'مسلّمة', val: delivered, icon: <CheckCircle2 size={17} className="text-success" />, bg: 'bg-success/10', color: 'text-success' },
           { label: 'غير مسلّمة', val: notDelivered, icon: <AlertTriangle size={17} className="text-muted-foreground" />, bg: 'bg-muted', color: 'text-muted-foreground' },
+          { label: 'بدون مندوب أو غير مستخدمة', val: unassignedOrUnusedNumbers, icon: <AlertTriangle size={17} className="text-warning" />, bg: 'bg-warning/10', color: 'text-warning' },
           { label: 'تجديد قريب (≤30 يوم)', val: renewingSoon, icon: <Calendar size={17} className="text-warning" />, bg: 'bg-warning/10', color: 'text-warning' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border/50 p-4 flex items-center justify-between rounded-2xl">
@@ -675,17 +679,19 @@ const EmployeeTiers = () => {
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-x-auto w-full">
-            <table className="w-full min-w-[920px] text-sm border-collapse table-fixed">
+            <table className="w-full min-w-[980px] text-sm border-collapse table-fixed">
               <colgroup>
+                <col className="w-[6%]" />
                 <col className="w-[13%]" />
-                <col className="w-[22%]" />
+                <col className="w-[20%]" />
                 <col className="w-[14%]" />
                 <col className="w-[12%]" />
-                <col className="w-[29%]" />
+                <col className="w-[25%]" />
                 <col className="w-[10%]" />
               </colgroup>
               <thead className="bg-muted/50">
                 <tr>
+                  <th className="ta-th border-b border-border/50">التسلسل</th>
                   <ThSort field="sim_number" label="رقم الشريحة" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                   <ThSort field="employee_name" label="المندوب" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                   <ThSort field="package_type" label="نوع الباقة" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
@@ -705,6 +711,7 @@ const EmployeeTiers = () => {
                 {/* ── Add new row ── */}
                 {addingRow && (
                   <tr className="border-b border-border/30 bg-primary/5">
+                    <td className="ta-td text-center font-semibold text-muted-foreground">جديد</td>
                     {/* sim_number */}
                     <td className="ta-td min-w-0 align-top">
                       <Input
@@ -763,7 +770,7 @@ const EmployeeTiers = () => {
                 {/* ── Data rows ── */}
                 {filtered.length === 0 && !addingRow ? (
                   <tr>
-                    <td colSpan={6} className="p-0 align-middle">
+                    <td colSpan={7} className="p-0 align-middle">
                       <div className="min-h-[min(48vh,26rem)] flex flex-col items-center justify-center gap-2 py-16 text-center text-muted-foreground">
                         <Layers size={32} className="opacity-20" />
                         <p className="text-sm">لا توجد شرائح — أضف شريحة جديدة</p>
@@ -771,12 +778,13 @@ const EmployeeTiers = () => {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map(tier => {
+                  filtered.map((tier, index) => {
                     const row   = getRow(tier);
                     const dirty = isDirty(tier);
 
                     return (
                       <tr key={tier.id} className={`border-b border-border/30 hover:bg-muted/10 transition-colors ${dirty ? 'bg-primary/5' : ''}`}>
+                        <td className="ta-td text-center font-semibold text-muted-foreground">{index + 1}</td>
                         {/* sim_number */}
                         <td className="ta-td min-w-0 align-top">
                           <Input

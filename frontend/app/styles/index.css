@@ -1043,3 +1043,10 @@
   width: 0;
   height: 0;
 }
+
+/* Keep secondary labels readable across dense operational screens. */
+.text-\[10px\],
+.text-\[11px\] {
+  font-size: var(--text-xs);
+  line-height: 1.35rem;
+}

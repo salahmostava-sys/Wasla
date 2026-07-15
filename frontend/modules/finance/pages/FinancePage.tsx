@@ -23,30 +23,30 @@ function PlatformProfitCard({ p }: Readonly<{ p: { name: string; revenue: number
   const isProfitable = profit > 0;
   const marginPct = p.revenue > 0 ? ((profit / p.revenue) * 100).toFixed(0) : '0';
   return (
-    <div className={`rounded-xl p-3 border ${isProfitable ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10' : 'border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/10'}`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-bold text-sm text-foreground">{p.name}</span>
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isProfitable ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300'}`}>
+    <div className={`rounded-lg border p-4 ${isProfitable ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10' : 'border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/10'}`}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <span className="text-base font-bold text-foreground">{p.name}</span>
+        <span className={`rounded-full px-3 py-1 text-sm font-bold ${isProfitable ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300'}`}>
           {isProfitable ? `✅ ربح ${marginPct}%` : `⚠️ خسارة`}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-xs">
-        <div>
-          <p className="text-muted-foreground">الإيرادات</p>
-          <p className="font-bold text-emerald-600">{p.revenue > 0 ? p.revenue.toLocaleString('en-US') : '—'}</p>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="rounded-lg bg-background/70 px-3 py-2">
+          <p className="text-sm font-medium text-muted-foreground">الإيرادات</p>
+          <p className="mt-1 text-lg font-bold text-emerald-600">{p.revenue > 0 ? p.revenue.toLocaleString('en-US') : '—'}</p>
         </div>
-        <div>
-          <p className="text-muted-foreground">الرواتب</p>
-          <p className="font-bold text-rose-500">{p.salary > 0 ? p.salary.toLocaleString('en-US') : '—'}</p>
+        <div className="rounded-lg bg-background/70 px-3 py-2">
+          <p className="text-sm font-medium text-muted-foreground">الرواتب</p>
+          <p className="mt-1 text-lg font-bold text-rose-500">{p.salary > 0 ? p.salary.toLocaleString('en-US') : '—'}</p>
         </div>
-        <div>
-          <p className="text-muted-foreground">الفرق</p>
-          <p className={`font-bold ${isProfitable ? 'text-emerald-600' : 'text-rose-500'}`}>
+        <div className="rounded-lg bg-background/70 px-3 py-2">
+          <p className="text-sm font-medium text-muted-foreground">الفرق</p>
+          <p className={`mt-1 text-lg font-bold ${isProfitable ? 'text-emerald-600' : 'text-rose-500'}`}>
             {profit > 0 ? '+' : ''}{profit.toLocaleString('en-US')}
           </p>
         </div>
       </div>
-      <p className="text-[10px] text-muted-foreground mt-2">
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">
         {p.orders.toLocaleString('en-US')} طلب
         {p.revenue > 0 && p.orders > 0 && ` • متوسط الإيراد/طلب: ${formatCurrency((p.revenue / p.orders))}`}
         {p.salary > 0 && p.orders > 0 && ` • تكلفة الراتب/طلب: ${formatCurrency((p.salary / p.orders))}`}
@@ -66,14 +66,14 @@ function SmartRecommendations({
   const profitMargin = revenue > 0 ? ((balance / revenue) * 100).toFixed(0) : '0';
 
   return (
-    <div className="bg-card -2xl shadow-card p-5 border border-primary/20 rounded-2xl">
-      <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+    <div className="rounded-lg border border-primary/20 bg-card p-5 shadow-card">
+      <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-foreground">
         💡 توصيات ذكية
       </h3>
       <div className="space-y-2.5">
         {platformStats && platformStats.platforms.length > 0 && (
           <div className="bg-primary/5 rounded-lg px-4 py-3">
-            <p className="text-sm font-bold text-foreground mb-3">📊 تحليل كل منصة: إيرادات مقابل رواتب</p>
+            <p className="mb-3 text-base font-bold text-foreground">📊 تحليل كل منصة: إيرادات مقابل رواتب</p>
             <div className="space-y-3">
               {platformStats.platforms.map(p => (
                 <PlatformProfitCard key={p.name} p={p} />

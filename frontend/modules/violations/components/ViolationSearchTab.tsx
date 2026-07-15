@@ -60,13 +60,13 @@ export default function ViolationSearchTab({
   return (
     <>
       {/* -- Search Card -- */}
-      <div className="bg-card border border-border -2xl p-4 shadow-sm space-y-3 rounded-2xl">
-        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Search size={15} className="text-primary" /> البحث والاستعلام
+      <div className="space-y-4 rounded-lg border border-border/70 bg-card p-5 shadow-sm">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <Search size={17} className="text-primary" /> البحث والاستعلام
         </h2>
 
         {/* Filters in one horizontal row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {/* Plate number with autocomplete */}
           <div className="relative" ref={suggRef}>
             <Label className="text-sm mb-1.5 block">رقم لوحة المركبة <span className="text-destructive">*</span></Label>
@@ -86,7 +86,7 @@ export default function ViolationSearchTab({
             />
             {/* Suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-50 top-full mt-1 w-full bg-card border border-border shadow-card overflow-hidden rounded-2xl">
+              <div className="absolute top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-card">
                 {suggestions.map(v => (
                   <button
                     key={v.id}
@@ -175,7 +175,7 @@ export default function ViolationSearchTab({
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <Button onClick={handleSearch} disabled={searching} className="flex-1 gap-2 h-11 text-base font-semibold">
             {searching
               ? <><span className="animate-spin w-4 h-4 border-2 border-primary-foreground/40 border-t-primary-foreground rounded-full" />جاري البحث...</>
@@ -189,7 +189,7 @@ export default function ViolationSearchTab({
 
       {/* -- No Vehicle Found -- */}
       {noVehicle && (
-        <div className="bg-card border border-border -2xl p-6 text-center space-y-2 rounded-2xl">
+        <div className="space-y-2 rounded-lg border border-border bg-card p-6 text-center">
           <XCircle className="mx-auto text-muted-foreground" size={36} />
           <p className="font-semibold text-foreground">لم يتم العثور على المركبة</p>
           <p className="text-sm text-muted-foreground">
@@ -200,7 +200,7 @@ export default function ViolationSearchTab({
 
       {/* -- No Assignment Found -- */}
       {results !== null && results.length === 0 && !noVehicle && (
-        <div className="bg-card border border-border -2xl p-6 text-center space-y-2 rounded-2xl">
+        <div className="space-y-2 rounded-lg border border-border bg-card p-6 text-center">
           <AlertTriangle className="mx-auto text-warning" size={36} />
           <p className="font-semibold text-foreground">لم يتم العثور على مخالفات</p>
           <p className="text-sm text-muted-foreground">
@@ -211,7 +211,7 @@ export default function ViolationSearchTab({
 
       {/* -- Results Table -- */}
       {results && results.length > 0 && (
-        <div className="bg-card border border-border -2xl shadow-sm overflow-hidden rounded-2xl">
+        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           <div className="px-5 py-3 border-b border-border flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-foreground">
               نتائج الاستعلام · {results.length} سجل

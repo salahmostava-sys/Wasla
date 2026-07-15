@@ -1,4 +1,4 @@
-import { FileWarning } from 'lucide-react';
+import { BadgeCheck, Clock3, CreditCard, FileWarning, ListChecks } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useViolationTable } from '@modules/violations/hooks/useViolationTable';
 import ViolationSearchTab from '@modules/violations/components/ViolationSearchTab';
@@ -7,6 +7,13 @@ import ViolationTable from '@modules/violations/components/ViolationTable';
 import ResolveViolationModal from '@modules/violations/components/ResolveViolationModal';
 import { savedViolationsCountLabel } from '@modules/violations/lib/violationUtils';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
+
+const VIOLATION_STAT_ITEMS = [
+  { key: 'total', label: 'إجمالي المخالفات', icon: ListChecks, tone: 'text-primary bg-primary/10' },
+  { key: 'pending', label: 'قيد المراجعة', icon: Clock3, tone: 'text-warning bg-warning/10' },
+  { key: 'approved', label: 'تمت الموافقة', icon: BadgeCheck, tone: 'text-success bg-success/10' },
+  { key: 'converted', label: 'محوّلة إلى سلفة', icon: CreditCard, tone: 'text-violet-700 bg-violet-100 dark:text-violet-300 dark:bg-violet-950/40' },
+] as const;
 
 const ViolationResolverPage = () => {
   const v = useViolationTable();
@@ -25,9 +32,8 @@ const ViolationResolverPage = () => {
 
   return (
     <div className="space-y-5" dir="rtl">
-      {/* ── Header ── */}
       <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-2xl bg-destructive/10 flex items-center justify-center flex-shrink-0">
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-destructive/10">
           <FileWarning className="text-destructive" size={22} />
         </div>
         <div>
@@ -40,21 +46,28 @@ const ViolationResolverPage = () => {
         </div>
       </div>
 
-      <div className="max-w-5xl space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <div className="border bg-card p-3 text-sm rounded-2xl">إجمالي المخالفات: <span className="font-bold">{v.violationStats.total}</span></div>
-          <div className="border bg-card p-3 text-sm rounded-2xl">قيد المراجعة: <span className="font-bold">{v.violationStats.pending}</span></div>
-          <div className="border bg-card p-3 text-sm rounded-2xl">موافَق: <span className="font-bold">{v.violationStats.approved}</span></div>
-          <div className="border bg-card p-3 text-sm rounded-2xl">محوّل لسلفة: <span className="font-bold">{v.violationStats.converted}</span></div>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {VIOLATION_STAT_ITEMS.map(({ key, label, icon: Icon, tone }) => (
+            <div key={key} className="flex min-h-24 items-center justify-between rounded-lg border border-border/70 bg-card px-4 py-3 shadow-sm">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{v.violationStats[key].toLocaleString('en-US')}</p>
+              </div>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${tone}`}>
+                <Icon size={19} />
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant={v.activeTab === 'search' ? 'default' : 'outline'} size="sm" onClick={() => v.setActiveTab('search')}>
+        <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
+          <Button variant={v.activeTab === 'search' ? 'default' : 'outline'} className="h-10" onClick={() => v.setActiveTab('search')}>
             الاستعلام
           </Button>
           <Button
             variant={v.activeTab === 'saved' ? 'default' : 'outline'}
-            size="sm"
+            className="h-10"
             onClick={() => {
               v.setActiveTab('saved');
               v.fetchViolations();
@@ -62,7 +75,7 @@ const ViolationResolverPage = () => {
           >
             المخالفات المرحلة
           </Button>
-          <span className="text-xs text-muted-foreground hidden sm:inline">
+          <span className="hidden text-sm text-muted-foreground lg:inline">
             بعد تأكيد ✓ من الاستعلام تُحفظ تلقائياً؛ يمكنك حذف أو «ترحيل للمرحلة» من الجدول ثم المراجعة في التبويب الثاني.
           </span>
         </div>
@@ -96,13 +109,13 @@ const ViolationResolverPage = () => {
 
         {/* ── Violations Management ── */}
         {v.activeTab === 'saved' && (
-        <div className="bg-card border border-border/50 -2xl shadow-sm overflow-hidden rounded-2xl">
+        <div className="overflow-hidden rounded-lg border border-border/70 bg-card shadow-sm">
           <div className="px-5 py-3 border-b border-border/50 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-sm font-semibold text-foreground">
                 المخالفات المرحلة (المؤكَّدة والمحفوظة)
               </h2>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
+              <p className="mt-1 text-sm text-muted-foreground">
                 كل ما تم تأكيده ✓ من جدول الاستعلام يُسجَّل هنا؛ يمكن تعديلها أو حذفها أو تحويلها لسلفة. إن رحّلت من الاستعلام بزر «ترحيل للمرحلة» سيُفلتر الجدول باسم المندوب للمراجعة.
               </p>
             </div>

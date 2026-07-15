@@ -2,11 +2,12 @@ import { formatStandardDateTime, formatCurrency } from '@shared/lib/formatters';
 
 import type React from 'react';
 import { Suspense, lazy, useEffect, useRef, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { Search, Plus, FolderOpen, Edit, Trash2, Bike, FileText, Car } from 'lucide-react';
+import { Search, Plus, FolderOpen, Edit, Trash2, Bike, FileText, Car, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
+import { Switch } from '@shared/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@shared/components/ui/alert-dialog';
 import { vehicleService, VEHICLES_QUERY_MAX_ROWS } from '@services/vehicleService';
@@ -359,6 +360,7 @@ const Motorcycles = () => {
   const [deleteVehicle, setDeleteVehicle] = useState<Vehicle | null>(null);
   const [deletingVehicle, setDeletingVehicle] = useState(false);
   const [detailsVehicle, setDetailsVehicle] = useState<Vehicle | null>(null);
+  const [updatingVehicleId, setUpdatingVehicleId] = useState<string | null>(null);
 
   const importRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -482,6 +484,31 @@ const Motorcycles = () => {
       setDeleteVehicle(null);
     }
   }, [deleteVehicle, toast, refetchVehicles]);
+
+  const handleQuickVehicleUpdate = useCallback(async (
+    vehicle: VehicleReportRow,
+    patch: Partial<Pick<VehicleReportRow, 'status' | 'has_fuel_chip'>>,
+    successMessage: string,
+  ) => {
+    if (!permissions.can_edit || updatingVehicleId) return;
+    setUpdatingVehicleId(vehicle.id);
+    setData((current) => current.map((row) => row.id === vehicle.id ? { ...row, ...patch } : row));
+    try {
+      await vehicleService.update(vehicle.id, patch);
+      toast({ title: 'تم التحديث', description: successMessage });
+      await refetchVehicles();
+    } catch (error) {
+      setData((current) => current.map((row) => row.id === vehicle.id ? vehicle : row));
+      logError('[Motorcycles] quick vehicle update failed', error);
+      toast({
+        title: 'تعذر تحديث المركبة',
+        description: getErrorMessage(error, 'تمت إعادة الحالة السابقة'),
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingVehicleId(null);
+    }
+  }, [permissions.can_edit, refetchVehicles, toast, updatingVehicleId]);
 
   return (
     <div className="space-y-4" dir="rtl">
@@ -623,7 +650,7 @@ const Motorcycles = () => {
                 <thead className="bg-muted/70">
                   <tr className="border-b border-border/60">
                     <th className="ta-th">رقم اللوحة</th>
-                    <th className="ta-th">الشريحة</th>
+                    <th className="ta-th">حالة الشريحة</th>
                     <th className="ta-th">المندوب</th>
                     <th className="ta-th">حالة الدباب</th>
                     <th className="ta-th">الماركة والموديل</th>
@@ -662,11 +689,22 @@ const Motorcycles = () => {
                           </div>
                         </td>
                         <td className="ta-td">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                            v.has_fuel_chip ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
-                          }`}>
-                            {v.has_fuel_chip ? 'شريحة' : 'بدون شريحة'}
-                          </span>
+                          <div className="flex min-w-32 items-center justify-center gap-2">
+                            <Switch
+                              checked={Boolean(v.has_fuel_chip)}
+                              onCheckedChange={(checked) => handleQuickVehicleUpdate(
+                                v,
+                                { has_fuel_chip: checked },
+                                checked ? 'تم تسجيل وجود الشريحة' : 'تم تسجيل عدم وجود الشريحة',
+                              )}
+                              disabled={!permissions.can_edit || updatingVehicleId === v.id}
+                              aria-label={`تغيير حالة شريحة المركبة ${v.plate_number}`}
+                            />
+                            <span className={`text-xs font-semibold ${v.has_fuel_chip ? 'text-success' : 'text-muted-foreground'}`}>
+                              {v.has_fuel_chip ? 'موجودة' : 'غير موجودة'}
+                            </span>
+                            {updatingVehicleId === v.id && <Loader2 size={13} className="animate-spin text-primary" />}
+                          </div>
                         </td>
                         <td className="ta-td">
                           {v.current_rider ? (
@@ -678,7 +716,24 @@ const Motorcycles = () => {
                           )}
                         </td>
                         <td className="ta-td">
-                          <SmartStatusBadge status={v.status} rider={v.current_rider} />
+                          <Select
+                            value={v.status}
+                            onValueChange={(status) => handleQuickVehicleUpdate(
+                              v,
+                              { status: status as VehicleStatus },
+                              `تم تغيير حالة الدباب إلى ${statusLabels[status]}`,
+                            )}
+                            disabled={!permissions.can_edit || updatingVehicleId === v.id}
+                          >
+                            <SelectTrigger className="mx-auto h-9 w-40 border-border/70 bg-background px-2 shadow-none" aria-label={`تغيير حالة الدباب ${v.plate_number}`}>
+                              <SmartStatusBadge status={v.status} rider={v.current_rider} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ALL_STATUSES.map((status) => (
+                                <SelectItem key={status} value={status}>{statusLabels[status]}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </td>
                         <td className="ta-td font-medium">
                           {[v.brand, v.model].filter(Boolean).join(' / ') || '—'}
