@@ -171,7 +171,7 @@ function EmployeeDetailedTableInner() {
   return (
     <div className="ta-table-wrap employees-table-wrap">
       <div className="overflow-x-auto">
-        <table className="employees-table text-center align-middle whitespace-nowrap" ref={tableRef}>
+        <table className="employees-table text-start align-middle whitespace-nowrap" ref={tableRef}>
           <colgroup>
             {activeCols.map((col) => (
               <col key={col.key} style={{ width: EMPLOYEE_COLUMN_WIDTHS[col.key] ?? "120px" }} />
@@ -198,18 +198,18 @@ function EmployeeDetailedTableInner() {
                 return (
                   <th
                     key={col.key}
-                    className={`ta-th !px-1 select-none whitespace-nowrap text-center ${col.key === "seq" ? "w-10 !px-1" : ""}`}
+                    className={`ta-th !px-1 select-none whitespace-nowrap text-start ${col.key === "seq" ? "w-10 !px-1 text-center" : ""}`}
                   >
-                    <div className="relative flex min-w-0 items-center justify-center">
+                    <div className="relative flex min-w-0 items-center justify-start">
                       {col.sortable ? (
                         <button
                           type="button"
-                          className="flex w-full min-w-0 items-center justify-center bg-transparent px-4 text-current cursor-pointer hover:opacity-80"
+                          className="flex w-full min-w-0 items-center justify-start gap-1.5 bg-transparent px-2 text-current cursor-pointer hover:opacity-80"
                           onClick={() => handleSort(col.key)}
                           title={`ترتيب حسب ${col.label}`}
                         >
                           <span className="truncate">{col.label}</span>
-                          <span className="absolute start-0 flex items-center justify-center">
+                          <span className="flex-shrink-0 flex items-center justify-center">
                             {sortField === col.key && (
                               <SortIcon
                                 field={col.key}
@@ -220,7 +220,7 @@ function EmployeeDetailedTableInner() {
                           </span>
                         </button>
                       ) : (
-                        <span className="px-4">{col.label}</span>
+                        <span className="px-2">{col.label}</span>
                       )}
                       {isFilterable && filterContent && (
                         <span className="absolute end-0 flex items-center justify-center">

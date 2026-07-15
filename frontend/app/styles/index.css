@@ -525,7 +525,7 @@
   }
 
   .ta-td {
-    @apply px-2 py-1.5 text-sm text-center whitespace-nowrap;
+    @apply px-2 py-1.5 text-sm text-start whitespace-nowrap;
     color: var(--ds-on-surface);
   }
 
