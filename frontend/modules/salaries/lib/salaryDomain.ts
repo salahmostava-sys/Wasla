@@ -185,6 +185,8 @@ const normalizePreviewPlatformBreakdown = (value: unknown) => {
 
     breakdown[appName] = {
       appName,
+      schemeId: item.scheme_id ?? null,
+      schemeTotalOrders: item.scheme_total_orders == null ? null : Number(item.scheme_total_orders),
       workType: toWorkType(item.work_type),
       calculationMethod: item.calculation_method ?? null,
       ordersCount: Number(item.orders_count || 0),
@@ -194,6 +196,53 @@ const normalizePreviewPlatformBreakdown = (value: unknown) => {
   });
 
   return breakdown;
+};
+
+export const allocateSalaryByPlatformOrders = (
+  totalSalary: number,
+  platformOrders: Record<string, number>,
+) => {
+  const entries = Object.entries(platformOrders).filter(([, orders]) => orders > 0);
+  const totalOrders = entries.reduce((sum, [, orders]) => sum + orders, 0);
+  const allocation = Object.fromEntries(Object.keys(platformOrders).map((name) => [name, 0]));
+  if (entries.length === 0 || totalOrders <= 0) return allocation;
+
+  const totalCents = Math.round(totalSalary * 100);
+  let allocatedCents = 0;
+  entries.forEach(([name, orders], index) => {
+    const cents = index === entries.length - 1
+      ? totalCents - allocatedCents
+      : Math.round((totalCents * orders) / totalOrders);
+    allocation[name] = cents / 100;
+    allocatedCents += cents;
+  });
+  return allocation;
+};
+
+const distributeGroupedSchemeMetrics = (
+  metrics: Record<string, PlatformSalaryMetric>,
+) => {
+  const distributed = { ...metrics };
+  const schemePlatforms = new Map<string, string[]>();
+
+  Object.entries(metrics).forEach(([platform, metric]) => {
+    if (!metric.schemeId || !metric.schemeTotalOrders) return;
+    const platforms = schemePlatforms.get(metric.schemeId) ?? [];
+    platforms.push(platform);
+    schemePlatforms.set(metric.schemeId, platforms);
+  });
+
+  schemePlatforms.forEach((platforms) => {
+    if (platforms.length < 2) return;
+    const totalSalary = platforms.reduce((sum, platform) => sum + metrics[platform].salary, 0);
+    const orders = Object.fromEntries(platforms.map((platform) => [platform, metrics[platform].ordersCount]));
+    const allocation = allocateSalaryByPlatformOrders(totalSalary, orders);
+    platforms.forEach((platform) => {
+      distributed[platform] = { ...metrics[platform], salary: allocation[platform] };
+    });
+  });
+
+  return distributed;
 };
 
 export const buildPreviewMap = (previewData: Array<Record<string, unknown>> | null | undefined) => {
@@ -414,9 +463,10 @@ function buildEmployeeSalaryRow(params: {
   const platformOrders: Record<string, number> = {};
   const platformSalaries: Record<string, number> = {};
   const platformMetrics: Record<string, PlatformSalaryMetric> = {};
+  const previewMetrics = distributeGroupedSchemeMetrics(preview?.platform_breakdown ?? {});
   for (const platformName of platformNames) {
     const previewMetric = resolvePlatformPreviewMetric({
-      previewMetric: preview?.platform_breakdown[platformName],
+      previewMetric: previewMetrics[platformName],
     });
     if (previewMetric) {
       platformMetrics[platformName] = previewMetric;

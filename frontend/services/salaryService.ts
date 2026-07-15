@@ -47,6 +47,8 @@ export type SalaryPreviewCalculationMethod =
 export interface SalaryPreviewPlatformBreakdown {
   app_id?: string;
   app_name: string;
+  scheme_id?: string | null;
+  scheme_total_orders?: number | null;
   work_type: WorkType;
   calculation_method?: SalaryPreviewCalculationMethod | null;
   orders_count?: number | null;

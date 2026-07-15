@@ -42,6 +42,8 @@ export interface SalaryRow {
 
 export interface PlatformSalaryMetric {
   appName: string;
+  schemeId?: string | null;
+  schemeTotalOrders?: number | null;
   workType: WorkType;
   calculationMethod?: string | null;
   ordersCount: number;

@@ -22,6 +22,7 @@ import { getPrimaryPlatformActivityCount } from '@modules/salaries/model/salaryU
 import { useSalaryIO } from '@modules/salaries/hooks/useSalaryIO';
 import { useSalaryPrint } from '@modules/salaries/hooks/useSalaryPrint';
 import { useSalaryPersistence } from '@modules/salaries/hooks/useSalaryPersistence';
+import { allocateSalaryByPlatformOrders } from '@modules/salaries/lib/salaryDomain';
 
 // ─── Params (kept identical to the original for backward-compat) ─────────────
 
@@ -139,19 +140,58 @@ export function useSalaryActions(params: UseSalaryActionsParams) {
         const currentMetric = r.platformMetrics[platform];
         if (currentMetric && currentMetric.workType !== 'orders') return r;
         const newOrders = { ...r.platformOrders, [platform]: value };
+        const platformSchemes = empPlatformSchemeRef.current?.[r.employeeId] ?? {};
+        const scheme = platformSchemes[platform];
+        if (scheme?.id && scheme.salary_scheme_tiers?.length) {
+          const groupedPlatforms = Object.keys(newOrders).filter(
+            (name) => platformSchemes[name]?.id === scheme.id,
+          );
+          const groupedOrders = Object.fromEntries(
+            groupedPlatforms.map((name) => [name, newOrders[name] ?? 0]),
+          );
+          const groupedSalary = salaryService.calculateTierSalary(
+            Object.values(groupedOrders).reduce((sum, orders) => sum + orders, 0),
+            scheme.salary_scheme_tiers,
+            scheme.target_orders,
+            scheme.target_bonus,
+          );
+          const allocations = allocateSalaryByPlatformOrders(groupedSalary, groupedOrders);
+          const newSalaries = { ...r.platformSalaries, ...allocations };
+          const newMetrics = { ...r.platformMetrics };
+          groupedPlatforms.forEach((name) => {
+            const metric = r.platformMetrics[name];
+            newMetrics[name] = {
+              appName: name,
+              schemeId: scheme.id,
+              schemeTotalOrders: Object.values(groupedOrders).reduce((sum, orders) => sum + orders, 0),
+              workType: metric?.workType || 'orders',
+              calculationMethod: metric?.calculationMethod ?? null,
+              ordersCount: groupedOrders[name],
+              shiftDays: metric?.shiftDays || 0,
+              salary: allocations[name],
+            };
+          });
+          return {
+            ...r,
+            platformOrders: newOrders,
+            platformSalaries: newSalaries,
+            platformMetrics: newMetrics,
+            isDirty: true,
+          };
+        }
         // FIX #3: read from refs to avoid stale closure
         const appId = appIdByNameRef.current[platform];
         const appRules = appId ? (pricingRulesByAppIdRef.current[appId] || []) : [];
         const ruleResult = salaryService.applyPricingRules(appRules, value);
         let salary = Math.round(ruleResult.salary || 0);
         if (!ruleResult.matchedRule) {
-          const scheme = empPlatformSchemeRef.current?.[r.employeeId]?.[platform];
-          if (scheme?.salary_scheme_tiers) {
+          const fallbackScheme = empPlatformSchemeRef.current?.[r.employeeId]?.[platform];
+          if (fallbackScheme?.salary_scheme_tiers) {
             salary = salaryService.calculateTierSalary(
               value,
-              scheme.salary_scheme_tiers,
-              scheme.target_orders,
-              scheme.target_bonus,
+              fallbackScheme.salary_scheme_tiers,
+              fallbackScheme.target_orders,
+              fallbackScheme.target_bonus,
             );
           }
         }
