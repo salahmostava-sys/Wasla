@@ -110,7 +110,11 @@ export function EmployeeProfileOverview({
         <SummaryMetric
           icon={Banknote}
           label="آخر راتب صافي"
-          value={loading ? '...' : (latestSalary ? formatCurrency(latestSalary.net_salary) : 'غير مسجل')}
+          value={(() => {
+            if (loading) return '...';
+            if (latestSalary) return formatCurrency(latestSalary.net_salary);
+            return 'غير مسجل';
+          })()}
           detail={latestSalary ? monthLabel(latestSalary.month_year) : 'لا توجد رواتب معتمدة'}
         />
       </div>

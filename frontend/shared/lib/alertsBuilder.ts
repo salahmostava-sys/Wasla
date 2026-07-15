@@ -1,4 +1,4 @@
-﻿import { differenceInDays, format, parseISO } from "date-fns";
+import { differenceInDays, format, parseISO } from "date-fns";
 import { fmtNum } from "@shared/lib/utils";
 
 const ISO_DATE_FORMAT = "yyyy-MM-dd";
@@ -150,10 +150,11 @@ const getEmployeeAlertLabel = (emp: EmployeeAlertRow) =>
     ? `${emp.name} • السجل: ${emp.commercial_record.trim()}`
     : emp.name;
 
-const getResidencyRenewalLabel = (renewal: ReturnType<typeof getResidencyRenewalCost>) =>
-  renewal.cost === null
-    ? ""
-    : ` — تكلفة التجديد: ${fmtNum(renewal.cost)} ر.س (${renewal.period === "yearly" ? "سنوي" : "3 شهور"})`;
+const getResidencyRenewalLabel = (renewal: ReturnType<typeof getResidencyRenewalCost>) => {
+  if (renewal.cost === null) return "";
+  const periodLabel = renewal.period === "yearly" ? "سنوي" : "3 شهور";
+  return ` — تكلفة التجديد: ${fmtNum(renewal.cost)} ر.س (${periodLabel})`;
+};
 
 const buildResidencyAlert = (
   emp: EmployeeAlertRow,

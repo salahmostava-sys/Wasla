@@ -317,11 +317,12 @@
     line-height: 1;
     white-space: nowrap;
   }
-
   .app-content-shell {
     width: 100%;
     background: var(--ds-surface);
     padding: clamp(1rem, 1.35vw, 1.5rem);
+    color: var(--ds-on-surface);
+    font-size: var(--text-md);
   }
 
   @media (min-width: 1280px) {
@@ -352,11 +353,6 @@
   .app-content-shell .ds-btn-primary {
     min-height: 2.25rem;
     max-width: 100%;
-  }
-
-  .app-content-shell {
-    color: var(--ds-on-surface);
-    font-size: var(--text-md);
   }
 
   .app-content-shell :is(p, span, label, input, select, textarea, button, td, th) {

@@ -12,7 +12,7 @@ const SENSITIVE_PATTERN = /(permission|profile|role|salary|treasury|finance|audi
 const CLEANUP_NAME_PATTERN = /(legacy|archive|backup|deprecated|obsolete|temporary|temp|old)/i;
 
 function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
 function countMatches(text, pattern) {
@@ -30,7 +30,7 @@ function extractObjectNames(typesSource, sectionName, nextSectionName) {
   }
 
   const section = typesSource.slice(start + startMarker.length, end);
-  return [...section.matchAll(/^      ([A-Za-z0-9_]+): \{/gm)].map((match) => match[1]);
+  return [...section.matchAll(/^      (\w+): \{/gm)].map((match) => match[1]);
 }
 
 async function collectFiles(directory, predicate) {
@@ -61,7 +61,7 @@ async function readCorpus(files) {
 function classifyObject({ name, kind, directReferences, sourceMentions, sqlReferences }) {
   const sensitive = SENSITIVE_PATTERN.test(name);
   const internalHelper = kind === 'Function'
-    && (/^_const_/.test(name) || /^(?:n?eq_|text_to_|has_|is_|jwt_)/.test(name));
+    && (name.startsWith('_const_') || /^(?:n?eq_|text_to_|has_|is_|jwt_)/.test(name));
   const hasApplicationEvidence = directReferences > 0 || sourceMentions > 0;
   const sqlHistoryOnly = !hasApplicationEvidence && !internalHelper && sqlReferences > 0;
   const unclear = !hasApplicationEvidence && !internalHelper && sqlReferences === 0;
@@ -83,12 +83,12 @@ function classifyObject({ name, kind, directReferences, sourceMentions, sqlRefer
 function inspectObject(name, kind, sourceCorpus, sqlCorpus) {
   const escapedName = escapeRegExp(name);
   const directPattern = kind === 'Function'
-    ? new RegExp(`\\.rpc\\(\\s*['\"\`]${escapedName}['\"\`]`, 'g')
-    : new RegExp(`\\.from\\(\\s*['\"\`]${escapedName}['\"\`]`, 'g');
-  const wordPattern = new RegExp(`\\b${escapedName}\\b`, 'g');
+    ? new RegExp(String.raw`\.rpc\(\s*['"\`]${escapedName}['"\`]`, 'g')
+    : new RegExp(String.raw`\.from\(\s*['"\`]${escapedName}['"\`]`, 'g');
+  const wordPattern = new RegExp(String.raw`\b${escapedName}\b`, 'g');
   const directReferences = countMatches(sourceCorpus, directPattern);
   const sourceMentions = countMatches(sourceCorpus, wordPattern);
-  const sqlReferences = countMatches(sqlCorpus, new RegExp(`\\b${escapedName}\\b`, 'gi'));
+  const sqlReferences = countMatches(sqlCorpus, new RegExp(String.raw`\b${escapedName}\b`, 'gi'));
   const classification = classifyObject({
     name,
     kind,

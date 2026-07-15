@@ -485,16 +485,18 @@ const Alerts = () => {
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {typeOptions.map(t => (
-            <button key={t} onClick={() => setTypeFilter(t)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
-              {t === 'all'
-                ? 'كل الأنواع'
-                : t === 'expired_residency_cost'
-                  ? 'تكلفة الإقامات المنتهية'
-                  : `${typeIcons[t] || '🔔'} ${alertTypeLabels[t] || t}`}
-            </button>
-          ))}
+          {typeOptions.map(t => {
+            let label = t;
+            if (t === 'all') label = 'كل الأنواع';
+            else if (t === 'expired_residency_cost') label = 'تكلفة الإقامات المنتهية';
+            else label = `${typeIcons[t] || '🔔'} ${alertTypeLabels[t] || t}`;
+            return (
+              <button key={t} onClick={() => setTypeFilter(t)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
+                {label}
+              </button>
+            );
+          })}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-muted-foreground">حالة المتابعة:</span>

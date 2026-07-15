@@ -28,13 +28,13 @@ export type AlertWorkflowForm = {
   note: string | null;
 };
 
-type AlertWorkflowDialogProps = {
+type AlertWorkflowDialogProps = Readonly<{
   alert: Alert | null;
   users: AssignableAlertUser[];
   saving: boolean;
   onClose: () => void;
   onSave: (alert: Alert, form: AlertWorkflowForm) => void | Promise<void>;
-};
+}>;
 
 const UNASSIGNED_VALUE = 'unassigned';
 
