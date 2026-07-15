@@ -222,27 +222,24 @@ export const buildAttendanceDaysMap = (rows: Array<{ employee_id: string }> | nu
   return attendanceDaysMap;
 };
 
-export const buildFuelCostMap = (rows: Array<{ employee_id: string; fuel_cost: number | string }> | null | undefined) => {
-  const fuelCostMap: Record<string, number> = {};
-  rows?.forEach((r) => {
-    const employeeId = r.employee_id ? String(r.employee_id) : '';
-    if (!employeeId) return;
-    // FIX #2: `Number(null)` → 0, but `Number('')` → 0 and `Number(undefined)` → NaN.
-    // The `|| 0` after Number() catches NaN (since NaN is falsy) and propagates a safe 0
-    // instead of silently corrupting the entire row's salary with NaN arithmetic.
-    fuelCostMap[employeeId] = (fuelCostMap[employeeId] || 0) + (Number(r.fuel_cost) || 0);
-  });
-  return fuelCostMap;
-};
-
-export const buildKilometersMap = (rows: Array<{ employee_id: string; km_total: number | string }> | null | undefined) => {
-  const kilometersMap: Record<string, number> = {};
+const buildEmployeeMetricMap = <TRow extends { employee_id: string }>(
+  rows: TRow[] | null | undefined,
+  getMetric: (row: TRow) => number | string,
+) => {
+  const metricMap: Record<string, number> = {};
   rows?.forEach((row) => {
     const employeeId = row.employee_id ? String(row.employee_id) : '';
     if (!employeeId) return;
-    kilometersMap[employeeId] = (kilometersMap[employeeId] || 0) + (Number(row.km_total) || 0);
+    metricMap[employeeId] = (metricMap[employeeId] || 0) + (Number(getMetric(row)) || 0);
   });
-  return kilometersMap;
+  return metricMap;
+};
+
+export const buildFuelCostMap = (rows: Array<{ employee_id: string; fuel_cost: number | string }> | null | undefined) =>
+  buildEmployeeMetricMap(rows, (row) => row.fuel_cost);
+
+export const buildKilometersMap = (rows: Array<{ employee_id: string; km_total: number | string }> | null | undefined) => {
+  return buildEmployeeMetricMap(rows, (row) => row.km_total);
 };
 
 const buildOrdersMap = (rows: OrderWithAppRow[] | null | undefined) => {
