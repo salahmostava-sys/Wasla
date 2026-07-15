@@ -39,14 +39,22 @@ import { getSalaryRowActivityTotals, hasPlatformActivity } from '@modules/salari
 import { Skeleton } from '@shared/components/ui/skeleton';
 
 // ── Style constants ───────────────────────────────────────────────────────────
-const thFrozenBase = "min-w-[6rem] px-3 py-2 text-[13px] font-semibold text-muted-foreground whitespace-nowrap border border-border/40 bg-card text-start sticky z-20";
-const thBase = "min-w-[7rem] px-3 py-2 text-[13px] font-semibold text-muted-foreground whitespace-nowrap border border-border/40 bg-card text-center";
-const tdClass = "px-3 py-2 text-sm font-medium whitespace-nowrap text-center border border-border/40 text-foreground";
-const tfClass = "px-3 py-2 text-sm font-bold whitespace-nowrap text-center border border-border/40 bg-muted/60 text-foreground";
+const thFrozenBase = "px-2 py-1.5 text-xs font-bold text-foreground whitespace-nowrap border border-border/40 bg-card text-start sticky z-20";
+const thBase = "min-w-[5.75rem] px-2 py-1.5 text-xs font-bold text-foreground whitespace-nowrap border border-border/40 bg-card text-center";
+const tdClass = "px-2 py-1 text-[13px] font-semibold whitespace-nowrap text-center border border-border/40 text-foreground";
+const tfClass = "px-2 py-1.5 text-[13px] font-bold whitespace-nowrap text-center border border-border/40 bg-muted/60 text-foreground";
 const stickyLeft = (offset: number) => ({ left: offset });
+const FROZEN_WIDTH = { index: 36, name: 120, jobTitle: 96, nationalId: 104 } as const;
+const FROZEN_LEFT = {
+  index: 0,
+  name: FROZEN_WIDTH.index,
+  jobTitle: FROZEN_WIDTH.index + FROZEN_WIDTH.name,
+  nationalId: FROZEN_WIDTH.index + FROZEN_WIDTH.name + FROZEN_WIDTH.jobTitle,
+} as const;
+const fixedWidth = (width: number) => ({ width, minWidth: width, maxWidth: width });
 
 /** Height of each row in pixels — must be fixed for virtual list to work correctly */
-const ROW_HEIGHT = 48;
+const ROW_HEIGHT = 42;
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 interface SalaryTableProps {
@@ -136,10 +144,10 @@ const SalaryRowCells = memo(function SalaryRowCells({
 
   return (
     <>
-      <td className={`${tdClass} sticky text-center text-muted-foreground font-mono`} style={{ left: 0, zIndex: 10, background: 'hsl(var(--card))' }}>{rowIdx + 1}</td>
-      <td className={`${tdClass} sticky font-medium whitespace-nowrap`} style={{ left: 40, zIndex: 10, background: 'hsl(var(--card))' }}>
-        <div className="flex items-center gap-1.5">
-          <button className="whitespace-nowrap text-primary hover:underline font-medium text-start" onClick={() => openEmployeeDetail(r)}>
+      <td className={`${tdClass} sticky text-center text-foreground font-mono`} style={{ ...fixedWidth(FROZEN_WIDTH.index), left: FROZEN_LEFT.index, zIndex: 10, background: 'hsl(var(--card))' }}>{rowIdx + 1}</td>
+      <td className={`${tdClass} sticky font-semibold`} style={{ ...fixedWidth(FROZEN_WIDTH.name), left: FROZEN_LEFT.name, zIndex: 10, background: 'hsl(var(--card))' }}>
+        <div className="flex min-w-0 items-center gap-1.5">
+          <button className="block min-w-0 flex-1 truncate text-primary hover:underline font-semibold text-start" title={r.employeeName} onClick={() => openEmployeeDetail(r)}>
             {shortEmployeeName(r.employeeName)}
           </button>
           {r.isDirty && (
@@ -156,8 +164,8 @@ const SalaryRowCells = memo(function SalaryRowCells({
           )}
         </div>
       </td>
-      <td className={`${tdClass} whitespace-nowrap`} style={{ position: 'sticky', left: 168, zIndex: 10, background: 'hsl(var(--card))' }}>{r.jobTitle}</td>
-      <td className={`${tdClass} border-l border-border/40 text-muted-foreground whitespace-nowrap`} style={{ position: 'sticky', left: 264, zIndex: 10, background: 'hsl(var(--card))' }}>{r.nationalId}</td>
+      <td className={`${tdClass} truncate`} title={r.jobTitle} style={{ ...fixedWidth(FROZEN_WIDTH.jobTitle), position: 'sticky', left: FROZEN_LEFT.jobTitle, zIndex: 10, background: 'hsl(var(--card))' }}>{r.jobTitle}</td>
+      <td className={`${tdClass} border-l border-border/40 font-mono`} style={{ ...fixedWidth(FROZEN_WIDTH.nationalId), position: 'sticky', left: FROZEN_LEFT.nationalId, zIndex: 10, background: 'hsl(var(--card))' }}>{r.nationalId}</td>
       <td className="ta-td border border-border/40 bg-info/5">
         <EditableCell value={r.platformIncome} onChange={v => updateRow(r.id, { platformIncome: v })} className="text-foreground" />
       </td>
@@ -228,7 +236,7 @@ const SalaryRowCells = memo(function SalaryRowCells({
           onValueChange={(v) => { if (v !== '_none') { persistEmployeeCity(r, v as 'makkah' | 'jeddah'); } }}
           disabled={employeeFieldSaving === `${r.employeeId}:city`}
         >
-          <SelectTrigger className="h-8 w-[104px] text-xs mx-auto" dir="rtl">
+          <SelectTrigger className="salary-table-select h-8 w-[88px] text-xs font-semibold mx-auto" dir="rtl">
             {employeeFieldSaving === `${r.employeeId}:city`
               ? <span className="flex w-full justify-center"><Loader2 className="h-4 w-4 animate-spin" /></span>
               : <SelectValue placeholder="الفرع" />}
@@ -246,7 +254,7 @@ const SalaryRowCells = memo(function SalaryRowCells({
           onValueChange={(v) => { persistEmployeePaymentMethod(r, v as 'bank' | 'cash'); }}
           disabled={employeeFieldSaving === `${r.employeeId}:payment`}
         >
-          <SelectTrigger className="h-8 w-[100px] text-xs mx-auto" dir="rtl">
+          <SelectTrigger className="salary-table-select h-8 w-[92px] text-xs font-semibold mx-auto" dir="rtl">
             {employeeFieldSaving === `${r.employeeId}:payment`
               ? <span className="flex w-full justify-center"><Loader2 className="h-4 w-4 animate-spin" /></span>
               : <SelectValue />}
@@ -455,17 +463,17 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
       {/* Scroll container — useVirtualizer reads its scrollTop */}
       {/* contain:layout paint — isolates repaints without breaking sticky positioning */}
       <div ref={scrollContainerRef} className="overflow-auto custom-scrollbar" style={{ maxHeight: '75vh', contain: 'layout paint' }}>
-        <table className="salary-table text-sm border-collapse w-max min-w-[2400px]">
+        <table className="salary-table border-collapse w-max min-w-max">
           {/* ── Header — sticky at top ── */}
           {/* bg-card is solid (not opacity-based) so it covers rows scrolling beneath */}
           <thead className="sticky top-0 z-30" style={{ backgroundColor: 'hsl(var(--card))' }}>
             <tr className="border-b border-border/50" style={{ backgroundColor: 'hsl(var(--card))' }}>
-              <th className={`${thFrozenBase} w-10 text-center`} style={stickyLeft(0)}>#</th>
-              <th colSpan={3} className={`${thFrozenBase} border-l border-border/50`} style={stickyLeft(40)}>بيانات المندوب</th>
+              <th className={`${thFrozenBase} text-center`} style={{ ...fixedWidth(FROZEN_WIDTH.index), ...stickyLeft(FROZEN_LEFT.index) }}>#</th>
+              <th colSpan={3} className={`${thFrozenBase} border-l border-border/50`} style={stickyLeft(FROZEN_LEFT.name)}>بيانات المندوب</th>
               <th colSpan={4} className="ta-th border-b border-border/40 border-l">📊 بيانات المندوب الشهرية</th>
               {platforms.length > 0 && (
-                <th colSpan={platforms.length} className="ta-th border-b border-border/50 border-l">
-                  المنصات (طلبات أو دوام / راتب، ونقر مزدوج لتعديل الطلبات في منصات الطلب فقط)
+                <th colSpan={platforms.length} className="ta-th border-b border-border/50 border-l" title="النشاط والراتب لكل منصة">
+                  المنصات: النشاط والراتب
                 </th>
               )}
               <th colSpan={2} className="ta-th border-b border-border/40 border-l">إجمالي الطلبات + الراتب الأساسي</th>
@@ -478,14 +486,14 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
             </tr>
             <tr style={{ backgroundColor: 'hsl(var(--card))' }}>
               {/* FIX I1: was duplicating # header — second row just needs spacer */}
-              <th className={`${thFrozenBase} w-10 text-center`} style={stickyLeft(0)} aria-hidden="true" tabIndex={-1}></th>
-              <th className={`${thFrozenBase} w-32 cursor-pointer hover:text-foreground select-none`} style={stickyLeft(40)} onClick={() => handleSort('employeeName')}>
+              <th className={`${thFrozenBase} text-center`} style={{ ...fixedWidth(FROZEN_WIDTH.index), ...stickyLeft(FROZEN_LEFT.index) }} aria-hidden="true" tabIndex={-1}></th>
+              <th className={`${thFrozenBase} cursor-pointer hover:text-primary select-none`} style={{ ...fixedWidth(FROZEN_WIDTH.name), ...stickyLeft(FROZEN_LEFT.name) }} onClick={() => handleSort('employeeName')}>
                 الاسم <SalarySortIcon field="employeeName" sortField={sortField} sortDir={sortDir} />
               </th>
-              <th className={`${thFrozenBase} w-24 cursor-pointer hover:text-foreground select-none`} style={stickyLeft(168)} onClick={() => handleSort('jobTitle')}>
+              <th className={`${thFrozenBase} cursor-pointer hover:text-primary select-none`} style={{ ...fixedWidth(FROZEN_WIDTH.jobTitle), ...stickyLeft(FROZEN_LEFT.jobTitle) }} onClick={() => handleSort('jobTitle')}>
                 المسمى الوظيفي <SalarySortIcon field="jobTitle" sortField={sortField} sortDir={sortDir} />
               </th>
-              <th className={`${thFrozenBase} w-28 cursor-pointer hover:text-foreground select-none`} style={stickyLeft(264)} onClick={() => handleSort('nationalId')}>
+              <th className={`${thFrozenBase} cursor-pointer hover:text-primary select-none`} style={{ ...fixedWidth(FROZEN_WIDTH.nationalId), ...stickyLeft(FROZEN_LEFT.nationalId) }} onClick={() => handleSort('nationalId')}>
                 رقم الهوية <SalarySortIcon field="nationalId" sortField={sortField} sortDir={sortDir} />
               </th>
               <th className="ta-th border border-border/40 cursor-pointer select-none hover:brightness-95" onClick={() => handleSort('platformIncome')}>
@@ -512,7 +520,7 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                     onClick={() => handleSort(p)}>
                     <div className="flex flex-col items-center gap-0">
                       <span>{p}</span>
-                      <span className="text-[9px] opacity-80 font-normal">طلبات/دوام / راتب <SalarySortIcon field={p} sortField={sortField} sortDir={sortDir} /></span>
+                      <span className="text-[10px] opacity-90 font-medium">نشاط / راتب <SalarySortIcon field={p} sortField={sortField} sortDir={sortDir} /></span>
                     </div>
                   </th>
                 );
@@ -633,10 +641,10 @@ export const SalaryTable = memo(function SalaryTable(props: Readonly<SalaryTable
                Use a solid inline background so rows scrolling behind the footer are hidden. */}
           <tfoot className="sticky bottom-0 z-20" style={{ backgroundColor: 'hsl(var(--muted))' }}>
             <tr className="border-t-2 border-border">
-              <td className={`${tfClass} sticky text-center`} style={{ left: 0, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}>—</td>
-              <td className={`${tfClass} sticky text-center border-l border-border/30`} style={{ left: 40, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}>الإجمالي</td>
-              <td className={tfClass} style={{ position: 'sticky', left: 168, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}></td>
-              <td className={`${tfClass} border-l border-border/30`} style={{ position: 'sticky', left: 264, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}></td>
+              <td className={`${tfClass} sticky text-center`} style={{ ...fixedWidth(FROZEN_WIDTH.index), left: FROZEN_LEFT.index, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}>—</td>
+              <td className={`${tfClass} sticky text-center border-l border-border/30`} style={{ ...fixedWidth(FROZEN_WIDTH.name), left: FROZEN_LEFT.name, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}>الإجمالي</td>
+              <td className={tfClass} style={{ ...fixedWidth(FROZEN_WIDTH.jobTitle), position: 'sticky', left: FROZEN_LEFT.jobTitle, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}></td>
+              <td className={`${tfClass} border-l border-border/30`} style={{ ...fixedWidth(FROZEN_WIDTH.nationalId), position: 'sticky', left: FROZEN_LEFT.nationalId, zIndex: 20, backgroundColor: 'hsl(var(--muted))' }}></td>
               <td className="ta-td font-bold border border-border/40 bg-info/10 text-foreground">
                 {totals.platformIncome.toLocaleString('en-US')}
               </td>
