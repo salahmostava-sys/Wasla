@@ -31,6 +31,8 @@ import { EmployeeTableProvider, useEmployeeTable, type EmployeeTableContextValue
 
 
 
+import { DoubleScrollbar } from "@shared/components/ui/DoubleScrollbar";
+
 type EmployeeDetailedTableProps = EmployeeTableContextValue;
 
 const EMPLOYEE_COLUMN_WIDTHS: Partial<Record<ColKey, string>> = {
@@ -170,7 +172,7 @@ function EmployeeDetailedTableInner() {
 
   return (
     <div className="ta-table-wrap employees-table-wrap">
-      <div className="overflow-x-auto">
+      <DoubleScrollbar>
         <table className="employees-table text-start align-middle whitespace-nowrap" ref={tableRef}>
           <colgroup>
             {activeCols.map((col) => (
@@ -314,7 +316,7 @@ function EmployeeDetailedTableInner() {
               })}
           </tbody>
         </table>
-      </div>
+      </DoubleScrollbar>
 
       {!loading && (
         <EmployeeTablePagination
