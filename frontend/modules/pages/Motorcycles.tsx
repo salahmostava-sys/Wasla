@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
-import { Switch } from '@shared/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@shared/components/ui/alert-dialog';
 import { vehicleService, VEHICLES_QUERY_MAX_ROWS } from '@services/vehicleService';
@@ -58,17 +57,18 @@ const statusLabels: Record<string, string> = {
   inactive: 'غير نشطة',
 };
 
-// Smart status badge — considers current_rider for active vehicles
-const SmartStatusBadge = ({ status, rider }: { status: VehicleStatus; rider?: string | null }) => {
-  if (status === 'active') {
-    return rider
-      ? <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">🔑 متاح مع مندوب</span>
-      : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">✅ متاح بدون مندوب</span>;
-  }
-  if (status === 'maintenance') return <span className="badge-warning">🔧 صيانة</span>;
-  if (status === 'breakdown') return <span className="badge-urgent">⚠️ خربان</span>;
-  if (status === 'rental') return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">🚙 إيجار</span>;
-  return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{statusLabels[status] || status}</span>;
+const VEHICLE_STATUS_CELL_CLASSES: Record<VehicleStatus, string> = {
+  active: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200',
+  maintenance: 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200',
+  breakdown: 'bg-rose-100 text-rose-800 dark:bg-rose-950/50 dark:text-rose-200',
+  rental: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-200',
+  inactive: 'bg-slate-100 text-foreground dark:bg-slate-800',
+  ended: 'bg-zinc-200 text-foreground dark:bg-zinc-800',
+};
+
+const vehicleStatusLabel = (status: VehicleStatus, rider?: string | null) => {
+  if (status !== 'active') return statusLabels[status];
+  return rider ? 'متاح مع مندوب' : 'متاح بدون مندوب';
 };
 
 const typeLabels: Record<string, string> = { motorcycle: 'دباب', car: 'سيارة' };
@@ -689,20 +689,34 @@ const Motorcycles = () => {
                           </div>
                         </td>
                         <td className="ta-td">
-                          <div className="flex min-w-32 items-center justify-center gap-2">
-                            <Switch
-                              checked={Boolean(v.has_fuel_chip)}
-                              onCheckedChange={(checked) => handleQuickVehicleUpdate(
-                                v,
-                                { has_fuel_chip: checked },
-                                checked ? 'تم تسجيل وجود الشريحة' : 'تم تسجيل عدم وجود الشريحة',
-                              )}
+                          <div className="flex min-w-40 items-center justify-center gap-2">
+                            <Select
+                              value={v.has_fuel_chip ? 'present' : 'absent'}
+                              onValueChange={(chipStatus) => {
+                                const hasFuelChip = chipStatus === 'present';
+                                handleQuickVehicleUpdate(
+                                  v,
+                                  { has_fuel_chip: hasFuelChip },
+                                  hasFuelChip ? 'تم تسجيل وجود الشريحة' : 'تم تسجيل عدم وجود الشريحة',
+                                );
+                              }}
                               disabled={!permissions.can_edit || updatingVehicleId === v.id}
-                              aria-label={`تغيير حالة شريحة المركبة ${v.plate_number}`}
-                            />
-                            <span className={`text-xs font-semibold ${v.has_fuel_chip ? 'text-success' : 'text-muted-foreground'}`}>
-                              {v.has_fuel_chip ? 'موجودة' : 'غير موجودة'}
-                            </span>
+                            >
+                              <SelectTrigger
+                                className={`relative mx-auto h-10 w-36 justify-center px-8 text-center font-bold shadow-none disabled:opacity-100 [&>svg]:absolute [&>svg]:left-3 ${
+                                  v.has_fuel_chip
+                                    ? 'border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200'
+                                    : 'border-zinc-300 bg-zinc-100 text-foreground dark:border-zinc-700 dark:bg-zinc-800'
+                                }`}
+                                aria-label={`تغيير حالة شريحة المركبة ${v.plate_number}`}
+                              >
+                                <span>{v.has_fuel_chip ? 'موجودة' : 'غير موجودة'}</span>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="present">موجودة</SelectItem>
+                                <SelectItem value="absent">غير موجودة</SelectItem>
+                              </SelectContent>
+                            </Select>
                             {updatingVehicleId === v.id && <Loader2 size={13} className="animate-spin text-primary" />}
                           </div>
                         </td>
@@ -715,7 +729,7 @@ const Motorcycles = () => {
                             <span className="text-muted-foreground">بدون مندوب</span>
                           )}
                         </td>
-                        <td className="ta-td">
+                        <td className={`ta-td !p-0 ${VEHICLE_STATUS_CELL_CLASSES[v.status]}`}>
                           <Select
                             value={v.status}
                             onValueChange={(status) => handleQuickVehicleUpdate(
@@ -725,8 +739,11 @@ const Motorcycles = () => {
                             )}
                             disabled={!permissions.can_edit || updatingVehicleId === v.id}
                           >
-                            <SelectTrigger className="mx-auto h-9 w-40 border-border/70 bg-background px-2 shadow-none" aria-label={`تغيير حالة الدباب ${v.plate_number}`}>
-                              <SmartStatusBadge status={v.status} rider={v.current_rider} />
+                            <SelectTrigger
+                              className="relative min-h-16 w-full justify-center rounded-none border-0 bg-transparent px-8 text-center font-bold text-current shadow-none hover:bg-black/[0.03] disabled:opacity-100 dark:hover:bg-white/[0.04] [&>svg]:absolute [&>svg]:left-3"
+                              aria-label={`تغيير حالة الدباب ${v.plate_number}`}
+                            >
+                              <span>{vehicleStatusLabel(v.status, v.current_rider)}</span>
                             </SelectTrigger>
                             <SelectContent>
                               {ALL_STATUSES.map((status) => (
