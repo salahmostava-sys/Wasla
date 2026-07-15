@@ -115,7 +115,7 @@ export const AppCard = ({
                     e.stopPropagation();
                   }
                 }}
-                className="h-6 w-auto min-w-[80px] border border-slate-200 bg-white text-slate-800 text-[10px] font-semibold px-2 py-0 gap-1 rounded-full hover:bg-slate-50 focus:ring-0 focus:ring-offset-0"
+                className="h-6 w-auto min-w-[80px] border border-slate-200 bg-white text-foreground text-[10px] font-semibold px-2 py-0 gap-1 rounded-full hover:bg-slate-50 focus:ring-0 focus:ring-offset-0"
               >
                 <SelectValue />
               </SelectTrigger>

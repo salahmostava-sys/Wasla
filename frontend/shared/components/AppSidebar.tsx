@@ -333,7 +333,7 @@ const AppSidebar = () => {
                 {projectSubtitle && (
                   <span
                     className="text-[11px] block truncate leading-tight mt-0.5"
-                    style={{ color: '#73829a' }}
+                    style={{ color: 'var(--ds-on-surface)' }}
                   >
                     {projectSubtitle}
                   </span>

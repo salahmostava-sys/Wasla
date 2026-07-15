@@ -39,7 +39,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 30% 97%;             /* #f6f8fb subtle surface */
-    --muted-foreground: 215 18% 53%;  /* #73829a */
+    --muted-foreground: 222 75% 12%;  /* #061735 — readable secondary text */
 
     --accent: 218 54% 95%;            /* very light navy tint */
     --accent-foreground: 218 70% 40%;
@@ -71,7 +71,7 @@
     --sidebar-accent-foreground: 218 70% 40%;
     --sidebar-border: 218 36% 92%;
     --sidebar-ring: 218 70% 40%;
-    --sidebar-muted: 215 18% 53%;
+    --sidebar-muted: 222 75% 12%;
 
     /* ── MD3 surface raw hex tokens ──────────────────────────── */
     --ds-surface:            #ffffff;
@@ -80,7 +80,7 @@
     --ds-surface-container:  #f4f6fa;
     --ds-surface-high:       #eef2f7;
     --ds-on-surface:         #061735;
-    --ds-on-surface-variant: #73829a;
+    --ds-on-surface-variant: #061735;
     --ds-outline-variant:    #dce2eb;
 
     /* ── Brand hex tokens ────────────────────────────────────── */
@@ -139,7 +139,7 @@
     --secondary: 215 28% 17%;
     --secondary-foreground: 0 0% 100%;
     --muted: 222 30% 16%;
-    --muted-foreground: 213 15% 50%;
+    --muted-foreground: 213 20% 92%;
     --accent: 222 35% 20%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 55%;
@@ -161,7 +161,7 @@
     --sidebar-accent-foreground: 213 18% 88%;
     --sidebar-border: 222 30% 14%;
     --sidebar-ring: 218 70% 40%;
-    --sidebar-muted: 213 14% 42%;
+    --sidebar-muted: 213 20% 92%;
 
     /* ── MD3 surface tokens — dark overrides ─────────────────── */
     --ds-surface:            #0f1422;
@@ -170,7 +170,7 @@
     --ds-surface-container:  #18202f;
     --ds-surface-high:       #1e2840;
     --ds-on-surface:         #dde3ec;
-    --ds-on-surface-variant: #8b9ab4;
+    --ds-on-surface-variant: #dde3ec;
     --ds-outline-variant:    #2a3850;
     --ds-success:           #25a576;
     --ds-warning:           #f0a51a;
@@ -359,8 +359,8 @@
     letter-spacing: 0;
   }
 
-  .app-content-shell .text-muted-foreground {
-    color: var(--ds-on-surface-variant);
+  .app-content-shell [class*='text-muted-foreground'] {
+    color: var(--ds-on-surface) !important;
   }
 
   .app-content-shell .text-primary {

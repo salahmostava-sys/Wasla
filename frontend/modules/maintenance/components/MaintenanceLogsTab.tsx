@@ -29,7 +29,7 @@ import { useAuthQueryGate, authQueryUserId } from '@shared/hooks/useAuthQueryGat
 const TYPE_COLORS: Record<string, string> = {
   'غيار زيت':    'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300',
   'صيانة دورية': 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300',
-  'إطارات':      'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  'إطارات':      'bg-slate-100 text-foreground dark:bg-slate-800',
   'بطارية':      'bg-purple-100 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300',
   'فرامل':       'bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-300',
   'أعطال':       'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300',

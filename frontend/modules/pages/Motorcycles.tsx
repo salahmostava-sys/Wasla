@@ -568,7 +568,7 @@ const Motorcycles = () => {
           { label: 'أعطال', value: stats.breakdown, icon: '⚠️', cls: 'text-destructive' },
           { label: 'إيجار', value: stats.rental, icon: '🚙', cls: 'text-blue-600' },
           { label: 'غير نشطة', value: stats.inactive, icon: '⏸️', cls: 'text-muted-foreground' },
-          { label: 'منتهي', value: stats.ended, icon: '⛔', cls: 'text-slate-600 dark:text-slate-300' },
+          { label: 'منتهي', value: stats.ended, icon: '⛔', cls: 'text-foreground' },
         ].map(s => (
           <div key={s.label} className="bg-card border border-border p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-1">
