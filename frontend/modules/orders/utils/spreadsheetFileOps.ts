@@ -24,6 +24,7 @@ import {
 import { ImportFactory } from '@modules/orders/utils/import/importFactory';
 import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { matchEmployeeNames, type UnmatchedEmployeeName } from '@shared/lib/nameMatching';
+import { escapeHtml } from '@shared/lib/security';
 import {
   buildDailyAppReportRows,
   getDailyAppReportName,
@@ -262,7 +263,7 @@ export async function printDailyAppReportTable(params: {
       : `${row.expectedToReachTarget ? 'متوقع' : 'غير متوقع'} (${row.projectedTotal})`;
     const tr = doc.createElement('tr');
     tr.innerHTML = `
-      <td>${row.empName}</td>
+      <td>${escapeHtml(row.empName)}</td>
       <td>${row.total}</td>
       <td>${row.employeeTarget ?? 'بدون هدف'}</td>
       <td>${achievement}</td>

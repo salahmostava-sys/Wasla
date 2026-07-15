@@ -191,7 +191,7 @@ describe('spreadsheetFileOps', () => {
         endDay: 3,
         appId: 'app1',
         employees: [
-          { id: 'emp1', name: 'John', platform_accounts: [], identity_id: '', is_active: true, avatar_url: '', created_at: '', updated_at: '' },
+          { id: 'emp1', name: '<img src=x onerror=alert(1)>', platform_accounts: [], identity_id: '', is_active: true, avatar_url: '', created_at: '', updated_at: '' },
           { id: 'emp2', name: 'Jane', platform_accounts: [], identity_id: '', is_active: true, avatar_url: '', created_at: '', updated_at: '' },
         ],
         data: {
@@ -206,7 +206,8 @@ describe('spreadsheetFileOps', () => {
       
       const tableEl = appendChildMock.mock.calls.find(call => call[0]?.tagName === 'TABLE')?.[0] as HTMLTableElement;
       expect(tableEl).toBeDefined();
-      expect(tableEl.innerHTML).toContain('John');
+      expect(tableEl.textContent).toContain('<img src=x onerror=alert(1)>');
+      expect(tableEl.querySelector('img')).toBeNull();
       expect(tableEl.innerHTML).toContain('Jane');
       expect(tableEl.innerHTML).toContain('5');
 
