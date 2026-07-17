@@ -1,8 +1,10 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { getInitialLanguage } from '@app/i18n/language';
 
 type Locale = 'ar' | 'en';
 type TranslationEntry = readonly [key: string, ar: string, en: string];
+const RIDER_CONSUMPTION_AR = 'استهلاك المناديب';
 
 const TRANSLATION_ENTRIES: readonly TranslationEntry[] = [
   ['appName', 'مهمة التوصيل', 'Delivery System'],
@@ -23,8 +25,8 @@ const TRANSLATION_ENTRIES: readonly TranslationEntry[] = [
   ['vehicles', 'بيانات المركبات', 'Vehicle Data'],
   ['vehicleTracking', 'تتبع المركبات', 'Vehicle Tracking'],
   ['vehicleAssignment', 'سجل تسليم المركبات', 'Vehicle Assignment'],
-  ['fuel', 'استهلاك المناديب', 'Rider consumption'],
-  ['fuelPageTitle', 'استهلاك المناديب', 'Rider consumption'],
+  ['fuel', RIDER_CONSUMPTION_AR, 'Rider consumption'],
+  ['fuelPageTitle', RIDER_CONSUMPTION_AR, 'Rider consumption'],
   [
     'fuelPageSubtitle',
     'الكيلومترات وتكلفة الوقود — يومي وشهري (vehicle_mileage_daily)',
@@ -184,6 +186,63 @@ const TRANSLATION_ENTRIES: readonly TranslationEntry[] = [
   ['secureConnection', 'اتصال آمن ومحمي', 'Secure and protected connection'],
   ['hidePassword', 'إخفاء كلمة المرور', 'Hide password'],
   ['showPassword', 'إظهار كلمة المرور', 'Show password'],
+  ['profile', 'الملف الشخصي', 'Profile'],
+  ['systemSettings', 'إعدادات النظام', 'System Settings'],
+  ['currentPagePath', 'مسار الصفحة الحالية', 'Current page path'],
+  ['toggleSidebar', 'فتح أو إغلاق القائمة الجانبية', 'Toggle sidebar'],
+  ['expandSidebar', 'توسيع القائمة', 'Expand sidebar'],
+  ['collapseSidebar', 'تصغير القائمة', 'Collapse sidebar'],
+  ['requestTimeout', 'انتهت مهلة الطلب، يرجى تحديث الصفحة', 'Request timed out. Please refresh the page.'],
+  ['refresh', 'تحديث', 'Refresh'],
+  ['accessDenied', 'غير مصرح بالوصول', 'Access Denied'],
+  ['accessDeniedDefault', 'ليس لديك صلاحية لعرض هذه الصفحة', 'You do not have permission to view this page.'],
+  ['pageRuntimeError', 'حدث خطأ أثناء تشغيل الصفحة', 'An error occurred while running this page'],
+  ['runtimeErrorHint', 'صوّر هذه الرسالة وأرسلها إلى فريق الدعم.', 'Take a screenshot of this message and send it to support.'],
+  ['reload', 'إعادة تحميل', 'Reload'],
+  ['dismiss', 'تجاهل', 'Dismiss'],
+  ['unexpectedError', 'عذراً، حدث خطأ غير متوقع. تم إرسال تقرير للمطورين.', 'Sorry, an unexpected error occurred. A report was sent to the developers.'],
+  ['previousMonth', 'الشهر السابق', 'Previous month'],
+  ['nextMonth', 'الشهر القادم', 'Next month'],
+  ['lightMode', 'الوضع الفاتح', 'Light mode'],
+  ['darkMode', 'الوضع الداكن', 'Dark mode'],
+  ['switchToLightMode', 'تبديل للوضع الفاتح', 'Switch to light mode'],
+  ['switchToDarkMode', 'تبديل للوضع الداكن', 'Switch to dark mode'],
+  ['offlineMessage', 'أنت غير متصل بالإنترنت — سيتم استئناف المزامنة تلقائياً عند عودة الاتصال', 'You are offline. Sync will resume automatically when the connection returns.'],
+  ['retry', 'إعادة المحاولة', 'Retry'],
+  ['connectionRestored', 'تم استعادة الاتصال بنجاح', 'Connection restored successfully'],
+  ['pageNotFound', 'الصفحة غير موجودة أو لم تعد متاحة.', 'The page was not found or is no longer available.'],
+  ['backHome', 'العودة للرئيسية', 'Back to dashboard'],
+  ['home', 'الرئيسية', 'Home'],
+  ['profileDescription', 'تعديل الاسم المعروض والصورة وكلمة المرور', 'Update your display name, photo, and password'],
+  ['monthlyData', 'بيانات شهر', 'Month'],
+  ['humanResources', 'الموارد البشرية', 'Human Resources'],
+  ['searchEmployee', 'بحث عن موظف...', 'Search employees...'],
+  ['columns', 'الأعمدة', 'Columns'],
+  ['showHideColumns', 'إظهار / إخفاء الأعمدة', 'Show / hide columns'],
+  ['commercialRecords', 'السجلات التجارية', 'Commercial Records'],
+  ['addEmployeeAction', 'إضافة موظف', 'Add Employee'],
+  ['dailyOrders', 'الطلبات اليومية', 'Daily Orders'],
+  ['ordersSection', 'قسم الطلبات', 'Orders section'],
+  ['shifts', 'الدوام', 'Shifts'],
+  ['platformReport', 'تقرير منصة', 'Platform Report'],
+  ['monthSummary', 'ملخص الشهر', 'Month Summary'],
+  ['wallet', 'المحفظة', 'Wallet'],
+  ['monthlyPayroll', 'الرواتب الشهرية', 'Monthly Payroll'],
+  ['maintenanceInventory', 'الصيانة والمخزون', 'Maintenance and Inventory'],
+  ['maintenanceDescription', 'سجّل عمليات صيانة المركبات وتابع مخزون قطع الغيار وتكاليف الشراء', 'Track vehicle maintenance, spare-parts inventory, and purchase costs'],
+  ['maintenanceLog', 'سجل الصيانة', 'Maintenance Log'],
+  ['inventorySpareParts', 'المخزون وقطع الغيار', 'Inventory and Spare Parts'],
+  ['vehicleReports', 'تقارير المركبات', 'Vehicle Reports'],
+  ['summary', 'الملخص', 'Summary'],
+  ['gasoline', 'البنزين', 'Fuel'],
+  ['kilometers', 'الكيلومترات', 'Kilometers'],
+  ['fuelConsumptionTitle', 'استهلاك البنزين', 'Fuel Consumption'],
+  ['kilometerLogTitle', 'سجل الكيلومترات', 'Mileage Log'],
+  ['riderConsumptionTitle', RIDER_CONSUMPTION_AR, 'Rider Consumption'],
+  ['fuelConsumptionSubtitle', 'سجل فواتير وتكاليف البنزين الخاصة بالمناديب', 'Track rider fuel invoices and costs'],
+  ['kilometerLogSubtitle', 'سجل قراءات العداد والمسافات المقطوعة', 'Track odometer readings and traveled distances'],
+  ['riderConsumptionSubtitle', 'ملخص شامل للكيلومترات وتكلفة الوقود للمناديب', 'A complete summary of rider mileage and fuel costs'],
+  ['uploadFullFile', 'رفع ملف كامل', 'Upload Full File'],
 ];
 
 const buildTranslations = (locale: Locale): Record<string, string> => {
@@ -198,8 +257,10 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'ar',
+  lng: getInitialLanguage(),
   fallbackLng: 'ar',
+  supportedLngs: ['ar', 'en'],
+  load: 'languageOnly',
   interpolation: { escapeValue: false },
 });
 

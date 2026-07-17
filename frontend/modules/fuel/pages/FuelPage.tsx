@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, ShieldAlert, UploadCloud } from 'lucide-react';
+import { Loader2, UploadCloud } from 'lucide-react';
 import { useFuelPage } from '@modules/fuel/hooks/useFuelPage';
 import { FuelPageHeader } from '@modules/fuel/components/FuelPageHeader';
 import { FuelFiltersToolbar, FuelPlatformTabs } from '@modules/fuel/components/FuelFilters';
@@ -10,16 +10,21 @@ import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import type { DailyRow, MonthlyRow } from '@modules/fuel/types/fuel.types';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@app/providers/LanguageContext';
+import { PageAccessDeniedState } from '@shared/components/PageAccessState';
 
 type PageTab = 'summary' | 'fuel' | 'km';
 
-const PAGE_TABS: { key: PageTab; label: string }[] = [
-  { key: 'summary', label: 'الملخص' },
-  { key: 'fuel', label: 'البنزين' },
-  { key: 'km', label: 'الكيلومترات' },
+const PAGE_TABS: { key: PageTab; labelKey: string }[] = [
+  { key: 'summary', labelKey: 'summary' },
+  { key: 'fuel', labelKey: 'gasoline' },
+  { key: 'km', labelKey: 'kilometers' },
 ];
 
 function FuelPageTabs({ pageTab, setPageTab }: Readonly<{ pageTab: PageTab; setPageTab: (v: PageTab) => void }>) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-wrap gap-2 items-center">
       {PAGE_TABS.map((t) => (
@@ -29,7 +34,7 @@ function FuelPageTabs({ pageTab, setPageTab }: Readonly<{ pageTab: PageTab; setP
           onClick={() => setPageTab(t.key)}
           className={`px-4 py-1.5 rounded-lg text-sm font-semibold border transition-colors ${pageTab === t.key ? 'bg-primary text-primary-foreground border-primary' : 'bg-card border-border hover:bg-muted/50'}`}
         >
-          {t.label}
+          {t(t.labelKey)}
         </button>
       ))}
     </div>
@@ -151,6 +156,8 @@ function MegaSpreadsheetTable({
 
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function FuelPage() {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const { authLoading } = useAuthQueryGate();
   const page = useFuelPage();
   const [pageTab, setPageTab] = useState<PageTab>('summary');
@@ -165,13 +172,7 @@ export default function FuelPage() {
   }
 
   if (!page.permissions.can_view) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-        <ShieldAlert size={40} className="text-destructive" />
-        <p className="text-lg font-semibold">غير مصرح بالوصول</p>
-        <p className="text-sm text-muted-foreground">ليس لديك صلاحية الوصول لصفحة استهلاك الوقود</p>
-      </div>
-    );
+    return <PageAccessDeniedState message="ليس لديك صلاحية الوصول لصفحة استهلاك الوقود" />;
   }
 
   const {
@@ -202,22 +203,22 @@ export default function FuelPage() {
 
   const getPageTitle = () => {
     switch(pageTab) {
-      case 'fuel': return 'استهلاك البنزين';
-      case 'km': return 'سجل الكيلومترات';
-      default: return 'استهلاك المناديب';
+      case 'fuel': return t('fuelConsumptionTitle');
+      case 'km': return t('kilometerLogTitle');
+      default: return t('riderConsumptionTitle');
     }
   };
 
   const getPageSubtitle = () => {
     switch(pageTab) {
-      case 'fuel': return 'سجل فواتير وتكاليف البنزين الخاصة بالمناديب';
-      case 'km': return 'سجل قراءات العداد والمسافات المقطوعة';
-      default: return 'ملخص شامل للكيلومترات وتكلفة الوقود للمناديب';
+      case 'fuel': return t('fuelConsumptionSubtitle');
+      case 'km': return t('kilometerLogSubtitle');
+      default: return t('riderConsumptionSubtitle');
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[1600px]" dir="rtl">
+    <div className="flex flex-col gap-4 w-full max-w-[1600px]" dir={isRTL ? 'rtl' : 'ltr'}>
       <FuelPageHeader
         title={getPageTitle()}
         subtitle={getPageSubtitle()}
@@ -229,7 +230,7 @@ export default function FuelPage() {
           <div className="flex items-center gap-2">
             {pageTab !== 'summary' && permissions.can_edit && (
               <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setImportOpen(true)}>
-                <UploadCloud size={14} /> رفع ملف كامل
+                <UploadCloud size={14} /> {t('uploadFullFile')}
               </Button>
             )}
             <FuelFiltersToolbar

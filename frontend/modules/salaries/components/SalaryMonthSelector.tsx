@@ -1,5 +1,6 @@
 ﻿import { useMemo } from 'react';
 import { Wallet, TrendingUp, Users, Building2, Package, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components/ui/button';
 import { SalaryEngineStatusBadge } from '@modules/salaries/components/SalaryEngineStatusBadge';
@@ -15,16 +16,17 @@ interface SalaryMonthSelectorProps {
 export function SalaryMonthSelector(props: Readonly<SalaryMonthSelectorProps>) {
   const { loadingData, previewBackendError, isRefreshingPreview = false } = props;
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap">
       <div>
         <nav className="page-breadcrumb">
-          <span>الرئيسية</span>
+          <span>{t('home')}</span>
           <span className="page-breadcrumb-sep">/</span>
-          <span>الرواتب الشهرية</span>
+          <span>{t('monthlyPayroll')}</span>
         </nav>
-        <h1 className="page-title flex items-center gap-2"><Wallet size={20} /> الرواتب الشهرية</h1>
+        <h1 className="page-title flex items-center gap-2"><Wallet size={20} /> {t('monthlyPayroll')}</h1>
         <div className="mt-1">
           <SalaryEngineStatusBadge
             loadingData={loadingData}
@@ -41,7 +43,7 @@ export function SalaryMonthSelector(props: Readonly<SalaryMonthSelectorProps>) {
           onClick={() => navigate('/orders')}
         >
           <Package size={13} />
-          الطلبات
+          {t('orders')}
         </Button>
         <Button
           size="sm"
@@ -50,7 +52,7 @@ export function SalaryMonthSelector(props: Readonly<SalaryMonthSelectorProps>) {
           onClick={() => navigate('/orders?tab=shifts')}
         >
           <Clock size={13} />
-          الدوام
+          {t('shifts')}
         </Button>
       </div>
     </div>

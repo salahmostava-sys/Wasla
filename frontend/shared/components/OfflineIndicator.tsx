@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { cn } from '@shared/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 type ConnectionState = 'online' | 'offline' | 'reconnected';
 
@@ -9,6 +10,7 @@ type ConnectionState = 'online' | 'offline' | 'reconnected';
  * مع حركة انزلاق ناعمة ورسالة عند عودة الاتصال.
  */
 export function OfflineIndicator() {
+  const { t } = useTranslation();
   const [state, setState] = useState<ConnectionState>(
     navigator.onLine ? 'online' : 'offline',
   );
@@ -64,20 +66,20 @@ export function OfflineIndicator() {
       {isOffline ? (
         <>
           <WifiOff size={14} className="shrink-0 animate-pulse" />
-          <span>أنت غير متصل بالإنترنت — سيتم استئناف المزامنة تلقائياً عند عودة الاتصال</span>
+          <span>{t('offlineMessage')}</span>
           <button
             type="button"
             onClick={handleRetry}
             className="mr-2 inline-flex items-center gap-1 rounded-md bg-white/20 px-2 py-0.5 text-[11px] font-semibold transition-colors hover:bg-white/30"
           >
             <RefreshCw size={11} />
-            إعادة المحاولة
+            {t('retry')}
           </button>
         </>
       ) : (
         <>
           <Wifi size={14} className="shrink-0" />
-          <span>تم استعادة الاتصال بنجاح ✓</span>
+          <span>{t('connectionRestored')} ✓</span>
         </>
       )}
     </div>

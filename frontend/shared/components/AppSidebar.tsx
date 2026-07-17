@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Users, Clock, Package, Wallet, CreditCard,
   Bike, FileDown, Bell, Smartphone,
@@ -13,7 +14,14 @@ import { useSystemSettings } from '@app/providers/SystemSettingsContext';
 import { useMobileSidebar } from '@app/providers/MobileSidebarContext';
 import { cn } from '@shared/lib/utils';
 import { brandLogoSrc } from '@shared/lib/brandLogo';
-import { routesManifest, routeGroupTitleAr, toPagePermissionKey, type RouteGroup } from '@app/routesManifest';
+import {
+  getRouteTitle,
+  routeGroupTitleAr,
+  routeGroupTitleEn,
+  routesManifest,
+  toPagePermissionKey,
+  type RouteGroup,
+} from '@app/routesManifest';
 
 const SIDEBAR_SECTIONS_STORAGE_KEY = 'sidebar_nav_sections_open_v1';
 
@@ -188,7 +196,8 @@ const SidebarNavLink = memo(function SidebarNavLink({
 
 const AppSidebar = () => {
   const location = useLocation();
-  const { isRTL } = useLanguage();
+  const { isRTL, lang } = useLanguage();
+  const { t } = useTranslation();
   const { permissionsByPage } = usePermissionMap();
   const { projectName, projectSubtitle, settings } = useSystemSettings();
   const { isOpen, close } = useMobileSidebar();
@@ -236,18 +245,18 @@ const AppSidebar = () => {
         .filter((route) => route.group === groupKey && route.sidebar)
         .filter((route) => canViewRoute(route.permission))
         .map((route) => ({
-          label: route.titleAr,
+          label: getRouteTitle(route, lang),
           icon: iconByRouteId[route.id] ?? LayoutDashboard,
           path: route.path,
         }));
       return {
         key: groupKey,
-        sectionLabel: routeGroupTitleAr[groupKey],
+        sectionLabel: lang === 'ar' ? routeGroupTitleAr[groupKey] : routeGroupTitleEn[groupKey],
         groupIcon: groupIcons[groupKey],
         items,
       };
     }).filter((group) => group.items.length > 0);
-  }, [canViewRoute]);
+  }, [canViewRoute, lang]);
 
   const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>({});
 
@@ -346,6 +355,7 @@ const AppSidebar = () => {
           {!collapsed && (
             <button
               onClick={close}
+              aria-label={t('close')}
               className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
               style={{ color: 'var(--ds-primary)' }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(31,84,173,0.08)')}
@@ -463,7 +473,8 @@ const AppSidebar = () => {
         >
           <button
             onClick={toggleCollapse}
-            title={collapsed ? 'توسيع القائمة' : 'تصغير القائمة'}
+            title={collapsed ? t('expandSidebar') : t('collapseSidebar')}
+            aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
             style={{ color: 'var(--ds-primary)' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(31,84,173,0.08)')}

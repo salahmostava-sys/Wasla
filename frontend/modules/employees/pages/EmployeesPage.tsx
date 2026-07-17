@@ -13,6 +13,7 @@ import {
 import { useToast } from '@shared/hooks/use-toast';
 import { todayISO, normalizeArabicDigits } from '@shared/lib/formatters';
 import { useSystemSettings } from '@app/providers/SystemSettingsContext';
+import { useLanguage } from '@app/providers/LanguageContext';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { usePagePresence } from '@shared/hooks/usePagePresence';
 import { PresenceAvatars } from '@shared/components/PresenceAvatars';
@@ -52,6 +53,7 @@ const InlineLoader = ({ minHeightClassName = 'min-h-[260px]' }: Readonly<{ minHe
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const Employees = () => {
+  const { isRTL } = useLanguage();
   useAuthQueryGate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -278,7 +280,7 @@ const Employees = () => {
 
   if (employeesError && !loading) {
     return (
-      <div className="space-y-4" dir="rtl">
+      <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div>
         <nav className="page-breadcrumb"><span>الرئيسية</span><span className="page-breadcrumb-sep">/</span><span>الموظفون</span></nav>
       </div>
@@ -293,7 +295,7 @@ const Employees = () => {
   }
 
   return (
-    <div className="space-y-4" dir="rtl">
+    <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <nav className="page-breadcrumb"><span>الرئيسية</span><span className="page-breadcrumb-sep">/</span><span>الموظفون</span></nav>
       {/* Real-time presence — who else is on this page */}
       {presence.onlineUsers.length > 0 && (
@@ -436,7 +438,7 @@ const Employees = () => {
       </AlertDialog>
 
       <Dialog open={!!statusDateDialog} onOpenChange={open => !open && setStatusDateDialog(null)}>
-        <DialogContent dir="rtl" className="max-w-sm">
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'} className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarDays size={16} className="text-destructive" />

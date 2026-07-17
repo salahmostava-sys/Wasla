@@ -1,6 +1,7 @@
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '@app/providers/ThemeContext';
 import { cn } from '@shared/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ThemeToggleProps {
   className?: string;
@@ -13,6 +14,7 @@ interface ThemeToggleProps {
  */
 export function ThemeToggle({ className }: Readonly<ThemeToggleProps>) {
   const { toggleTheme, isDark } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <button
@@ -24,8 +26,8 @@ export function ThemeToggle({ className }: Readonly<ThemeToggleProps>) {
         'hover:bg-muted transition-colors flex-shrink-0 overflow-hidden',
         className
       )}
-      title={isDark ? 'الوضع الفاتح' : 'الوضع الداكن'}
-      aria-label={isDark ? 'تبديل للوضع الفاتح' : 'تبديل للوضع الداكن'}
+      title={isDark ? t('lightMode') : t('darkMode')}
+      aria-label={isDark ? t('switchToLightMode') : t('switchToDarkMode')}
     >
       {/* Sun icon — visible in dark mode */}
       <Sun

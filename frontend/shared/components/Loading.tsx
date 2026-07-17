@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 type LoadingProps = Readonly<{
   className?: string;
@@ -10,6 +11,7 @@ type LoadingProps = Readonly<{
 
 export default function Loading(props: Readonly<LoadingProps>) {
   const { className = '', minHeightClassName = 'min-h-[300px]', resetKey = 'default' } = props;
+  const { t } = useTranslation();
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -22,10 +24,10 @@ export default function Loading(props: Readonly<LoadingProps>) {
   if (timedOut) {
     return (
       <div className={`${minHeightClassName} flex flex-col items-center justify-center gap-3 ${className}`}>
-        <p className="text-sm text-muted-foreground">Request Timeout - Please Refresh</p>
+        <p className="text-sm text-muted-foreground">{t('requestTimeout')}</p>
         <Button variant="outline" size="sm" onClick={() => globalThis.location.reload()} className="gap-2">
           <RefreshCw size={14} />
-          Refresh
+          {t('refresh')}
         </Button>
       </div>
     );

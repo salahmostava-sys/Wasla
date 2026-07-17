@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@app/providers/AuthContext';
 import { logError } from '@shared/lib/logger';
 import { settingsHubService } from '@services/settingsHubService';
+import { useLanguage } from '@app/providers/LanguageContext';
+import { getStoredLanguage, isAppLanguage, localizedText } from '@app/i18n/language';
 
 interface SystemSettings {
   id: string;
@@ -49,6 +51,7 @@ const SystemSettingsContext = createContext<SystemSettingsContextType>({
 
 export const SystemSettingsProvider = ({ children }: { children: ReactNode }) => {
   const { user, session, authLoading } = useAuth();
+  const { lang, setLang } = useLanguage();
   const enabled = !!session && !!user && !authLoading;
   const query = useQuery({
     queryKey: ['system-settings', user?.id ?? '__guest__'] as const,
@@ -67,8 +70,19 @@ export const SystemSettingsProvider = ({ children }: { children: ReactNode }) =>
 
   const s = query.data ?? defaults;
   const loading = enabled ? query.isLoading : authLoading;
-  const projectName = s.project_name_ar;
-  const projectSubtitle = s.project_subtitle_ar;
+  const projectName = localizedText(lang, s.project_name_ar, s.project_name_en || s.project_name_ar);
+  const projectSubtitle = localizedText(
+    lang,
+    s.project_subtitle_ar,
+    s.project_subtitle_en || s.project_subtitle_ar,
+  );
+
+  useEffect(() => {
+    if (!query.data || getStoredLanguage()) return;
+    if (isAppLanguage(query.data.default_language)) {
+      setLang(query.data.default_language);
+    }
+  }, [query.data, setLang]);
   const contextValue = useMemo<SystemSettingsContextType>(
     () => ({
       settings: s,

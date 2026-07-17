@@ -1,33 +1,39 @@
-import { createContext, useContext, useEffect, ReactNode, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, ReactNode, useMemo, useState } from 'react';
 import { DirectionProvider } from '@radix-ui/react-direction';
 import i18n from '@app/i18n';
-
-type Lang = 'ar' | 'en';
+import {
+  getInitialLanguage,
+  persistLanguage,
+  type AppLanguage,
+} from '@app/i18n/language';
 
 interface LanguageContextType {
-  lang: Lang;
+  lang: AppLanguage;
   isRTL: boolean;
-  setLang: (lang: Lang) => void;
+  setLang: (lang: AppLanguage) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType>({} as LanguageContextType);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLang] = useState<Lang>(() => {
-    return (localStorage.getItem('app-lang') as Lang) || 'ar';
-  });
+  const [lang, setLanguageState] = useState<AppLanguage>(getInitialLanguage);
 
   const isRTL = lang === 'ar';
+  const setLang = useCallback((nextLanguage: AppLanguage) => {
+    setLanguageState(nextLanguage);
+    persistLanguage(nextLanguage);
+  }, []);
 
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
-    document.documentElement.style.fontFamily = "'Tajawal', 'IBM Plex Sans Arabic', sans-serif";
-    i18n.changeLanguage(lang);
-    localStorage.setItem('app-lang', lang);
+    document.documentElement.style.fontFamily = isRTL
+      ? "'Tajawal', 'IBM Plex Sans Arabic', sans-serif"
+      : "Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
+    void i18n.changeLanguage(lang);
   }, [lang, isRTL]);
 
-  const value = useMemo<LanguageContextType>(() => ({ lang, isRTL, setLang }), [lang, isRTL]);
+  const value = useMemo<LanguageContextType>(() => ({ lang, isRTL, setLang }), [lang, isRTL, setLang]);
 
   return (
     <DirectionProvider dir={isRTL ? 'rtl' : 'ltr'}>

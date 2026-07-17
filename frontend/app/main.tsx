@@ -5,6 +5,7 @@ import "./styles/index.css";
 import { ErrorBoundary } from "@shared/components/ErrorBoundary";
 import { installGlobalErrorMonitoring } from "@shared/lib/logger";
 import { isLikelyStaleChunkReason, reloadOnceForStaleChunk } from "@shared/lib/chunkLoadRecovery";
+import i18n from '@app/i18n';
 
 // ── Environment validation ────────────────────────────────────────────────────
 // Fail fast with a clear message instead of cryptic Supabase/auth errors later.
@@ -49,18 +50,18 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 }
 
 const SentryFallback = () => (
-  <div dir="rtl" className="min-h-screen w-full bg-background px-4">
+  <div dir={i18n.dir()} className="min-h-screen w-full bg-background px-4">
     <div className="mx-auto flex min-h-screen w-full max-w-xl items-center justify-center">
       <div className="w-full rounded-2xl border border-border bg-card p-6 text-center shadow-card">
         <p className="text-base font-semibold text-foreground">
-          عذراً، حدث خطأ غير متوقع. تم إرسال تقرير للمطورين جاري العمل على حله.
+          {i18n.t('unexpectedError')}
         </p>
         <button
           type="button"
           onClick={() => globalThis.location.reload()}
           className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
         >
-          تحديث الصفحة
+          {i18n.t('refresh')}
         </button>
       </div>
     </div>

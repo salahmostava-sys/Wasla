@@ -2,6 +2,7 @@ import { Component, type ReactNode } from 'react';
 import { getErrorContextSnapshot } from '@shared/lib/errorContextMeta';
 import { logger } from '@shared/lib/logger';
 import { isLikelyStaleChunkReason, reloadOnceForStaleChunk } from '@shared/lib/chunkLoadRecovery';
+import i18n from '@app/i18n';
 
 type Props = {
   children: ReactNode;
@@ -63,11 +64,11 @@ export class ErrorBoundary extends Component<Props, State> {
     if (!this.state.error) return this.props.children;
     const message = extractErrorMessage(this.state.error);
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6" dir={i18n.dir()}>
         <div className="max-w-2xl w-full bg-card border border-border -2xl shadow-card p-6 space-y-3 rounded-2xl">
-          <h1 className="text-lg font-bold">حدث خطأ أثناء تشغيل الصفحة</h1>
+          <h1 className="text-lg font-bold">{i18n.t('pageRuntimeError')}</h1>
           <p className="text-sm text-muted-foreground">
-            لو الشاشة كانت بيضاء، صوّر هذه الرسالة وأرسلها لنا.
+            {i18n.t('runtimeErrorHint')}
           </p>
           <pre className="text-xs overflow-auto max-h-[50vh] rounded-xl bg-muted/40 p-4 whitespace-pre-wrap break-words">
             {message}
@@ -78,14 +79,14 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={() => globalThis.location.reload()}
               type="button"
             >
-              إعادة تحميل
+              {i18n.t('reload')}
             </button>
             <button
               className="px-4 py-2 rounded-xl border border-border text-sm"
               onClick={() => this.setState({ error: null })}
               type="button"
             >
-              تجاهل
+              {i18n.t('dismiss')}
             </button>
           </div>
         </div>

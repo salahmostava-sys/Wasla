@@ -8,6 +8,7 @@ import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGat
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { useNavigate } from 'react-router-dom';
 import { useSystemSettings } from '@app/providers/SystemSettingsContext';
+import { useLanguage } from '@app/providers/LanguageContext';
 import type { PricingRule } from '@services/salaryService';
 import { useQueryClient } from '@tanstack/react-query';
 import Loading from '@shared/components/Loading';
@@ -60,6 +61,7 @@ const InlineLoader = ({ minHeightClassName = 'min-h-[220px]' }: Readonly<{ minHe
 
 // ─────────────────────────────────────────────────────────────────────────────
 const Salaries = () => {
+  const { isRTL } = useLanguage();
   const { toast } = useToast();
   const { user } = useAuth();
   const { enabled: _enabled, userId } = useAuthQueryGate();
@@ -258,7 +260,7 @@ const Salaries = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-4" dir="rtl">
+    <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Breadcrumb is rendered inside SalaryMonthSelector — no duplicate here */}
 
       <CardErrorBoundary title="فشل تحميل محدد الشهر">

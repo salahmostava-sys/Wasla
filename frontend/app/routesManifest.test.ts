@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { routesManifest, routeGroupTitleAr, routePermission, type RouteGroup } from './routesManifest';
+import {
+  getRouteTitle,
+  routeGroupTitleAr,
+  routeGroupTitleEn,
+  routePermission,
+  routesManifest,
+  type RouteGroup,
+} from './routesManifest';
 import { PERMISSION_PAGE_ENTRIES } from '@shared/constants/permissionPages';
 
 describe('routesManifest', () => {
@@ -8,11 +15,16 @@ describe('routesManifest', () => {
     expect(new Set(paths).size).toBe(paths.length);
   });
 
-  it('defines an Arabic title for every route group in use', () => {
+  it('defines Arabic and English titles for every route and group in use', () => {
     const groups = new Set<RouteGroup>();
-    routesManifest.forEach((r) => groups.add(r.group));
+    routesManifest.forEach((route) => {
+      groups.add(route.group);
+      expect(getRouteTitle(route, 'ar')).toMatch(/\S/);
+      expect(getRouteTitle(route, 'en')).toMatch(/\S/);
+    });
     groups.forEach((g) => {
       expect(routeGroupTitleAr[g]).toMatch(/\S/);
+      expect(routeGroupTitleEn[g]).toMatch(/\S/);
     });
   });
 

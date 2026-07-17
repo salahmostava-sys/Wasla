@@ -7,7 +7,7 @@ import { useSystemSettings } from '@app/providers/SystemSettingsContext';
 import { useMobileSidebar, MobileSidebarProvider } from '@app/providers/MobileSidebarContext';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { getRouteByPathname } from '@app/routesManifest';
+import { getRouteByPathname, getRouteTitle } from '@app/routesManifest';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -28,9 +28,9 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-const roleLabelsMap: Record<string, string> = {
-  admin: 'مدير النظام', hr: 'موارد بشرية', finance: 'مالية',
-  operations: 'عمليات', viewer: 'عارض',
+const roleTranslationKeys: Record<string, string> = {
+  admin: 'admin', hr: 'hr_role', finance: 'finance_role',
+  operations: 'operations_role', viewer: 'viewer',
 };
 /** ألوان هادئة للدور في الهيدر (بدون أحمر يشبه الخطأ) */
 const roleBadgeClass: Record<string, string> = {
@@ -47,7 +47,7 @@ const SIDEBAR_WIDTH_EXPANDED = '260px';
 const SIDEBAR_WIDTH_COLLAPSED = '64px';
 
 const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR: layout wiring for route/theme/sidebar states
-  const { isRTL } = useLanguage();
+  const { isRTL, lang } = useLanguage();
   const { signOut, role, user } = useAuth();
 
   const { projectName, projectSubtitle, settings } = useSystemSettings();
@@ -76,7 +76,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
   }, [location.pathname]);
 
   const manifestRoute = getRouteByPathname(location.pathname);
-  const pageTitle = manifestRoute?.titleAr ?? t('dashboard');
+  const pageTitle = manifestRoute ? getRouteTitle(manifestRoute, lang) : t('dashboard');
   const isDashboardRoute = location.pathname === '/';
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
   const displayEmail = user?.email ?? '';
   const displayName = profileName || displayEmail.split('@')[0];
   const initials = displayName.charAt(0).toUpperCase();
-  const roleLabel = role ? roleLabelsMap[role] || role : '';
+  const roleLabel = role ? t(roleTranslationKeys[role] || role) : '';
   const roleBadgeCls = role ? roleBadgeClass[role] || 'text-muted-foreground bg-muted' : '';
 
   const sidebarOffsetCls = isRTL ? SIDEBAR_WIDTH_CLASS : SIDEBAR_WIDTH_CLASS_LTR;
@@ -140,7 +140,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
               onClick={toggle}
               className="h-9 w-9 flex items-center justify-center border border-border/60 bg-card/80 flex-shrink-0 rounded-xl"
               style={{ color: 'var(--ds-on-surface-variant)' }}
-              aria-label="Toggle sidebar"
+              aria-label={t('toggleSidebar')}
             >
               <Menu size={18} />
             </button>
@@ -169,7 +169,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
             <div
               className="hidden lg:flex h-9 items-center gap-1.5 text-[11px] min-w-0 max-w-[220px] lg:max-w-[260px] px-3 rounded-xl bg-muted border border-border/50 shrink-0"
               style={{ color: 'var(--ds-on-surface-variant)' }}
-              aria-label="مسار الصفحة الحالية"
+              aria-label={t('currentPagePath')}
             >
               {isDashboardRoute ? null : (
                 <>
@@ -278,13 +278,13 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
                     <User size={14} />
-                    <span>الملف الشخصي</span>
+                    <span>{t('profile')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex items-center gap-2 cursor-pointer">
                     <Settings size={14} />
-                    <span>إعدادات النظام</span>
+                    <span>{t('systemSettings')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

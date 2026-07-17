@@ -1,5 +1,6 @@
 import type React from 'react';
 import { Plus, Columns, Filter, Building2, X, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@shared/components/ui/button';
 import { cityLabel } from '@modules/employees/model/employeeCity';
 import {
@@ -47,6 +48,7 @@ export function EmployeeActionsBar({
   hasActiveFilters, colFilters, setColFilter, setColFilters,
   filteredCount, totalCount,
 }: Readonly<EmployeeActionsBarProps>) {
+  const { t } = useTranslation();
   let floatingUploadBody: React.ReactNode = null;
   if (isUploading) {
     floatingUploadBody = (
@@ -92,11 +94,11 @@ export function EmployeeActionsBar({
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <nav className="page-breadcrumb">
-            <span>الموارد البشرية</span>
+            <span>{t('humanResources')}</span>
             <span className="page-breadcrumb-sep">/</span>
-            <span className="text-foreground font-medium">الموظفين</span>
+            <span className="text-foreground font-medium">{t('employees')}</span>
           </nav>
-          <h1 className="page-title">الموظفين</h1>
+          <h1 className="page-title">{t('employees')}</h1>
         </div>
         <div className="mb-1 grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
           <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2">
@@ -105,7 +107,7 @@ export function EmployeeActionsBar({
               <Search size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
-                placeholder="بحث عن موظف..."
+                placeholder={t('searchEmployee')}
                 value={colFilters.name ?? ''}
                 onChange={e => setColFilter('name', e.target.value)}
                 className="h-9 w-full rounded-lg border border-border bg-background ps-8 pe-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:w-48"
@@ -125,11 +127,11 @@ export function EmployeeActionsBar({
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9 w-full gap-1.5 sm:w-auto">
-                  <Columns size={14} /> الأعمدة
+                  <Columns size={14} /> {t('columns')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52 max-h-80 overflow-y-auto">
-                <DropdownMenuLabel>إظهار / إخفاء الأعمدة</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('showHideColumns')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {ALL_COLUMNS.map(col => (
                   <DropdownMenuCheckboxItem
@@ -158,10 +160,10 @@ export function EmployeeActionsBar({
           {permissions.can_edit && (
             <>
               <Button variant="outline" onClick={onManageCommercialRecords} className="h-9 w-full gap-2 sm:w-auto">
-                <Building2 size={15} /> السجلات التجارية
+                <Building2 size={15} /> {t('commercialRecords')}
               </Button>
               <Button onClick={onAddEmployee} className="h-9 w-full gap-2 sm:w-auto">
-              <Plus size={15} /> إضافة موظف
+              <Plus size={15} /> {t('addEmployeeAction')}
             </Button>
             </>
           )}
