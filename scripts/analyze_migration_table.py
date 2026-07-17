@@ -198,14 +198,13 @@ def split_top_level_commas(sql: str) -> list[str]:
 
 def strip_leading_comments(statement: str) -> str:
     remaining = statement.lstrip('\ufeff \t\r\n')
-    while True:
-        if remaining.startswith('--'):
-            newline = remaining.find('\n')
-            return '' if newline < 0 else strip_leading_comments(remaining[newline + 1:])
-        if remaining.startswith('/*'):
-            end = remaining.find('*/', 2)
-            return remaining if end < 0 else strip_leading_comments(remaining[end + 2:])
-        return remaining
+    if remaining.startswith('--'):
+        newline = remaining.find('\n')
+        return '' if newline < 0 else strip_leading_comments(remaining[newline + 1:])
+    if remaining.startswith('/*'):
+        end = remaining.find('*/', 2)
+        return remaining if end < 0 else strip_leading_comments(remaining[end + 2:])
+    return remaining
 
 
 def normalize_identifier(identifier: str) -> str:
@@ -802,6 +801,14 @@ def write_outputs(analysis: Analysis, output_dir: Path) -> tuple[Path, Path, Pat
     return draft_path, report_path, json_path
 
 
+def resolve_workspace_path(candidate: Path, workspace_root: Path, label: str) -> Path:
+    resolved_root = workspace_root.resolve()
+    resolved_candidate = candidate.resolve() if candidate.is_absolute() else (resolved_root / candidate).resolve()
+    if not resolved_candidate.is_relative_to(resolved_root):
+        raise SystemExit(f'{label} must stay inside the project directory')
+    return resolved_candidate
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('table', help='Unqualified public table name, for example employees')
@@ -814,8 +821,11 @@ def main() -> int:
     args = parse_args()
     if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', args.table):
         raise SystemExit('Table name must be an unqualified SQL identifier')
-    analysis = MigrationAnalyzer(args.migrations_dir, args.table).analyze()
-    paths = write_outputs(analysis, args.output_dir)
+    workspace_root = Path.cwd().resolve()
+    migrations_dir = resolve_workspace_path(args.migrations_dir, workspace_root, 'Migrations directory')
+    output_dir = resolve_workspace_path(args.output_dir, workspace_root, 'Output directory')
+    analysis = MigrationAnalyzer(migrations_dir, args.table).analyze()
+    paths = write_outputs(analysis, output_dir)
     print(f'Scanned {analysis.migration_count} migrations; {len(analysis.touching_files)} mention {analysis.table}.')
     print(f'Final inferred state: {len(analysis.columns)} columns, {len(analysis.policies)} policies, '
           f'{len(analysis.triggers)} triggers, {len(analysis.indexes)} indexes.')

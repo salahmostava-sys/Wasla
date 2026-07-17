@@ -78,16 +78,22 @@ const resolveEmployeeTargetApp = ({
 
   const assignedAppIds = appIds.filter((appId) => employeeAppIdsByApp[appId]?.has(employeeId));
   const candidateAppIds = assignedAppIds.length > 0 ? assignedAppIds : appIds;
-  return candidateAppIds.reduce((bestAppId, appId) =>
+  const [initialAppId, ...remainingAppIds] = candidateAppIds;
+  if (!initialAppId) return null;
+
+  return remainingAppIds.reduce((bestAppId, appId) =>
     getEmployeeAppOrders(employeeId, appId, data, dayNumbers)
       > getEmployeeAppOrders(employeeId, bestAppId, data, dayNumbers)
       ? appId
-      : bestAppId
+      : bestAppId,
+    initialAppId,
   );
 };
 
-const getEmployeeTarget = (targets: DailyAppReportTarget[], appId: string) =>
-  targets.find((target) => target.app_id === appId)?.employee_target_orders ?? null;
+const getEmployeeTarget = (targets: DailyAppReportTarget[], appId: string | null) =>
+  appId === null
+    ? null
+    : targets.find((target) => target.app_id === appId)?.employee_target_orders ?? null;
 
 const getElapsedDaysInRange = ({ year, month, startDay, endDay, today }: ReportPeriod) => {
   const reportMonth = year * 12 + month;

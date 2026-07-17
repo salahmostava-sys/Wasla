@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.analyze_migration_table import MigrationAnalyzer, split_sql_statements
+from scripts.analyze_migration_table import MigrationAnalyzer, resolve_workspace_path, split_sql_statements
 
 
 class SqlSplitterTests(unittest.TestCase):
@@ -25,6 +25,24 @@ class SqlSplitterTests(unittest.TestCase):
         from scripts.analyze_migration_table import strip_leading_comments
 
         self.assertEqual('SELECT 1;', strip_leading_comments('\ufeffSELECT 1;'))
+
+
+class WorkspacePathTests(unittest.TestCase):
+    def test_accepts_paths_inside_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+
+            resolved = resolve_workspace_path(Path('output'), workspace, 'Output directory')
+
+        self.assertEqual(workspace / 'output', resolved)
+
+    def test_rejects_paths_outside_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / 'workspace'
+            workspace.mkdir()
+
+            with self.assertRaisesRegex(SystemExit, 'must stay inside'):
+                resolve_workspace_path(Path('..') / 'outside', workspace, 'Output directory')
 
 
 class MigrationAnalyzerTests(unittest.TestCase):
