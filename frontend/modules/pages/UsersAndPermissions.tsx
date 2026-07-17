@@ -43,6 +43,7 @@ import { userPermissionService } from '@services/userPermissionService';
 import { auditService } from '@services/auditService';
 import { useAuth } from '@app/providers/AuthContext';
 import { useLanguage } from '@app/providers/LanguageContext';
+import type { AppLanguage } from '@app/i18n/language';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { usePermissions, DEFAULT_PERMISSIONS, type AppRole, type PagePermission } from '@shared/hooks/usePermissions';
 import { PERMISSION_PAGE_ENTRIES } from '@shared/constants/permissionPages';
@@ -92,6 +93,39 @@ const PERMISSION_COLUMNS: { field: PermissionField; labelKey: string }[] = [
   { field: 'can_edit', labelKey: 'edit' },
   { field: 'can_delete', labelKey: 'delete' },
 ];
+
+function getSearchClasses(isRTL: boolean) {
+  return {
+    icon: cn(
+      'absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground',
+      isRTL ? 'right-3' : 'left-3',
+    ),
+    input: isRTL ? 'pr-9' : 'pl-9',
+  };
+}
+
+function getDirection(isRTL: boolean): 'rtl' | 'ltr' {
+  return isRTL ? 'rtl' : 'ltr';
+}
+
+function getPermissionPageLabel(
+  entry: (typeof PERMISSION_PAGE_ENTRIES)[number],
+  lang: AppLanguage,
+) {
+  return lang === 'ar' ? entry.labelAr : entry.labelEn;
+}
+
+function UserStatusBadge({ isActive, t }: Readonly<{ isActive: boolean; t: TFunction }>) {
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium',
+      isActive ? 'bg-green-500/10 text-green-700' : 'bg-destructive/10 text-destructive',
+    )}>
+      <span className={cn('h-2 w-2 rounded-full', isActive ? 'bg-green-500' : 'bg-destructive')} />
+      {isActive ? t('active') : t('inactive')}
+    </span>
+  );
+}
 
 function mergeMatrix(
   role: AppRole,
@@ -347,6 +381,8 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
   const canEdit = settingsPerm.can_edit;
   const canDelete = settingsPerm.can_delete;
   const currentUserId = user?.id ?? null;
+  const direction = getDirection(isRTL);
+  const searchClasses = getSearchClasses(isRTL);
 
   useEffect(() => {
     setRows(usersRows);
@@ -576,8 +612,8 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
   if (authLoading) {
     return (
-      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl">
-        جاري التحقق من الجلسة...
+      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl" dir={direction}>
+        {t('sessionChecking')}
       </div>
     );
   }
@@ -586,9 +622,9 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     return (
       <Alert variant="destructive" className="rounded-xl">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>غير متاح</AlertTitle>
+        <AlertTitle>{t('unavailable')}</AlertTitle>
         <AlertDescription>
-          ليس لديك صلاحية الوصول لإدارة المستخدمين والأدوار والصلاحيات. تواصل مع مدير النظام لمنحك هذه الصلاحية.
+          {t('manageUsersAccessDenied')}
         </AlertDescription>
       </Alert>
     );
@@ -596,53 +632,53 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
   if (loading) {
     return (
-      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl">
-        جاري تحميل المستخدمين والصلاحيات...
+      <div className="border bg-card p-6 text-sm text-muted-foreground rounded-2xl" dir={direction}>
+        {t('usersPermissionsLoading')}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6" dir={direction}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className={`${embedded ? 'text-lg' : 'text-xl'} font-bold flex items-center gap-2`}>
             <Shield size={18} className="me-1" />
-            المستخدمون والصلاحيات
+            {t('usersPermissionsTitle')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            إدارة حسابات المستخدمين وصلاحيات وصولهم للصفحات بسهولة.
+            {t('usersPermissionsDescription')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {canEdit && (
             <Button type="button" className="gap-2" onClick={() => setCreateUserOpen(true)}>
               <UserPlus size={14} className="me-1" />
-              إضافة مستخدم
+              {t('addUser')}
             </Button>
           )}
           <Button variant="outline" className="gap-2" onClick={() => refetchUsersData().catch(() => {})}>
             <RefreshCw size={14} className="me-1" />
-            تحديث
+            {t('refresh')}
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList className="grid w-full max-w-sm grid-cols-2">
-          <TabsTrigger value="users">المستخدمون</TabsTrigger>
-          <TabsTrigger value="permissions">الصلاحيات</TabsTrigger>
+          <TabsTrigger value="users">{t('users')}</TabsTrigger>
+          <TabsTrigger value="permissions">{t('permissions')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
           <div className="space-y-4">
             <div className="relative max-w-md">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className={searchClasses.icon} />
               <Input
-                placeholder="ابحث بالاسم أو البريد..."
+                placeholder={t('searchUsersPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-9"
+                className={searchClasses.input}
               />
             </div>
 
@@ -651,11 +687,11 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                 <table className="w-full min-w-[820px] text-sm">
                   <thead className="bg-muted/40">
                     <tr>
-                      <th className="ta-th text-start">الاسم</th>
-                      <th className="ta-th text-start">الدور</th>
-                      <th className="ta-th text-start">البريد</th>
-                      <th className="ta-th text-start">الحالة</th>
-                      <th className="ta-th text-start">الإجراءات</th>
+                      <th className="ta-th text-start">{t('userName')}</th>
+                      <th className="ta-th text-start">{t('role')}</th>
+                      <th className="ta-th text-start">{t('email')}</th>
+                      <th className="ta-th text-start">{t('status')}</th>
+                      <th className="ta-th text-start">{t('actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -668,7 +704,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                             row.id === permUserId && "bg-primary/5"
                           )}
                         >
-                          <td className="ta-td font-semibold">{row.name}</td>
+                          <td className="ta-td font-semibold">{row.name || t('unnamedUser')}</td>
                           <td className="ta-td">
                             <Select
                               value={row.role}
@@ -676,34 +712,28 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                               disabled={!canEdit || savingId === row.id}
                             >
                               <SelectTrigger className="h-9 w-[170px]">
-                                <SelectValue placeholder="اختر الدور" />
+                                <SelectValue placeholder={t('selectRole')} />
                               </SelectTrigger>
                               <SelectContent>
                                 {ROLES.map((roleOption) => (
                                   <SelectItem key={roleOption} value={roleOption}>
-                                    {ROLE_LABELS_AR[roleOption]}
+                                    {t(ROLE_LABEL_KEYS[roleOption])}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </td>
                           <td className="ta-td text-muted-foreground" dir="ltr">
-                            {row.email || 'لا يوجد بريد إلكتروني'}
+                            {row.email || t('noEmail')}
                           </td>
                           <td className="ta-td">
-                            <span className={cn(
-                              "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium",
-                              row.isActive ? "bg-green-500/10 text-green-700" : "bg-destructive/10 text-destructive"
-                            )}>
-                              <span className={cn("h-2 w-2 rounded-full", row.isActive ? "bg-green-500" : "bg-destructive")} />
-                              {row.isActive ? 'نشط' : 'موقوف'}
-                            </span>
+                            <UserStatusBadge isActive={row.isActive} t={t} />
                           </td>
                           <td className="ta-td">
                             <div className="flex flex-wrap items-center gap-2">
                               {canEdit && (
                                 <Button variant="outline" size="sm" onClick={() => openEditModal(row)}>
-                                  <Pencil size={14} className="me-1" /> تعديل
+                                  <Pencil size={14} className="me-1" /> {t('edit')}
                                 </Button>
                               )}
                               {canDelete && row.id !== currentUserId && (
@@ -713,7 +743,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                                   onClick={() => setDeleteTarget(row)}
                                   className="text-destructive hover:text-destructive"
                                 >
-                                  <Trash2 size={14} className="me-1" /> حذف
+                                  <Trash2 size={14} className="me-1" /> {t('delete')}
                                 </Button>
                               )}
                             </div>
@@ -723,7 +753,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                     ) : (
                       <tr>
                         <td colSpan={5} className="ta-td py-10 text-center text-muted-foreground">
-                          لا توجد نتائج للبحث.
+                          {t('noSearchResults')}
                         </td>
                       </tr>
                     )}
@@ -740,8 +770,8 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
             <div className="border bg-card rounded-2xl p-5 flex flex-col">
               <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b">
                 <div>
-                  <h3 className="text-lg font-bold">{selectedUser.name}</h3>
-                  <p className="text-sm text-muted-foreground">تخصيص صلاحيات الوصول للصفحات</p>
+                  <h3 className="text-lg font-bold">{selectedUser.name || t('unnamedUser')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('accessCustomization')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Select
@@ -750,12 +780,12 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                     disabled={rows.length === 0 || matrixLoading || savingMatrix}
                   >
                     <SelectTrigger className="w-[240px]">
-                      <SelectValue placeholder="اختر المستخدم" />
+                      <SelectValue placeholder={t('selectUser')} />
                     </SelectTrigger>
                     <SelectContent>
                       {rows.map((row) => (
                         <SelectItem key={row.id} value={row.id}>
-                          {row.name} - {ROLE_LABELS_AR[row.role]}
+                          {row.name || t('unnamedUser')} - {t(ROLE_LABEL_KEYS[row.role])}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -766,7 +796,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                     onClick={() => { saveMatrix(); }}
                     disabled={savingMatrix || matrixLoading || !canEdit}
                   >
-                    {savingMatrix ? 'جاري الحفظ...' : 'حفظ الصلاحيات'}
+                    {savingMatrix ? t('savingPermissions') : t('savePermissions')}
                   </Button>
                 </div>
               </div>
@@ -774,26 +804,27 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
               <div className="pt-4">
                 {matrixLoading ? (
                   <div className="py-10 flex items-center justify-center text-sm text-muted-foreground">
-                    جاري تحميل الصلاحيات...
+                    {t('permissionsLoading')}
                   </div>
                 ) : (
                   <div className="rounded-lg border overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead className="bg-muted/40">
                         <tr>
-                          <th className="ta-th text-start w-[40%]">الصفحة</th>
-                          {PERMISSION_COLUMNS.map(({ field, label }) => (
-                            <th key={field} className="ta-th">{label}</th>
+                          <th className="ta-th text-start w-[40%]">{t('page')}</th>
+                          {PERMISSION_COLUMNS.map(({ field, labelKey }) => (
+                            <th key={field} className="ta-th">{t(labelKey)}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {PERMISSION_PAGE_ENTRIES.map(({ key, labelAr }) => {
+                        {PERMISSION_PAGE_ENTRIES.map((entry) => {
+                          const { key } = entry;
                           const m = matrix[key];
                           if (!m) return null;
                           return (
                             <tr key={key} className="border-b last:border-0 hover:bg-muted/20">
-                              <td className="ta-td font-medium py-1">{labelAr}</td>
+                              <td className="ta-td font-medium py-1">{getPermissionPageLabel(entry, lang)}</td>
                               {PERMISSION_COLUMNS.map(({ field }) => (
                                 <td key={field} className="ta-td py-1 text-center">
                                   <Checkbox
@@ -816,7 +847,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
           ) : (
             <div className="border bg-card rounded-2xl p-5 flex flex-col items-center justify-center h-[300px] text-muted-foreground">
               <ShieldAlert className="h-12 w-12 opacity-20 mb-3" />
-              <p>لا يوجد مستخدمون لتعديل صلاحياتهم</p>
+              <p>{t('noUsersForPermissions')}</p>
             </div>
           )}
         </TabsContent>
@@ -838,22 +869,22 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
           if (!open && !editingUser) setEditTarget(null);
         }}
       >
-        <DialogContent className="sm:max-w-md" dir="rtl">
+        <DialogContent className="sm:max-w-md" dir={direction}>
           <DialogHeader>
-            <DialogTitle>تعديل بيانات المستخدم</DialogTitle>
+            <DialogTitle>{t('editUserTitle')}</DialogTitle>
             <DialogDescription>
-              تعديل بيانات المستخدم المحددة. يمكنك تغيير كلمة المرور عبر إدخال قيمة جديدة أو تركها فارغة للاحتفاظ بالقديمة.
+              {t('editUserDescription')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
-            <BaseInput label="الاسم" id="edit-user-name"
+            <BaseInput label={t('userName')} id="edit-user-name"
                 value={editUserForm.name}
                 onChange={(e) => setEditUserForm(p => ({ ...p, name: e.target.value }))}
-                placeholder="اسم المستخدم"
+                placeholder={t('userNamePlaceholder')}
                 disabled={editingUser} />
 
-            <BaseInput label="البريد الإلكتروني" id="edit-user-email"
+            <BaseInput label={t('email')} id="edit-user-email"
                 type="email"
                 value={editUserForm.email}
                 onChange={(e) => setEditUserForm(p => ({ ...p, email: e.target.value }))}
@@ -862,26 +893,26 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                 disabled={editingUser} />
 
             <div className="space-y-2">
-              <Label>الدور</Label>
+              <Label>{t('role')}</Label>
               <Select
                 value={editUserForm.role}
                 onValueChange={(value) => setEditUserForm((p) => ({ ...p, role: value as AppRole }))}
                 disabled={editingUser}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر الدور" />
+                  <SelectValue placeholder={t('selectRole')} />
                 </SelectTrigger>
                 <SelectContent>
                   {ROLES.map((role) => (
                     <SelectItem key={role} value={role}>
-                      {ROLE_LABELS_AR[role]}
+                      {t(ROLE_LABEL_KEYS[role])}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             
-            <div className="flex items-center space-x-2 space-x-reverse pt-2 pb-2">
+            <div className="flex items-center gap-2 pt-2 pb-2">
               <Checkbox
                 id="edit-user-active"
                 checked={editUserForm.isActive}
@@ -889,15 +920,15 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                 disabled={editingUser}
               />
               <label htmlFor="edit-user-active" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                المستخدم نشط (يمكنه الدخول للنظام)
+                {t('activeUserHint')}
               </label>
             </div>
 
-            <BaseInput label="كلمة المرور الجديدة (اختياري)" id="edit-user-password"
+            <BaseInput label={t('newPasswordOptional')} id="edit-user-password"
                 type="password"
                 value={editUserForm.password}
                 onChange={(e) => setEditUserForm(p => ({ ...p, password: e.target.value }))}
-                placeholder="اتركه فارغاً لعدم التغيير"
+                placeholder={t('leavePasswordEmpty')}
                 disabled={editingUser} />
           </div>
 
@@ -908,10 +939,10 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
               onClick={() => setEditTarget(null)}
               disabled={editingUser}
             >
-              إلغاء
+              {t('cancel')}
             </Button>
             <Button type="button" onClick={() => { saveEditUser(); }} disabled={editingUser}>
-              {editingUser ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+              {editingUser ? t('saving') : t('saveChanges')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -923,23 +954,23 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
           if (!open && !deletingUserId) setDeleteTarget(null);
         }}
       >
-        <AlertDialogContent dir="rtl">
+        <AlertDialogContent dir={direction}>
           <AlertDialogHeader>
-            <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteUserTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteTarget
-                ? `سيتم حذف المستخدم "${deleteTarget.name}" نهائيًا من النظام. لا يمكن التراجع عن هذا الإجراء.`
-                : 'سيتم حذف المستخدم نهائيًا من النظام.'}
+                ? t('deleteUserNamedDescription', { name: deleteTarget.name || t('unnamedUser') })
+                : t('deleteUserDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deletingUserId !== null}>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel disabled={deletingUserId !== null}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => { deleteUser(); }}
               disabled={deletingUserId !== null}
             >
-              {deletingUserId ? 'جارٍ الحذف...' : 'تأكيد الحذف'}
+              {deletingUserId ? t('deletingUser') : t('confirmDelete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

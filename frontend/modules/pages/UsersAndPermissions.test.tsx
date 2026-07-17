@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '@app/i18n';
 import UsersAndPermissions from './UsersAndPermissions';
 
-const { toastMock, refetchMock, invalidateQueriesMock, authServiceMock, queryRowsMock } = vi.hoisted(() => ({
+const { toastMock, refetchMock, invalidateQueriesMock, authServiceMock, queryRowsMock, languageState } = vi.hoisted(() => ({
   toastMock: vi.fn(),
   refetchMock: vi.fn().mockResolvedValue(undefined),
   invalidateQueriesMock: vi.fn().mockResolvedValue(undefined),
@@ -15,6 +16,11 @@ const { toastMock, refetchMock, invalidateQueriesMock, authServiceMock, queryRow
     { id: 'admin-1', name: 'Admin User', email: 'admin@test.com', isActive: true, role: 'admin' },
     { id: 'user-2', name: 'Second User', email: 'user@test.com', isActive: true, role: 'viewer' },
   ],
+  languageState: { lang: 'ar' as 'ar' | 'en', isRTL: true },
+}));
+
+vi.mock('@app/providers/LanguageContext', () => ({
+  useLanguage: () => languageState,
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -73,8 +79,11 @@ vi.mock('@services/authService', () => ({
 }));
 
 describe('UsersAndPermissions', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    languageState.lang = 'ar';
+    languageState.isRTL = true;
+    await i18n.changeLanguage('ar');
     refetchMock.mockResolvedValue(undefined);
     authServiceMock.createManagedUser.mockResolvedValue({ user_id: 'user-3' });
     authServiceMock.deleteManagedUser.mockResolvedValue(undefined);
@@ -168,5 +177,26 @@ describe('UsersAndPermissions', () => {
     render(<UsersAndPermissions />);
     const selectTriggers = screen.getAllByRole('combobox');
     expect(selectTriggers.length).toBeGreaterThan(0);
+  });
+
+  it('renders the users and permissions interface in English', async () => {
+    languageState.lang = 'en';
+    languageState.isRTL = false;
+    await i18n.changeLanguage('en');
+
+    render(<UsersAndPermissions />);
+
+    expect(await screen.findByRole('heading', { name: 'Users & Permissions' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add User' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+    expect(screen.getByText('System Admin')).toBeInTheDocument();
+
+    const permissionsTab = screen.getByRole('tab', { name: 'Permissions' });
+    fireEvent.mouseDown(permissionsTab, { button: 0, ctrlKey: false });
+    fireEvent.click(permissionsTab);
+
+    expect(await screen.findByRole('columnheader', { name: 'Page' })).toBeInTheDocument();
+    expect(screen.getByText('Employees')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save Permissions' })).toBeInTheDocument();
   });
 });
