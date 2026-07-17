@@ -31,6 +31,28 @@ export interface UseSalaryIOParams {
   setSalaryActionLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+function buildSalaryIoRecords(
+  rows: SalaryRow[],
+  computeRow: (row: SalaryRow) => ReturnType<typeof computeSalaryRow>,
+  selectedMonth: string,
+): SalaryIoRecord[] {
+  return rows.map((row) => {
+    const computed = computeRow(row);
+    return {
+      employee_id: row.employeeId,
+      month_year: selectedMonth,
+      base_salary: Number(computed.totalPlatformSalary || 0),
+      allowances: Number(computed.totalAdditions || 0),
+      attendance_deduction: Number(row.violations || 0),
+      advance_deduction: Number(row.advanceDeduction || 0),
+      external_deduction: Number(row.externalDeduction || 0),
+      manual_deduction: Number(getManualDeductionTotal(row) || 0),
+      net_salary: Number(computed.netSalary || 0),
+      is_approved: row.status === 'approved' || row.status === 'paid',
+    };
+  });
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useSalaryIO(params: UseSalaryIOParams) {
@@ -52,21 +74,7 @@ export function useSalaryIO(params: UseSalaryIOParams) {
 
   const exportExcel = useCallback(async () => {
     const XLSX = await loadXlsx();
-    const records: SalaryIoRecord[] = filtered.map((r) => {
-      const c = computeRow(r);
-      return {
-        employee_id: r.employeeId,
-        month_year: selectedMonth,
-        base_salary: Number(c.totalPlatformSalary || 0),
-        allowances: Number(c.totalAdditions || 0),
-        attendance_deduction: Number(r.violations || 0),
-        advance_deduction: Number(r.advanceDeduction || 0),
-        external_deduction: Number(r.externalDeduction || 0),
-        manual_deduction: Number(getManualDeductionTotal(r) || 0),
-        net_salary: Number(c.netSalary || 0),
-        is_approved: r.status === 'approved' || r.status === 'paid',
-      };
-    });
+    const records = buildSalaryIoRecords(filtered, computeRow, selectedMonth);
 
     const headerRow = SALARY_IO_COLUMNS.map((column) => column.label);
     const dataRows = records.map((record) => SALARY_IO_COLUMNS.map((column) => record[column.key]));
@@ -82,11 +90,13 @@ export function useSalaryIO(params: UseSalaryIOParams) {
 
   const downloadSalaryTemplate = useCallback(async () => {
     const XLSX = await loadXlsx();
-    const ws = XLSX.utils.aoa_to_sheet([Array.from(SALARY_IMPORT_TEMPLATE_HEADERS)]);
+    const records = buildSalaryIoRecords(filtered, computeRow, selectedMonth);
+    const dataRows = records.map((record) => SALARY_IO_COLUMNS.map((column) => record[column.key]));
+    const ws = XLSX.utils.aoa_to_sheet([Array.from(SALARY_IMPORT_TEMPLATE_HEADERS), ...dataRows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'رواتب');
     XLSX.writeFile(wb, 'قالب_استيراد_الرواتب.xlsx');
-  }, []);
+  }, [filtered, computeRow, selectedMonth]);
 
   // ── Import from file ──────────────────────────────────────────────────────
 

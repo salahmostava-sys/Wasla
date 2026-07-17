@@ -441,19 +441,26 @@ const EmployeeTiers = () => {
     return list;
   }, [tiers, search, statusFilter, sortField, sortDir, empMap]);
 
+  const buildTierSpreadsheetRows = () => filtered.map((tier) => {
+    const platformLabel = apps
+      .filter((app) => tier.app_ids.includes(app.id))
+      .map((app) => app.name)
+      .join('، ');
+    return [
+      tier.sim_number ?? '',
+      empMap[tier.employee_id]?.name ?? '',
+      tier.package_type,
+      tier.renewal_date,
+      statusLabel(tier.delivery_status),
+      platformLabel,
+    ];
+  });
+
   const downloadTierTemplate = async () => {
     setFileActionsLoading(true);
     try {
       const XLSX = await loadXlsx();
-      const exampleRow = [
-        '0555123456',
-        'اسم المندوب كما في النظام',
-        'باقة شهرية',
-        '2026-12-31',
-        'مسلّمة',
-        'مرسول، جاهز',
-      ];
-      const ws = XLSX.utils.aoa_to_sheet([EMPLOYEE_TIER_TEMPLATE_HEADERS, exampleRow]);
+      const ws = XLSX.utils.aoa_to_sheet([EMPLOYEE_TIER_TEMPLATE_HEADERS, ...buildTierSpreadsheetRows()]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'شرائح');
       XLSX.writeFile(wb, 'قالب_استيراد_شرائح_الشركة.xlsx');
@@ -470,17 +477,7 @@ const EmployeeTiers = () => {
     setFileActionsLoading(true);
     try {
       const XLSX = await loadXlsx();
-      const rows = filtered.map((t) => {
-        const platformLabel = apps.filter((a) => t.app_ids.includes(a.id)).map((a) => a.name).join('، ');
-        return [
-          t.sim_number ?? '',
-          empMap[t.employee_id]?.name ?? '',
-          t.package_type,
-          t.renewal_date,
-          statusLabel(t.delivery_status),
-          platformLabel,
-        ];
-      });
+      const rows = buildTierSpreadsheetRows();
       const ws = XLSX.utils.aoa_to_sheet([EMPLOYEE_TIER_TEMPLATE_HEADERS, ...rows]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'شرائح');

@@ -14,20 +14,31 @@ function buildFuelIoHeaders(dayArr: number[]): string[] {
 
 export function buildFuelMetricTemplateRows(
   dayArr: number[],
-  employees: Pick<Employee, 'name'>[],
-): string[][] {
-  const blankDayCells = dayArr.map(() => '');
-  const employeeRows = employees.map((employee) => [employee.name, ...blankDayCells]);
+  employees: Pick<Employee, 'id' | 'name'>[],
+  metric: FuelMetric,
+  dailyRows: DailyRow[],
+): Array<Array<string | number>> {
+  const valuesByEmployeeDay = new Map<string, number>();
+  dailyRows.forEach((row) => {
+    const day = Number(row.date.slice(8, 10));
+    const metricAmount = metric === 'km' ? row.km_total : row.fuel_cost;
+    valuesByEmployeeDay.set(`${row.employee_id}::${day}`, metricAmount);
+  });
+  const employeeRows = employees.map((employee) => [
+    employee.name,
+    ...dayArr.map((day) => valuesByEmployeeDay.get(`${employee.id}::${day}`) || ''),
+  ]);
   return [buildFuelIoHeaders(dayArr), ...employeeRows];
 }
 
 export async function downloadFuelMetricTemplate(
   dayArr: number[],
   metric: FuelMetric,
-  employees: Pick<Employee, 'name'>[],
+  employees: Pick<Employee, 'id' | 'name'>[],
+  dailyRows: DailyRow[],
 ): Promise<void> {
   const XLSX = await loadXlsx();
-  const rows = buildFuelMetricTemplateRows(dayArr, employees);
+  const rows = buildFuelMetricTemplateRows(dayArr, employees, metric, dailyRows);
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{ wch: 36 }, ...dayArr.map(() => ({ wch: 12 }))];
   const wb = XLSX.utils.book_new();

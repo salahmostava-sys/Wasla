@@ -239,6 +239,7 @@ export default function FuelPage() {
               handleExportMonthly={handleExportMonthly}
               handleExportDaily={handleExportDaily}
               onOpenImport={() => page.setShowImport(true)}
+              monthlyRows={filteredMonthly}
             />
           </div>
         }
@@ -303,6 +304,7 @@ export default function FuelPage() {
         year={year}
         month={month}
         employees={employees}
+        templateEmployees={ridersForTab}
         dailyRows={dailyRows}
         bulkUpsertDailyMileage={bulkUpsertDailyMileage}
         onImported={() => page.refetch()}

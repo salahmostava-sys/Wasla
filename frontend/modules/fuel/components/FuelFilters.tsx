@@ -3,7 +3,7 @@ import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import type { AppRow } from '@modules/fuel/types/fuel.types';
+import type { AppRow, MonthlyRow } from '@modules/fuel/types/fuel.types';
 
 export function FuelFiltersToolbar(props: Readonly<{
   search: string;
@@ -12,8 +12,9 @@ export function FuelFiltersToolbar(props: Readonly<{
   handleExportMonthly: () => void;
   handleExportDaily: () => void;
   onOpenImport: () => void;
+  monthlyRows: MonthlyRow[];
 }>) {
-  const { search, setSearch, view, handleExportMonthly, handleExportDaily, onOpenImport } = props;
+  const { search, setSearch, view, handleExportMonthly, handleExportDaily, onOpenImport, monthlyRows } = props;
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -49,8 +50,14 @@ export function FuelFiltersToolbar(props: Readonly<{
             <DropdownMenuItem
               onClick={async () => {
                 const XLSX = await loadXlsx();
-                const headers = [['اسم المندوب', 'الكيلومترات', 'تكلفة البنزين (ر.س)', 'ملاحظات']];
-                const ws = XLSX.utils.aoa_to_sheet(headers);
+                const headers = ['اسم المندوب', 'الكيلومترات', 'تكلفة البنزين (ر.س)', 'ملاحظات'];
+                const rows = monthlyRows.map((row) => [
+                  row.employee_name,
+                  row.km_total,
+                  row.fuel_cost,
+                  '',
+                ]);
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'قالب');
                 XLSX.writeFile(wb, 'template_fuel.xlsx');

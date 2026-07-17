@@ -29,6 +29,7 @@ type Props = Readonly<{
   year: number;
   month: number;
   employees: Employee[];
+  templateEmployees: Employee[];
   dailyRows: DailyRow[];
   bulkUpsertDailyMileage: (rows: { employee_id: string; date: string; km_total: number; fuel_cost: number; notes: string | null }[], chunkSize?: number) => Promise<{ saved: number; failed: { row: unknown; error: string }[] }>;
   onImported: () => void;
@@ -44,6 +45,7 @@ export function FuelImportDialog({
   year,
   month,
   employees,
+  templateEmployees,
   dailyRows,
   bulkUpsertDailyMileage,
   onImported,
@@ -129,7 +131,7 @@ export function FuelImportDialog({
             <Button
               variant="outline"
               className="gap-2 justify-start"
-              onClick={() => downloadFuelMetricTemplate(dayArr, metric, employees)}
+              onClick={() => downloadFuelMetricTemplate(dayArr, metric, templateEmployees, dailyRows)}
             >
               <Download size={16} /> تحميل القالب
             </Button>

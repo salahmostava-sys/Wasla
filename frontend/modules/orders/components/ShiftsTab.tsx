@@ -367,7 +367,13 @@ export function ShiftsTab({
   const downloadTemplate = async () => {
     const XLSX = await loadXlsx();
     const headers = ['الموظف', ...dayArr.map(String)];
-    const rows = filteredEmployees.map(emp => [emp.name, ...dayArr.map(() => '')]);
+    const rows = filteredEmployees.map((emp) => [
+      emp.name,
+      ...dayArr.map((day) => {
+        const key = `${emp.id}::${day}`;
+        return getAttendanceExportLabel(getVal(emp.id, day), grid[key] !== undefined);
+      }),
+    ]);
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'قالب الدوام');

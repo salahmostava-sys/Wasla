@@ -18,6 +18,32 @@ const MONTHS_AR = [
   'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
 ];
 
+type AttendanceTemplateEmployee = { id: string; name: string };
+type AttendanceTemplateRecord = {
+  employee_id: string;
+  date: string;
+  status: string;
+  note?: string | null;
+};
+
+function buildAttendanceTemplateRows(
+  employees: AttendanceTemplateEmployee[],
+  attendanceRows: AttendanceTemplateRecord[],
+): Array<Array<string>> {
+  const employeeNames = new Map(employees.map((employee) => [employee.id, employee.name]));
+  const employeesWithRecords = new Set(attendanceRows.map((record) => record.employee_id));
+  const populatedRows = attendanceRows.map((record) => [
+    employeeNames.get(record.employee_id) ?? '',
+    record.date,
+    record.status,
+    record.note ?? '',
+  ]);
+  const blankEmployeeRows = employees
+    .filter((employee) => !employeesWithRecords.has(employee.id))
+    .map((employee) => [employee.name, '', '', '']);
+  return [...populatedRows, ...blankEmployeeRows];
+}
+
 
 const Attendance = () => {
   useAuthQueryGate();
@@ -34,28 +60,29 @@ const Attendance = () => {
   const selectedYear = yearStr;
   const selectedMonth = String(Number(monthStr) - 1); // 0-indexed for existing components
 
+  const loadAttendanceTemplateRows = async (): Promise<Array<Array<string>>> => {
+    const year = Number(selectedYear);
+    const month = Number(selectedMonth);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthNumber = String(month + 1).padStart(2, '0');
+    const startDate = `${year}-${monthNumber}-01`;
+    const endDate = `${year}-${monthNumber}-${String(daysInMonth).padStart(2, '0')}`;
+    const result = await attendanceService.getMonthlyEmployeesAndAttendance(startDate, endDate);
+    return buildAttendanceTemplateRows(
+      result.employees,
+      result.attendanceRows,
+    );
+  };
 
 
   const handleExportAttendance = async () => {
     try {
       toast({ title: 'جاري التحميل...' });
-      const year = Number(selectedYear);
       const month = Number(selectedMonth);
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
-      const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
-
-      const records = await attendanceService.getAttendanceStatusRange(startDate, endDate);
-
-      const data = records.map((r: { employee_name?: string; date: string; status: string; notes?: string }) => ({
-        'الموظف': r.employee_name || '—',
-        'التاريخ': r.date,
-        'الحالة': r.status,
-        'ملاحظات': r.notes ?? '',
-      }));
-
+      const rows = await loadAttendanceTemplateRows();
       const XLSX = await loadXlsx();
-      const ws = XLSX.utils.json_to_sheet(data);
+      const headers = ['اسم الموظف', 'التاريخ (YYYY-MM-DD)', 'الحالة (present/absent/leave/sick/late)', 'ملاحظات'];
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
       XLSX.writeFile(wb, `attendance_${selectedYear}-${String(month + 1).padStart(2, '0')}.xlsx`);
@@ -67,8 +94,9 @@ const Attendance = () => {
 
   const handleAttendanceTemplate = async () => {
     const XLSX = await loadXlsx();
-    const headers = [['اسم الموظف', 'التاريخ (YYYY-MM-DD)', 'الحالة (present/absent/leave/sick/late)', 'ملاحظات']];
-    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const headers = ['اسم الموظف', 'التاريخ (YYYY-MM-DD)', 'الحالة (present/absent/leave/sick/late)', 'ملاحظات'];
+    const rows = await loadAttendanceTemplateRows();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'قالب');
     XLSX.writeFile(wb, 'template_attendance.xlsx');

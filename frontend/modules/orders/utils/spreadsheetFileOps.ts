@@ -404,9 +404,20 @@ export async function runSpreadsheetImport(params: {
   }
 }
 
-export async function downloadSpreadsheetTemplate(dayArr: number[]): Promise<void> {
+export async function downloadSpreadsheetTemplate(params: {
+  dayArr: number[];
+  employees: Employee[];
+  empDayTotal: (employeeId: string, day: number) => number;
+  empMonthTotal: (employeeId: string) => number;
+}): Promise<void> {
   const XLSX = await loadXlsx();
-  const ws = XLSX.utils.aoa_to_sheet([buildOrdersIoHeaders(dayArr)]);
+  const { dayArr, employees, empDayTotal, empMonthTotal } = params;
+  const rows = employees.map((employee) => [
+    employee.name,
+    ...dayArr.map((day) => empDayTotal(employee.id, day) || ''),
+    empMonthTotal(employee.id),
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([buildOrdersIoHeaders(dayArr), ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'قالب الطلبات');
   XLSX.writeFile(wb, 'template_orders.xlsx');

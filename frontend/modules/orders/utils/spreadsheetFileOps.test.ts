@@ -132,9 +132,21 @@ describe('spreadsheetFileOps', () => {
   });
 
   describe('downloadSpreadsheetTemplate', () => {
-    it('downloads the template', async () => {
-      await downloadSpreadsheetTemplate([1, 2, 3]);
-      expect(aoaToSheetMock).toHaveBeenCalledWith([buildOrdersIoHeaders([1, 2, 3])]);
+    it('prefills the template with the visible riders and their current totals', async () => {
+      await downloadSpreadsheetTemplate({
+        dayArr: [1, 2, 3],
+        employees: [
+          { id: 'emp1', name: 'أحمد' },
+          { id: 'emp2', name: 'خالد' },
+        ],
+        empDayTotal: (employeeId, day) => employeeId === 'emp1' && day === 2 ? 7 : 0,
+        empMonthTotal: (employeeId) => employeeId === 'emp1' ? 7 : 0,
+      });
+      expect(aoaToSheetMock).toHaveBeenCalledWith([
+        buildOrdersIoHeaders([1, 2, 3]),
+        ['أحمد', '', 7, '', 7],
+        ['خالد', '', '', '', 0],
+      ]);
       expect(writeFileMock).toHaveBeenCalledWith(undefined, 'template_orders.xlsx');
     });
   });

@@ -384,14 +384,6 @@ const Motorcycles = () => {
     e.target.value = '';
   };
 
-  const handleTemplate = async () => {
-    const XLSX = await loadXlsx();
-    const ws = XLSX.utils.aoa_to_sheet([VEHICLE_TEMPLATE_HEADERS.slice()]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'vehicles');
-    XLSX.writeFile(wb, 'template_vehicles.xlsx');
-  };
-
   // Local state mirrors React Query — kept because filtered/stats derive from `data` and
   // removing it would require restructuring the component to use vehiclesData directly.
   useEffect(() => {
@@ -447,9 +439,22 @@ const Motorcycles = () => {
     }
   };
 
+  const buildVehicleIoRows = () => filtered.map((vehicle) =>
+    MOTORCYCLE_IO_COLUMNS.map((column) => exportCell(vehicle, column.key))
+  );
+
+  const handleTemplate = async () => {
+    const XLSX = await loadXlsx();
+    const rows = buildVehicleIoRows();
+    const ws = XLSX.utils.aoa_to_sheet([VEHICLE_TEMPLATE_HEADERS.slice(), ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'vehicles');
+    XLSX.writeFile(wb, 'template_vehicles.xlsx');
+  };
+
   const handleExport = async () => {
     const XLSX = await loadXlsx();
-    const rows = filtered.map((v) => MOTORCYCLE_IO_COLUMNS.map((col) => exportCell(v, col.key)));
+    const rows = buildVehicleIoRows();
     const ws = XLSX.utils.aoa_to_sheet([VEHICLE_TEMPLATE_HEADERS, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'المركبات');

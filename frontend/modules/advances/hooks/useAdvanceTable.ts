@@ -35,6 +35,18 @@ function safeText(value: unknown): string {
   }
 }
 
+function buildAdvanceIoRows(advances: Advance[], employeeIds: Set<string>) {
+  return advances
+    .filter((advance) => employeeIds.has(advance.employee_id))
+    .map((advance) => [
+      advance.employees?.name ?? '',
+      advance.amount,
+      advance.monthly_amount,
+      advance.disbursement_date ?? '',
+      advance.first_deduction_month ?? '',
+    ]);
+}
+
 export interface UseAdvanceTableProps {
   advances: Advance[];
   employees: { id: string; name: string; national_id?: string | null; sponsorship_status?: string | null }[];
@@ -204,18 +216,8 @@ export function useAdvanceTable({
   const handleExport = useCallback(async () => {
     const XLSX = await loadXlsx();
     const filteredEmployeeIds = new Set(filtered.map((s) => s.employeeId));
-    const exportedAdvances = advances.filter((adv) => filteredEmployeeIds.has(adv.employee_id));
     const headerRow = ADVANCE_IO_COLUMNS.map((c) => c.label);
-    const rows = exportedAdvances.map((adv) => {
-      const employeeName = adv.employees?.name ?? '';
-      return [
-        employeeName,
-        adv.amount,
-        adv.monthly_amount,
-        adv.disbursement_date ?? '',
-        adv.first_deduction_month ?? '',
-      ];
-    });
+    const rows = buildAdvanceIoRows(advances, filteredEmployeeIds);
     const ws = XLSX.utils.aoa_to_sheet([headerRow, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'السلف');
@@ -224,11 +226,13 @@ export function useAdvanceTable({
 
   const handleTemplate = useCallback(async () => {
     const XLSX = await loadXlsx();
-    const ws = XLSX.utils.aoa_to_sheet([ADVANCE_IO_COLUMNS.map((c) => c.label)]);
+    const filteredEmployeeIds = new Set(filtered.map((summary) => summary.employeeId));
+    const rows = buildAdvanceIoRows(advances, filteredEmployeeIds);
+    const ws = XLSX.utils.aoa_to_sheet([ADVANCE_IO_COLUMNS.map((c) => c.label), ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'قالب السلف');
     XLSX.writeFile(wb, 'template_advances.xlsx');
-  }, []);
+  }, [filtered, advances]);
 
   const handlePrintTable = useCallback(() => {
     const table = tableRef.current;

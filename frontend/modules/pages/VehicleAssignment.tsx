@@ -397,8 +397,17 @@ const VehicleAssignment = () => {
 
   const handleTemplate = async () => {
     const XLSX = await loadXlsx();
-    const headers = [['رقم اللوحة', 'نوع المركبة', 'اسم المندوب', 'تاريخ الاستلام', 'تاريخ الإعادة', 'السبب', 'ملاحظات']];
-    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const headers = ['رقم اللوحة', 'نوع المركبة', 'اسم المندوب', 'تاريخ الاستلام', 'تاريخ الإعادة', 'السبب', 'ملاحظات'];
+    const rows = filtered.map((assignment) => [
+      assignment.vehicles?.plate_number ?? '',
+      assignment.vehicles?.type === 'motorcycle' ? 'دباب' : 'سيارة',
+      assignment.employees?.name ?? '',
+      assignment.start_at ? format(new Date(assignment.start_at), 'yyyy-MM-dd HH:mm') : '',
+      assignment.returned_at ? format(new Date(assignment.returned_at), 'yyyy-MM-dd HH:mm') : '',
+      assignment.reason ?? '',
+      assignment.notes ?? '',
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'قالب');
     XLSX.writeFile(wb, 'template_vehicle_assignment.xlsx');

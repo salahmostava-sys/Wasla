@@ -170,31 +170,33 @@ export function useEmployeeActions(params: {
     });
   }, [setColFilters]);
 
+  const buildEmployeeIoRows = () => filtered.map((employee) => ({
+    name: employee.name ?? '',
+    name_en: employee.name_en ?? '',
+    national_id: employee.national_id ?? '',
+    phone: employee.phone ?? '',
+    email: employee.email ?? '',
+    cities: employeeCitySummary(employee, ''),
+    nationality: employee.nationality ?? '',
+    job_title: employee.job_title ?? '',
+    join_date: employee.join_date ?? '',
+    birth_date: employee.birth_date ?? '',
+    probation_end_date: employee.probation_end_date ?? '',
+    residency_expiry: employee.residency_expiry ?? '',
+    health_insurance_expiry: employee.health_insurance_expiry ?? '',
+    license_expiry: employee.license_expiry ?? '',
+    license_status: employee.license_status ?? '',
+    sponsorship_status: employee.sponsorship_status ?? '',
+    bank_account_number: employee.bank_account_number ?? '',
+    iban: employee.iban ?? '',
+    commercial_record: employee.commercial_record ?? '',
+    salary_type: employee.salary_type || 'shift',
+    status: employee.status || 'active',
+  }));
+
   const handleExport = async () => {
     const XLSX = await loadXlsx();
-    const rows = filtered.map((e) => ({
-      name: e.name ?? '',
-      name_en: e.name_en ?? '',
-      national_id: e.national_id ?? '',
-      phone: e.phone ?? '',
-      email: e.email ?? '',
-      cities: employeeCitySummary(e, ''),
-      nationality: e.nationality ?? '',
-      job_title: e.job_title ?? '',
-      join_date: e.join_date ?? '',
-      birth_date: e.birth_date ?? '',
-      probation_end_date: e.probation_end_date ?? '',
-      residency_expiry: e.residency_expiry ?? '',
-      health_insurance_expiry: e.health_insurance_expiry ?? '',
-      license_expiry: e.license_expiry ?? '',
-      license_status: e.license_status ?? '',
-      sponsorship_status: e.sponsorship_status ?? '',
-      bank_account_number: e.bank_account_number ?? '',
-      iban: e.iban ?? '',
-      commercial_record: e.commercial_record ?? '',
-      salary_type: e.salary_type || 'shift',
-      status: e.status || 'active',
-    }));
+    const rows = buildEmployeeIoRows();
     const headerRow = EMPLOYEE_IMPORT_COLUMNS.map((column) => column.label);
     const aoaRows = rows.map((row) => EMPLOYEE_IMPORT_COLUMNS.map((column) => row[column.key]));
     const ws = XLSX.utils.aoa_to_sheet([headerRow, ...aoaRows]);
@@ -259,8 +261,9 @@ export function useEmployeeActions(params: {
 
   const handleTemplate = async () => {
     const XLSX = await loadXlsx();
-    const headers = [Array.from(EMPLOYEE_TEMPLATE_AR_HEADERS)];
-    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const rows = buildEmployeeIoRows();
+    const aoaRows = rows.map((row) => EMPLOYEE_IMPORT_COLUMNS.map((column) => row[column.key]));
+    const ws = XLSX.utils.aoa_to_sheet([Array.from(EMPLOYEE_TEMPLATE_AR_HEADERS), ...aoaRows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'القالب');
     XLSX.writeFile(wb, 'import_template.xlsx');

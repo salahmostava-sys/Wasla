@@ -327,7 +327,14 @@ export function useSpreadsheetGrid() {
     setPendingImportFile(null);
   };
 
-  const handleTemplate = () => { downloadSpreadsheetTemplate(dayArr); };
+  const handleTemplate = () => {
+    downloadSpreadsheetTemplate({
+      dayArr,
+      employees: filteredEmployees,
+      empDayTotal,
+      empMonthTotal,
+    });
+  };
 
   const handlePrint = () =>
     printSpreadsheetTable({

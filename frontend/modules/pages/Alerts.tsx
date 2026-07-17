@@ -305,8 +305,18 @@ const Alerts = () => {
 
   const handleDownloadTemplate = async () => {
     const XLSX = await loadXlsx();
-    const headers = [['النوع', 'الكيان', 'تاريخ الاستحقاق', 'المتبقي (يوم)', 'الأولوية']];
-    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const severityOrder: Record<string, number> = { urgent: 0, warning: 1, info: 2 };
+    const rows = [...filtered]
+      .sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3))
+      .map((alert) => [
+        alertTypeLabels[alert.type] || alert.type,
+        alert.entityName,
+        alert.dueDate,
+        alert.daysLeft,
+        severityLabels[alert.severity] || alert.severity,
+      ]);
+    const headers = ['النوع', 'الكيان', 'تاريخ الاستحقاق', 'المتبقي (يوم)', 'الأولوية'];
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'قالب');
     XLSX.writeFile(wb, 'template_alerts.xlsx');
