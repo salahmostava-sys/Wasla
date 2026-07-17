@@ -120,7 +120,7 @@ export default function GlobalSearch() {
           dir={isRTL ? 'rtl' : 'ltr'}
         />
         {query && (
-          <button aria-label="مسح البحث" onClick={() => { setQuery(''); setResults([]); }} className="text-muted-foreground hover:text-foreground flex-shrink-0">
+          <button type="button" aria-label="مسح البحث" onClick={() => { setQuery(''); setResults([]); }} className="text-muted-foreground hover:text-foreground flex-shrink-0">
             <X size={12} />
           </button>
         )}
@@ -141,7 +141,7 @@ export default function GlobalSearch() {
             <ul className="py-1">
               {results.map(r => (
                 <li key={r.id}>
-                  <button
+                  <button type="button"
                     onClick={() => handleSelect(r)}
                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition-colors text-start"
                   >

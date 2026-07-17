@@ -69,7 +69,7 @@ export function AIInsightsPanel({ insights }: Readonly<AIInsightsPanelProps>) {
 
       {/* Expand/collapse */}
       {insights.insights.length > 4 && (
-        <button
+        <button type="button"
           onClick={() => setExpanded(!expanded)}
           className="w-full py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground
                      flex items-center justify-center gap-1 border-t border-border/50

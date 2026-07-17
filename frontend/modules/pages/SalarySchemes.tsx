@@ -359,8 +359,8 @@ const SalarySchemes = () => {
                     <span className={s.status === 'active' ? 'badge-success' : 'badge-warning'}>{s.status === 'active' ? 'نشطة' : 'مؤرشفة'}</span>
                     {perms.can_edit && (
                       <>
-                        <button aria-label="تعديل" onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors"><Edit size={14} /></button>
-                        <button aria-label={s.status === 'active' ? 'أرشفة' : 'تفعيل'} onClick={() => handleArchive(s.id, s.status)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors" title={s.status === 'active' ? 'أرشفة' : 'تفعيل'}>
+                        <button type="button" aria-label="تعديل" onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors"><Edit size={14} /></button>
+                        <button type="button" aria-label={s.status === 'active' ? 'أرشفة' : 'تفعيل'} onClick={() => handleArchive(s.id, s.status)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors" title={s.status === 'active' ? 'أرشفة' : 'تفعيل'}>
                           {s.status === 'active' ? <Trash2 size={14} className="text-destructive" /> : <Check size={14} />}
                         </button>
                       </>
@@ -373,7 +373,7 @@ const SalarySchemes = () => {
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-xs font-medium text-muted-foreground">المنصات المرتبطة:</p>
                     {perms.can_edit && (
-                      <button onClick={() => openAssign(s.id)} className="text-xs text-primary hover:underline flex items-center gap-1">
+                      <button type="button" onClick={() => openAssign(s.id)} className="text-xs text-primary hover:underline flex items-center gap-1">
                         <Link2 size={11} /> ربط منصة
                       </button>
                     )}
@@ -386,7 +386,7 @@ const SalarySchemes = () => {
                         <span key={a.id} className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary rounded-full px-2.5 py-1">
                           {a.name}
                           {perms.can_edit && (
-                            <button aria-label="إزالة التطبيق" onClick={() => handleUnassignApp(a.id)} className="hover:text-destructive me-0.5"><X size={10} /></button>
+                            <button type="button" aria-label="إزالة التطبيق" onClick={() => handleUnassignApp(a.id)} className="hover:text-destructive me-0.5"><X size={10} /></button>
                           )}
                         </span>
                       ))}

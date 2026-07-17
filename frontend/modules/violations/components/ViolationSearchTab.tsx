@@ -88,7 +88,7 @@ export default function ViolationSearchTab({
             {showSuggestions && suggestions.length > 0 && (
               <div className="absolute top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-card">
                 {suggestions.map(v => (
-                  <button
+                  <button type="button"
                     key={v.id}
                     onMouseDown={() => selectVehicle(v)}
                     className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-muted/60 text-sm text-start transition-colors"

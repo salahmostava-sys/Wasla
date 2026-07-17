@@ -70,7 +70,7 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
       </div>
       <div className="flex gap-1">
         {[{ v: 'all', l: 'الكل' }, { v: 'pending', l: 'معلّق' }, { v: 'approved', l: 'معتمد' }, { v: 'paid', l: 'مصروف' }].map(s => (
-          <button key={s.v} onClick={() => setStatusFilter(s.v)}
+          <button type="button" key={s.v} onClick={() => setStatusFilter(s.v)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${statusFilter === s.v ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
             {s.l}
           </button>
@@ -78,13 +78,13 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
       </div>
       <div className="flex gap-2 ms-auto items-center">
         <div className="flex rounded-lg border border-border overflow-hidden">
-          <button
+          <button type="button"
             onClick={() => setViewMode('table')}
             className={`px-2.5 py-1.5 flex items-center gap-1 text-xs transition-colors ${viewMode === 'table' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
           >
             <Table2 size={13} /> جدول
           </button>
-          <button
+          <button type="button"
             onClick={() => setViewMode('cards')}
             className={`px-2.5 py-1.5 flex items-center gap-1 text-xs border-r border-l border-border transition-colors ${viewMode === 'cards' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
           >

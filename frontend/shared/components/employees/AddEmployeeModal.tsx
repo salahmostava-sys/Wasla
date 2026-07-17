@@ -181,7 +181,7 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
           <h2 className="text-lg font-bold text-foreground">
             {isEdit ? 'تعديل بيانات المندوب' : 'إضافة مندوب جديد'}
           </h2>
-          <button aria-label="إغلاق" onClick={onClose} className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground">
+          <button type="button" aria-label="إغلاق" onClick={onClose} className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground">
             <X size={18} />
           </button>
         </div>

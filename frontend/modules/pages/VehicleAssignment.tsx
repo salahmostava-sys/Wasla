@@ -506,7 +506,7 @@ const VehicleAssignment = () => {
             { key: 'active',   label: 'قيد الاستخدام' },
             { key: 'returned', label: 'تم الإعادة' },
           ].map(opt => (
-            <button
+            <button type="button"
               key={opt.key}
               onClick={() => { if (isShowActiveKey(opt.key)) setShowActive(opt.key); }}
               className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${showActive === opt.key ? 'bg-card shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}

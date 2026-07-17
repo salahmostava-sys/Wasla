@@ -147,7 +147,7 @@ const SalaryRowCells = memo(function SalaryRowCells({
       <td className={`${tdClass} sticky text-center text-foreground font-mono`} style={{ ...fixedWidth(FROZEN_WIDTH.index), left: FROZEN_LEFT.index, zIndex: 10, background: 'hsl(var(--card))' }}>{rowIdx + 1}</td>
       <td className={`${tdClass} sticky font-semibold`} style={{ ...fixedWidth(FROZEN_WIDTH.name), left: FROZEN_LEFT.name, zIndex: 10, background: 'hsl(var(--card))' }}>
         <div className="flex min-w-0 items-center gap-1.5">
-          <button className="block min-w-0 flex-1 truncate text-primary hover:underline font-semibold text-start" title={r.employeeName} onClick={() => openEmployeeDetail(r)}>
+          <button type="button" className="block min-w-0 flex-1 truncate text-primary hover:underline font-semibold text-start" title={r.employeeName} onClick={() => openEmployeeDetail(r)}>
             {shortEmployeeName(r.employeeName)}
           </button>
           {r.isDirty && (

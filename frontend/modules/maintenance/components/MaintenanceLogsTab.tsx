@@ -63,7 +63,7 @@ function LogCard({ log, canEdit, canDelete, onEdit, onDelete }: Readonly<{
         </div>
         <div className="flex items-center gap-1">
           {canEdit && (
-            <button
+            <button type="button"
               onClick={() => onEdit(log)}
               className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary p-1 rounded"
               title="تعديل"
@@ -72,7 +72,7 @@ function LogCard({ log, canEdit, canDelete, onEdit, onDelete }: Readonly<{
             </button>
           )}
           {canDelete && (
-            <button
+            <button type="button"
               onClick={() => onDelete(log)}
               className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1 rounded"
               title="حذف"

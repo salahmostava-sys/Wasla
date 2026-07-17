@@ -152,14 +152,14 @@ export const AdvanceTable = ({
                   {permissions.can_edit && (
                     <td className="ta-td" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
-                        <button
+                        <button type="button"
                           onClick={() => setTransactionsEmployee({ id: s.employeeId, name: s.employeeName, nationalId: s.nationalId, totalDebt: s.totalDebt, totalPaid: s.totalPaid, remaining: s.remaining, isWrittenOff: s.isWrittenOff, allAdvances: s.allAdvances })}
                           className="p-1.5 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                           title="عرض وتعديل السلف"
                         >
                           <Edit size={13} />
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => setDeleteEmployeeAdvancesId(s.employeeId)}
                           className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                           title="حذف جميع سلف هذا المندوب"

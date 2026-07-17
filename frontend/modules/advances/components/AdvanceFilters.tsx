@@ -1,4 +1,4 @@
-﻿import { Search, AlertTriangle } from 'lucide-react';
+import { Search, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@shared/lib/formatters';
 
 import { Input } from '@shared/components/ui/input';
@@ -43,7 +43,7 @@ export const AdvanceFilters = ({
       </div>
       <div className="flex gap-2">
         {[{ v: 'all', l: 'الكل' }, { v: 'active', l: 'نشط' }, { v: 'has_debt', l: 'عليه متبقي' }, { v: 'completed', l: 'منتهي' }].map(s => (
-          <button key={s.v} onClick={() => setStatusFilter(s.v)}
+          <button type="button" key={s.v} onClick={() => setStatusFilter(s.v)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statusFilter === s.v ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
             {s.l}
           </button>

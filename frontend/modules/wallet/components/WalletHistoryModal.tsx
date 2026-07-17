@@ -65,7 +65,7 @@ function renderHistoryContent(isLoading: boolean, history: WalletHistoryTx[], on
               <div className={`font-bold ${isCollection ? 'text-orange-600' : 'text-green-600'}`} dir="ltr">
                 {isCollection ? '+' : '-'}{tx.amount}
               </div>
-              <button 
+              <button type="button"
                 onClick={() => onDelete(tx.id)}
                 className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                 title="حذف الحركة"

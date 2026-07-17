@@ -485,7 +485,7 @@ export function SparePartsTab() {
                       <td className="p-3">
                         <div className="flex items-center justify-center gap-1">
                           {permissions.can_edit && (
-                            <button
+                            <button type="button"
                               onClick={() => openEdit(part)}
                               className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded hover:bg-muted"
                               title="تعديل"
@@ -494,7 +494,7 @@ export function SparePartsTab() {
                             </button>
                           )}
                           {permissions.can_delete && (
-                            <button
+                            <button type="button"
                               onClick={() => setDeleteTarget(part)}
                               className="text-muted-foreground hover:text-destructive transition-colors p-1.5 rounded hover:bg-muted"
                               title="حذف"

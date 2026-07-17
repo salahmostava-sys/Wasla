@@ -139,7 +139,7 @@ export function PerformanceDetailedTable({
           {/* Tier filter */}
           <div className="flex gap-1 bg-muted/30 rounded-xl p-0.5">
             {tiers.map((t) => (
-              <button
+              <button type="button"
                 key={t.value}
                 onClick={() => setTierFilter(t.value)}
                 className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors ${

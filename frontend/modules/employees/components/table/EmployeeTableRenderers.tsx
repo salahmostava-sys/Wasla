@@ -98,7 +98,7 @@ function renderNameCell(ctx: CellContext): React.ReactNode {
   const { emp, setSelectedEmployee } = ctx;
   return (
     <td key="name" className="ta-td !px-1 align-middle">
-      <button
+      <button type="button"
         onClick={() => setSelectedEmployee(emp.id)}
         className="flex items-center justify-center gap-2.5 text-sm font-semibold text-foreground transition-colors hover:text-primary text-center"
       >

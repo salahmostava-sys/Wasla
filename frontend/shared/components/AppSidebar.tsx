@@ -353,7 +353,7 @@ const AppSidebar = () => {
 
           {/* Mobile close */}
           {!collapsed && (
-            <button
+            <button type="button"
               onClick={close}
               aria-label={t('close')}
               className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
@@ -471,7 +471,7 @@ const AppSidebar = () => {
           className="hidden lg:flex px-3 py-2.5 flex-shrink-0 justify-end"
           style={{ borderTop: '1px solid #e5eaf2' }}
         >
-          <button
+          <button type="button"
             onClick={toggleCollapse}
             title={collapsed ? t('expandSidebar') : t('collapseSidebar')}
             aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}

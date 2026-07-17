@@ -50,7 +50,7 @@ export class CardErrorBoundary extends Component<Props, State> {
             </p>
           </div>
           {this.props.onRetry && (
-            <button
+            <button type="button"
               onClick={this.handleRetry}
               className="inline-flex items-center gap-2 px-4 py-2 mt-2 text-xs font-medium text-destructive bg-destructive/10 hover:bg-destructive/20 rounded-lg transition-colors border border-destructive/20"
             >

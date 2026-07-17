@@ -213,7 +213,7 @@ export function EmployeeActionsBar({
             return (
               <span key={key} className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                 {colLabel}: {displayVal}
-                <button aria-label="إزالة التصفية" onClick={() => setColFilter(key, '')} className="hover:text-destructive"><X size={10} /></button>
+                <button type="button" aria-label="إزالة التصفية" onClick={() => setColFilter(key, '')} className="hover:text-destructive"><X size={10} /></button>
               </span>
             );
           })}

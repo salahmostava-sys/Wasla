@@ -105,7 +105,7 @@ export const ColFilterPopover = ({ label, active, children, onClear }: Readonly<
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
+        <button type="button"
           className={`inline-flex items-center gap-0.5 rounded transition-colors text-current ${active ? 'opacity-100' : 'opacity-45 hover:opacity-80'}`}
           title={`فلترة ${label}`}
           onClick={(e) => e.stopPropagation()}
@@ -118,7 +118,7 @@ export const ColFilterPopover = ({ label, active, children, onClear }: Readonly<
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-foreground">{label}</span>
           {active && (
-            <button
+            <button type="button"
               onClick={() => {
                 onClear();
                 setOpen(false);

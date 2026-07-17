@@ -211,7 +211,7 @@ export default function NotificationCenter() {
               )}
             </div>
             {unread > 0 && (
-              <button
+              <button type="button"
                 onClick={dismissAll}
                 className="flex items-center gap-1 text-xs text-primary hover:underline"
               >
@@ -277,7 +277,7 @@ export default function NotificationCenter() {
                   </div>
 
                   {/* Dismiss */}
-                  <button
+                  <button type="button"
                     onClick={(e) => dismiss(a.id, e)}
                     className="flex-shrink-0 h-5 w-5 rounded-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors mt-0.5"
                     title={isRTL ? 'إخفاء' : 'Dismiss'}

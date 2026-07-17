@@ -633,7 +633,7 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
                       return (
                         <div key={m.month} className="border border-border/40 rounded-xl overflow-hidden">
                           {/* Month header */}
-                          <button
+                          <button type="button"
                             className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
                             onClick={() => setExpandedMonth(isOpen ? null : m.month)}
                           >

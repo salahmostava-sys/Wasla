@@ -144,7 +144,7 @@ export function AppSettingsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {apps.map((app) => (
-          <button
+          <button type="button"
             key={app.id}
             onClick={() => setSelectedAppId(app.id)}
             className="flex items-center gap-4 rounded-lg border p-4 text-start transition-colors hover:bg-muted/50"

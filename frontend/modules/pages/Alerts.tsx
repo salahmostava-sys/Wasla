@@ -450,7 +450,7 @@ const Alerts = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <button
+        <button type="button"
           className="stat-card text-start w-full border-r-4 border-r-destructive cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'urgent' ? 'all' : 'urgent')}
         >
@@ -458,7 +458,7 @@ const Alerts = () => {
           <p className="text-3xl font-bold text-destructive mt-1">{urgentCount}</p>
           <p className="text-xs text-muted-foreground mt-1">يتطلب تدخل فوري</p>
         </button>
-        <button
+        <button type="button"
           className="stat-card text-start w-full border-r-4 border-r-warning cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'warning' ? 'all' : 'warning')}
         >
@@ -466,7 +466,7 @@ const Alerts = () => {
           <p className="text-3xl font-bold text-warning mt-1">{warningCount}</p>
           <p className="text-xs text-muted-foreground mt-1">خلال 30-60 يوم</p>
         </button>
-        <button
+        <button type="button"
           className="stat-card text-start w-full border-r-4 border-r-info cursor-pointer hover:shadow-card-hover transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
           onClick={() => setSeverityFilter(severityFilter === 'info' ? 'all' : 'info')}
         >
@@ -489,7 +489,7 @@ const Alerts = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             {[{ v: 'all', l: 'الكل' }, { v: 'urgent', l: '🔴 عاجل' }, { v: 'warning', l: '🟡 تحذير' }, { v: 'info', l: '🔵 معلومات' }].map(s => (
-              <button key={s.v} onClick={() => setSeverityFilter(s.v)}
+              <button type="button" key={s.v} onClick={() => setSeverityFilter(s.v)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${severityFilter === s.v ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
                 {s.l}
               </button>
@@ -503,7 +503,7 @@ const Alerts = () => {
             else if (t === 'expired_residency_cost') label = 'تكلفة الإقامات المنتهية';
             else label = `${typeIcons[t] || '🔔'} ${alertTypeLabels[t] || t}`;
             return (
-              <button key={t} onClick={() => setTypeFilter(t)}
+              <button type="button" key={t} onClick={() => setTypeFilter(t)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
                 {label}
               </button>
@@ -531,12 +531,12 @@ const Alerts = () => {
         {commercialRecords.length > 0 && (
           <div className="flex gap-2 flex-wrap items-center">
             <span className="text-xs text-muted-foreground font-semibold">السجل التجاري:</span>
-            <button onClick={() => setCrFilter('all')}
+            <button type="button" onClick={() => setCrFilter('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${crFilter === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
               الكل
             </button>
             {commercialRecords.map(cr => (
-              <button key={cr} onClick={() => setCrFilter(cr)}
+              <button type="button" key={cr} onClick={() => setCrFilter(cr)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${crFilter === cr ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
                 📋 {cr}
               </button>
@@ -600,7 +600,7 @@ const Alerts = () => {
               <Label>مدة التأجيل (أيام)</Label>
               <div className="flex gap-2">
                 {['7', '14', '30', '60'].map(d => (
-                  <button key={d} onClick={() => setDeferDays(d)}
+                  <button type="button" key={d} onClick={() => setDeferDays(d)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1 ${deferDays === d ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
                     {d} يوم
                   </button>

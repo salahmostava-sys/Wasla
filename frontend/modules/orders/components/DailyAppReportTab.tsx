@@ -57,7 +57,7 @@ export const DailyAppReportTab = React.memo(() => {
                 const isSelected = r.selectedApp === app.id;
                 const color = r.getAppColor(app.id);
                 return (
-                  <button
+                  <button type="button"
                     key={app.id}
                     onClick={() => r.setSelectedApp(app.id)}
                     className={cn(

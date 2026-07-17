@@ -114,7 +114,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
       />
       <div className="flex items-center justify-between mb-2.5 relative z-10">
         <span className="text-xs font-semibold text-foreground">يوم {state.day}</span>
-        <button aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground p-0.5 rounded">
+        <button type="button" aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground p-0.5 rounded">
           <X size={13} />
         </button>
       </div>

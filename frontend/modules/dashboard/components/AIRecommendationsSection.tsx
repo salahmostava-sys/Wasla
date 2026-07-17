@@ -54,7 +54,7 @@ function RecommendationCard({
 
       <div className="space-y-1.5">
         {rec.riders.map((rider) => (
-          <button
+          <button type="button"
             key={rider.employeeId}
             onClick={() => onRiderClick?.(rider.employeeId)}
             className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl

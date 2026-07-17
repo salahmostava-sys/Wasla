@@ -489,7 +489,7 @@ export default function ActivityLogContent() {
 
         {/* Clear filters */}
         {activeFilters > 0 && (
-          <button
+          <button type="button"
             onClick={() => { setFilterAction('all'); setFilterTable('all'); setFilterUserId('all'); }}
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
           >
@@ -768,7 +768,7 @@ export default function ActivityLogContent() {
               {`${(page * PAGE_SIZE + 1).toLocaleString('en-US')}–${Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString('en-US')} من ${totalCount.toLocaleString('en-US')}`}
             </p>
             <div className="flex items-center gap-1">
-              <button
+              <button type="button"
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}
                 className="h-7 w-7 flex items-center justify-center rounded-lg border border-border disabled:opacity-40 hover:bg-muted transition-colors"
@@ -778,7 +778,7 @@ export default function ActivityLogContent() {
               <span className="text-xs px-2 text-muted-foreground" >
                 {page + 1} / {totalPages}
               </span>
-              <button
+              <button type="button"
                 onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                 disabled={page >= totalPages - 1}
                 className="h-7 w-7 flex items-center justify-center rounded-lg border border-border disabled:opacity-40 hover:bg-muted transition-colors"

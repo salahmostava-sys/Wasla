@@ -145,7 +145,7 @@ function renderLanguageButtons(
   return (
     <div className="flex gap-2">
       {['ar', 'en'].map(l => (
-        <button
+        <button type="button"
           key={l}
           onClick={() => setDefaultLang(l)}
           className={cn(
@@ -174,7 +174,7 @@ function renderThemeButtons(
         { key: 'light', labelAr: 'فاتح', labelEn: 'Light' },
         { key: 'dark', labelAr: 'داكن', labelEn: 'Dark' },
       ].map(opt => (
-        <button
+        <button type="button"
           key={opt.key}
           onClick={() => { if (currentTheme !== opt.key) toggleTheme(); }}
           className={cn(
@@ -384,7 +384,7 @@ export default function ProjectSettings() {
           {logoPreview ? (
             <div className="relative">
               <img src={logoPreview} alt="logo" className="h-16 w-16 rounded-xl object-cover border border-border" />
-              <button
+              <button type="button"
                 onClick={() => {
                   clearLogoObjectUrl();
                   setLogoPreview(null);

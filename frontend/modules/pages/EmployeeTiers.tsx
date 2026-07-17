@@ -648,7 +648,7 @@ const EmployeeTiers = () => {
             </Button>
           )}
           {[{ v: 'all', l: 'الكل' }, { v: STATUS_DELIVERED, l: 'مسلّمة' }, { v: STATUS_NOT_DELIVERED, l: 'غير مسلّمة' }].map(s => (
-            <button key={s.v} onClick={() => setStatusFilter(s.v)}
+            <button type="button" key={s.v} onClick={() => setStatusFilter(s.v)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${statusFilter === s.v ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>
               {s.l}
             </button>
@@ -755,7 +755,7 @@ const EmployeeTiers = () => {
                           {savingNew ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                           حفظ
                         </Button>
-                        <button aria-label="إلغاء الإضافة" onClick={() => setAddingRow(false)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                        <button type="button" aria-label="إلغاء الإضافة" onClick={() => setAddingRow(false)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors">
                           <X size={13} />
                         </button>
                       </div>
@@ -848,7 +848,7 @@ const EmployeeTiers = () => {
                                   {savingId === tier.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                                   حفظ
                                 </Button>
-                                <button aria-label="إلغاء التعديل" onClick={() => cancelRow(tier.id)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                                <button type="button" aria-label="إلغاء التعديل" onClick={() => cancelRow(tier.id)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors">
                                   <X size={13} />
                                 </button>
                               </>

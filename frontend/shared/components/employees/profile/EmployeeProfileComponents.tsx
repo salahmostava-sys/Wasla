@@ -57,7 +57,7 @@ export const SecureDocThumb = ({
           </a>
         )}
         {signedUrl && onDelete && (
-          <button
+          <button type="button"
             onClick={onDelete}
             className="flex items-center gap-0.5 text-[10px] text-destructive hover:underline"
           >

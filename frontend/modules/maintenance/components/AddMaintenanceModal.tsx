@@ -323,7 +323,7 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts, 
                           />
                         </td>
                         <td className="p-2 text-center">
-                          <button
+                          <button type="button"
                             onClick={() => removePartRow(row.id)}
                             className="text-muted-foreground hover:text-destructive transition-colors p-1"
                           >

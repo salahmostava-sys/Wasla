@@ -653,7 +653,7 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
                       </td>
                       <td className="ta-td">
                         {canEdit && (
-                          <button
+                          <button type="button"
                             onClick={(e) => { e.stopPropagation(); setDeleteInstallmentId(inst.id); }}
                             className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                             title="حذف هذا الصف"

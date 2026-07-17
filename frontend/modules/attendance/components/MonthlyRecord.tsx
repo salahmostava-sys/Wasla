@@ -290,7 +290,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
 
                       return (
                         <td key={d} className="p-0 border-b border-l border-border relative align-middle">
-                          <button
+                          <button type="button"
                             onClick={() => setEditingCell({ empId: row.id, empName: row.name, day: d, record: record || null })}
                             className={cn(
                               "w-full h-[40px] flex items-center justify-center transition-colors relative hover:bg-muted/80 focus:outline-none",

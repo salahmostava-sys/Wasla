@@ -218,7 +218,7 @@ export function SchemeFormModal({
                         </SelectContent>
                       </Select>
                       {formTiers.length > 1 && (
-                        <button aria-label="إزالة الشريحة" onClick={() => removeTier(i)} className="text-destructive hover:text-destructive/80 p-1"><X size={14} /></button>
+                        <button type="button" aria-label="إزالة الشريحة" onClick={() => removeTier(i)} className="text-destructive hover:text-destructive/80 p-1"><X size={14} /></button>
                       )}
                     </div>
 

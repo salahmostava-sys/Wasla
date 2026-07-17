@@ -29,7 +29,7 @@ export function UndoProvider({ children }: Readonly<{ children: React.ReactNode 
     toast((t) => (
       <div className="flex items-center justify-between gap-4 w-full">
         <span className="text-sm font-medium">{action.description}</span>
-        <button
+        <button type="button"
           onClick={async () => {
             toast.dismiss(t.id);
             if (handleUndoRef.current) {

@@ -24,7 +24,7 @@ const GlobalMonthPicker = () => {
 
   return (
     <div className="flex items-center gap-1 bg-background/50 border border-border/60 rounded-xl p-1 shadow-sm backdrop-blur-sm group hover:border-primary/30 transition-all">
-      <button
+      <button type="button"
         onClick={handlePrev}
         className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
         title={t('previousMonth')}
@@ -46,7 +46,7 @@ const GlobalMonthPicker = () => {
         />
       </div>
 
-      <button
+      <button type="button"
         onClick={handleNext}
         className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
         title={t('nextMonth')}

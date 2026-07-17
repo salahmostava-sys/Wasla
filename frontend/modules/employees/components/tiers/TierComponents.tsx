@@ -24,7 +24,7 @@ export const AppMultiSelect = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="min-h-[32px] w-full flex flex-wrap gap-1 items-center px-2 py-1 rounded-lg border border-border/50 bg-background hover:border-primary/50 transition-colors text-start">
+        <button type="button" className="min-h-[32px] w-full flex flex-wrap gap-1 items-center px-2 py-1 rounded-lg border border-border/50 bg-background hover:border-primary/50 transition-colors text-start">
           {chosen.length === 0
             ? <span className="text-xs text-muted-foreground">اختر منصة...</span>
             : chosen.map(a => (
@@ -37,7 +37,7 @@ export const AppMultiSelect = ({
       </PopoverTrigger>
       <PopoverContent className="w-52 p-1" align="start">
         {apps.map(a => (
-          <button key={a.id} onClick={() => toggle(a.id)}
+          <button type="button" key={a.id} onClick={() => toggle(a.id)}
             className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors text-sm">
             <Check size={13} className={selected.includes(a.id) ? 'text-primary' : 'opacity-0'} />
             <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: a.brand_color }} />
@@ -66,7 +66,7 @@ export const EmployeeSelect = ({
 
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen(o => !o)}
+      <button type="button" onClick={() => setOpen(o => !o)}
         className="w-full min-w-[160px] flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border border-border/50 bg-background hover:border-primary/50 transition-colors text-sm">
         <span className={chosen ? 'text-foreground' : 'text-muted-foreground'}>
           {chosen ? chosen.name : 'بدون مندوب'}
@@ -79,13 +79,13 @@ export const EmployeeSelect = ({
             <Input value={q} onChange={e => setQ(e.target.value)} placeholder="بحث..." className="h-7 text-xs" autoFocus />
           </div>
           <div className="max-h-48 overflow-y-auto">
-            <button onClick={() => { onChange(''); setOpen(false); setQ(''); }}
+            <button type="button" onClick={() => { onChange(''); setOpen(false); setQ(''); }}
               className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-muted transition-colors text-sm text-start border-b border-border mb-1">
               <Check size={13} className={!value ? 'text-primary' : 'opacity-0'} />
               <span className="text-muted-foreground italic">بدون مندوب</span>
             </button>
             {filtered.map(e => (
-              <button key={e.id} onClick={() => { onChange(e.id); setOpen(false); setQ(''); }}
+              <button type="button" key={e.id} onClick={() => { onChange(e.id); setOpen(false); setQ(''); }}
                 className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-muted transition-colors text-sm text-start">
                 <Check size={13} className={e.id === value ? 'text-primary' : 'opacity-0'} />
                 <span>{e.name}</span>
