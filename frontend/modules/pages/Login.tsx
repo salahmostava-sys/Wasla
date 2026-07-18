@@ -190,64 +190,68 @@ function LoginBrandingPanel({
 
   return (
     <section
-      className="hidden lg:flex lg:w-1/2 relative flex-col justify-between bg-muted/30 px-12 py-10 xl:px-16 xl:py-12 border-l border-border rtl:border-l-0 rtl:border-r"
+      className="hidden lg:flex lg:w-[52%] relative flex-col justify-between overflow-hidden px-12 py-10 xl:px-16 xl:py-12"
+      style={{
+        background: 'var(--ds-primary)',
+      }}
     >
-      <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.045]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.55) 1px, transparent 1px)',
+          backgroundSize: '44px 44px',
+        }}
+      />
 
-      <div className={`relative z-10 transition-all duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="flex items-center gap-6 mb-12">
+      <div className={`relative z-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+        <div className="flex items-center gap-4 mb-7">
           {settings?.logo_url ? (
-            <span className="w-16 h-16 overflow-hidden flex items-center justify-center shrink-0 mix-blend-multiply dark:mix-blend-screen dark:invert">
+            <span className="w-20 h-20 overflow-hidden bg-white ring-1 ring-white/35 shadow-card rounded-xl flex items-center justify-center shrink-0">
               <img
                 src={brandLogoSrc(settings.logo_url, settings.updated_at)}
                 alt=""
-                className="h-full w-full object-contain grayscale opacity-80"
+                className="h-full w-full object-contain scale-150"
               />
             </span>
           ) : (
-            <div className="w-16 h-16 border-[1px] border-foreground/20 rounded-full flex items-center justify-center shrink-0">
-              <div className="w-2/3 h-2/3 border-[1px] border-foreground/40 rounded-full flex items-center justify-center">
-                 <div className="w-1/3 h-1/3 bg-foreground/20 rounded-full"></div>
-              </div>
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20 shadow-card relative rounded-xl shrink-0">
+              <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
+              <span className={`absolute -top-1 ${isRtl ? '-right-1' : '-left-1'} w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white/30`} />
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-xl font-bold tracking-tight text-foreground uppercase">{projectName}</h1>
-            <p className="text-muted-foreground text-xs uppercase tracking-widest mt-1 truncate">{projectSubtitle}</p>
+            <h1 className="text-2xl xl:text-3xl font-extrabold text-white leading-tight max-w-lg">{projectName}</h1>
+            <p className="text-white/90 text-sm mt-1 truncate max-w-md">{projectSubtitle}</p>
           </div>
         </div>
-        
-        <div className="space-y-4">
-            <h2 className="text-3xl xl:text-4xl font-medium tracking-tighter text-foreground leading-[1.2] max-w-xl">
-            {t('systemSubtitleDesc')}
-            </h2>
-            <div className="w-12 h-1 bg-primary mt-6"></div>
-        </div>
+        <p className="text-white/90 text-lg max-w-xl leading-8">
+          {t('systemSubtitleDesc')}
+        </p>
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mt-16 border-t border-border/50 pt-12">
+      <div className="relative z-10 grid grid-cols-2 gap-3 mt-10">
         {features.map((f, i) => (
           <div
             key={f.icon}
-            className="flex flex-col gap-3 group"
+            className="group min-h-[132px] bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-sm border border-white/10 hover:border-white/20 p-4 rounded-2xl flex flex-col gap-2 transition-all duration-300 cursor-default"
             style={{
+              animationDelay: `${i * 80 + 200}ms`,
               opacity: mounted ? 1 : 0,
-              transform: mounted ? 'none' : 'translateY(8px)',
-              transition: `opacity 600ms ${i * 100 + 300}ms, transform 600ms ${i * 100 + 300}ms cubic-bezier(0.16,1,0.3,1)`,
+              transform: mounted ? 'none' : 'translateY(16px)',
+              transition: `opacity 500ms ${i * 80 + 200}ms, transform 500ms ${i * 80 + 200}ms cubic-bezier(0.22,1,0.36,1), background-color 200ms, border-color 200ms`,
             }}
           >
-            <div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center group-hover:scale-110 transition-transform duration-500 ease-out shadow-sm">
-              <span className="material-symbols-outlined text-foreground/70 text-sm">{f.icon}</span>
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/15 transition-colors">
+              <span className="material-symbols-outlined text-white text-lg">{f.icon}</span>
             </div>
-            <div>
-                <h3 className="text-foreground font-medium text-sm mb-1">{f.title}</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">{f.desc}</p>
-            </div>
+            <h3 className="text-white font-bold text-base">{f.title}</h3>
+            <p className="text-white/90 text-sm leading-relaxed">{f.desc}</p>
           </div>
         ))}
       </div>
 
-      <p className={`relative z-10 text-muted-foreground text-xs mt-8 uppercase tracking-widest ${isRtl ? 'text-right' : 'text-left'}`}>
+      <p className={`relative z-10 text-white/80 text-sm mt-8 ${isRtl ? 'text-right' : 'text-left'}`}>
         {`© ${new Date().getFullYear()} ${projectName}`}
       </p>
     </section>
@@ -368,16 +372,16 @@ function LoginFormSection(props: LoginFormSectionProps) {
         style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(-12px)', transition: 'opacity 500ms, transform 500ms cubic-bezier(0.22,1,0.36,1)' }}
       >
         {settings?.logo_url ? (
-          <span className="w-16 h-16 overflow-hidden border border-border bg-card mb-3 rounded-full flex items-center justify-center">
+          <span className="w-20 h-20 overflow-hidden shadow-card border border-border bg-card mb-3 rounded-xl flex items-center justify-center">
             <img
               src={brandLogoSrc(settings.logo_url, settings.updated_at)}
               alt=""
-              className="h-full w-full object-contain scale-125 grayscale mix-blend-multiply dark:mix-blend-screen dark:invert opacity-90"
+              className="h-full w-full object-contain scale-150"
             />
           </span>
         ) : (
-          <div className="w-16 h-16 rounded-full mb-3 flex items-center justify-center bg-muted border border-border">
-            <span className="material-symbols-outlined text-4xl text-muted-foreground" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
+          <div className="w-20 h-20 rounded-xl mb-3 flex items-center justify-center" style={{ background: 'var(--ds-primary)' }}>
+            <span className="material-symbols-outlined text-5xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
           </div>
         )}
         <h1 className="text-lg font-extrabold text-foreground text-center leading-tight max-w-[17rem]">{projectName}</h1>
@@ -462,12 +466,21 @@ function LoginFormSection(props: LoginFormSectionProps) {
             <button
               type="submit"
               disabled={loading}
-              className="relative h-12 w-full px-5 text-primary-foreground font-semibold rounded-xl overflow-hidden active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group bg-primary hover:bg-primary/90 shadow-sm"
+              className="relative h-12 w-full px-5 text-white font-bold rounded-xl overflow-hidden active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group"
+              style={{ background: 'var(--ds-primary)' }}
             >
+              <span
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 1.8s linear infinite',
+                }}
+              />
               {loading ? (
                 <><Loader2 size={18} className="animate-spin" /><span>{t('loginVerifying')}</span></>
               ) : (
-                <><span>{t('login')}</span><span className="material-symbols-outlined text-xl transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1">arrow_forward</span></>
+                <><span>{t('login')}</span><span className="material-symbols-outlined text-xl">login</span></>
               )}
             </button>
           </div>
