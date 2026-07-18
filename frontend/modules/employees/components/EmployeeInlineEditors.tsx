@@ -6,6 +6,7 @@ import { Checkbox } from '@shared/components/ui/checkbox';
 import { Input } from '@shared/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/components/ui/popover';
 import { normalizeArabicDigits } from '@shared/lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 const InlineEditTrigger = forwardRef<HTMLButtonElement, Readonly<{
   children: React.ReactNode;
@@ -13,7 +14,8 @@ const InlineEditTrigger = forwardRef<HTMLButtonElement, Readonly<{
   title?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }>>((props, ref) => {
-  const { children, saving = false, title = 'اضغط للتعديل', onClick, ...rest } = props;
+  const { t } = useTranslation();
+  const { children, saving = false, title = t('clickToEdit'), onClick, ...rest } = props;
 
   return (
     <button
@@ -141,6 +143,7 @@ export function InlineInputEditor({
   dir = 'auto',
   placeholder = '',
 }: Readonly<InlineInputEditorProps>) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(value);
   const [saving, setSaving] = useState(false);
@@ -190,7 +193,7 @@ export function InlineInputEditor({
             }}
             disabled={saving}
           >
-            إلغاء
+            {t('cancel')}
           </Button>
           <div className="flex items-center gap-2">
             {value && (
@@ -202,7 +205,7 @@ export function InlineInputEditor({
                 onClick={() => setDraft('')}
                 disabled={saving}
               >
-                مسح
+                {t('clear')}
               </Button>
             )}
             <Button
@@ -212,7 +215,7 @@ export function InlineInputEditor({
               onClick={() => { handleSave(); }}
               disabled={saving}
             >
-              {saving ? <Loader2 size={13} className="animate-spin" /> : 'حفظ'}
+              {saving ? <Loader2 size={13} className="animate-spin" /> : t('save')}
             </Button>
           </div>
         </div>
@@ -234,6 +237,7 @@ export function InlineMultiSelectEditor({
   onSave,
   renderDisplay,
 }: Readonly<InlineMultiSelectEditorProps>) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedValues, setSelectedValues] = useState<Set<string>>(new Set(values));
@@ -292,7 +296,7 @@ export function InlineMultiSelectEditor({
             }}
             disabled={saving}
           >
-            إلغاء
+            {t('cancel')}
           </Button>
           <Button
             type="button"
@@ -301,7 +305,7 @@ export function InlineMultiSelectEditor({
             onClick={() => { handleSave(); }}
             disabled={saving}
           >
-            {saving ? <Loader2 size={13} className="animate-spin" /> : 'حفظ'}
+            {saving ? <Loader2 size={13} className="animate-spin" /> : t('save')}
           </Button>
         </div>
       </div>

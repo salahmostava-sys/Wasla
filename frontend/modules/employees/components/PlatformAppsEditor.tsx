@@ -6,6 +6,8 @@ import { Checkbox } from '@shared/components/ui/checkbox';
 import { useToast } from '@shared/hooks/use-toast';
 import { employeeService } from '@services/employeeService';
 import { getErrorMessage } from '@services/serviceError';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@app/providers/LanguageContext';
 
 type PlatformApp = {
   id: string;
@@ -28,6 +30,8 @@ export function PlatformAppsEditor({
   availableApps,
   onSuccess,
 }: Readonly<PlatformAppsEditorProps>) {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [selectedAppIds, setSelectedAppIds] = useState<Set<string>>(
@@ -59,15 +63,15 @@ export function PlatformAppsEditor({
     try {
       await employeeService.replaceEmployeeApps(employeeId, Array.from(selectedAppIds));
       toast({
-        title: 'تم التحديث',
-        description: `تم تحديث التطبيقات للموظف ${employeeName}`,
+        title: t('applicationsUpdated'),
+        description: t('employeeApplicationsUpdated', { name: employeeName }),
       });
       onSuccess();
       setOpen(false);
     } catch (error) {
       toast({
-        title: 'خطأ',
-        description: getErrorMessage(error, 'فشل تحديث التطبيقات'),
+        title: t('error'),
+        description: getErrorMessage(error, t('applicationsUpdateFailed')),
         variant: 'destructive',
       });
     } finally {
@@ -106,10 +110,10 @@ export function PlatformAppsEditor({
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-64" align="start" dir="rtl">
+      <PopoverContent className="w-64" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-sm">اختيار التطبيقات</h4>
+            <h4 className="font-medium text-sm">{t('selectApplications')}</h4>
             {hasChanges() && (
               <Button
                 size="sm"
@@ -122,7 +126,7 @@ export function PlatformAppsEditor({
                 ) : (
                   <Check size={12} className="me-1" />
                 )}
-                حفظ
+                {t('save')}
               </Button>
             )}
           </div>
@@ -130,7 +134,7 @@ export function PlatformAppsEditor({
           <div className="space-y-2 max-h-[300px] overflow-y-auto">
             {availableApps.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-4">
-                لا توجد تطبيقات متاحة
+                {t('noApplicationsAvailable')}
               </p>
             ) : (
               availableApps.map(app => (

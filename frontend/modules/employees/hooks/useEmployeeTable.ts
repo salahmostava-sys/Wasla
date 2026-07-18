@@ -21,6 +21,17 @@ import {
 
 import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { useUndo } from '@shared/context/UndoContext';
+import { useTranslation } from 'react-i18next';
+
+const EMPLOYEE_EXPORT_LABEL_KEYS: Record<string, string> = {
+  name: 'employeeName', name_en: 'nameEnglish', national_id: 'nationalId', phone: 'phone',
+  email: 'email', cities: 'cities', nationality: 'nationality', job_title: 'jobTitle',
+  join_date: 'joinDate', birth_date: 'birthDate', probation_end_date: 'probationEndDate',
+  residency_expiry: 'residencyExpiry', health_insurance_expiry: 'healthInsuranceExpiry',
+  license_expiry: 'licenseExpiry', license_status: 'licenseStatus',
+  sponsorship_status: 'sponsorshipStatus', bank_account_number: 'bankAccount', iban: 'IBAN',
+  commercial_record: 'commercialRegistration', salary_type: 'salaryType', status: 'employeeStatus',
+};
 
 // Reverts a single employee row to its previous field values (used by the undo stack).
 const buildRevertPatch = (
@@ -66,6 +77,7 @@ export function useEmployeeActions(params: {
   colFilters: Record<string, string>;
   setColFilters: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) {
+  const { t } = useTranslation();
   const {
     data, setData, filtered, sortField, setSortField, sortDir, setSortDir,
     toast, permissions, deleteEmployee, setDeleteEmployee, setDeleting,
@@ -108,16 +120,16 @@ export function useEmployeeActions(params: {
           await employeeService.updateEmployee(id, revertPatch);
         };
         registerAction({
-          description: `تعديل ${prev.name} — حقل "${field}"`,
+          description: t('employeeFieldUpdated', { name: prev.name, field }),
           undoCommand: revertRow,
         });
       }
     } catch (err: unknown) {
-      const message = getErrorMessage(err, 'تعذر حفظ التعديل');
+      const message = getErrorMessage(err, t('saveEditFailed'));
       if (prev) applyPatch(id, prev);
-      toast({ title: 'خطأ في الحفظ', description: message, variant: 'destructive' });
+      toast({ title: t('saveError'), description: message, variant: 'destructive' });
     }
-  }, [toast, registerAction, applyPatch]);
+  }, [toast, registerAction, applyPatch, t]);
 
 
   const handleSaveStatusWithDate = async () => {
@@ -134,8 +146,8 @@ export function useEmployeeActions(params: {
       extraFields,
     );
     toast({
-      title: `✅ تم تحديث الحالة إلى "${statusDateDialog.label}"`,
-      description: `التاريخ: ${statusDate}`,
+      title: t('statusUpdatedTo', { status: statusDateDialog.label }),
+      description: t('selectedDate', { date: statusDate }),
     });
     setStatusDateSaving(false);
     setStatusDateDialog(null);
@@ -147,19 +159,19 @@ export function useEmployeeActions(params: {
     try {
       await employeeService.deleteById(deleteEmployee.id);
       setData(d => d.filter(e => e.id !== deleteEmployee.id));
-      toast({ title: 'تم الحذف', description: deleteEmployee.name });
+      toast({ title: t('deleted'), description: deleteEmployee.name });
     } catch (err: unknown) {
-      const message = getErrorMessage(err, 'تعذر حذف المندوب');
+      const message = getErrorMessage(err, t('employeeDeleteFailed'));
       const blocked = message === EMPLOYEE_DELETE_BLOCKED_MESSAGE;
       toast({
-        title: blocked ? 'لا يمكن الحذف' : 'خطأ في الحذف',
+        title: blocked ? t('deleteNotAllowed') : t('errorDeleting'),
         description: message,
         variant: 'destructive',
       });
     }
     setDeleting(false);
     setDeleteEmployee(null);
-  }, [deleteEmployee, setData, setDeleteEmployee, setDeleting, toast]);
+  }, [deleteEmployee, setData, setDeleteEmployee, setDeleting, toast, t]);
 
   const setColFilter = useCallback((key: string, value: string) => {
     setColFilters(prev => {
@@ -197,12 +209,12 @@ export function useEmployeeActions(params: {
   const handleExport = async () => {
     const XLSX = await loadXlsx();
     const rows = buildEmployeeIoRows();
-    const headerRow = EMPLOYEE_IMPORT_COLUMNS.map((column) => column.label);
+    const headerRow = EMPLOYEE_IMPORT_COLUMNS.map((column) => t(EMPLOYEE_EXPORT_LABEL_KEYS[column.key] ?? column.label));
     const aoaRows = rows.map((row) => EMPLOYEE_IMPORT_COLUMNS.map((column) => row[column.key]));
     const ws = XLSX.utils.aoa_to_sheet([headerRow, ...aoaRows]);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'بيانات الموظفين');
-    XLSX.writeFile(wb, `بيانات_المناديب_${todayISO()}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, t('employeeDataSheet'));
+    XLSX.writeFile(wb, `${t('employeeDataFile')}_${todayISO()}.xlsx`);
   };
 
   const handleFastExport = async () => {

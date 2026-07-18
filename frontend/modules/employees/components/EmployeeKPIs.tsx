@@ -4,9 +4,10 @@ import { differenceInDays, differenceInYears, parseISO, startOfMonth, endOfMonth
 import { Users, UserCheck, UserX, UserMinus, ShieldCheck, ShieldOff, Car, AlertTriangle, CalendarClock, MapPin, Globe2, TrendingUp } from 'lucide-react';
 import type { Employee } from '@modules/employees/model/employeeUtils';
 import { getEmployeeCities } from '@modules/employees/model/employeeUtils';
-import { SPONSORSHIP_LABELS, LICENSE_LABELS } from '@modules/employees/types/employee.types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/components/ui/dialog';
 import { ScrollArea } from '@shared/components/ui/scroll-area';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@app/providers/LanguageContext';
 
 interface Props {
   allEmployees: Employee[];
@@ -27,6 +28,8 @@ const isExcluded = (e: Employee) => {
 };
 
 export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>) {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const [detailModal, setDetailModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -168,58 +171,58 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
   const cityMax = useMemo(() => Math.max(1, ...Object.values(stats.cityCount)), [stats.cityCount]);
   const natMax  = useMemo(() => Math.max(1, ...Object.values(stats.natCount)),  [stats.natCount]);
 
-  const CITY_LABELS: Record<string, string> = { makkah: 'مكة المكرمة', jeddah: 'جدة' };
+  const cityLabels: Record<string, string> = { makkah: t('makkah'), jeddah: t('jeddah') };
 
   if (allEmployees.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-3">
         <Users size={40} className="opacity-30" />
-        <p className="text-sm">لا توجد بيانات موظفين</p>
+        <p className="text-sm">{t('noEmployeeData')}</p>
       </div>
     );
   }
 
   const handleCityClick = (city: string) => {
     const list = stats.lists.active.filter(e => getEmployeeCities(e).includes(city));
-    showDetails(`توزيع الموظفين في مدينة: ${CITY_LABELS[city] ?? city}`, list);
+    showDetails(t('cityEmployeeDistribution', { value: cityLabels[city] ?? city }), list);
   };
 
   const handleNationalityClick = (nationality: string) => {
     const list = stats.lists.active.filter(e => e.nationality === nationality);
-    showDetails(`توزيع الموظفين من الجنسية: ${nationality}`, list);
+    showDetails(t('nationalityEmployeeDistribution', { value: nationality }), list);
   };
 
   const handleJobClick = (job: string) => {
     const list = stats.lists.active.filter(e => e.job_title === job);
-    showDetails(`توزيع الموظفين بمسمى وظيفي: ${job}`, list);
+    showDetails(t('jobEmployeeDistribution', { value: job }), list);
   };
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* ── القسم الأول: الملخص العام ── */}
-      <Section title="الملخص العام" icon={<TrendingUp size={16} />}>
+      <Section title={t('generalSummary')} icon={<TrendingUp size={16} />}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <KpiCard icon={<Users size={20} />} label="إجمالي الموظفين" value={stats.total} color="blue" onClick={() => showDetails("إجمالي الموظفين", stats.lists.all)} />
-          <KpiCard icon={<UserCheck size={20} />} label="نشط" value={stats.active} color="green" onClick={() => showDetails("الموظفين النشطين", stats.lists.activeRaw)} />
-          <KpiCard icon={<UserMinus size={20} />} label="غير نشط" value={stats.inactive} color="yellow" onClick={() => showDetails("الموظفين غير النشطين", stats.lists.inactive)} />
-          <KpiCard icon={<UserX size={20} />} label="منتهي" value={stats.ended} color="gray" onClick={() => showDetails("الموظفين منتهية خدمتهم", stats.lists.ended)} />
+          <KpiCard icon={<Users size={20} />} label={t('totalEmployees')} value={stats.total} color="blue" onClick={() => showDetails(t('totalEmployees'), stats.lists.all)} />
+          <KpiCard icon={<UserCheck size={20} />} label={t('active')} value={stats.active} color="green" onClick={() => showDetails(t('activeEmployees'), stats.lists.activeRaw)} />
+          <KpiCard icon={<UserMinus size={20} />} label={t('inactive')} value={stats.inactive} color="yellow" onClick={() => showDetails(t('inactiveEmployees'), stats.lists.inactive)} />
+          <KpiCard icon={<UserX size={20} />} label={t('ended')} value={stats.ended} color="gray" onClick={() => showDetails(t('endedEmployees'), stats.lists.ended)} />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-          <KpiCard icon={<CalendarClock size={20} />} label="موظفون جدد هذا الشهر" value={stats.newThisMonth} color="purple" onClick={() => showDetails("الموظفين الجدد هذا الشهر", stats.lists.newThisMonth)} />
+          <KpiCard icon={<CalendarClock size={20} />} label={t('newEmployeesThisMonth')} value={stats.newThisMonth} color="purple" onClick={() => showDetails(t('newEmployeesThisMonth'), stats.lists.newThisMonth)} />
           {stats.avgAge !== null && (
-            <KpiCard icon={<Users size={20} />} label="متوسط العمر" value={`${stats.avgAge} سنة`} color="blue" />
+            <KpiCard icon={<Users size={20} />} label={t('averageAge')} value={t('yearsCount', { count: stats.avgAge })} color="blue" />
           )}
         </div>
       </Section>
 
       {/* ── القسم الثاني: حالة الكفالة ── */}
-      <Section title="حالة الكفالة" icon={<ShieldCheck size={16} />}>
+      <Section title={t('sponsorshipStatus')} icon={<ShieldCheck size={16} />}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <KpiCard label={SPONSORSHIP_LABELS['sponsored']}    value={stats.sponsoredRawCount}    color="green"  icon={<ShieldCheck size={20} />} onClick={() => showDetails(SPONSORSHIP_LABELS['sponsored'], stats.lists.sponsoredRaw)} />
-          <KpiCard label={SPONSORSHIP_LABELS['not_sponsored']} value={stats.notSponsoredRawCount} color="gray"   icon={<ShieldOff size={20} />} onClick={() => showDetails(SPONSORSHIP_LABELS['not_sponsored'], stats.lists.notSponsoredRaw)} />
-          <KpiCard label={SPONSORSHIP_LABELS['absconded']}    value={stats.absconded}    color="red"    icon={<UserX size={20} />} onClick={() => showDetails(SPONSORSHIP_LABELS['absconded'], stats.lists.absconded)} />
-          <KpiCard label={SPONSORSHIP_LABELS['terminated']}   value={stats.terminated}   color="orange" icon={<UserMinus size={20} />} onClick={() => showDetails(SPONSORSHIP_LABELS['terminated'], stats.lists.terminated)} />
+          <KpiCard label={t('sponsored')} value={stats.sponsoredRawCount} color="green" icon={<ShieldCheck size={20} />} onClick={() => showDetails(t('sponsored'), stats.lists.sponsoredRaw)} />
+          <KpiCard label={t('notSponsored')} value={stats.notSponsoredRawCount} color="gray" icon={<ShieldOff size={20} />} onClick={() => showDetails(t('notSponsored'), stats.lists.notSponsoredRaw)} />
+          <KpiCard label={t('absconded')} value={stats.absconded} color="red" icon={<UserX size={20} />} onClick={() => showDetails(t('absconded'), stats.lists.absconded)} />
+          <KpiCard label={t('terminated')} value={stats.terminated} color="orange" icon={<UserMinus size={20} />} onClick={() => showDetails(t('terminated'), stats.lists.terminated)} />
         </div>
         <div className="mt-2">
           <SponsorshipBar
@@ -231,26 +234,26 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
       </Section>
 
       {/* ── القسم الثالث: حالة الرخصة ── */}
-      <Section title="حالة الرخصة" icon={<Car size={16} />}>
+      <Section title={t('licenseStatusSection')} icon={<Car size={16} />}>
         <div className="grid grid-cols-3 gap-3">
-          <KpiCard label={LICENSE_LABELS['has_license']} value={stats.hasLicense} color="green"  icon={<Car size={20} />} onClick={() => showDetails(LICENSE_LABELS['has_license'], stats.lists.hasLicense)} />
-          <KpiCard label={LICENSE_LABELS['no_license']}  value={stats.noLicense}  color="red"    icon={<Car size={20} />} onClick={() => showDetails(LICENSE_LABELS['no_license'], stats.lists.noLicense)} />
-          <KpiCard label={LICENSE_LABELS['applied']}     value={stats.applied}    color="yellow" icon={<Car size={20} />} onClick={() => showDetails(LICENSE_LABELS['applied'], stats.lists.applied)} />
+          <KpiCard label={t('hasLicense')} value={stats.hasLicense} color="green" icon={<Car size={20} />} onClick={() => showDetails(t('hasLicense'), stats.lists.hasLicense)} />
+          <KpiCard label={t('noLicense')} value={stats.noLicense} color="red" icon={<Car size={20} />} onClick={() => showDetails(t('noLicense'), stats.lists.noLicense)} />
+          <KpiCard label={t('applied')} value={stats.applied} color="yellow" icon={<Car size={20} />} onClick={() => showDetails(t('applied'), stats.lists.applied)} />
         </div>
       </Section>
 
       {/* ── القسم الرابع: تنبيهات الوثائق ── */}
-      <Section title="تنبيهات الوثائق" icon={<AlertTriangle size={16} />}>
+      <Section title={t('documentAlerts')} icon={<AlertTriangle size={16} />}>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <AlertCard label="إقامة منتهية"          value={stats.residencyExpired}   severity="danger" onClick={() => showDetails("الموظفين ذوي الإقامة المنتهية", stats.lists.residencyExpired)} />
-          <AlertCard label="إقامة تنتهي خلال 30 يوم" value={stats.residencyExpiring30} severity="warning" onClick={() => showDetails("الموظفين الذين تنتهي إقامتهم خلال 30 يوم", stats.lists.residencyExpiring30)} />
-          <AlertCard label="إقامة تنتهي خلال 60 يوم" value={stats.residencyExpiring60} severity="info" onClick={() => showDetails("الموظفين الذين تنتهي إقامتهم خلال 60 يوم", stats.lists.residencyExpiring60)} />
-          <AlertCard label="تأمين صحي منتهٍ"       value={stats.insuranceExpired}   severity="danger" onClick={() => showDetails("الموظفين ذوي التأمين الصحي المنتهي", stats.lists.insuranceExpired)} />
-          <AlertCard label="تأمين ينتهي خلال 30 يوم" value={stats.insuranceExpiring30} severity="warning" onClick={() => showDetails("الموظفين الذين ينتهي تأمينهم خلال 30 يوم", stats.lists.insuranceExpiring30)} />
-          <AlertCard label="رخصة قيادة منتهية"     value={stats.licenseExpired}    severity="danger" onClick={() => showDetails("الموظفين ذوي رخصة القيادة المنتهية", stats.lists.licenseExpired)} />
-          <AlertCard label="رخصة تنتهي خلال 30 يوم"  value={stats.licenseExpiring30}  severity="warning" onClick={() => showDetails("الموظفين الذين تنتهي رخصهم خلال 30 يوم", stats.lists.licenseExpiring30)} />
-          <AlertCard label="تجربة تنتهي خلال 7 أيام" value={stats.probationExpiring7}  severity="danger" onClick={() => showDetails("الموظفين الذين تنتهي فترة تجريبتهم خلال 7 أيام", stats.lists.probationExpiring7)} />
-          <AlertCard label="تجربة تنتهي خلال 30 يوم" value={stats.probationExpiring30} severity="warning" onClick={() => showDetails("الموظفين الذين تنتهي فترة تجريبتهم خلال 30 يوم", stats.lists.probationExpiring30)} />
+          <AlertCard label={t('expiredResidency')} value={stats.residencyExpired} severity="danger" onClick={() => showDetails(t('employeesWithExpiredResidency'), stats.lists.residencyExpired)} />
+          <AlertCard label={t('residencyExpiresIn30')} value={stats.residencyExpiring30} severity="warning" onClick={() => showDetails(t('employeesResidencyExpiring30'), stats.lists.residencyExpiring30)} />
+          <AlertCard label={t('residencyExpiresIn60')} value={stats.residencyExpiring60} severity="info" onClick={() => showDetails(t('employeesResidencyExpiring60'), stats.lists.residencyExpiring60)} />
+          <AlertCard label={t('expiredHealthInsurance')} value={stats.insuranceExpired} severity="danger" onClick={() => showDetails(t('employeesWithExpiredInsurance'), stats.lists.insuranceExpired)} />
+          <AlertCard label={t('insuranceExpiresIn30')} value={stats.insuranceExpiring30} severity="warning" onClick={() => showDetails(t('employeesInsuranceExpiring30'), stats.lists.insuranceExpiring30)} />
+          <AlertCard label={t('expiredDrivingLicense')} value={stats.licenseExpired} severity="danger" onClick={() => showDetails(t('employeesWithExpiredLicense'), stats.lists.licenseExpired)} />
+          <AlertCard label={t('licenseExpiresIn30')} value={stats.licenseExpiring30} severity="warning" onClick={() => showDetails(t('employeesLicenseExpiring30'), stats.lists.licenseExpiring30)} />
+          <AlertCard label={t('probationExpiresIn7')} value={stats.probationExpiring7} severity="danger" onClick={() => showDetails(t('employeesProbationExpiring7'), stats.lists.probationExpiring7)} />
+          <AlertCard label={t('probationExpiresIn30')} value={stats.probationExpiring30} severity="warning" onClick={() => showDetails(t('employeesProbationExpiring30'), stats.lists.probationExpiring30)} />
         </div>
       </Section>
 
@@ -258,14 +261,14 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* ── القسم الخامس: توزيع المدن ── */}
         {Object.keys(stats.cityCount).length > 0 && (
-          <Section title="توزيع الموظفين حسب المدينة" icon={<MapPin size={16} />}>
+          <Section title={t('employeesByCity')} icon={<MapPin size={16} />}>
             <div className="space-y-2">
               {Object.entries(stats.cityCount)
                 .sort(([, a], [, b]) => b - a)
                 .map(([city, count]) => (
                   <BarRow
                     key={city}
-                    label={CITY_LABELS[city] ?? city}
+                    label={cityLabels[city] ?? city}
                     value={count}
                     max={cityMax}
                     total={stats.activeCount}
@@ -279,7 +282,7 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
 
         {/* ── القسم السادس: توزيع الجنسيات ── */}
         {Object.keys(stats.natCount).length > 0 && (
-          <Section title="توزيع الموظفين حسب الجنسية" icon={<Globe2 size={16} />}>
+          <Section title={t('employeesByNationality')} icon={<Globe2 size={16} />}>
             <div className="space-y-2">
               {Object.entries(stats.natCount)
                 .sort(([, a], [, b]) => b - a)
@@ -301,7 +304,7 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
 
         {/* ── القسم السابع: توزيع المسميات الوظيفية ── */}
         {Object.keys(stats.jobCount).length > 0 && (
-          <Section title="أكثر المسميات الوظيفية" icon={<Users size={16} />}>
+          <Section title={t('topJobTitles')} icon={<Users size={16} />}>
             <div className="space-y-2">
               {Object.entries(stats.jobCount)
                 .sort(([, a], [, b]) => b - a)
@@ -324,8 +327,8 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
 
       {/* Modal to show list of employees */}
       <Dialog open={detailModal.isOpen} onOpenChange={(open) => setDetailModal(prev => ({ ...prev, isOpen: open }))}>
-        <DialogContent className="max-w-lg w-[90vw] max-h-[85vh] flex flex-col p-6 rounded-2xl border bg-card text-foreground" dir="rtl">
-          <DialogHeader className="pb-3 border-b text-right">
+        <DialogContent className="max-w-lg w-[90vw] max-h-[85vh] flex flex-col p-6 rounded-2xl border bg-card text-foreground" dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader className="pb-3 border-b text-start">
             <DialogTitle className="text-lg font-bold text-foreground">
               {detailModal.title}
             </DialogTitle>
@@ -334,7 +337,7 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
           <ScrollArea className="flex-1 mt-4 overflow-y-auto pr-1">
             <div className="space-y-2">
               {detailModal.employees.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-6">لا يوجد موظفين</p>
+                <p className="text-center text-sm text-muted-foreground py-6">{t('noEmployees')}</p>
               ) : (
                 detailModal.employees.map((emp) => (
                   <button 
@@ -346,17 +349,17 @@ export function EmployeeKPIs({ allEmployees, onSelectEmployee }: Readonly<Props>
                     }}
                     className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border/40 text-start"
                   >
-                    <div className="flex flex-col text-right">
+                    <div className="flex flex-col text-start">
                       <span className="font-semibold text-sm text-foreground hover:text-primary transition-colors">
                         {emp.name}
                       </span>
                       <span className="text-xs text-muted-foreground mt-0.5">
-                        {emp.job_title || 'بدون مسمى وظيفي'} {emp.nationality ? `• ${emp.nationality}` : ''}
+                        {emp.job_title || t('withoutJobTitle')} {emp.nationality ? `• ${emp.nationality}` : ''}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                        عرض الملف
+                        {t('viewProfile')}
                       </span>
                     </div>
                   </button>
@@ -494,22 +497,23 @@ function BarRow({ label, value, max, total, color, onClick }: Readonly<{ label: 
 function SponsorshipBar({ sponsored, notSponsored, absconded, terminated, total }: Readonly<{
   sponsored: number; notSponsored: number; absconded: number; terminated: number; total: number;
 }>) {
+  const { t } = useTranslation();
   if (total === 0) return null;
   const pctOf = (n: number) => `${((n / total) * 100).toFixed(1)}%`;
   const widthOf = (n: number) => `${(n / total) * 100}%`;
   return (
     <div className="space-y-1">
       <div className="h-4 rounded-full overflow-hidden flex gap-0.5">
-        {sponsored    > 0 && <div className="bg-green-500  h-full"  style={{ width: widthOf(sponsored) }}    title={`على الكفالة: ${sponsored}`} />}
-        {notSponsored > 0 && <div className="bg-slate-400  h-full"  style={{ width: widthOf(notSponsored) }} title={`ليس على الكفالة: ${notSponsored}`} />}
-        {absconded    > 0 && <div className="bg-red-500    h-full"  style={{ width: widthOf(absconded) }}    title={`هروب: ${absconded}`} />}
-        {terminated   > 0 && <div className="bg-orange-400 h-full"  style={{ width: widthOf(terminated) }}   title={`انتهاء خدمة: ${terminated}`} />}
+        {sponsored > 0 && <div className="bg-green-500 h-full" style={{ width: widthOf(sponsored) }} title={`${t('sponsored')}: ${sponsored}`} />}
+        {notSponsored > 0 && <div className="bg-slate-400 h-full" style={{ width: widthOf(notSponsored) }} title={`${t('notSponsored')}: ${notSponsored}`} />}
+        {absconded > 0 && <div className="bg-red-500 h-full" style={{ width: widthOf(absconded) }} title={`${t('absconded')}: ${absconded}`} />}
+        {terminated > 0 && <div className="bg-orange-400 h-full" style={{ width: widthOf(terminated) }} title={`${t('terminated')}: ${terminated}`} />}
       </div>
       <div className="flex gap-4 text-[10px] text-muted-foreground flex-wrap">
-        {sponsored    > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-green-500" />على الكفالة {pctOf(sponsored)}</span>}
-        {notSponsored > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-slate-400" />ليس على الكفالة {pctOf(notSponsored)}</span>}
-        {absconded    > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-red-500" />هروب {pctOf(absconded)}</span>}
-        {terminated   > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-orange-400" />انتهاء خدمة {pctOf(terminated)}</span>}
+        {sponsored > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-green-500" />{t('sponsored')} {pctOf(sponsored)}</span>}
+        {notSponsored > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-slate-400" />{t('notSponsored')} {pctOf(notSponsored)}</span>}
+        {absconded > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-red-500" />{t('absconded')} {pctOf(absconded)}</span>}
+        {terminated > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-orange-400" />{t('terminated')} {pctOf(terminated)}</span>}
       </div>
     </div>
   );
