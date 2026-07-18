@@ -5,7 +5,6 @@ import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { Label } from '@shared/components/ui/label';
 import { toast } from '@shared/components/ui/sonner';
-import { TOAST_ERROR_GENERIC } from '@shared/lib/toastMessages';
 import { toAppFormValues } from '@modules/apps/lib/appsModel';
 import type { AppData, AppFormValues, CustomColumn } from '@modules/apps/types';
 import { getContrastText } from '@shared/hooks/useAppColors';
@@ -51,7 +50,7 @@ export const AppModal = ({ app, saving, onClose, onSave }: Readonly<AppModalProp
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      toast.error(TOAST_ERROR_GENERIC, { description: t('nameRequired') });
+      toast.error(t('genericTryAgainError'), { description: t('nameRequired') });
       return;
     }
 

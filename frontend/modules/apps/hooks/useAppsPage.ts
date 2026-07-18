@@ -1,12 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@shared/components/ui/sonner';
-import {
-  TOAST_ERROR_GENERIC,
-  TOAST_SUCCESS_ACTION,
-  TOAST_SUCCESS_ADD,
-  TOAST_SUCCESS_EDIT,
-} from '@shared/lib/toastMessages';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { useTemporalContext } from '@app/providers/TemporalContext';
 import { authQueryUserId, useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
@@ -19,8 +13,10 @@ import { appsPageService } from '@modules/apps/services/appsPageService';
 import { appsRootQueryKey, appsOverviewQueryKey, appEmployeesQueryKey } from '@modules/apps/queryKeys';
 import { normalizeCustomColumns, toAppUpsertPayload } from '@modules/apps/lib/appsModel';
 import type { AppData, AppFormValues } from '@modules/apps/types';
+import { useTranslation } from 'react-i18next';
 
 export const useAppsPage = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { permissions } = usePermissions('apps');
   const { selectedMonth: monthYear } = useTemporalContext();
@@ -59,8 +55,8 @@ export const useAppsPage = () => {
     queryFn: () => selectedAppId ? appsPageService.getAppEmployees(selectedAppId, monthYear) : Promise.resolve([]),
   });
 
-  useQueryErrorToast(appsQuery.isError, appsQuery.error, undefined, appsQuery.refetch);
-  useQueryErrorToast(employeesQuery.isError, employeesQuery.error, undefined, employeesQuery.refetch);
+  useQueryErrorToast(appsQuery.isError, appsQuery.error, t('platformsLoadError'), appsQuery.refetch);
+  useQueryErrorToast(employeesQuery.isError, employeesQuery.error, t('platformsLoadError'), employeesQuery.refetch);
 
   const invalidateApps = async () => {
     await Promise.all([
@@ -89,11 +85,12 @@ export const useAppsPage = () => {
     },
     onSuccess: async (mode) => {
       await invalidateApps();
-      toast.success(mode === 'edit' ? TOAST_SUCCESS_EDIT : TOAST_SUCCESS_ADD);
+      toast.success(mode === 'edit' ? t('applicationUpdated') : t('applicationAdded'));
       setModalApp(undefined);
     },
     onError: (error: unknown) => {
-      toast.error(TOAST_ERROR_GENERIC, { description: getErrorMessage(error, TOAST_ERROR_GENERIC) });
+      const fallbackMessage = t('genericTryAgainError');
+      toast.error(fallbackMessage, { description: getErrorMessage(error, fallbackMessage) });
     },
   });
 
@@ -102,10 +99,10 @@ export const useAppsPage = () => {
       appService.toggleMonthlyActive(app.id, monthYear, !app.is_active_this_month),
     onSuccess: async () => {
       await invalidateApps();
-      toast.success(TOAST_SUCCESS_ACTION);
+      toast.success(t('operationCompleted'));
     },
     onError: () => {
-      toast.error(TOAST_ERROR_GENERIC);
+      toast.error(t('genericTryAgainError'));
     },
   });
 
@@ -125,10 +122,10 @@ export const useAppsPage = () => {
       setDeleteApp(null);
       setDeleteMode('soft');
       setAppDependencies(null);
-      toast.success(TOAST_SUCCESS_ACTION);
+      toast.success(t('operationCompleted'));
     },
     onError: () => {
-      toast.error(TOAST_ERROR_GENERIC);
+      toast.error(t('genericTryAgainError'));
     },
   });
 
@@ -163,9 +160,9 @@ export const useAppsPage = () => {
         work_type: workType,
       });
       await queryClient.invalidateQueries({ queryKey: ['apps'] });
-      toast.success('تم تحديث نوع العمل');
+      toast.success(t('workTypeUpdated'));
     } catch (err: unknown) {
-      const message = getErrorMessage(err, 'تعذر تحديث نوع العمل');
+      const message = getErrorMessage(err, t('workTypeUpdateError'));
       toast.error(message);
     }
   };
