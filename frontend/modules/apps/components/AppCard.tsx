@@ -8,8 +8,8 @@ import {
   SelectValue,
 } from '@shared/components/ui/select';
 import type { AppData } from '@modules/apps/types';
-import { getWorkTypeLabel } from '@shared/lib/workType';
 import type { WorkType } from '@shared/types/shifts';
+import { useTranslation } from 'react-i18next';
 
 interface AppCardProps {
   app: AppData;
@@ -33,6 +33,12 @@ export const AppCard = ({
   onWorkTypeChange,
 }: Readonly<AppCardProps>) => {
   const isActiveInMonth = app.is_active_this_month;
+  const { t } = useTranslation();
+  const workTypeLabel = app.work_type === 'shift'
+    ? t('workTypeShift')
+    : app.work_type === 'hybrid'
+      ? t('workTypeHybrid')
+      : t('workTypeOrders');
 
   return (
     <button
@@ -63,7 +69,7 @@ export const AppCard = ({
                 onEdit(app);
               }}
               className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-black"
-              title="تعديل"
+              title={t('edit')}
               type="button"
             >
               <Edit size={12} />
@@ -75,7 +81,7 @@ export const AppCard = ({
                   ? 'bg-white/20 hover:bg-rose-500 hover:text-white'
                   : 'bg-white/20 hover:bg-emerald-500 hover:text-white'
               }`}
-              title={isActiveInMonth ? 'تعطيل لهذا الشهر' : 'تفعيل لهذا الشهر'}
+              title={isActiveInMonth ? t('disablePlatformForMonth') : t('enablePlatformForMonth')}
               type="button"
             >
               {isActiveInMonth ? <PowerOff size={12} /> : <Power size={12} />}
@@ -83,7 +89,7 @@ export const AppCard = ({
             <button
               onClick={(event) => onDelete(app, event)}
               className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-rose-600 hover:text-white"
-              title="أرشفة نهائية"
+              title={t('archivePermanently')}
               type="button"
             >
               <Trash2 size={12} className="text-destructive" />
@@ -120,9 +126,9 @@ export const AppCard = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="orders">📦 طلبات</SelectItem>
-                <SelectItem value="shift">⏰ دوام</SelectItem>
-                <SelectItem value="hybrid">🔄 مختلط</SelectItem>
+                <SelectItem value="orders">📦 {t('workTypeOrders')}</SelectItem>
+                <SelectItem value="shift">⏰ {t('workTypeShift')}</SelectItem>
+                <SelectItem value="hybrid">🔄 {t('workTypeHybrid')}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
@@ -130,20 +136,20 @@ export const AppCard = ({
               className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
               style={{ backgroundColor: 'rgba(255,255,255,0.18)', color: app.text_color }}
             >
-              {getWorkTypeLabel(app.work_type)}
+              {workTypeLabel}
             </span>
           )}
         </div>
 
         <div className="mt-3 space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span style={{ color: app.text_color, opacity: 0.85 }}>المناديب العاملين</span>
+            <span style={{ color: app.text_color, opacity: 0.85 }}>{t('workingRiders')}</span>
             <span className="font-black text-[15px]" style={{ color: app.text_color }}>
               {app.employeeCount.toLocaleString('en-US')}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span style={{ color: app.text_color, opacity: 0.85 }}>إجمالي الطلبات</span>
+            <span style={{ color: app.text_color, opacity: 0.85 }}>{t('totalOrders')}</span>
             <span className="font-black text-[15px]" style={{ color: app.text_color }}>
               {app.ordersCount.toLocaleString('en-US')}
             </span>
@@ -153,7 +159,7 @@ export const AppCard = ({
         {!isActiveInMonth && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
             <span className="rounded-lg border border-white/20 bg-black/50 px-2 py-1 text-[10px] font-bold text-white">
-              غير مفعلة للشهر
+              {t('platformInactiveForMonth')}
             </span>
           </div>
         )}
@@ -162,15 +168,19 @@ export const AppCard = ({
   );
 };
 
-export const AddAppCard = ({ onClick }: { onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    className="group flex min-h-[160px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border p-5 text-center transition-all hover:border-primary/50 hover:bg-primary/5"
-    type="button"
-  >
-    <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-primary/10">
-      <Plus size={20} className="text-muted-foreground group-hover:text-primary" />
-    </div>
-    <p className="text-xs font-medium text-muted-foreground group-hover:text-primary">إضافة منصة جديدة</p>
-  </button>
-);
+export const AddAppCard = ({ onClick }: { onClick: () => void }) => {
+  const { t } = useTranslation();
+
+  return (
+    <button
+      onClick={onClick}
+      className="group flex min-h-[160px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border p-5 text-center transition-all hover:border-primary/50 hover:bg-primary/5"
+      type="button"
+    >
+      <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-primary/10">
+        <Plus size={20} className="text-muted-foreground group-hover:text-primary" />
+      </div>
+      <p className="text-xs font-medium text-muted-foreground group-hover:text-primary">{t('addNewPlatform')}</p>
+    </button>
+  );
+};

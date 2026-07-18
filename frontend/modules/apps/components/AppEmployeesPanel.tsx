@@ -1,7 +1,9 @@
 import { Check, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { ar, enUS } from 'date-fns/locale';
 import type { AppData, AppEmployee } from '@modules/apps/types';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@app/providers/LanguageContext';
 
 interface AppEmployeesPanelProps {
   app: AppData;
@@ -11,15 +13,10 @@ interface AppEmployeesPanelProps {
   onClose: () => void;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  active: 'نشط',
-  inactive: 'موقوف',
-};
 const STATUS_CLASSES: Record<string, string> = {
   active: 'badge-success',
   inactive: 'badge-warning',
 };
-const getStatusLabel = (status: string) => STATUS_LABELS[status] ?? 'منتهي';
 const getStatusClass = (status: string) => STATUS_CLASSES[status] ?? 'badge-urgent';
 
 export const AppEmployeesPanel = ({
@@ -29,6 +26,15 @@ export const AppEmployeesPanel = ({
   loading,
   onClose,
 }: Readonly<AppEmployeesPanelProps>) => {
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
+  const locale = lang === 'ar' ? ar : enUS;
+  const getStatusLabel = (status: string) => {
+    if (status === 'active') return t('active');
+    if (status === 'inactive') return t('inactive');
+    return t('ended');
+  };
+
   return (
     <div className="mt-8 space-y-4 animate-in fade-in slide-in-from-top-4">
       <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-4">
@@ -40,13 +46,13 @@ export const AppEmployeesPanel = ({
             {app.name.charAt(0)}
           </div>
           <div>
-            <h3 className="font-bold text-foreground">تفاصيل أداء {app.name}</h3>
+            <h3 className="font-bold text-foreground">{t('platformPerformanceDetails', { name: app.name })}</h3>
             <p className="text-[10px] text-muted-foreground">
-              لشهر {format(new Date(`${monthYear}-01`), 'MMMM yyyy', { locale: ar })}
+              {t('forMonth', { month: format(new Date(`${monthYear}-01`), 'MMMM yyyy', { locale }) })}
             </p>
           </div>
         </div>
-        <button aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground" type="button">
+        <button aria-label={t('close')} onClick={onClose} className="text-muted-foreground hover:text-foreground" type="button">
           <X size={20} />
         </button>
       </div>
@@ -55,26 +61,26 @@ export const AppEmployeesPanel = ({
         {loading && (
           <div className="flex flex-col items-center gap-2 py-12 text-center text-sm text-muted-foreground">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            جاري تحميل أرقام المناديب...
+            {t('loadingRiderNumbers')}
           </div>
         )}
         {!loading && employees.length === 0 && (
           <div className="rounded-xl border border-dashed border-border bg-muted/10 py-12 text-center text-muted-foreground">
-            لم يتم تسجيل أي طلبات لهذه المنصة بواسطة المناديب في هذا الشهر.
+            {t('noPlatformOrdersThisMonth')}
           </div>
         )}
         {!loading && employees.length > 0 && (
           <table className="w-full">
             <thead className="ta-thead">
               <tr>
-                <th className="ta-th text-start">المندوب</th>
-                <th className="ta-th">رقم الهوية</th>
-                <th className="ta-th">الجوال</th>
-                <th className="ta-th">حالة العمل</th>
-                <th className="ta-th">الطلبات المنفذة</th>
-                <th className="ta-th">حصة الهدف</th>
-                <th className="ta-th">التوقع</th>
-                <th className="ta-th">الحالة</th>
+                <th className="ta-th text-start">{t('walletRider')}</th>
+                <th className="ta-th">{t('nationalId')}</th>
+                <th className="ta-th">{t('phone')}</th>
+                <th className="ta-th">{t('workStatus')}</th>
+                <th className="ta-th">{t('completedOrders')}</th>
+                <th className="ta-th">{t('targetShare')}</th>
+                <th className="ta-th">{t('projection')}</th>
+                <th className="ta-th">{t('status')}</th>
               </tr>
             </thead>
             <tbody>
@@ -117,18 +123,18 @@ export const AppEmployeesPanel = ({
                     <td className="ta-td">
                       {(() => {
                         if (employee.onTrack === null) {
-                          return <span className="text-[10px] text-muted-foreground">بدون هدف</span>;
+                          return <span className="text-[10px] text-muted-foreground">{t('noTarget')}</span>;
                         }
                         if (employee.onTrack) {
                           return (
                             <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                              <Check size={10} /> يحقق التارجت
+                              <Check size={10} /> {t('onTrackTarget')}
                             </div>
                           );
                         }
                         return (
                           <div className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600">
-                            <X size={10} /> تحت التارجت
+                            <X size={10} /> {t('belowTarget')}
                           </div>
                         );
                       })()}

@@ -11,6 +11,7 @@ import { hybridRuleService } from '@services/hybridRuleService';
 import { logger } from '@shared/lib/logger';
 import type { WorkType, AppHybridRule } from '@shared/types/shifts';
 import { getErrorMessage } from '@services/serviceError';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   appId: string;
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTypeChange }: Readonly<Props>) {
+  const { t } = useTranslation();
   const [workType, setWorkType] = useState<WorkType>(currentWorkType);
   const [hybridRule, setHybridRule] = useState<Partial<AppHybridRule>>({
     min_hours_for_shift: 11,
@@ -70,10 +72,10 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
         }
       }
 
-      toast.success('تم حفظ الإعدادات بنجاح');
+      toast.success(t('settingsSavedSuccessfully'));
     } catch (error) {
-      const message = getErrorMessage(error, 'فشل حفظ الإعدادات');
-      toast.error('خطأ', { description: message });
+      const message = getErrorMessage(error, t('settingsSaveFailed'));
+      toast.error(t('errorSaving'), { description: message });
     } finally {
       setSaving(false);
     }
@@ -83,22 +85,22 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
   return (
     <Card>
       <CardHeader>
-        <CardTitle>إعدادات نوع العمل - {appName}</CardTitle>
+        <CardTitle>{t('workTypeSettingsTitle', { name: appName })}</CardTitle>
         <CardDescription>
-          حدد كيفية حساب رواتب الموظفين على هذه المنصة
+          {t('workTypeCalculationDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-3">
-          <Label>نوع العمل</Label>
+          <Label>{t('workType')}</Label>
           <RadioGroup value={workType} onValueChange={(v) => setWorkType(v as WorkType)}>
             <div className="flex items-center space-x-2 space-x-reverse">
               <RadioGroupItem value="orders" id="orders" />
               <Label htmlFor="orders" className="cursor-pointer font-normal">
                 <div>
-                  <div className="font-medium">طلبات فقط</div>
+                  <div className="font-medium">{t('ordersOnly')}</div>
                   <div className="text-xs text-muted-foreground">
-                    يتم حساب الراتب بناءً على عدد الطلبات المنجزة
+                    {t('ordersOnlyDescription')}
                   </div>
                 </div>
               </Label>
@@ -107,9 +109,9 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
               <RadioGroupItem value="shift" id="shift" />
               <Label htmlFor="shift" className="cursor-pointer font-normal">
                 <div>
-                  <div className="font-medium">دوام فقط</div>
+                  <div className="font-medium">{t('shiftsOnly')}</div>
                   <div className="text-xs text-muted-foreground">
-                    يتم حساب الراتب بناءً على عدد أيام الدوام وساعات العمل
+                    {t('shiftsOnlyDescription')}
                   </div>
                 </div>
               </Label>
@@ -118,9 +120,9 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
               <RadioGroupItem value="hybrid" id="hybrid" />
               <Label htmlFor="hybrid" className="cursor-pointer font-normal">
                 <div>
-                  <div className="font-medium">مختلط (دوام أو طلبات)</div>
+                  <div className="font-medium">{t('hybridWorkType')}</div>
                   <div className="text-xs text-muted-foreground">
-                    يتم الحساب بناءً على تحقيق شروط الدوام، وإلا يتم الحساب بالطلبات
+                    {t('hybridWorkTypeDescription')}
                   </div>
                 </div>
               </Label>
@@ -130,17 +132,17 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
 
         {workType === 'hybrid' && (
           <div className="space-y-4 border-t pt-4">
-            <h4 className="font-medium text-sm">إعدادات الدوام المختلط</h4>
+            <h4 className="font-medium text-sm">{t('hybridShiftSettings')}</h4>
             {loading ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="animate-spin size-4" />
-                جاري التحميل...
+                {t('loading')}
               </div>
             ) : (
               <>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="minHours">الحد الأدنى للساعات (دوام)</Label>
+                    <Label htmlFor="minHours">{t('minimumShiftHours')}</Label>
                     <Input
                       id="minHours"
                       type="number"
@@ -154,11 +156,11 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
                       placeholder="11"
                     />
                     <p className="text-xs text-muted-foreground">
-                      عدد الساعات المطلوبة لاحتساب اليوم كدوام
+                      {t('minimumShiftHoursHint')}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="shiftRate">سعر الدوام اليومي (ريال)</Label>
+                    <Label htmlFor="shiftRate">{t('dailyShiftRate')}</Label>
                     <Input
                       id="shiftRate"
                       type="number"
@@ -171,7 +173,7 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
                       placeholder="150"
                     />
                     <p className="text-xs text-muted-foreground">
-                      المبلغ المدفوع عند تحقيق ساعات الدوام
+                      {t('dailyShiftRateHint')}
                     </p>
                   </div>
                 </div>
@@ -184,7 +186,7 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
                     }
                   />
                   <Label htmlFor="fallback" className="cursor-pointer font-normal text-sm">
-                    التحويل لحساب الطلبات عند عدم تحقيق الساعات المطلوبة
+                    {t('fallbackToOrders')}
                   </Label>
                 </div>
               </>
@@ -195,7 +197,7 @@ export function AppWorkTypeSettings({ appId, appName, currentWorkType, onWorkTyp
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="animate-spin size-4 me-2" />}
-            حفظ الإعدادات
+            {t('saveSettings')}
           </Button>
         </div>
       </CardContent>
