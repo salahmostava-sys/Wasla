@@ -11,6 +11,7 @@ import {
 import { normalizeArabicDigits } from "@shared/lib/formatters";
 import { TextFilterInput } from "@modules/employees/components/EmployeesViewParts";
 import { type ColumnDef } from "@modules/employees/types/employee.types";
+import type { TFunction } from "i18next";
 
 export const DATE_FILTER_KEYS = new Set([
   "join_date",
@@ -20,18 +21,6 @@ export const DATE_FILTER_KEYS = new Set([
   "health_insurance_expiry",
   "license_expiry",
 ]);
-
-const LICENSE_OPTIONS = [
-  { value: "has_license", label: "لديه رخصة" },
-  { value: "no_license", label: "ليس لديه رخصة" },
-  { value: "applied", label: "تم التقديم" },
-] as const;
-
-const STATUS_OPTIONS = [
-  { value: "active", label: "نشط" },
-  { value: "inactive", label: "غير نشط" },
-  { value: "ended", label: "منتهي" },
-] as const;
 
 export function getContrastTextColor(hexColor: string): string {
   const hex = hexColor.replaceAll('#', '');
@@ -56,6 +45,7 @@ export type FilterContext = {
     status: string[];
   };
   setColFilter: (key: string, value: string) => void;
+  t: TFunction;
 };
 
 export function buildCityFilter(ctx: FilterContext): React.ReactNode {
@@ -82,7 +72,7 @@ export function buildCityFilter(ctx: FilterContext): React.ReactNode {
 }
 
 export function buildPlatformAppsFilter(ctx: FilterContext): React.ReactNode {
-  const { colFilters, availableApps, setColFilter } = ctx;
+  const { colFilters, availableApps, setColFilter, t } = ctx;
   const selected = colFilters.platform_apps
     ? colFilters.platform_apps.split(",").map((value) => value.trim()).filter(Boolean)
     : [];
@@ -94,7 +84,7 @@ export function buildPlatformAppsFilter(ctx: FilterContext): React.ReactNode {
     setColFilter("platform_apps", ordered.join(","));
   };
   if (availableApps.length === 0) {
-    return <p className="text-xs text-muted-foreground text-center py-2">لا توجد منصات متاحة</p>;
+    return <p className="text-xs text-muted-foreground text-center py-2">{t('noPlatformsAvailable')}</p>;
   }
   return (
     <div className="space-y-2">
@@ -117,12 +107,12 @@ export function buildPlatformAppsFilter(ctx: FilterContext): React.ReactNode {
 }
 
 export function buildSponsorshipFilter(ctx: FilterContext): React.ReactNode {
-  const { colFilters, setColFilter } = ctx;
+  const { colFilters, setColFilter, t } = ctx;
   const kafalaOptions = [
-    { v: "sponsored", l: "على الكفالة" },
-    { v: "not_sponsored", l: "ليس على الكفالة" },
-    { v: "absconded", l: "هروب" },
-    { v: "terminated", l: "انتهاء الخدمة" },
+    { v: "sponsored", l: t('sponsored') },
+    { v: "not_sponsored", l: t('notSponsored') },
+    { v: "absconded", l: t('absconded') },
+    { v: "terminated", l: t('terminated') },
   ] as const;
   const selected = colFilters.sponsorship_status
     ? colFilters.sponsorship_status.split(",").map((s) => s.trim()).filter(Boolean)
@@ -148,7 +138,7 @@ export function buildSponsorshipFilter(ctx: FilterContext): React.ReactNode {
 }
 
 export function buildDateRangeFilter(ctx: FilterContext): React.ReactNode {
-  const { col, colFilters, setColFilter } = ctx;
+  const { col, colFilters, setColFilter, t } = ctx;
   const rangeVal = colFilters[col.key] || "";
   const [rangeFrom = "", rangeTo = ""] = rangeVal.includes("..") ? rangeVal.split("..") : [rangeVal, ""];
   const updateRange = (from: string, to: string) => {
@@ -157,13 +147,13 @@ export function buildDateRangeFilter(ctx: FilterContext): React.ReactNode {
     else setColFilter(col.key, from);
   };
   return (
-    <fieldset className="space-y-1.5" aria-label="اختيار نطاق التاريخ">
+    <fieldset className="space-y-1.5" aria-label={t('dateRange')}>
       <div className="flex items-center gap-1">
-        <span className="text-[10px] text-muted-foreground w-6">من</span>
+        <span className="text-[10px] text-muted-foreground w-6">{t('from')}</span>
         <Input type="date" className="h-7 text-xs px-1.5 flex-1" value={rangeFrom} onChange={(event) => updateRange(normalizeArabicDigits(event.target.value), rangeTo)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-[10px] text-muted-foreground w-6">إلى</span>
+        <span className="text-[10px] text-muted-foreground w-6">{t('to')}</span>
         <Input type="date" className="h-7 text-xs px-1.5 flex-1" value={rangeTo} onChange={(event) => updateRange(rangeFrom, normalizeArabicDigits(event.target.value))} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} />
       </div>
     </fieldset>
@@ -184,15 +174,25 @@ export function buildSelectFilter(filterKey: string, label: string, options: { v
 }
 
 export function buildColumnFilter(ctx: FilterContext): React.ReactNode {
-  const { col, uniqueVals, commercialRecordNames } = ctx;
+  const { col, uniqueVals, commercialRecordNames, t } = ctx;
+  const licenseOptions = [
+    { value: "has_license", label: t('hasLicense') },
+    { value: "no_license", label: t('noLicense') },
+    { value: "applied", label: t('applied') },
+  ];
+  const statusOptions = [
+    { value: "active", label: t('active') },
+    { value: "inactive", label: t('inactive') },
+    { value: "ended", label: t('ended') },
+  ];
   if (col.key === "city") return buildCityFilter(ctx);
   if (col.key === "platform_apps") return buildPlatformAppsFilter(ctx);
   if (col.key === "sponsorship_status") return buildSponsorshipFilter(ctx);
   if (DATE_FILTER_KEYS.has(col.key)) return buildDateRangeFilter(ctx);
-  if (col.key === "license_status") return buildSelectFilter("license_status", "الكل", [...LICENSE_OPTIONS], ctx);
-  if (col.key === "status") return buildSelectFilter("status", "الكل", [...STATUS_OPTIONS], ctx);
-  if (col.key === "nationality") return buildSelectFilter("nationality", "الكل", uniqueVals.nationality.map((n) => ({ value: n, label: n })), ctx);
-  if (col.key === "job_title") return buildSelectFilter("job_title", "الكل", uniqueVals.job_title.map((j) => ({ value: j, label: j })), ctx);
-  if (col.key === "commercial_record") return buildSelectFilter("commercial_record", "الكل", commercialRecordNames.map((cr) => ({ value: cr, label: cr })), ctx);
+  if (col.key === "license_status") return buildSelectFilter("license_status", t('all'), licenseOptions, ctx);
+  if (col.key === "status") return buildSelectFilter("status", t('all'), statusOptions, ctx);
+  if (col.key === "nationality") return buildSelectFilter("nationality", t('all'), uniqueVals.nationality.map((n) => ({ value: n, label: n })), ctx);
+  if (col.key === "job_title") return buildSelectFilter("job_title", t('all'), uniqueVals.job_title.map((j) => ({ value: j, label: j })), ctx);
+  if (col.key === "commercial_record") return buildSelectFilter("commercial_record", t('all'), commercialRecordNames.map((cr) => ({ value: cr, label: cr })), ctx);
   return <TextFilterInput value={ctx.colFilters[col.key] || ""} onChange={(v) => ctx.setColFilter(col.key, v)} />;
 }

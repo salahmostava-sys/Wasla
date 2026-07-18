@@ -260,9 +260,9 @@ function EmployeeDetailedTableInner() {
                 <td colSpan={activeCols.length} className="ta-td !px-1">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Users size={40} className="opacity-60" aria-hidden />
-                    <p className="font-medium">لا توجد نتائج</p>
+                    <p className="font-medium">{t('noResults')}</p>
                     <p className="text-xs">
-                      جرّب تغيير الفلاتر أو إضافة موظف جديد
+                      {t('changeFiltersOrAddEmployee')}
                     </p>
                   </div>
                 </td>
@@ -313,6 +313,7 @@ function EmployeeDetailedTableInner() {
                         renderEditableDate,
                         formatDateCell,
                         buildTextOptions,
+                        t,
                       });
                     })}
                   </tr>
