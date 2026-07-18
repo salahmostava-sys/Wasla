@@ -21,6 +21,7 @@ import { PresenceAvatars } from '@shared/components/PresenceAvatars';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { useAuth } from '@app/providers/AuthContext';
 import { useRealtimePostgresChanges, REALTIME_TABLES_EMPLOYEES } from '@shared/hooks/useRealtimePostgresChanges';
+import { isStringRecord, usePersistentState } from '@shared/hooks/usePersistentState';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { isEmployeeVisibleInMonth } from '@shared/lib/employeeVisibility';
 import { getEmployeeCities, applyEmployeeFilters, sortEmployees } from '@modules/employees/model/employeeUtils';
@@ -47,6 +48,15 @@ const EmployeeFormModal = lazy(() =>
 
 /** Minimum time (ms) the page must be hidden before triggering a background refetch. */
 const VISIBILITY_REFETCH_DELAY_MS = 90_000;
+const EMPLOYEE_FILTERS_STORAGE_KEY = 'table:employees:filters:v1';
+const EMPLOYEE_PAGE_SIZE_STORAGE_KEY = 'table:employees:page-size:v1';
+const EMPLOYEE_COLUMN_KEYS = new Set<string>(ALL_COLUMNS.map((column) => column.key));
+
+const isEmployeeFilterState = (value: unknown): value is Record<string, string> =>
+  isStringRecord(value) && Object.keys(value).every((key) => EMPLOYEE_COLUMN_KEYS.has(key));
+
+const isEmployeePageSize = (value: unknown): value is number =>
+  value === 25 || value === 50 || value === 100;
 
 const InlineLoader = ({ minHeightClassName = 'min-h-[260px]' }: Readonly<{ minHeightClassName?: string }>) => (
   <Loading minHeightClassName={minHeightClassName} />
@@ -95,9 +105,17 @@ const Employees = () => {
     localStorage.setItem('employees_visible_cols', JSON.stringify([...visibleCols]));
   }, [visibleCols]);
 
-  const [colFilters, setColFilters] = useState<Record<string, string>>({});
+  const [colFilters, setColFilters] = usePersistentState<Record<string, string>>(
+    EMPLOYEE_FILTERS_STORAGE_KEY,
+    {},
+    isEmployeeFilterState,
+  );
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = usePersistentState(
+    EMPLOYEE_PAGE_SIZE_STORAGE_KEY,
+    50,
+    isEmployeePageSize,
+  );
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCommercialRecordsManager, setShowCommercialRecordsManager] = useState(false);

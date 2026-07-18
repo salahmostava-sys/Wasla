@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { Skeleton } from '@shared/components/ui/skeleton';
 import { useMotorcyclesData } from '@shared/hooks/useMotorcyclesData';
+import { isStringRecord, usePersistentState } from '@shared/hooks/usePersistentState';
 import { printHtmlTable } from '@shared/lib/printTable';
 import { MOTORCYCLE_IO_COLUMNS } from '@shared/constants/excelSchemas';
 import { logError } from '@shared/lib/logger';
@@ -102,6 +103,26 @@ const EMPTY_VEHICLE_COLUMN_FILTERS: VehicleColumnFilters = {
   authorizationExpiry: '',
   minimumMaintenanceCost: '',
   rental: 'all',
+};
+
+const VEHICLE_SEARCH_STORAGE_KEY = 'table:vehicles:search:v1';
+const VEHICLE_STATUS_STORAGE_KEY = 'table:vehicles:status:v1';
+const VEHICLE_TYPE_STORAGE_KEY = 'table:vehicles:type:v1';
+const VEHICLE_COLUMNS_STORAGE_KEY = 'table:vehicles:column-filters:v1';
+const VEHICLE_COLUMN_FILTER_KEYS = Object.keys(EMPTY_VEHICLE_COLUMN_FILTERS);
+
+const isVehicleStatusFilter = (value: unknown): value is string =>
+  value === 'all' || (typeof value === 'string' && ALL_STATUSES.includes(value as VehicleStatus));
+
+const isVehicleTypeFilter = (value: unknown): value is string =>
+  value === 'all' || value === 'motorcycle' || value === 'car';
+
+const isVehicleColumnFilters = (value: unknown): value is VehicleColumnFilters => {
+  if (!isStringRecord(value)) return false;
+  if (!VEHICLE_COLUMN_FILTER_KEYS.every((key) => key in value)) return false;
+  if (!['all', 'present', 'absent'].includes(value.chip)) return false;
+  if (!isVehicleStatusFilter(value.status)) return false;
+  return ['all', 'with_rental', 'without_rental'].includes(value.rental);
 };
 
 const COLUMN_FILTER_CELL_CLASS = 'border-t border-border/40 bg-card p-1 align-top';
@@ -443,10 +464,26 @@ const Motorcycles = () => {
     error: vehiclesError,
     refetch: refetchVehicles,
   } = useMotorcyclesData();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [columnFilters, setColumnFilters] = useState<VehicleColumnFilters>(EMPTY_VEHICLE_COLUMN_FILTERS);
+  const [search, setSearch] = usePersistentState(
+    VEHICLE_SEARCH_STORAGE_KEY,
+    '',
+    (value): value is string => typeof value === 'string',
+  );
+  const [statusFilter, setStatusFilter] = usePersistentState(
+    VEHICLE_STATUS_STORAGE_KEY,
+    'all',
+    isVehicleStatusFilter,
+  );
+  const [typeFilter, setTypeFilter] = usePersistentState(
+    VEHICLE_TYPE_STORAGE_KEY,
+    'all',
+    isVehicleTypeFilter,
+  );
+  const [columnFilters, setColumnFilters] = usePersistentState<VehicleColumnFilters>(
+    VEHICLE_COLUMNS_STORAGE_KEY,
+    EMPTY_VEHICLE_COLUMN_FILTERS,
+    isVehicleColumnFilters,
+  );
   const [showForm, setShowForm] = useState(false);
   const [editVehicle, setEditVehicle] = useState<Vehicle | null>(null);
   const [fileIoHint, setFileIoHint] = useState<{ kind: 'ok' | 'err'; message: string } | null>(null);
@@ -515,6 +552,18 @@ const Motorcycles = () => {
   const hasActiveColumnFilters = Object.values(columnFilters).some(
     (value) => value !== '' && value !== 'all',
   );
+  const hasActiveFilters = Boolean(
+    search.trim()
+      || statusFilter !== 'all'
+      || typeFilter !== 'all'
+      || hasActiveColumnFilters,
+  );
+  const resetTableFilters = () => {
+    setSearch('');
+    setStatusFilter('all');
+    setTypeFilter('all');
+    setColumnFilters(EMPTY_VEHICLE_COLUMN_FILTERS);
+  };
 
   // Summary stats
   const stats = {
@@ -712,7 +761,14 @@ const Motorcycles = () => {
             <SelectItem value="car">سيارة</SelectItem>
           </SelectContent>
         </Select>
-        <span className="text-xs text-muted-foreground ms-auto">{filtered.length} مركبة</span>
+        {hasActiveFilters && (
+          <Button type="button" variant="ghost" size="sm" className="gap-1.5" onClick={resetTableFilters}>
+            <X size={14} /> مسح الفلاتر
+          </Button>
+        )}
+        <span className="text-xs font-medium text-foreground ms-auto">
+          {filtered.length.toLocaleString('en-US')} من {data.length.toLocaleString('en-US')} مركبة
+        </span>
       </div>
 
       {fileIoHint && (
@@ -741,7 +797,7 @@ const Motorcycles = () => {
             return (
               <div className="space-y-3">
                 {Array.from({ length: 5 }).map((_, idx) => (
-                  <Skeleton key={idx} className="h-16 w-full rounded-2xl" />
+                  <Skeleton key={idx} className="h-10 w-full rounded-lg" />
                 ))}
               </div>
             );
@@ -750,8 +806,15 @@ const Motorcycles = () => {
             return (
               <div className="text-center py-16 text-muted-foreground bg-card border border-border/60 rounded-xl">
                 <Bike size={40} className="mx-auto mb-3 opacity-30" />
-                <p className="font-semibold">لا توجد مركبات</p>
-                <p className="text-xs">أضف مركبة جديدة للبدء</p>
+                <p className="font-semibold">{hasActiveFilters ? 'لا توجد نتائج مطابقة' : 'لا توجد مركبات'}</p>
+                <p className="text-xs">
+                  {hasActiveFilters ? 'غيّر الفلاتر أو امسحها لعرض المركبات' : 'أضف مركبة جديدة للبدء'}
+                </p>
+                {hasActiveFilters && (
+                  <Button type="button" variant="outline" size="sm" className="mt-3" onClick={resetTableFilters}>
+                    مسح الفلاتر
+                  </Button>
+                )}
               </div>
             );
           }
