@@ -7,6 +7,7 @@ import { Input } from '@shared/components/ui/input';
 import { useSignedUrl, extractStoragePath } from '@shared/hooks/useSignedUrl';
 import { getEmployeeCities } from '@modules/employees/model/employeeUtils';
 import { cityLabel } from '@modules/employees/model/employeeCity';
+import { useTranslation } from 'react-i18next';
 
 export const CityBadge = ({ city }: { city?: string | null }) => {
   if (!city) return <span className="text-muted-foreground/40">•</span>;
@@ -30,37 +31,40 @@ export const CityBadges = ({ cities, city }: { cities?: string[] | null; city?: 
 };
 
 export const LicenseBadge = ({ status }: { status?: string | null }) => {
+  const { t } = useTranslation();
   if (!status) return <span className="text-muted-foreground/40">•</span>;
   const map: Record<string, { label: string; cls: string }> = {
-    has_license: { label: 'لديه رخصة', cls: 'badge-success' },
-    no_license: { label: 'ليس لديه رخصة', cls: 'badge-urgent' },
-    applied: { label: 'تم التقديم', cls: 'badge-warning' },
+    has_license: { label: t('hasLicense'), cls: 'badge-success' },
+    no_license: { label: t('noLicense'), cls: 'badge-urgent' },
+    applied: { label: t('applied'), cls: 'badge-warning' },
   };
   const m = map[status];
   return m ? <span className={m.cls}>{m.label}</span> : null;
 };
 
 export const SponsorBadge = ({ status }: { status?: string | null }) => {
+  const { t } = useTranslation();
   if (!status) return <span className="text-muted-foreground/40">•</span>;
   const map: Record<string, { label: string; cls: string }> = {
-    sponsored: { label: 'على الكفالة', cls: 'badge-info' },
+    sponsored: { label: t('sponsored'), cls: 'badge-info' },
     not_sponsored: {
-      label: 'ليس على الكفالة',
+      label: t('notSponsored'),
       cls: 'bg-muted text-muted-foreground text-xs font-medium px-2.5 py-0.5 rounded-full',
     },
-    absconded: { label: 'هروب', cls: 'badge-urgent' },
-    terminated: { label: 'انتهاء الخدمة', cls: 'badge-urgent' },
+    absconded: { label: t('absconded'), cls: 'badge-urgent' },
+    terminated: { label: t('terminated'), cls: 'badge-urgent' },
   };
   const m = map[status];
   return m ? <span className={m.cls}>{m.label}</span> : null;
 };
 
 export const StatusBadge = ({ status }: { status?: string | null }) => {
+  const { t } = useTranslation();
   if (!status) return <span className="text-muted-foreground/40">•</span>;
-  if (status === 'active') return <span className="badge-success">نشط</span>;
-  if (status === 'inactive') return <span className="badge-warning">غير نشط</span>;
+  if (status === 'active') return <span className="badge-success">{t('active')}</span>;
+  if (status === 'inactive') return <span className="badge-warning">{t('inactive')}</span>;
   if (status === 'ended')
-    return <span className="bg-muted text-muted-foreground text-xs font-medium px-2.5 py-0.5 rounded-full">منتهي</span>;
+    return <span className="bg-muted text-muted-foreground text-xs font-medium px-2.5 py-0.5 rounded-full">{t('ended')}</span>;
   return <span className="text-muted-foreground/40">{status || '•'}</span>;
 };
 
@@ -102,12 +106,13 @@ export interface ColFilterPopoverProps {
 
 export const ColFilterPopover = ({ label, active, children, onClear }: Readonly<ColFilterPopoverProps>) => {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button type="button"
           className={`inline-flex items-center gap-0.5 rounded transition-colors text-current ${active ? 'opacity-100' : 'opacity-45 hover:opacity-80'}`}
-          title={`فلترة ${label}`}
+          title={t('filterBy', { label })}
           onClick={(e) => e.stopPropagation()}
         >
           <FilterIcon size={10} />
@@ -125,7 +130,7 @@ export const ColFilterPopover = ({ label, active, children, onClear }: Readonly<
               }}
               className="text-xs text-destructive hover:underline flex items-center gap-1"
             >
-              <X size={10} /> مسح
+              <X size={10} /> {t('clear')}
             </button>
           )}
         </div>
@@ -151,15 +156,18 @@ export const TextFilterInput = ({
 }: {
   value: string;
   onChange: (v: string) => void;
-}) => (
-  <Input
-    className="h-7 text-xs px-2"
-    placeholder="ابحث..."
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    onClick={(e) => e.stopPropagation()}
-    autoFocus
-  />
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Input
+      className="h-7 text-xs px-2"
+      placeholder={t('searchShort')}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onClick={(e) => e.stopPropagation()}
+      autoFocus
+    />
+  );
+};
 
 
