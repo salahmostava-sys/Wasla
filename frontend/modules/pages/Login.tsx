@@ -11,6 +11,7 @@ import { brandLogoSrc } from '@shared/lib/brandLogo';
 import { Checkbox } from '@shared/components/ui/checkbox';
 import { Label } from '@shared/components/ui/label';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 interface SystemSettings {
   project_name_ar: string;
@@ -23,14 +24,17 @@ interface SystemSettings {
 
 const DEACTIVATED_LOGIN_MESSAGE = 'هذا الحساب معطّل. تواصل مع المسؤول.';
 
-function getFriendlyLoginErrorMessage(message: string): string {
+function getFriendlyLoginErrorMessage(message: string, t: TFunction): string {
   const normalized = message.toLowerCase();
 
   if (message === DEACTIVATED_LOGIN_MESSAGE || normalized.includes('معط')) {
-    return DEACTIVATED_LOGIN_MESSAGE;
+    return t('loginAccountDisabled');
+  }
+  if (message === t('loginActionFailed')) {
+    return message;
   }
   if (normalized.includes('invalid login credentials')) {
-    return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    return t('loginInvalidCredentials');
   }
   if (
     normalized.includes('rate limit') ||
@@ -38,7 +42,7 @@ function getFriendlyLoginErrorMessage(message: string): string {
     normalized.includes('over_email_send_rate_limit') ||
     normalized.includes('429')
   ) {
-    return 'محاولات كثيرة، انتظر دقيقة ثم حاول مرة أخرى';
+    return t('loginRateLimited');
   }
   if (
     normalized.includes(':timeout') ||
@@ -48,18 +52,16 @@ function getFriendlyLoginErrorMessage(message: string): string {
     normalized.includes('network') ||
     normalized.includes('مهلة')
   ) {
-    return 'تعذّر الاتصال بالخادم. تحقّق من الإنترنت ثم حاول مرة أخرى';
+    return t('loginNetworkError');
   }
   if (
     normalized.includes('email not confirmed') ||
     normalized.includes('email_not_confirmed')
   ) {
-    return 'يجب تأكيد البريد الإلكتروني أولاً';
+    return t('loginEmailNotConfirmed');
   }
-  return `تعذّر تسجيل الدخول حالياً. حاول مرة أخرى لاحقاً. (Error: ${message})`;
+  return t('loginUnexpectedError', { message });
 }
-
-import type { TFunction } from 'i18next';
 
 function useFeatures(t: TFunction) {
   return useMemo(() => [
@@ -109,7 +111,8 @@ async function performLoginAction(
   signIn: (e: string, p: string) => Promise<{ error: { message: string } | null }>,
   setLoading: (l: boolean) => void,
   setLoginError: (err: string) => void,
-  navigate: (path: string, opts?: { replace?: boolean }) => void
+  navigate: (path: string, opts?: { replace?: boolean }) => void,
+  t: TFunction,
 ) {
   setLoading(true);
   let error: { message: string } | null;
@@ -118,13 +121,13 @@ async function performLoginAction(
     error = res.error;
   } catch (err) {
     logError('[Login] signIn threw', err);
-    error = { message: 'تعذّر إكمال تسجيل الدخول. حاول مرة أخرى.' };
+    error = { message: t('loginActionFailed') };
   } finally {
     setLoading(false);
   }
 
   if (error) {
-    setLoginError(getFriendlyLoginErrorMessage(error.message));
+    setLoginError(getFriendlyLoginErrorMessage(error.message, t));
   } else {
     try { await persistRememberedEmail(email.trim(), rememberMe); } catch (e) { logError('[Login] persist failed', e); }
     navigate('/', { replace: true });
@@ -134,6 +137,7 @@ async function performLoginAction(
 function useLoginLogic() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -160,7 +164,7 @@ function useLoginLogic() {
     e.preventDefault();
     setLoginError('');
     if (!email || !password) return;
-    await performLoginAction(email, password, rememberMe, signIn, setLoading, setLoginError, navigate);
+    await performLoginAction(email, password, rememberMe, signIn, setLoading, setLoginError, navigate, t);
   };
 
   return {

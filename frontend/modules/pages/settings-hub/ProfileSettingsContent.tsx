@@ -12,6 +12,7 @@ import { settingsHubService } from '@services/settingsHubService';
 import { validateUploadFile } from '@shared/lib/validation';
 import { useQuery } from '@tanstack/react-query';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
+import { useTranslation } from 'react-i18next';
 
 const getStrength = (pw: string) => {
   if (!pw) return 0;
@@ -23,8 +24,6 @@ const getStrength = (pw: string) => {
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   return Math.min(3, Math.floor(score * 3 / 5));
 };
-
-const strengthLabelAr = (s: number) => (['', 'ضعيفة', 'متوسطة', 'قوية'][s] || '');
 
 const strengthColor = (s: number) => {
   if (s === 1) return 'bg-destructive';
@@ -76,6 +75,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
   const { user } = useAuth();
   const { toast } = useToast();
   const { isRTL } = useLanguage();
+  const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { data: profileData, isLoading: profileLoading, error: profileError, refetch: refetchProfile } = useQuery({
@@ -148,10 +148,10 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       await settingsHubService.updateProfileByUserId(user.id, { name: profile.name.trim(), avatar_url });
       setProfile(p => ({ ...p, avatar_url }));
       setAvatarFile(null);
-      toast({ title: 'تم حفظ التغييرات ✓' });
+      toast({ title: t('profileSaved') });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      toast({ title: 'خطأ في الحفظ', description: message, variant: 'destructive' });
+      toast({ title: t('profileSaveError'), description: message, variant: 'destructive' });
     } finally {
       setSavingProfile(false);
     }
@@ -160,11 +160,11 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
   const changePassword = async () => {
     setPwError('');
     if (!pw.next || pw.next.length < 8) {
-      setPwError('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+      setPwError(t('profilePasswordLengthError'));
       return;
     }
     if (pw.next !== pw.confirm) {
-      setPwError('كلمتا المرور غير متطابقتين');
+      setPwError(t('profilePasswordsMismatch'));
       return;
     }
     setSavingPw(true);
@@ -176,7 +176,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       return;
     }
     setSavingPw(false);
-    toast({ title: 'تم تغيير كلمة المرور ✓' });
+    toast({ title: t('profilePasswordChanged') });
     setPw({ next: '', confirm: '' });
   };
 
@@ -193,7 +193,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
     <QueryErrorRetry
       error={profileError}
       onRetry={() => refetchProfile().catch(() => {})}
-      title="تعذر تحميل الملف الشخصي"
+      title={t('profileLoadError')}
     />
   );
 
@@ -202,20 +202,20 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       {!omitPageHeading && (
         <SectionHeader
           icon={<User size={20} />}
-          title="الملف الشخصي"
-          subtitle="تعديل بياناتك الشخصية وكلمة المرور"
+          title={t('profile')}
+          subtitle={t('profileEditSubtitle')}
         />
       )}
 
       {/* Avatar */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          الصورة الشخصية
+          {t('profilePhoto')}
         </p>
         <div className="flex items-center gap-5">
           <div className="relative flex-shrink-0">
             {avatarSrc ? (
-              <img src={avatarSrc} alt="الصورة الشخصية" className="w-20 h-20 rounded-full object-cover border-2 border-border" />
+              <img src={avatarSrc} alt={t('profilePhotoAlt')} className="w-20 h-20 rounded-full object-cover border-2 border-border" />
             ) : (
               <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold border-2 border-border"
                 style={{ background: 'rgba(31,84,173,0.1)', color: '#1f54ad' }}>
@@ -234,10 +234,10 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
           <div className="flex-1 space-y-2">
             <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => fileRef.current?.click()}>
               <Camera size={14} />
-              تغيير الصورة
+              {t('profileChangePhoto')}
             </Button>
             <p className="text-[11px] text-muted-foreground text-center">
-              JPG أو PNG — الحجم الأقصى 2MB
+              {t('profilePhotoRequirements')}
             </p>
             {avatarFile && <p className="text-[11px] text-primary text-center truncate">{avatarFile.name}</p>}
           </div>
@@ -248,27 +248,27 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       {/* Personal Info */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          المعلومات الشخصية
+          {t('profilePersonalInfo')}
         </p>
         <div>
-          <Label className="text-sm mb-1.5 block text-foreground/80">الاسم الكامل</Label>
-          <Input value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} placeholder="أدخل اسمك" />
+          <Label className="text-sm mb-1.5 block text-foreground/80">{t('fullName')}</Label>
+          <Input value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} placeholder={t('profileNamePlaceholder')} />
         </div>
         <div>
-          <Label className="text-sm mb-1.5 block text-foreground/80">البريد الإلكتروني</Label>
+          <Label className="text-sm mb-1.5 block text-foreground/80">{t('email')}</Label>
           <Input value={user?.email ?? ''} readOnly dir="ltr" className="bg-muted/40 text-muted-foreground cursor-default" />
           <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
             <AlertCircle size={11} />
-            لتغيير البريد الإلكتروني، تواصل مع المسؤول
+            {t('profileEmailChangeHint')}
           </p>
         </div>
         <Button onClick={saveProfile} disabled={savingProfile} className="w-full gap-2">
           {savingProfile ? (
-            'جاري الحفظ...'
+            t('profileSaving')
           ) : (
             <>
               <Check size={15} />
-              حفظ التغييرات
+              {t('saveChanges')}
             </>
           )}
         </Button>
@@ -277,11 +277,11 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
       {/* Change Password */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          تغيير كلمة المرور
+          {t('profileChangePassword')}
         </p>
         <PwField
           id="next"
-          label="كلمة المرور الجديدة"
+          label={t('profileNewPassword')}
           value={pw.next}
           onChange={v => { setPw(p => ({ ...p, next: v })); setPwError(''); }}
           show={showPw.next}
@@ -295,13 +295,13 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
               ))}
             </div>
             <p className={cn('text-xs font-medium', strengthTextClass)}>
-              {strengthLabelAr(strength)}
+              {['', t('profilePasswordWeak'), t('profilePasswordMedium'), t('profilePasswordStrong')][strength]}
             </p>
           </div>
         )}
         <PwField
           id="confirm"
-          label="تأكيد كلمة المرور"
+          label={t('profileConfirmPassword')}
           value={pw.confirm}
           onChange={v => { setPw(p => ({ ...p, confirm: v })); setPwError(''); }}
           show={showPw.confirm}
@@ -312,12 +312,12 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
             {passwordsMatch ? (
               <>
                 <Check size={11} />
-                كلمتا المرور متطابقتان
+                {t('profilePasswordsMatch')}
               </>
             ) : (
               <>
                 <AlertCircle size={11} />
-                كلمتا المرور غير متطابقتين
+                {t('profilePasswordsMismatch')}
               </>
             )}
           </p>
@@ -328,7 +328,7 @@ export default function ProfileSettingsContent({ omitPageHeading = false }: Read
           </p>
         )}
         <Button variant="outline" onClick={changePassword} disabled={savingPw || !pw.next || !pw.confirm} className="w-full gap-2">
-          {savingPw ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
+          {savingPw ? t('profileChangingPassword') : t('profileChangePassword')}
         </Button>
       </div>
     </div>
