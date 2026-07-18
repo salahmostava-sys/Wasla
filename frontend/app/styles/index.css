@@ -731,9 +731,6 @@
   }
 
   .data-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
     background: var(--ds-table-header-bg) !important;
   }
 
@@ -757,10 +754,6 @@
   .data-table tbody td {
     @apply px-3 py-1.5 text-sm text-center;
     color: var(--ds-on-surface);
-  }
-
-  .data-table tbody td:not(.whitespace-normal) {
-    white-space: nowrap;
   }
 
   .data-table-compact thead th,
