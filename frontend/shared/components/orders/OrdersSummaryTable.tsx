@@ -62,7 +62,7 @@ export const OrdersSummaryTable = React.memo(({
   onSort,
 }: Readonly<Props>) => {
   return (
-    <table className="w-full text-xs">
+    <table className="dense-grid-table w-full">
       <thead>
         <tr className="border-b-2 border-border bg-muted/40">
           <th className="ta-th p-3 w-10">#</th>

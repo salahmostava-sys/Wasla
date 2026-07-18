@@ -88,7 +88,7 @@ export const OrdersGridTable = React.memo(({
           <Loader2 size={20} className="animate-spin" /> جاري التحميل...
         </div>
       ) : (
-        <table ref={tableRef} className="border-collapse text-[11px] leading-tight" style={{ minWidth: `${seqColMin + repColMin + days * 36 + 64}px`, width: '100%' }}>
+        <table ref={tableRef} className="dense-grid-table leading-tight" style={{ minWidth: `${seqColMin + repColMin + days * 36 + 64}px`, width: '100%' }}>
           <thead className="sticky top-0 z-20">
             <tr className="bg-muted border-b-2 border-border">
               <th

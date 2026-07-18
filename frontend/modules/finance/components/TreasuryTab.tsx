@@ -504,7 +504,7 @@ export function TreasuryTab() {
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead className="bg-muted/40 text-xs">
               <tr>
                 <th className="ta-th w-10">م</th>

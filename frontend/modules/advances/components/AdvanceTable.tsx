@@ -70,7 +70,7 @@ export const AdvanceTable = ({
   return (
     <div className="bg-card shadow-card overflow-hidden rounded-2xl">
       <div className="overflow-x-auto">
-        <table ref={tableRef} className="w-full text-sm">
+        <table ref={tableRef} className="data-table w-full text-sm">
           <thead>
             <tr className="ta-thead">
               <th className="ta-th w-12">#</th>

@@ -478,7 +478,7 @@ export function ShiftsTab({
             <Loader2 size={20} className="animate-spin" /> جاري التحميل...
           </div>
         ) : (
-          <table ref={tableRef} className="border-collapse text-[11px] leading-tight w-full" style={{ minWidth: `${36 + 132 + days * 44 + 80}px` }}>
+          <table ref={tableRef} className="dense-grid-table w-full leading-tight" style={{ minWidth: `${36 + 132 + days * 44 + 80}px` }}>
             <thead className="sticky top-0 z-20">
               <tr className="bg-muted border-b-2 border-border">
                 <th className="ta-th sticky right-0 z-40 bg-muted px-0.5 border-l border-border" style={{ minWidth: 36, width: 36 }}>

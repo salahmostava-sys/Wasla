@@ -504,7 +504,7 @@ export default function ActivityLogContent() {
       {/* Table */}
       <div className="rounded-xl overflow-hidden shadow-card" >
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="data-table w-full">
             <thead>
               <tr className="bg-muted border-b border-border" >
                 {['التاريخ والوقت', 'المستخدم', 'العملية', 'الوحدة', 'التفاصيل'].map((h, i) => (
@@ -689,7 +689,7 @@ export default function ActivityLogContent() {
 
                           {log.action === 'UPDATE' && (
                             <div className="rounded-lg border border-border overflow-hidden">
-                              <table className="w-full text-xs">
+                              <table className="data-table data-table-compact w-full text-xs">
                                 <thead className="bg-muted">
                                   <tr>
                                     <th className="p-2 text-start font-semibold">البيان</th>

@@ -221,7 +221,7 @@ export default function ViolationSearchTab({
             </p>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-sm">
+            <table className="data-table w-full min-w-[760px] text-sm">
               <thead className="bg-muted/40 border-b border-border">
                 <tr>
                   <th className="ta-th">اسم الموظف</th>

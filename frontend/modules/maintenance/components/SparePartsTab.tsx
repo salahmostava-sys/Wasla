@@ -422,7 +422,7 @@ export function SparePartsTab() {
         </div>
       ) : (
         <div className="border border-border/60 rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead className="bg-muted/50">
               <tr className="text-right">
                 <th className="p-3 font-semibold text-muted-foreground">اسم القطعة</th>

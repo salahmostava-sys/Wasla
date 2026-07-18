@@ -70,7 +70,7 @@ export const AppEmployeesPanel = ({
           </div>
         )}
         {!loading && employees.length > 0 && (
-          <table className="w-full">
+          <table className="data-table w-full">
             <thead className="ta-thead">
               <tr>
                 <th className="ta-th text-start">{t('walletRider')}</th>

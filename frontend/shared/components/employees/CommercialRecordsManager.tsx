@@ -295,7 +295,7 @@ export function CommercialRecordsManager({
             )}
             {!isLoading && managedRecords.length > 0 && (
               <div className="max-h-[430px] overflow-auto">
-                <table className="w-full min-w-[980px] text-sm">
+                <table className="data-table w-full min-w-[980px] text-sm">
                   <thead className="sticky top-0 z-10 bg-muted/95 text-xs text-muted-foreground">
                     <tr className="border-b border-border/60">
                       <th className="px-3 py-2 text-start">اسم السجل</th>

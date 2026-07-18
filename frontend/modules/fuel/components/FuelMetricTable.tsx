@@ -90,7 +90,7 @@ export function FuelMetricTable({ metric, employees, dailyRows, year, month, sea
 
   return (
     <div className="overflow-x-auto relative scrollbar-thin pb-4">
-      <table className="w-full text-[11px] border-collapse" style={{ minWidth: `${daysInMonth * 50 + 220}px` }}>
+      <table className="dense-grid-table w-full" style={{ minWidth: `${daysInMonth * 50 + 220}px` }}>
         <thead className="sticky top-0 z-30">
           <tr className="bg-muted border-b-2 border-border/60">
             <th className="ta-th text-start font-medium sticky right-0 bg-muted z-30 min-w-[150px] border-l-2 border-border/50">

@@ -152,7 +152,7 @@ function TransactionTable(props: Readonly<TransactionTableProps>) {
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full text-sm min-w-[300px]">
+      <table className="data-table w-full min-w-[300px] text-sm">
       <thead>
         <tr className="bg-muted/30">
           <th className="ta-th text-[11px] w-36">المبلغ (ر.س)</th>

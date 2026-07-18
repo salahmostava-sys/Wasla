@@ -54,7 +54,7 @@ export default function ViolationTable({
   }
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[980px] text-sm">
+      <table className="data-table w-full min-w-[980px] text-sm">
         <thead className="bg-muted/40 border-b border-border">
           <tr>
             <th onClick={() => toggleVSort('employee_name')} className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground whitespace-nowrap cursor-pointer hover:text-foreground select-none">

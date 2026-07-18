@@ -157,7 +157,7 @@ export function PerformanceDetailedTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="data-table w-full text-sm">
           <thead>
             <tr className="border-t border-b border-border/50 bg-muted/20">
               {[

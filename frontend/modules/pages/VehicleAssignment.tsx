@@ -521,7 +521,7 @@ const VehicleAssignment = () => {
       {/* Table */}
       <div className="ta-table-wrap">
         <div className="overflow-x-auto">
-          <table ref={tableRef} className="w-full min-w-[800px]">
+          <table ref={tableRef} className="data-table w-full min-w-[800px]">
             <thead className="ta-thead">
               <tr>
                 <th className="ta-th">المركبة</th>

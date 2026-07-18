@@ -255,7 +255,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
 
       <div className="rounded-xl border border-border shadow-sm overflow-hidden bg-card">
         <div className="overflow-x-auto custom-sidebar-scroll pb-2">
-          <table className="w-full text-[13px] border-collapse" dir={isRTL ? "rtl" : "ltr"}>
+          <table className="dense-grid-table w-full" dir={isRTL ? "rtl" : "ltr"}>
             <thead>
               <tr>
                 <th className="sticky start-0 z-20 bg-muted/90 p-3 min-w-[160px] text-start border-b border-e border-border backdrop-blur shadow-[1px_0_0_hsl(var(--border))] text-foreground">

@@ -278,7 +278,7 @@ export function AddMaintenanceModal({ open, onOpenChange, vehicles, spareParts, 
 
             {rows.length > 0 && (
               <div className="border border-border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
+                <table className="data-table data-table-compact w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr>
                       <th className="text-right p-2.5 font-medium">القطعة</th>

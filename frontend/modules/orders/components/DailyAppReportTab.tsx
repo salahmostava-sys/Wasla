@@ -133,7 +133,7 @@ export const DailyAppReportTab = React.memo(() => {
         <div className="bg-card shadow-card border border-border/50 rounded-2xl overflow-hidden">
           <ScrollArea className="w-full">
             <div className="min-w-max p-1">
-              <table className="w-full text-right text-sm">
+              <table className="data-table w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/60 bg-muted/30">
                     <th className="p-3 font-semibold text-muted-foreground sticky right-0 bg-muted/95 z-10 w-48 shadow-[1px_0_0_0_hsl(var(--border))]">

@@ -169,7 +169,7 @@ export function InvoiceUploadModal({
                 </Button>
               </div>
               <div className="border border-border/60 rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
+                <table className="data-table data-table-compact w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr className="text-right">
                       <th className="p-2 font-semibold text-muted-foreground">اسم القطعة</th>

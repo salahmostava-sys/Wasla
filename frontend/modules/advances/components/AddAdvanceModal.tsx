@@ -581,7 +581,7 @@ export const TransactionsModal = ({ employeeId, employeeName, nationalId, totalD
             <p className="text-center text-muted-foreground py-8">لا توجد عمليات لهذا المندوب</p>
           ) : (
             <div className="overflow-x-auto rounded-xl border border-border/50">
-              <table className="w-full text-sm">
+              <table className="data-table data-table-compact w-full text-sm">
                 <thead>
                  <tr className="ta-thead">
                     <th className="ta-th w-10">#</th>

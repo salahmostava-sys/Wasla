@@ -87,7 +87,7 @@ function MegaSpreadsheetTable({
 
   return (
     <div className="overflow-x-auto relative scrollbar-thin pb-4">
-      <table className="w-full text-[11px] border-collapse" style={{ minWidth: `${daysInMonth * 120 + 200}px` }}>
+      <table className="dense-grid-table w-full" style={{ minWidth: `${daysInMonth * 120 + 200}px` }}>
         <thead className="sticky top-0 z-30">
           <tr className="bg-muted border-b border-border/40">
             <th rowSpan={2} className="ta-th text-start font-medium sticky right-0 bg-muted z-30 min-w-[150px] border-l-2 border-border/50">

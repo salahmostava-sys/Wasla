@@ -296,7 +296,7 @@ export function DashboardPlatformsTab(props: Readonly<{
           <p className="text-[11px] text-muted-foreground mt-1">اضغط على رأس العمود للترتيب</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-sm">
+          <table className="data-table w-full min-w-[800px] text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
                 <SortHeader label="المنصة" sortKey="appName" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />

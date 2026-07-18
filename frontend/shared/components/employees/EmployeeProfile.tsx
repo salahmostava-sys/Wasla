@@ -449,7 +449,7 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
                       </button>
                       {isExpanded && adv.advance_installments && adv.advance_installments.length > 0 && (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-xs">
+                          <table className="data-table data-table-compact w-full text-xs">
                             <thead>
                               <tr className="border-t border-border/30 bg-muted/10">
                                 <th className="ta-th p-2">الشهر</th>
@@ -533,7 +533,7 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
 
                   {/* Detail table */}
                   <div className="overflow-x-auto rounded-lg border border-border/40">
-                    <table className="w-full text-sm">
+                    <table className="data-table w-full text-sm">
                       <thead>
                         <tr className="ta-thead">
                           <th className="ta-th p-3">الشهر</th>
@@ -674,7 +674,7 @@ const EmployeeProfile = ({ employee, onBack, onEdit }: Readonly<Props>) => {
                           {/* Day breakdown */}
                           {isOpen && (
                             <div className="border-t border-border/30 overflow-x-auto">
-                              <table className="w-full text-xs">
+                              <table className="data-table data-table-compact w-full text-xs">
                                 <thead>
                                   <tr className="bg-muted/20">
                                     <th className="ta-th p-2.5">التاريخ</th>

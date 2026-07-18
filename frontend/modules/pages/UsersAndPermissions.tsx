@@ -684,7 +684,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
 
             <div className="rounded-2xl border bg-card overflow-hidden">
               <ScrollArea className="w-full">
-                <table className="w-full min-w-[820px] text-sm">
+                <table className="data-table w-full min-w-[820px] text-sm">
                   <thead className="bg-muted/40">
                     <tr>
                       <th className="ta-th text-start">{t('userName')}</th>
@@ -808,7 +808,7 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                   </div>
                 ) : (
                   <div className="rounded-lg border overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="data-table data-table-compact w-full text-sm">
                       <thead className="bg-muted/40">
                         <tr>
                           <th className="ta-th text-start w-[40%]">{t('page')}</th>
