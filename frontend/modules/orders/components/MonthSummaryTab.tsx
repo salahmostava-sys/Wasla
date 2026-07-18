@@ -9,18 +9,20 @@ import { monthLabel } from '@modules/orders/utils/dateMonth';
 import { shortName } from '@modules/orders/utils/text';
 import { MonthSummaryStats } from '@modules/orders/components/MonthSummaryStats';
 import { Button } from '@shared/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 export const MonthSummaryTab = React.memo(() => {
   const m = useMonthSummaryTab();
   const { apps: appColorsList } = useAppColors();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="inline-flex items-center gap-2 border border-border bg-card px-3 py-1.5 rounded-2xl">
           <TrendingUp size={14} className="text-primary" />
-          <span className="text-sm font-semibold text-foreground">ملخص الشهر</span>
+          <span className="text-sm font-semibold text-foreground">{t('monthSummary')}</span>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -30,7 +32,7 @@ export const MonthSummaryTab = React.memo(() => {
             onClick={() => navigate('/salaries')}
           >
             <Wallet size={13} />
-            احسب الرواتب
+            {t('calculatePayroll')}
           </Button>
           <OrdersMonthNavigator label={monthLabel(m.year, m.month)} onPrev={m.prevMonth} onNext={m.nextMonth} />
         </div>

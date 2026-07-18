@@ -3,11 +3,13 @@ import { usePagePresence } from '@shared/hooks/usePagePresence';
 import { useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/components/ui/card';
 import { User, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 
 export const ActiveUsersTab = React.memo(() => {
   const location = useLocation();
   const { onlineUsers } = usePagePresence('global', location.pathname);
+  const { t } = useTranslation();
 
   // Filter out users who are inactive or anonymous if needed, but onlineUsers handles uniqueness
   return (
@@ -15,17 +17,17 @@ export const ActiveUsersTab = React.memo(() => {
       <CardHeader>
         <CardTitle className="text-xl font-bold flex items-center gap-2">
           <User className="h-5 w-5 text-primary" />
-          المستخدمين النشطين
+          {t('activeUsers')}
         </CardTitle>
         <CardDescription>
-          عرض المستخدمين المتصلين بالنظام حالياً والصفحات التي يتصفحونها
+          {t('activeUsersDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {onlineUsers.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground flex flex-col items-center gap-2">
             <User className="h-8 w-8 opacity-20" />
-            <p>لا يوجد مستخدمين نشطين آخرين حالياً</p>
+            <p>{t('noOtherActiveUsers')}</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -46,7 +48,7 @@ export const ActiveUsersTab = React.memo(() => {
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3 shrink-0" />
-                    <span className="truncate" dir="ltr" title={user.currentPath || 'الصفحة الرئيسية'}>
+                    <span className="truncate" dir="ltr" title={user.currentPath || t('dashboardPage')}>
                       {user.currentPath || '/'}
                     </span>
                   </div>

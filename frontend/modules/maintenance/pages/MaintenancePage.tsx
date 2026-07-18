@@ -30,7 +30,7 @@ const MaintenancePage = () => {
   }
 
   if (!permissions.can_view) {
-    return <PageAccessDeniedState message="ليس لديك صلاحية الوصول لصفحة الصيانة" />;
+    return <PageAccessDeniedState message={t('maintenanceAccessDenied')} />;
   }
 
   return (

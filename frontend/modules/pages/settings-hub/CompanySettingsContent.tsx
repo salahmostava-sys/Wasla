@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { usePermissions } from '@shared/hooks/usePermissions';
+import { useTranslation } from 'react-i18next';
 
 const SectionHeader = ({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) => (
   <div className="flex items-center gap-3 pb-4 mb-5" style={{ borderBottom: '1px solid var(--ds-surface-container)' }}>
@@ -28,6 +29,7 @@ const SectionHeader = ({ icon, title, subtitle }: { icon: React.ReactNode; title
 
 export default function CompanySettingsContent() {
   const { isRTL } = useLanguage();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { enabled } = useAuthQueryGate();
@@ -73,10 +75,10 @@ export default function CompanySettingsContent() {
         if (data) setRecordId((data as { id: string }).id);
       }
       await queryClient.invalidateQueries({ queryKey: ['settings', 'trade-register'] });
-      toast({ title: 'تم الحفظ ✓', description: 'تم تحديث بيانات المنشأة' });
+      toast({ title: t('organizationSaved'), description: t('organizationUpdated') });
     } catch (err: unknown) {
       logError('[CompanySettings] save trade register failed', err);
-      toast({ title: 'خطأ', description: getErrorMessage(err), variant: 'destructive' });
+      toast({ title: t('organizationSaveError'), description: getErrorMessage(err), variant: 'destructive' });
     }
     setSaving(false);
   };
@@ -90,8 +92,8 @@ export default function CompanySettingsContent() {
   if (!permissions.can_view) return (
     <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
       <ShieldAlert size={40} className="text-destructive" />
-      <p className="text-lg font-semibold">غير مصرح بالوصول</p>
-      <p className="text-sm text-muted-foreground">ليس لديك صلاحية تعديل بيانات المنشأة</p>
+      <p className="text-lg font-semibold">{t('accessDenied')}</p>
+      <p className="text-sm text-muted-foreground">{t('organizationAccessDenied')}</p>
     </div>
   );
 
@@ -99,7 +101,7 @@ export default function CompanySettingsContent() {
     <QueryErrorRetry
       error={error}
       onRetry={() => refetch().catch(() => {})}
-      title="تعذر تحميل بيانات المنشأة"
+      title={t('organizationLoadError')}
     />
   );
 
@@ -107,29 +109,29 @@ export default function CompanySettingsContent() {
     <div className="space-y-6 max-w-2xl" dir={isRTL ? 'rtl' : 'ltr'}>
       <SectionHeader
         icon={<Building2 size={20} />}
-        title="بيانات المنشأة"
-        subtitle="المعلومات الأساسية التي تظهر في التقارير والفواتير"
+        title={t('organizationInfo')}
+        subtitle={t('organizationInfoSubtitle')}
       />
 
       {/* Names */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          اسم المؤسسة
+          {t('organizationName')}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <BaseInput label="اسم المؤسسة (بالعربية)" value={nameAr} onChange={e => setNameAr(e.target.value)} placeholder="شركة المنسق الرقمي" dir="rtl" />
-          <BaseInput label="اسم المؤسسة (بالإنجليزية)" value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder="Digital Coordinator Logistics" dir="ltr" />
+          <BaseInput label={t('organizationNameArabic')} value={nameAr} onChange={e => setNameAr(e.target.value)} placeholder={t('organizationArabicPlaceholder')} dir="rtl" />
+          <BaseInput label={t('organizationNameEnglish')} value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder={t('organizationEnglishPlaceholder')} dir="ltr" />
         </div>
       </div>
 
       {/* Registration Numbers */}
       <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          الأرقام الرسمية
+          {t('organizationOfficialNumbers')}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <BaseInput label="السجل التجاري" value={crNumber} onChange={e => setCrNumber(e.target.value)} placeholder="1010101010" dir="ltr" />
-          <BaseInput label="الرقم الضريبي" value={taxNumber} onChange={e => setTaxNumber(e.target.value)} placeholder="3000524140003" dir="ltr" />
+          <BaseInput label={t('commercialRegistration')} value={crNumber} onChange={e => setCrNumber(e.target.value)} placeholder="1010101010" dir="ltr" />
+          <BaseInput label={t('taxNumber')} value={taxNumber} onChange={e => setTaxNumber(e.target.value)} placeholder="3000524140003" dir="ltr" />
         </div>
       </div>
 
@@ -137,7 +139,7 @@ export default function CompanySettingsContent() {
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={saving} className="gap-2 min-w-36">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-          حفظ البيانات
+          {t('organizationSaveAction')}
         </Button>
       </div>
     </div>

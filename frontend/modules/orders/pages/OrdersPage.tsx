@@ -95,7 +95,7 @@ const OrdersPage = () => {
   }
 
   if (!permissions.can_view) {
-    return <PageAccessDeniedState message="ليس لديك صلاحية الوصول لصفحة الطلبات" dir={isRTL ? 'rtl' : 'ltr'} />;
+    return <PageAccessDeniedState message={t('ordersAccessDenied')} dir={isRTL ? 'rtl' : 'ltr'} />;
   }
 
   return (
