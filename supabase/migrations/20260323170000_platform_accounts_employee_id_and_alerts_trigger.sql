@@ -1,4 +1,4 @@
-﻿-- Link platform accounts to an employee (optional)
+-- Link platform accounts to an employee (optional)
 ALTER TABLE public.platform_accounts
   ADD COLUMN IF NOT EXISTS employee_id UUID REFERENCES public.employees(id) ON DELETE SET NULL;
 

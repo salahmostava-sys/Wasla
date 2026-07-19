@@ -1,4 +1,4 @@
-﻿-- Fix missing ON DELETE SET NULL for remaining auth.users references
+-- Fix missing ON DELETE SET NULL for remaining auth.users references
 -- that cause "Cannot delete user" errors due to foreign key constraints.
 
 -- â”€â”€ account_assignments.created_by â”€â”€

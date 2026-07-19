@@ -1,4 +1,4 @@
-﻿-- Fix Supabase Linter: security_definer_view
+-- Fix Supabase Linter: security_definer_view
 -- Set security_invoker = true so these views respect the querying user's RLS
 -- policies instead of the view creator's permissions.
 

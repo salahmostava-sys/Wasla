@@ -1,4 +1,4 @@
-﻿
+
 -- Create new enums
 CREATE TYPE public.city_enum AS ENUM ('makkah', 'jeddah');
 CREATE TYPE public.license_status_enum AS ENUM ('has_license', 'no_license', 'applied');
@@ -32,7 +32,7 @@ CREATE POLICY "HR/admin can upload employee documents"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'employee-documents'
-  AND (has_role(auth.uid(), _const_role_admin()) OR has_role(auth.uid(), _const_role_hr()))
+  AND (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'hr'))
 );
 
 DROP POLICY IF EXISTS "HR/admin can view employee documents" ON storage.objects;
@@ -40,7 +40,7 @@ CREATE POLICY "HR/admin can view employee documents"
 ON storage.objects FOR SELECT
 USING (
   bucket_id = 'employee-documents'
-  AND (has_role(auth.uid(), _const_role_admin()) OR has_role(auth.uid(), _const_role_hr()))
+  AND (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'hr'))
 );
 
 DROP POLICY IF EXISTS "HR/admin can delete employee documents" ON storage.objects;
@@ -48,7 +48,7 @@ CREATE POLICY "HR/admin can delete employee documents"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'employee-documents'
-  AND (has_role(auth.uid(), _const_role_admin()) OR has_role(auth.uid(), _const_role_hr()))
+  AND (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'hr'))
 );
 
 DROP POLICY IF EXISTS "HR/admin can update employee documents" ON storage.objects;
@@ -56,5 +56,5 @@ CREATE POLICY "HR/admin can update employee documents"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'employee-documents'
-  AND (has_role(auth.uid(), _const_role_admin()) OR has_role(auth.uid(), _const_role_hr()))
+  AND (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'hr'))
 );

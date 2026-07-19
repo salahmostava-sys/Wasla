@@ -1,4 +1,4 @@
-﻿-- 20260703000001_treasury_accounts.sql
+-- 20260703000001_treasury_accounts.sql
 -- Create Treasury (Ø§Ù„Ø®Ø²ÙŠÙ†Ø©) tracking system: Accounts, Categories, Transactions
 
 -- 1. treasury_accounts

@@ -1,4 +1,4 @@
-﻿-- Ensure employees remain visible/editable after full company_id removal.
+-- Ensure employees remain visible/editable after full company_id removal.
 -- Rebuild employees RLS policies explicitly in single-org mode.
 
 BEGIN;

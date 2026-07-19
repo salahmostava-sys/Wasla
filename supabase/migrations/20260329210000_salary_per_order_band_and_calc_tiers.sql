@@ -1,4 +1,4 @@
-﻿-- 1) Allow per_order_band tier type (Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙƒÙ„ÙŠ Ã— Ø³Ø¹Ø± Ø§Ù„Ø´Ø±ÙŠØØ© â€” Ø¨Ø¯ÙˆÙ† ØªØ±Ø§ÙƒÙ… Ø´Ø±Ø§Ø¦Ø).
+-- 1) Allow per_order_band tier type (Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙƒÙ„ÙŠ Ã— Ø³Ø¹Ø± Ø§Ù„Ø´Ø±ÙŠØØ© â€” Ø¨Ø¯ÙˆÙ† ØªØ±Ø§ÙƒÙ… Ø´Ø±Ø§Ø¦Ø).
 -- 2) Align calc_tier_salary with band model: 1â€“300Ã—3, 301â€“400Ã—4, 401â€“449Ã—5, 450â€“470 = 2500, >470 = 2500+(n-470)Ã—5
 
 BEGIN;
@@ -10,8 +10,8 @@ ALTER TABLE public.salary_scheme_tiers
   ADD CONSTRAINT salary_scheme_tiers_tier_type_check
   CHECK (tier_type IN (
     'total_multiplier',
-    _const_tier_fixed(),
-    _const_tier_incremental(),
+    'fixed_amount',
+    'base_plus_incremental',
     'per_order_band'
   ));
 

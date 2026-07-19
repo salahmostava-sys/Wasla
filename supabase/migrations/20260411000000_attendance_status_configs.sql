@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS public.attendance_status_configs (
+CREATE TABLE IF NOT EXISTS public.attendance_status_configs (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   name text NOT NULL,
   color text NOT NULL DEFAULT '#6366f1', /* NOSONAR */
@@ -16,5 +16,5 @@ DROP POLICY IF EXISTS "admin can manage configs" ON public.attendance_status_con
 CREATE POLICY "admin can manage configs"
   ON public.attendance_status_configs FOR ALL
   TO authenticated USING (
-    is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin())
+    is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin')
   );

@@ -1,4 +1,4 @@
-﻿
+
 -- Function to insert into audit_log
 CREATE OR REPLACE FUNCTION public.log_audit_event()
 RETURNS TRIGGER

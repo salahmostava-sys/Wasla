@@ -1,4 +1,4 @@
-﻿-- Fix preview_salary_for_month: shift threshold hours_worked >= 8 â†’ > 0
+-- Fix preview_salary_for_month: shift threshold hours_worked >= 8 â†’ > 0
 -- UI now uses present=1/absent=0 so >= 8 never matches.
 
 BEGIN;
@@ -47,7 +47,7 @@ BEGIN
   FOR v_emp IN
     SELECT e.id
     FROM public.employees e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
   LOOP
     v_total_orders := 0;
     v_total_shift_days := 0;
@@ -62,22 +62,22 @@ BEGIN
       v_app_orders := 0;
       v_app_shift_days := 0;
       v_app_earnings := 0;
-      v_calculation_method := _const_work_orders();
+      v_calculation_method := 'orders';
 
-      IF v_app.work_type = _const_work_orders() OR v_app.work_type IS NULL THEN
+      IF v_app.work_type = 'orders' OR v_app.work_type IS NULL THEN
         SELECT COALESCE(SUM(d.orders_count), 0)::INTEGER
         INTO v_app_orders
         FROM public.daily_orders AS d
         WHERE d.employee_id = v_emp.id
           AND d.app_id = v_app.id
           AND d.date BETWEEN v_start AND v_end
-          AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+          AND (d.status IS NULL OR d.status <> 'cancelled');
 
         v_total_orders := v_total_orders + v_app_orders;
         v_app_earnings := public.calc_tier_salary(v_app_orders);
 
-      ELSIF v_app.work_type = _const_work_shift() THEN
-        v_calculation_method := _const_work_shift();
+      ELSIF v_app.work_type = 'shift' THEN
+        v_calculation_method := 'shift';
 
         -- Count any day with hours_worked > 0 as present (was >= 8)
         SELECT COUNT(*)::INTEGER
@@ -103,13 +103,13 @@ BEGIN
           v_app_earnings := v_app_shift_days * 150;
         END IF;
 
-      ELSIF v_app.work_type = _const_work_hybrid() THEN
+      ELSIF v_app.work_type = 'hybrid' THEN
         SELECT * INTO v_hybrid_rule
         FROM public.app_hybrid_rules
         WHERE app_id = v_app.id;
 
         IF v_hybrid_rule IS NULL THEN
-          v_calculation_method := _const_calc_method_orders_fallback();
+          v_calculation_method := 'orders_fallback';
 
           SELECT COALESCE(SUM(d.orders_count), 0)::INTEGER
           INTO v_app_orders
@@ -117,7 +117,7 @@ BEGIN
           WHERE d.employee_id = v_emp.id
             AND d.app_id = v_app.id
             AND d.date BETWEEN v_start AND v_end
-            AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+            AND (d.status IS NULL OR d.status <> 'cancelled');
 
           v_total_orders := v_total_orders + v_app_orders;
           v_app_earnings := public.calc_tier_salary(v_app_orders);
@@ -142,7 +142,7 @@ BEGIN
               WHERE d.employee_id = v_emp.id
                 AND d.app_id = v_app.id
                 AND d.date = v_day.day_date
-                AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+                AND (d.status IS NULL OR d.status <> 'cancelled');
 
               v_total_orders := v_total_orders + v_app_orders;
 
@@ -155,11 +155,11 @@ BEGIN
           v_total_shift_days := v_total_shift_days + v_app_shift_days;
 
           IF v_app_shift_days > 0 AND v_app_orders > 0 THEN
-            v_calculation_method := _const_calc_method_mixed();
+            v_calculation_method := 'mixed';
           ELSIF v_app_shift_days > 0 THEN
-            v_calculation_method := _const_work_shift();
+            v_calculation_method := 'shift';
           ELSIF v_app_orders > 0 THEN
-            v_calculation_method := _const_calc_method_orders_fallback();
+            v_calculation_method := 'orders_fallback';
           ELSE
             v_calculation_method := 'none';
           END IF;
@@ -172,7 +172,7 @@ BEGIN
         v_platform_breakdown := v_platform_breakdown || jsonb_build_object(
           'app_id', v_app.id,
           'app_name', v_app.name,
-          'work_type', COALESCE(v_app.work_type, _const_work_orders()),
+          'work_type', COALESCE(v_app.work_type, 'orders'),
           'calculation_method', v_calculation_method,
           'orders_count', v_app_orders,
           'shift_days', v_app_shift_days,
@@ -186,7 +186,7 @@ BEGIN
     FROM public.external_deductions AS ed
     WHERE ed.employee_id = v_emp.id
       AND ed.apply_month = p_month_year
-      AND ed.approval_status = _const_approval_approved();
+      AND ed.approval_status = 'approved';
 
     SELECT COALESCE(SUM(ai.amount), 0)
     INTO v_advance_deduction
@@ -194,7 +194,7 @@ BEGIN
     JOIN public.advance_installments AS ai ON ai.advance_id = ad.id
     WHERE ad.employee_id = v_emp.id
       AND ai.month_year = p_month_year
-      AND ai.status IN (_const_installment_pending(), _const_installment_deferred());
+      AND ai.status IN ('pending', 'deferred');
 
     v_net := GREATEST(
       v_base_salary

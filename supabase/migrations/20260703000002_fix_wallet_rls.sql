@@ -1,4 +1,4 @@
-﻿-- Fix RLS security on employee_wallet_transactions
+-- Fix RLS security on employee_wallet_transactions
 -- Replace the overly-permissive auth.role() = 'authenticated' OR ... pattern
 -- with strict role-based access: only admin/finance with active user status
 

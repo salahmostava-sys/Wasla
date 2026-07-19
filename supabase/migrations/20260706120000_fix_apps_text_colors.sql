@@ -1,4 +1,4 @@
-﻿-- Fix text_color for HungerStation to improve readability on yellow background
+-- Fix text_color for HungerStation to improve readability on yellow background
 UPDATE public.apps
 SET text_color = '#000000'
 WHERE (name ILIKE '%hunger%' OR name ILIKE '%Ù‡Ù†Ù‚Ø±%') AND text_color = '#ffffff'; /* NOSONAR */

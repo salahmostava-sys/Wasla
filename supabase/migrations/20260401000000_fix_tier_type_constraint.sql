@@ -1,4 +1,4 @@
-﻿-- Fix: Add per_order_band tier type support to salary_scheme_tiers constraint
+-- Fix: Add per_order_band tier type support to salary_scheme_tiers constraint
 -- This fixes the error when saving schemes with 'per_order_band' tier type
 
 ALTER TABLE public.salary_scheme_tiers
@@ -8,7 +8,7 @@ ALTER TABLE public.salary_scheme_tiers
   ADD CONSTRAINT salary_scheme_tiers_tier_type_check
   CHECK (tier_type IN (
     'total_multiplier',
-    _const_tier_fixed(),
-    _const_tier_incremental(),
+    'fixed_amount',
+    'base_plus_incremental',
     'per_order_band'
   ));

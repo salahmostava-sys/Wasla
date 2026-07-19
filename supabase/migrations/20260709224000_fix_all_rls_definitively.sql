@@ -1,4 +1,4 @@
-﻿-- Definitive fix for CUD policies for employees, employee_apps, and employee_tiers
+-- Definitive fix for CUD policies for employees, employee_apps, and employee_tiers
 -- This ensures operations role has full access, AND user_permissions works correctly.
 -- We use is_active_user instead of is_internal_user to prevent failures if user_roles is empty.
 

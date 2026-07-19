@@ -1,4 +1,4 @@
-﻿-- Restore salary RPC functions after single-org company_id removal.
+-- Restore salary RPC functions after single-org company_id removal.
 -- These definitions remove company_id dependencies that were left from tenant-era functions.
 
 DROP FUNCTION IF EXISTS public.calculate_salary_for_employee_month(uuid, text, text, numeric, text) CASCADE;
@@ -8,7 +8,7 @@ DROP FUNCTION IF EXISTS public.preview_salary_for_month(text) CASCADE;
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_employee_month(
   p_employee_id uuid,
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash()::text,
+  p_payment_method text DEFAULT 'cash'::text,
   p_manual_deduction numeric DEFAULT 0,
   p_manual_deduction_note text DEFAULT NULL::text
 )
@@ -57,7 +57,7 @@ BEGIN
   FROM public.daily_orders d
   WHERE d.employee_id = p_employee_id
     AND d.date BETWEEN v_start AND v_end
-    AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+    AND (d.status IS NULL OR d.status <> 'cancelled');
 
   SELECT COALESCE(COUNT(*), 0)::INTEGER
     INTO v_attendance_days
@@ -73,7 +73,7 @@ BEGIN
   FROM public.external_deductions ed
   WHERE ed.employee_id = p_employee_id
     AND ed.apply_month = p_month_year
-    AND ed.approval_status = _const_approval_approved();
+    AND ed.approval_status = 'approved';
 
   SELECT COALESCE(SUM(ai.amount), 0)
     INTO v_advance_deduction
@@ -81,7 +81,7 @@ BEGIN
   JOIN public.advance_installments ai ON ai.advance_id = ad.id
   WHERE ad.employee_id = p_employee_id
     AND ai.month_year = p_month_year
-    AND ai.status IN (_const_installment_pending(), _const_installment_deferred());
+    AND ai.status IN ('pending', 'deferred');
 
   v_attendance_deduction := 0;
   v_net := GREATEST(
@@ -118,8 +118,8 @@ BEGIN
     v_manual_deduction,
     p_manual_deduction_note,
     v_net,
-    COALESCE(NULLIF(TRIM(p_payment_method), ''), _const_payment_cash()),
-    _const_calc_calculated(),
+    COALESCE(NULLIF(TRIM(p_payment_method), ''), 'cash'),
+    'calculated',
     'engine_v3',
     false
   )
@@ -167,7 +167,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_month(
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash()::text
+  p_payment_method text DEFAULT 'cash'::text
 )
 RETURNS TABLE(
   employee_id uuid,
@@ -192,7 +192,7 @@ BEGIN
   FOR r IN
     SELECT e.id
     FROM public.employees e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
     ORDER BY e.name
   LOOP
     RETURN QUERY
@@ -234,7 +234,7 @@ BEGIN
   WITH active_emp AS (
     SELECT e.id
     FROM public.employees e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
   ),
   orders_cte AS (
     SELECT
@@ -243,7 +243,7 @@ BEGIN
     FROM public.daily_orders d
     JOIN active_emp ae ON ae.id = d.employee_id
     WHERE d.date BETWEEN v_start AND v_end
-      AND (d.status IS NULL OR d.status <> _const_order_cancelled())
+      AND (d.status IS NULL OR d.status <> 'cancelled')
     GROUP BY d.employee_id
   ),
   ext_cte AS (
@@ -253,7 +253,7 @@ BEGIN
     FROM public.external_deductions ed
     JOIN active_emp ae ON ae.id = ed.employee_id
     WHERE ed.apply_month = p_month_year
-      AND ed.approval_status = _const_approval_approved()
+      AND ed.approval_status = 'approved'
     GROUP BY ed.employee_id
   ),
   adv_cte AS (
@@ -264,7 +264,7 @@ BEGIN
     JOIN public.advance_installments ai ON ai.advance_id = ad.id
     JOIN active_emp ae ON ae.id = ad.employee_id
     WHERE ai.month_year = p_month_year
-      AND ai.status IN (_const_installment_pending(), _const_installment_deferred())
+      AND ai.status IN ('pending', 'deferred')
     GROUP BY ad.employee_id
   )
   SELECT

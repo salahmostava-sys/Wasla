@@ -1,4 +1,4 @@
-﻿-- Shared rate-limit guard for Edge Functions.
+-- Shared rate-limit guard for Edge Functions.
 CREATE TABLE IF NOT EXISTS public.edge_rate_limits (
   key text PRIMARY KEY,
   window_start timestamptz NOT NULL,

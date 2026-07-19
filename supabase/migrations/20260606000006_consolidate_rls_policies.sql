@@ -1,4 +1,4 @@
-﻿-- Migration to consolidate multiple permissive RLS policies
+-- Migration to consolidate multiple permissive RLS policies
 
 -- Consolidating 2 policies for public.advance_installments.SELECT
 DROP POLICY IF EXISTS "advance_installments_select_policy" ON "public"."advance_installments";

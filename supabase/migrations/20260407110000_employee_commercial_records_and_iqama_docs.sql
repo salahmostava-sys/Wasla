@@ -1,4 +1,4 @@
-﻿BEGIN;
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS public.commercial_records (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -155,7 +155,7 @@ BEGIN
     LEFT JOIN public.roles r ON r.id = ur.role_id
     WHERE ur.user_id = auth.uid()
       AND (
-        ur.role = _const_role_admin()
+        ur.role = 'admin'
         OR lower(COALESCE(r.title, '')) = 'admin'
       )
   ) THEN
@@ -183,33 +183,33 @@ BEGIN
     FROM public.user_roles ur
     WHERE ur.user_id = auth.uid()
       AND (
-        (ur.role = _const_role_hr() AND (
+        (ur.role = 'hr' AND (
           (p_resource = 'employees'  AND p_action IN ('view','write')) OR
-          (p_resource = _const_work_orders()     AND p_action IN ('view','write')) OR
+          (p_resource = 'orders'     AND p_action IN ('view','write')) OR
           (p_resource = 'attendance' AND p_action IN ('view','write')) OR /* NOSONAR */
           (p_resource = 'salary'     AND p_action = 'view') OR /* NOSONAR */
           (p_resource = 'roles'      AND p_action = 'view') OR
           (p_resource = 'financials' AND p_action = 'view') /* NOSONAR */
         ))
         OR
-        (ur.role = _const_role_finance() AND (
+        (ur.role = 'finance' AND (
           (p_resource = 'employees'  AND p_action = 'view') OR
-          (p_resource = _const_work_orders()     AND p_action = 'view') OR
+          (p_resource = 'orders'     AND p_action = 'view') OR
           (p_resource = 'attendance' AND p_action = 'view') OR /* NOSONAR */
           (p_resource = 'salary'     AND p_action IN ('view','write','approve')) OR /* NOSONAR */
           (p_resource = 'financials' AND p_action IN ('view','write','approve')) OR /* NOSONAR */
           (p_resource = 'roles'      AND p_action = 'view')
         ))
         OR
-        (ur.role = _const_role_operations() AND (
+        (ur.role = 'operations' AND (
           (p_resource = 'employees'  AND p_action IN ('view','write')) OR
-          (p_resource = _const_work_orders()     AND p_action IN ('view','write')) OR
+          (p_resource = 'orders'     AND p_action IN ('view','write')) OR
           (p_resource = 'attendance' AND p_action IN ('view','write')) OR /* NOSONAR */
           (p_resource = 'salary'     AND p_action = 'view') OR /* NOSONAR */
           (p_resource = 'financials' AND p_action = 'view') /* NOSONAR */
         ))
         OR
-        (ur.role = _const_role_viewer() AND p_action = 'view')
+        (ur.role = 'viewer' AND p_action = 'view')
       )
   ) THEN
     RETURN true;

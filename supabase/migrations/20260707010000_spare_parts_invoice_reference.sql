@@ -1,4 +1,4 @@
-﻿-- Track which invoice a spare-parts purchase came from, and allow attaching
+-- Track which invoice a spare-parts purchase came from, and allow attaching
 -- a scan/photo of the invoice itself so reports can reference the source
 -- document (Ø±Ù‚Ù… Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØªØ§Ø±ÙŠØ® Ø§Ù„ÙØ§ØªÙˆØ±Ø© / ØµÙˆØ±Ø© Ø§Ù„ÙØ§ØªÙˆØ±Ø©).
 

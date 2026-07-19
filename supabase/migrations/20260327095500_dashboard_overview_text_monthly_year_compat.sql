@@ -1,4 +1,4 @@
-﻿-- Compatibility overloads for backend calls using:
+-- Compatibility overloads for backend calls using:
 -- dashboard_overview(p_cip, p_monthly_year, p_today)
 -- and dashboard_overview_rpc(p_cip, p_monthly_year, p_today).
 

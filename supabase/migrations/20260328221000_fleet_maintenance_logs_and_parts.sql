@@ -1,4 +1,4 @@
-﻿-- Replace legacy maintenance_logs with fleet maintenance + line-item parts. -- NOSONAR
+-- Replace legacy maintenance_logs with fleet maintenance + line-item parts. -- NOSONAR
 -- Preserves old rows in maintenance_logs_legacy_pre_fleet. -- NOSONAR
 
 BEGIN;
@@ -78,14 +78,14 @@ CREATE POLICY "Operations/admin can manage maintenance_logs" -- NOSONAR
   TO authenticated
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -101,14 +101,14 @@ CREATE POLICY "Operations/admin can manage maintenance_parts" -- NOSONAR
   TO authenticated
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 

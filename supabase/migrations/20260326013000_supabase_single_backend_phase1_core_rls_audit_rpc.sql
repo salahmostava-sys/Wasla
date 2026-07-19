@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- PHASE 1: Supabase-only backend consolidation (core DB layer)
 -- - Helper functions: is_internal_user, has_permission
 -- - Explicit RLS policies for core tables (no global dynamic loops)
@@ -53,8 +53,8 @@ BEGIN
     LEFT JOIN public.roles r ON r.id = ur.role_id
     WHERE ur.user_id = auth.uid()
       AND (
-        ur.role = _const_role_admin()
-        OR lower(COALESCE(r.title, '')) = _const_role_admin()::text
+        ur.role = 'admin'
+        OR lower(COALESCE(r.title, '')) = 'admin'::text
       )
   ) THEN
     RETURN true;
@@ -84,9 +84,9 @@ BEGIN
     WHERE ur.user_id = auth.uid()
       AND (
         -- HR
-        (ur.role = _const_role_hr() AND (
+        (ur.role = 'hr' AND (
           (p_resource = 'employees' /* NOSONAR */  AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
-          (p_resource = _const_work_orders()     AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
+          (p_resource = 'orders'     AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
           (p_resource = 'attendance' /* NOSONAR */ AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
           (p_resource = 'salary' /* NOSONAR */     AND p_action = 'view' /* NOSONAR */) OR
           (p_resource = 'roles' /* NOSONAR */      AND p_action = 'view' /* NOSONAR */) OR
@@ -94,9 +94,9 @@ BEGIN
         ))
         OR
         -- Finance
-        (ur.role = _const_role_finance() AND (
+        (ur.role = 'finance' AND (
           (p_resource = 'employees' /* NOSONAR */  AND p_action = 'view' /* NOSONAR */) OR
-          (p_resource = _const_work_orders()     AND p_action = 'view' /* NOSONAR */) OR
+          (p_resource = 'orders'     AND p_action = 'view' /* NOSONAR */) OR
           (p_resource = 'attendance' /* NOSONAR */ AND p_action = 'view' /* NOSONAR */) OR
           (p_resource = 'salary' /* NOSONAR */     AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */,'approve')) OR
           (p_resource = 'financials' /* NOSONAR */ AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */,'approve')) OR
@@ -104,16 +104,16 @@ BEGIN
         ))
         OR
         -- Operations
-        (ur.role = _const_role_operations() AND (
+        (ur.role = 'operations' AND (
           (p_resource = 'employees' /* NOSONAR */  AND p_action = 'view' /* NOSONAR */) OR
-          (p_resource = _const_work_orders()     AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
+          (p_resource = 'orders'     AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
           (p_resource = 'attendance' /* NOSONAR */ AND p_action IN ('view' /* NOSONAR */,'write' /* NOSONAR */)) OR
           (p_resource = 'salary' /* NOSONAR */     AND p_action = 'view' /* NOSONAR */) OR
           (p_resource = 'financials' /* NOSONAR */ AND p_action = 'view' /* NOSONAR */)
         ))
         OR
         -- Viewer
-        (ur.role = _const_role_viewer() AND p_action = 'view' /* NOSONAR */)
+        (ur.role = 'viewer' AND p_action = 'view' /* NOSONAR */)
       )
   ) THEN
     RETURN true;
@@ -147,19 +147,19 @@ UPDATE public.roles
 SET permissions = jsonb_build_object /* NOSONAR */( -- NOSONAR
   '*', jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true, 'approve', true), -- NOSONAR
   'employees' /* NOSONAR */,  jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true), -- NOSONAR
-  _const_work_orders(),     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true), -- NOSONAR
+  'orders',     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true), -- NOSONAR
   'attendance' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true), -- NOSONAR
   'salary' /* NOSONAR */,     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'approve', true), -- NOSONAR
   'financials' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true, 'approve', true), -- NOSONAR
   'roles' /* NOSONAR */,      jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', true), -- NOSONAR
   'audit',      jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true) -- NOSONAR
 )
-WHERE title = _const_role_admin()::text;
+WHERE title = 'admin'::text;
 
 UPDATE public.roles
 SET permissions = jsonb_build_object /* NOSONAR */( -- NOSONAR
   'employees' /* NOSONAR */,  jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
-  _const_work_orders(),     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
+  'orders',     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
   'attendance' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
   'salary' /* NOSONAR */,     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'approve', false), -- NOSONAR
   'financials' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false, 'approve', false), -- NOSONAR
@@ -171,7 +171,7 @@ WHERE title = 'hr' /* NOSONAR */;
 UPDATE public.roles
 SET permissions = jsonb_build_object /* NOSONAR */( -- NOSONAR
   'employees' /* NOSONAR */,  jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
-  _const_work_orders(),     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
+  'orders',     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
   'attendance' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
   'salary' /* NOSONAR */,     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'approve', true), -- NOSONAR
   'financials' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false, 'approve', true), -- NOSONAR
@@ -183,7 +183,7 @@ WHERE title IN ('finance' /* NOSONAR */, 'accountant' /* NOSONAR */);
 UPDATE public.roles
 SET permissions = jsonb_build_object /* NOSONAR */( -- NOSONAR
   'employees' /* NOSONAR */,  jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
-  _const_work_orders(),     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
+  'orders',     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
   'attendance' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, true, 'delete', false), -- NOSONAR
   'salary' /* NOSONAR */,     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'approve', false), -- NOSONAR
   'financials' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false, 'approve', false), -- NOSONAR
@@ -195,14 +195,14 @@ WHERE title = 'operations' /* NOSONAR */;
 UPDATE public.roles
 SET permissions = jsonb_build_object /* NOSONAR */( -- NOSONAR
   'employees' /* NOSONAR */,  jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
-  _const_work_orders(),     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
+  'orders',     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
   'attendance' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
   'salary' /* NOSONAR */,     jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'approve', false), -- NOSONAR
   'financials' /* NOSONAR */, jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, true, 'write' /* NOSONAR */, false, 'delete', false, 'approve', false), -- NOSONAR
   'roles' /* NOSONAR */,      jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, false, 'write' /* NOSONAR */, false, 'delete', false), -- NOSONAR
   'audit',      jsonb_build_object /* NOSONAR */('view' /* NOSONAR */, false, 'write' /* NOSONAR */, false) -- NOSONAR
 )
-WHERE title = _const_role_viewer()::text;
+WHERE title = 'viewer'::text;
 
 -- --------------------------------------------------------------------------
 -- 3) Explicit RLS (core tables only, no branch/company row isolation)
@@ -313,17 +313,17 @@ DROP POLICY IF EXISTS daily_orders_delete_policy ON public.daily_orders;
 
 CREATE POLICY daily_orders_select_policy
   ON public.daily_orders FOR SELECT TO authenticated
-  USING (public.is_internal_user() AND public.has_permission(_const_work_orders(), 'view' /* NOSONAR */));
+  USING (public.is_internal_user() AND public.has_permission('orders', 'view' /* NOSONAR */));
 CREATE POLICY daily_orders_insert_policy
   ON public.daily_orders FOR INSERT TO authenticated
-  WITH CHECK (public.is_internal_user() AND public.has_permission(_const_work_orders(), 'write' /* NOSONAR */));
+  WITH CHECK (public.is_internal_user() AND public.has_permission('orders', 'write' /* NOSONAR */));
 CREATE POLICY daily_orders_update_policy
   ON public.daily_orders FOR UPDATE TO authenticated
-  USING (public.is_internal_user() AND public.has_permission(_const_work_orders(), 'write' /* NOSONAR */))
-  WITH CHECK (public.is_internal_user() AND public.has_permission(_const_work_orders(), 'write' /* NOSONAR */));
+  USING (public.is_internal_user() AND public.has_permission('orders', 'write' /* NOSONAR */))
+  WITH CHECK (public.is_internal_user() AND public.has_permission('orders', 'write' /* NOSONAR */));
 CREATE POLICY daily_orders_delete_policy
   ON public.daily_orders FOR DELETE TO authenticated
-  USING (public.is_internal_user() AND public.has_permission(_const_work_orders(), 'delete'));
+  USING (public.is_internal_user() AND public.has_permission('orders', 'delete'));
 
 -- attendance
 DROP POLICY IF EXISTS "Authenticated can view attendance" ON public.attendance;
@@ -748,7 +748,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.calculate_salary(
   p_employee_id uuid,
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash(),
+  p_payment_method text DEFAULT 'cash',
   p_manual_deduction numeric DEFAULT 0,
   p_manual_deduction_note text DEFAULT NULL
 )

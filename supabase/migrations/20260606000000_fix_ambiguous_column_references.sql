@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: Ambiguous column references in salary functions
 --
 -- Root causes identified by supabase db lint:

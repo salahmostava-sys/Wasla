@@ -1,4 +1,4 @@
-﻿-- Backward compatibility for older dashboard RPC call signatures.
+-- Backward compatibility for older dashboard RPC call signatures.
 -- Some deployed clients still call month/year argument variants.
 
 CREATE OR REPLACE FUNCTION public.dashboard_overview_rpc(

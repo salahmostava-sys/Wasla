@@ -1,4 +1,4 @@
-﻿-- Create salary_slip_templates table
+-- Create salary_slip_templates table
 CREATE TABLE IF NOT EXISTS public.salary_slip_templates (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,

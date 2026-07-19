@@ -1,4 +1,4 @@
-﻿-- Fix preview_salary_for_month and calculate_salary_for_employee_month 
+-- Fix preview_salary_for_month and calculate_salary_for_employee_month 
 -- to process all apps (even those without scheme_id) and use calculate_order_salary_for_app
 -- so that it correctly falls back to pricing_rules if scheme has no tiers or app has no scheme.
 

@@ -1,4 +1,4 @@
-﻿-- Fix: fn_handle_employee_sponsorship_alerts queries cr.cr_number
+-- Fix: fn_handle_employee_sponsorship_alerts queries cr.cr_number
 -- from commercial_records table, but that column doesn't exist.
 -- commercial_records only has (id, name). cr_number is in trade_registers.
 -- Fix: remove cr_number references since commercial_records has no such column.

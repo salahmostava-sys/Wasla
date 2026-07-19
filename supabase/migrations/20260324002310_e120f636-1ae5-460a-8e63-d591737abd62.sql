@@ -1,4 +1,4 @@
-﻿
+
 -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- 1. platform_accounts
 -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.platform_accounts (
   account_id_on_platform  TEXT,
   iqama_number            TEXT,
   iqama_expiry_date       DATE,
-  status                  TEXT        NOT NULL DEFAULT _const_employee_active() CHECK (status IN (_const_employee_active(), 'inactive')),
+  status                  TEXT        NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   notes                   TEXT,
   created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()

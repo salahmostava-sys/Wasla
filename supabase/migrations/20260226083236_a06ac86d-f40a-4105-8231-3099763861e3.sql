@@ -1,25 +1,25 @@
-﻿
+
 -- ============================================================
 -- ENUMS
 -- ============================================================
 CREATE TYPE public.app_role AS ENUM ('admin', 'hr', 'finance', 'operations', 'viewer'); -- NOSONAR
-CREATE TYPE public.salary_type AS ENUM (_const_work_shift(), _const_work_orders());
-CREATE TYPE public.employee_status AS ENUM (_const_employee_active(), 'inactive', 'ended');
+CREATE TYPE public.salary_type AS ENUM ('shift', 'orders');
+CREATE TYPE public.employee_status AS ENUM ('active', 'inactive', 'ended');
 CREATE TYPE public.attendance_status AS ENUM ('present', 'absent', 'leave', 'sick', 'late');
 CREATE TYPE public.vehicle_type AS ENUM ('motorcycle', 'car');
-CREATE TYPE public.vehicle_status AS ENUM (_const_employee_active(), 'maintenance', 'inactive');
-CREATE TYPE public.advance_status AS ENUM (_const_employee_active(), 'completed', 'paused');
-CREATE TYPE public.installment_status AS ENUM (_const_installment_pending(), 'deducted', _const_installment_deferred());
+CREATE TYPE public.vehicle_status AS ENUM ('active', 'maintenance', 'inactive');
+CREATE TYPE public.advance_status AS ENUM ('active', 'completed', 'paused');
+CREATE TYPE public.installment_status AS ENUM ('pending', 'deducted', 'deferred');
 CREATE TYPE public.deduction_type AS ENUM ('fine', 'return', 'delay', 'accident', 'other');
-CREATE TYPE public.approval_status AS ENUM (_const_installment_pending(), _const_approval_approved(), 'rejected');
+CREATE TYPE public.approval_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE public.maintenance_type AS ENUM ('routine', 'breakdown', 'accident');
-CREATE TYPE public.scheme_status AS ENUM (_const_employee_active(), 'archived');
+CREATE TYPE public.scheme_status AS ENUM ('active', 'archived');
 
-CREATE OR REPLACE FUNCTION _const_role_admin() RETURNS public.app_role AS $$ BEGIN RETURN _const_role_admin(); END; $$ LANGUAGE plpgsql IMMUTABLE;
-CREATE OR REPLACE FUNCTION _const_role_hr() RETURNS public.app_role AS $$ BEGIN RETURN _const_role_hr(); END; $$ LANGUAGE plpgsql IMMUTABLE;
-CREATE OR REPLACE FUNCTION _const_role_finance() RETURNS public.app_role AS $$ BEGIN RETURN _const_role_finance(); END; $$ LANGUAGE plpgsql IMMUTABLE;
-CREATE OR REPLACE FUNCTION _const_role_operations() RETURNS public.app_role AS $$ BEGIN RETURN _const_role_operations(); END; $$ LANGUAGE plpgsql IMMUTABLE;
-CREATE OR REPLACE FUNCTION _const_role_viewer() RETURNS public.app_role AS $$ BEGIN RETURN _const_role_viewer(); END; $$ LANGUAGE plpgsql IMMUTABLE;
+CREATE OR REPLACE FUNCTION _const_role_admin() RETURNS public.app_role AS $$ BEGIN RETURN 'admin'; END; $$ LANGUAGE plpgsql IMMUTABLE;
+CREATE OR REPLACE FUNCTION _const_role_hr() RETURNS public.app_role AS $$ BEGIN RETURN 'hr'; END; $$ LANGUAGE plpgsql IMMUTABLE;
+CREATE OR REPLACE FUNCTION _const_role_finance() RETURNS public.app_role AS $$ BEGIN RETURN 'finance'; END; $$ LANGUAGE plpgsql IMMUTABLE;
+CREATE OR REPLACE FUNCTION _const_role_operations() RETURNS public.app_role AS $$ BEGIN RETURN 'operations'; END; $$ LANGUAGE plpgsql IMMUTABLE;
+CREATE OR REPLACE FUNCTION _const_role_viewer() RETURNS public.app_role AS $$ BEGIN RETURN 'viewer'; END; $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- ============================================================
 -- PROFILES (linked to auth.users)
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS public.salary_schemes (
   name_en TEXT,
   target_orders INT,
   target_bonus NUMERIC(10,2),
-  status public.scheme_status NOT NULL DEFAULT _const_employee_active(),
+  status public.scheme_status NOT NULL DEFAULT 'active',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -147,11 +147,11 @@ CREATE TABLE IF NOT EXISTS public.employees (
   license_has BOOLEAN NOT NULL DEFAULT false,
   license_expiry DATE,
   email TEXT,
-  salary_type public.salary_type NOT NULL DEFAULT _const_work_orders(),
+  salary_type public.salary_type NOT NULL DEFAULT 'orders',
   base_salary NUMERIC(10,2) NOT NULL DEFAULT 0,
   allowances JSONB DEFAULT '{}',
   trade_register_id UUID REFERENCES public.trade_registers(id),
-  status public.employee_status NOT NULL DEFAULT _const_employee_active(),
+  status public.employee_status NOT NULL DEFAULT 'active',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS public.employee_apps (
   employee_id UUID NOT NULL REFERENCES public.employees(id) ON DELETE CASCADE,
   app_id UUID NOT NULL REFERENCES public.apps(id),
   username TEXT,
-  status TEXT NOT NULL DEFAULT _const_employee_active(),
+  status TEXT NOT NULL DEFAULT 'active',
   joined_date DATE,
   UNIQUE(employee_id, app_id)
 );
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS public.vehicles (
   year INT,
   insurance_expiry DATE,
   registration_expiry DATE,
-  status public.vehicle_status NOT NULL DEFAULT _const_employee_active(),
+  status public.vehicle_status NOT NULL DEFAULT 'active',
   notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS public.advances (
   monthly_amount NUMERIC(10,2) NOT NULL,
   first_deduction_month TEXT NOT NULL,
   note TEXT,
-  status public.advance_status NOT NULL DEFAULT _const_employee_active(),
+  status public.advance_status NOT NULL DEFAULT 'active',
   approved_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS public.advance_installments (
   advance_id UUID NOT NULL REFERENCES public.advances(id) ON DELETE CASCADE,
   month_year TEXT NOT NULL,
   amount NUMERIC(10,2) NOT NULL,
-  status public.installment_status NOT NULL DEFAULT _const_installment_pending(),
+  status public.installment_status NOT NULL DEFAULT 'pending',
   deducted_at TIMESTAMPTZ
 );
 ALTER TABLE public.advance_installments ENABLE ROW LEVEL SECURITY;
@@ -298,7 +298,7 @@ CREATE TABLE IF NOT EXISTS public.external_deductions (
   amount NUMERIC(10,2) NOT NULL,
   incident_date DATE,
   apply_month TEXT NOT NULL,
-  approval_status public.approval_status NOT NULL DEFAULT _const_installment_pending(),
+  approval_status public.approval_status NOT NULL DEFAULT 'pending',
   note TEXT,
   approved_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()

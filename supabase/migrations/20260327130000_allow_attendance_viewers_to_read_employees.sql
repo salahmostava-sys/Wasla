@@ -1,4 +1,4 @@
-﻿-- Fix: Attendance page needs active employees list.
+-- Fix: Attendance page needs active employees list.
 -- Some roles have attendance:view without employees:view, causing empty riders.
 
 BEGIN;

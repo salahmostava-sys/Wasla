@@ -1,4 +1,4 @@
-﻿BEGIN;
+BEGIN;
 
 -- Employee targets (monthly + daily)
 CREATE TABLE IF NOT EXISTS public.employee_targets (
@@ -42,19 +42,19 @@ CREATE POLICY employee_targets_manage_policy
   USING (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
     )
   );
 
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS public.order_import_batches (
     CHECK (source_type IN ('manual', 'excel', 'api')),
   file_name TEXT,
   target_app_id UUID REFERENCES public.apps(id) ON DELETE SET NULL,
-  status TEXT NOT NULL DEFAULT _const_installment_pending()
-    CHECK (status IN (_const_installment_pending(), 'completed', 'failed')),
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'completed', 'failed')),
   total_rows INTEGER NOT NULL DEFAULT 0 CHECK (total_rows >= 0),
   imported_rows INTEGER NOT NULL DEFAULT 0 CHECK (imported_rows >= 0),
   skipped_rows INTEGER NOT NULL DEFAULT 0 CHECK (skipped_rows >= 0),
@@ -107,10 +107,10 @@ CREATE POLICY order_import_batches_select_policy
   USING (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
     )
   );
 
@@ -121,19 +121,19 @@ CREATE POLICY order_import_batches_manage_policy
   USING (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
     )
   );
 
@@ -178,8 +178,8 @@ CREATE POLICY salary_month_snapshots_select_policy
   USING (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'finance')
     )
   );
 
@@ -190,15 +190,15 @@ CREATE POLICY salary_month_snapshots_manage_policy
   USING (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'finance')
     )
   );
 
@@ -222,7 +222,7 @@ JOIN public.employees AS e
 JOIN public.apps AS a
   ON a.id = d.app_id
 WHERE d.orders_count > 0
-  AND (d.status IS NULL OR d.status <> _const_order_cancelled())
+  AND (d.status IS NULL OR d.status <> 'cancelled')
 GROUP BY
   d.employee_id,
   e.name,
@@ -249,7 +249,7 @@ SELECT
         'app_id', p.app_id,
         'app_name', p.app_name,
         'brand_color', p.brand_color,
-        _const_work_orders(), p.total_orders
+        'orders', p.total_orders
       )
       ORDER BY p.total_orders DESC, p.app_name
     ),
@@ -356,9 +356,9 @@ BEGIN
   IF NOT (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_operations())
-      OR public.has_role(auth.uid(), _const_role_hr())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'operations')
+      OR public.has_role(auth.uid(), 'hr')
     )
   ) THEN
     RAISE EXCEPTION 'Not allowed';
@@ -390,7 +390,7 @@ BEGIN
     p_source_type,
     NULLIF(BTRIM(p_file_name), ''),
     p_target_app_id,
-    _const_installment_pending(),
+    'pending',
     v_total_rows,
     auth.uid(),
     jsonb_build_object(
@@ -514,8 +514,8 @@ BEGIN
   IF NOT (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_finance())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'finance')
     )
   ) THEN
     RAISE EXCEPTION 'Not allowed';

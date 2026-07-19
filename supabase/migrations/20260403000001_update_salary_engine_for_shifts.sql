@@ -1,4 +1,4 @@
-﻿-- Migration: Update salary engine to support shifts and hybrid platforms
+-- Migration: Update salary engine to support shifts and hybrid platforms
 -- Date: 2026-04-03
 -- Description: Replaces calculate_salary_for_employee_month and calculate_salary_for_month
 --              to support work_type: orders, shift, hybrid
@@ -16,7 +16,7 @@ DROP FUNCTION IF EXISTS public.calculate_salary_for_month(TEXT, TEXT);
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_employee_month(
   p_employee_id UUID,
   p_month_year TEXT,
-  p_payment_method TEXT DEFAULT _const_payment_cash(),
+  p_payment_method TEXT DEFAULT 'cash',
   p_manual_deduction NUMERIC DEFAULT 0,
   p_manual_deduction_note TEXT DEFAULT NULL
 )
@@ -79,14 +79,14 @@ BEGIN
     -- ========================================================================
     -- ORDERS-BASED PLATFORM
     -- ========================================================================
-    IF v_app.work_type = _const_work_orders() OR v_app.work_type IS NULL THEN
+    IF v_app.work_type = 'orders' OR v_app.work_type IS NULL THEN
       SELECT COALESCE(SUM(d.orders_count), 0)::INTEGER
       INTO v_app_orders
       FROM public.daily_orders AS d
       WHERE d.employee_id = p_employee_id
         AND d.app_id = v_app.id
         AND d.date BETWEEN v_start AND v_end
-        AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+        AND (d.status IS NULL OR d.status <> 'cancelled');
 
       v_total_orders := v_total_orders + v_app_orders;
 
@@ -96,7 +96,7 @@ BEGIN
     -- ========================================================================
     -- SHIFT-BASED PLATFORM
     -- ========================================================================
-    ELSIF v_app.work_type = _const_work_shift() THEN
+    ELSIF v_app.work_type = 'shift' THEN
       SELECT COUNT(*)::INTEGER
       INTO v_app_shifts
       FROM public.daily_shifts AS s
@@ -125,7 +125,7 @@ BEGIN
     -- ========================================================================
     -- HYBRID PLATFORM (Shift or Orders fallback)
     -- ========================================================================
-    ELSIF v_app.work_type = _const_work_hybrid() THEN
+    ELSIF v_app.work_type = 'hybrid' THEN
       -- Get hybrid rules
       SELECT * INTO v_hybrid_rule
       FROM public.app_hybrid_rules
@@ -139,7 +139,7 @@ BEGIN
         WHERE d.employee_id = p_employee_id
           AND d.app_id = v_app.id
           AND d.date BETWEEN v_start AND v_end
-          AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+          AND (d.status IS NULL OR d.status <> 'cancelled');
 
         v_total_orders := v_total_orders + v_app_orders;
         v_app_earnings := public.calc_tier_salary(v_app_orders);
@@ -168,7 +168,7 @@ BEGIN
               WHERE d.employee_id = p_employee_id
                 AND d.app_id = v_app.id
                 AND d.date = v_day.day_date
-                AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+                AND (d.status IS NULL OR d.status <> 'cancelled');
 
               v_total_orders := v_total_orders + v_app_orders;
 
@@ -192,7 +192,7 @@ BEGIN
   FROM public.external_deductions AS ed
   WHERE ed.employee_id = p_employee_id
     AND ed.apply_month = p_month_year
-    AND ed.approval_status = _const_approval_approved();
+    AND ed.approval_status = 'approved';
 
   -- Calculate advance deductions
   SELECT COALESCE(SUM(ai.amount), 0)
@@ -201,7 +201,7 @@ BEGIN
   JOIN public.advance_installments AS ai ON ai.advance_id = ad.id
   WHERE ad.employee_id = p_employee_id
     AND ai.month_year = p_month_year
-    AND ai.status IN (_const_installment_pending(), _const_installment_deferred());
+    AND ai.status IN ('pending', 'deferred');
 
   -- Calculate net salary
   v_net := GREATEST(
@@ -239,8 +239,8 @@ BEGIN
     v_manual_deduction,
     p_manual_deduction_note,
     v_net,
-    COALESCE(NULLIF(TRIM(p_payment_method), ''), _const_payment_cash()),
-    _const_calc_calculated(),
+    COALESCE(NULLIF(TRIM(p_payment_method), ''), 'cash'),
+    'calculated',
     'engine_v4_shifts',
     false
   )
@@ -292,7 +292,7 @@ $$;
 -- ============================================================================
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_month(
   p_month_year TEXT,
-  p_payment_method TEXT DEFAULT _const_payment_cash()
+  p_payment_method TEXT DEFAULT 'cash'
 )
 RETURNS TABLE (
   employee_id UUID,
@@ -317,7 +317,7 @@ BEGIN
   FOR v_emp IN
     SELECT e.id
     FROM public.employees AS e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
     ORDER BY e.name
   LOOP
     RETURN QUERY

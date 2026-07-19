@@ -1,4 +1,4 @@
-﻿-- Fix employee app assignment RLS.
+-- Fix employee app assignment RLS.
 --
 -- Managing rows in employee_apps is an edit to an employee's app assignments,
 -- not an employee delete operation. The UI allows this from the Employees page

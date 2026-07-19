@@ -1,4 +1,4 @@
-﻿-- Debug and fix: the preview function reads scheme but monthly_amount returns NULL
+-- Debug and fix: the preview function reads scheme but monthly_amount returns NULL
 -- Possible cause: RLS blocks the read even with SECURITY DEFINER
 -- Fix: use explicit schema and bypass RLS
 

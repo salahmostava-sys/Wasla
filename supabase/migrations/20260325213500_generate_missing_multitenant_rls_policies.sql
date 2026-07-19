@@ -1,4 +1,4 @@
-﻿-- Generate missing multi-tenant RLS policies for tables that have company_id.
+-- Generate missing multi-tenant RLS policies for tables that have company_id.
 -- This migration is intentionally conservative:
 -- - Enables RLS on every public table that has company_id.
 -- - Creates policies ONLY for tables that currently have zero policies.

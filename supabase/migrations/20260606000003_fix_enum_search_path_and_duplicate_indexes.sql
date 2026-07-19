@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: All 81 Dashboard Warnings
 --
 -- Category 1: function_search_path_mutable (SECURITY) ~64 warnings

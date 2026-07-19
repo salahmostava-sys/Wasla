@@ -1,4 +1,4 @@
-﻿-- Migration: Auto-generate text comparison operators for all ENUMs
+-- Migration: Auto-generate text comparison operators for all ENUMs
 -- Fixes "operator does not exist: enum_type = text" errors permanently
 
 DO $$

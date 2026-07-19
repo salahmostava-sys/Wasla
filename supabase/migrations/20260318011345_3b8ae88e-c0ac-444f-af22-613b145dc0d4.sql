@@ -1,1 +1,1 @@
-﻿ALTER TABLE public.advance_installments ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE public.advance_installments ADD COLUMN IF NOT EXISTS notes text;

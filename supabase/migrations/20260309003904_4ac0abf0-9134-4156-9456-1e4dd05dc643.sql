@@ -1,4 +1,4 @@
-﻿
+
 -- Fix storage: make employee-documents private and fix UPDATE policy
 UPDATE storage.buckets SET public = FALSE WHERE id = 'employee-documents'; -- NOSONAR
 
@@ -14,9 +14,9 @@ CREATE POLICY "HR/admin/finance can view employee documents"
     bucket_id = 'employee-documents' AND
     auth.uid() IS NOT NULL AND
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -27,8 +27,8 @@ CREATE POLICY "HR/admin can upload employee documents"
     bucket_id = 'employee-documents' AND
     auth.uid() IS NOT NULL AND
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -39,8 +39,8 @@ CREATE POLICY "HR/admin can update employee documents"
     bucket_id = 'employee-documents' AND
     auth.uid() IS NOT NULL AND
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -51,5 +51,5 @@ CREATE POLICY "Admins can delete employee documents"
     bucket_id = 'employee-documents' AND
     auth.uid() IS NOT NULL AND
     is_active_user(auth.uid()) AND
-    has_role(auth.uid(), _const_role_admin())
+    has_role(auth.uid(), 'admin')
   );

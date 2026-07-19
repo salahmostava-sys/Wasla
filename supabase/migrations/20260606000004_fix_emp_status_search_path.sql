@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: Remaining 4 function_search_path_mutable warnings
 --
 -- Functions eq_emp_status_text / neq_emp_status_text (short names for

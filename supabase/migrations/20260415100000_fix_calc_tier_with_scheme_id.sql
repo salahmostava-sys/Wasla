@@ -1,4 +1,4 @@
-﻿-- Fix: calc_tier_salary now takes scheme_id to read the correct tiers.
+-- Fix: calc_tier_salary now takes scheme_id to read the correct tiers.
 -- Previously read from ALL tiers without filtering by scheme.
 
 DROP FUNCTION IF EXISTS public.calc_tier_salary(integer);

@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: Restore original performance_dashboard_rpc shape
 -- ============================================================
 -- The previous fix altered the return shape of the RPC, causing frontend crashes.

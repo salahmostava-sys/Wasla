@@ -1,4 +1,4 @@
-﻿-- Create vehicle_mileage table
+-- Create vehicle_mileage table
 CREATE TABLE IF NOT EXISTS public.vehicle_mileage (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   employee_id uuid NOT NULL REFERENCES public.employees(id) ON DELETE CASCADE,
@@ -26,10 +26,10 @@ CREATE POLICY "Admin/operations can manage vehicle_mileage"
   ON public.vehicle_mileage FOR ALL
   TO authenticated
   USING (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'operations')
   )
   WITH CHECK (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'operations')
   );

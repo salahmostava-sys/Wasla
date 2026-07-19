@@ -1,4 +1,4 @@
-﻿-- Fix "Function Search Path Mutable" security lint warnings on maintenance/spare-parts
+-- Fix "Function Search Path Mutable" security lint warnings on maintenance/spare-parts
 -- trigger functions by pinning search_path explicitly.
 BEGIN;
 

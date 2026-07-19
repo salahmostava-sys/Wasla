@@ -1,4 +1,4 @@
-﻿-- Add is_archived to apps table for soft-delete / archive workflow.
+-- Add is_archived to apps table for soft-delete / archive workflow.
 -- is_active = false means "temporarily disabled this month"
 -- is_archived = true means "permanently retired, hide everywhere"
 

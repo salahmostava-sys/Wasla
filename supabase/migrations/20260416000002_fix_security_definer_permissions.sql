@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- Fix Supabase Linter Warnings: SECURITY DEFINER Function Permissions
 -- =============================================================================
 -- This migration addresses security warnings about SECURITY DEFINER functions

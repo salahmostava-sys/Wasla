@@ -1,4 +1,4 @@
-﻿-- Ensure the activity log captures CUD changes across all application tables.
+-- Ensure the activity log captures CUD changes across all application tables.
 -- Excludes audit tables themselves to avoid recursive logging.
 
 CREATE OR REPLACE FUNCTION public.log_audit_event()

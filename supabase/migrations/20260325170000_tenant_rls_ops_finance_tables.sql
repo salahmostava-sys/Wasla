@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- Tenant RLS hardening for operations/finance tables
 -- Scope:
 --   - attendance
@@ -58,10 +58,10 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -74,8 +74,8 @@ WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -88,16 +88,16 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -110,8 +110,8 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -134,10 +134,10 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -150,18 +150,18 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
   )
 );
 
@@ -183,9 +183,9 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -198,16 +198,16 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -229,9 +229,9 @@ USING (
   is_active_user(auth.uid())
   AND public.advance_in_my_company(advance_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -244,16 +244,16 @@ USING (
   is_active_user(auth.uid())
   AND public.advance_in_my_company(advance_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.advance_in_my_company(advance_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -275,8 +275,8 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -289,16 +289,16 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -318,8 +318,8 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -332,15 +332,15 @@ USING (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND public.employee_in_my_company(employee_id)
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );

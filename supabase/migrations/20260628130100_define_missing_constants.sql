@@ -1,4 +1,4 @@
-﻿-- supabase/migrations/20260628130100_define_missing_constants.sql
+-- supabase/migrations/20260628130100_define_missing_constants.sql
 -- Fix: Define all missing _const_* functions
 
 CREATE OR REPLACE FUNCTION _const_work_shift() RETURNS TEXT

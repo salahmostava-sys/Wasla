@@ -1,4 +1,4 @@
-﻿-- Fix dashboard_overview_rpc city enum casting issue.
+-- Fix dashboard_overview_rpc city enum casting issue.
 -- In some datasets employees.city can be NULL, and COALESCE on enum without text cast
 -- can throw: invalid input value for enum city_enum: "unknown".
 
@@ -21,10 +21,10 @@ BEGIN
   IF NOT (
     is_active_user(auth.uid())
     AND (
-      has_role(auth.uid(), _const_role_admin())
-      OR has_role(auth.uid(), _const_role_hr())
-      OR has_role(auth.uid(), _const_role_finance())
-      OR has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin')
+      OR has_role(auth.uid(), 'hr')
+      OR has_role(auth.uid(), 'finance')
+      OR has_role(auth.uid(), 'operations')
     )
   ) THEN
     RAISE EXCEPTION 'Not allowed';
@@ -40,7 +40,7 @@ BEGIN
       emp_details AS (
         SELECT e.id, e.city, e.license_status, e.sponsorship_status
         FROM public.employees e
-        WHERE e.status = _const_employee_active()
+        WHERE e.status = 'active'
       ),
       att_today AS (
         SELECT
@@ -149,7 +149,7 @@ BEGIN
       ),
       counts AS (
         SELECT
-          (SELECT COUNT(*)::INT FROM public.vehicles v WHERE v.status = _const_employee_active()) AS active_vehicles,
+          (SELECT COUNT(*)::INT FROM public.vehicles v WHERE v.status = 'active') AS active_vehicles,
           (SELECT COUNT(*)::INT FROM public.alerts al WHERE al.is_resolved IS FALSE) AS active_alerts,
           (SELECT COUNT(*)::INT FROM apps_active) AS active_apps
       ),
@@ -170,7 +170,7 @@ BEGIN
           jsonb_build_object( -- NOSONAR
             'appId', o.app_id,
             'app', o.app,
-            _const_work_orders(), o.orders,
+            'orders', o.orders,
             'riders', o.riders,
             'brandColor', o.brand_color,
             'textColor', o.text_color,
@@ -187,7 +187,7 @@ BEGIN
           jsonb_build_object( -- NOSONAR
             'employee_id', r.employee_id,
             'name', r.name,
-            _const_work_orders(), r.orders,
+            'orders', r.orders,
             'appId', r.app_id,
             'app', r.app,
             'appColor', r.app_color

@@ -1,4 +1,4 @@
-﻿-- ══════════════════════════════════════════════════════════════════════════════
+-- ══════════════════════════════════════════════════════════════════════════════
 -- Remove company_id from platform_accounts and account_assignments
 -- ══════════════════════════════════════════════════════════════════════════════
 
@@ -37,10 +37,10 @@ CREATE POLICY "platform_accounts_select"
   ON public.platform_accounts FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -49,14 +49,14 @@ CREATE POLICY "platform_accounts_manage"
   ON public.platform_accounts FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -65,10 +65,10 @@ CREATE POLICY "account_assignments_select"
   ON public.account_assignments FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -77,8 +77,8 @@ CREATE POLICY "account_assignments_insert_update"
   ON public.account_assignments FOR INSERT
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -87,7 +87,7 @@ CREATE POLICY "account_assignments_update_only"
   ON public.account_assignments FOR UPDATE
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );

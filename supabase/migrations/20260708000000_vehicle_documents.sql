@@ -1,4 +1,4 @@
-﻿-- Allow attaching documents (license, insurance, registration, authorization,
+-- Allow attaching documents (license, insurance, registration, authorization,
 -- or any other scan/photo) to a vehicle, so users can see and download every
 -- document related to a given vehicle from its details view.
 

@@ -1,4 +1,4 @@
-﻿
+
 -- ============================================================
 -- COMPREHENSIVE RLS AUDIT & FIX
 -- Organised by: users | orders | drivers | tasks | finance | vehicles | system
@@ -32,19 +32,19 @@ CREATE POLICY "Users can update own profile"
 DROP POLICY IF EXISTS "Admins can update all profiles" ON public.profiles;
 CREATE POLICY "Admins can update all profiles"
   ON public.profiles FOR UPDATE
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- Only admins can insert profiles (outside of the new-user trigger)
 DROP POLICY IF EXISTS "Admins can insert profiles" ON public.profiles;
 CREATE POLICY "Admins can insert profiles"
   ON public.profiles FOR INSERT
-  WITH CHECK (has_role(auth.uid(), _const_role_admin()));
+  WITH CHECK (has_role(auth.uid(), 'admin'));
 
 -- Only admins can delete profiles
 DROP POLICY IF EXISTS "Admins can delete profiles" ON public.profiles;
 CREATE POLICY "Admins can delete profiles"
   ON public.profiles FOR DELETE
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- user_roles
 DROP POLICY IF EXISTS "Users can view own roles"            ON public.user_roles;
@@ -57,22 +57,22 @@ CREATE POLICY "Users can view own roles"
 DROP POLICY IF EXISTS "Admins can view all roles" ON public.user_roles;
 CREATE POLICY "Admins can view all roles"
   ON public.user_roles FOR SELECT
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Admins can insert roles" ON public.user_roles;
 CREATE POLICY "Admins can insert roles"
   ON public.user_roles FOR INSERT
-  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Admins can update roles" ON public.user_roles;
 CREATE POLICY "Admins can update roles"
   ON public.user_roles FOR UPDATE
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Admins can delete roles" ON public.user_roles;
 CREATE POLICY "Admins can delete roles"
   ON public.user_roles FOR DELETE
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- user_permissions
 DROP POLICY IF EXISTS "Users can view own permissions"      ON public.user_permissions;
@@ -85,13 +85,13 @@ CREATE POLICY "Users can view own permissions"
 DROP POLICY IF EXISTS "Admins can view all permissions" ON public.user_permissions;
 CREATE POLICY "Admins can view all permissions"
   ON public.user_permissions FOR SELECT
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Admins can manage permissions" ON public.user_permissions;
 CREATE POLICY "Admins can manage permissions"
   ON public.user_permissions FOR ALL
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()))
-  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'))
+  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 
 -- ────────────────────────────────────────────────────────────
@@ -111,16 +111,16 @@ CREATE POLICY "Ops/HR/admin can manage daily_orders"
   ON public.daily_orders FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -137,16 +137,16 @@ CREATE POLICY "Admin/ops/finance can manage app_targets"
   ON public.app_targets FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -160,8 +160,8 @@ CREATE POLICY "Active users can view apps"
 
 CREATE POLICY "Admins can manage apps"
   ON public.apps FOR ALL
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()))
-  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'))
+  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- external_deductions
 DROP POLICY IF EXISTS "Finance/admin can view external_deductions"   ON public.external_deductions;
@@ -172,8 +172,8 @@ CREATE POLICY "Finance/admin can view external_deductions"
   ON public.external_deductions FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -182,14 +182,14 @@ CREATE POLICY "Finance/admin can manage external_deductions"
   ON public.external_deductions FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -211,14 +211,14 @@ CREATE POLICY "HR/admin can manage employees"
   ON public.employees FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -235,14 +235,14 @@ CREATE POLICY "HR/admin can manage employee_apps"
   ON public.employee_apps FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -259,14 +259,14 @@ CREATE POLICY "HR/admin can manage employee_scheme"
   ON public.employee_scheme FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -283,14 +283,14 @@ CREATE POLICY "HR/admin can manage employee_tiers"
   ON public.employee_tiers FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -307,14 +307,14 @@ CREATE POLICY "HR/admin can manage departments"
   ON public.departments FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -331,14 +331,14 @@ CREATE POLICY "HR/admin can manage positions"
   ON public.positions FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -360,14 +360,14 @@ CREATE POLICY "HR/admin can manage attendance"
   ON public.attendance FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -384,14 +384,14 @@ CREATE POLICY "Finance/admin can manage advances"
   ON public.advances FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -409,14 +409,14 @@ CREATE POLICY "Finance/admin can manage advance_installments"
   ON public.advance_installments FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -433,14 +433,14 @@ CREATE POLICY "HR/admin can manage alerts"
   ON public.alerts FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -457,8 +457,8 @@ CREATE POLICY "Finance/admin can view salary_records"
   ON public.salary_records FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -467,14 +467,14 @@ CREATE POLICY "Finance/admin can manage salary_records"
   ON public.salary_records FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -486,8 +486,8 @@ CREATE POLICY "Finance/admin can view pl_records"
   ON public.pl_records FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -496,14 +496,14 @@ CREATE POLICY "Finance/admin can manage pl_records"
   ON public.pl_records FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -520,14 +520,14 @@ CREATE POLICY "Admins/finance can manage salary_schemes"
   ON public.salary_schemes FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -545,14 +545,14 @@ CREATE POLICY "Admins/finance can manage salary_scheme_tiers"
   ON public.salary_scheme_tiers FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -570,14 +570,14 @@ CREATE POLICY "Admins/finance can manage scheme_month_snapshots"
   ON public.scheme_month_snapshots FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 
@@ -599,14 +599,14 @@ CREATE POLICY "Operations/admin can manage vehicles"
   ON public.vehicles FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -624,14 +624,14 @@ CREATE POLICY "Operations/admin can manage vehicle_assignments"
   ON public.vehicle_assignments FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -648,14 +648,14 @@ CREATE POLICY "Operations/admin can manage maintenance_logs"
   ON public.maintenance_logs FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -672,14 +672,14 @@ CREATE POLICY "Admin/operations can manage vehicle_mileage"
   ON public.vehicle_mileage FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -697,14 +697,14 @@ CREATE POLICY "Admin/operations can manage vehicle_mileage_daily"
   ON public.vehicle_mileage_daily FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -727,12 +727,12 @@ CREATE POLICY "Anyone can view system_settings"
 DROP POLICY IF EXISTS "Admins can insert system_settings" ON public.system_settings;
 CREATE POLICY "Admins can insert system_settings"
   ON public.system_settings FOR INSERT
-  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Admins can update system_settings" ON public.system_settings;
 CREATE POLICY "Admins can update system_settings"
   ON public.system_settings FOR UPDATE
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- trade_registers
 DROP POLICY IF EXISTS "Active users can view trade_registers"        ON public.trade_registers;
@@ -745,8 +745,8 @@ CREATE POLICY "Active users can view trade_registers"
 DROP POLICY IF EXISTS "Admins can manage trade_registers" ON public.trade_registers;
 CREATE POLICY "Admins can manage trade_registers"
   ON public.trade_registers FOR ALL
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()))
-  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'))
+  WITH CHECK (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 -- audit_log
 DROP POLICY IF EXISTS "Admins can view audit_log"                    ON public.audit_log;
@@ -756,7 +756,7 @@ DROP POLICY IF EXISTS "Authenticated can insert audit_log"           ON public.a
 DROP POLICY IF EXISTS "Admins can view audit_log" ON public.audit_log;
 CREATE POLICY "Admins can view audit_log"
   ON public.audit_log FOR SELECT
-  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), _const_role_admin()));
+  USING (is_active_user(auth.uid()) AND has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Active users can insert audit_log" ON public.audit_log;
 CREATE POLICY "Active users can insert audit_log"

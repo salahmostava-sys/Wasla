@@ -1,4 +1,4 @@
-﻿
+
 -- ============================================================
 -- SECURITY FIX: Restrict PII access — remove broad viewer access
 -- Problem: "Active users can view X" allowed ANY authenticated user
@@ -16,10 +16,10 @@ CREATE POLICY "HR/admin/finance/ops can view employees"
   ON public.employees FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_finance()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'finance') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -31,10 +31,10 @@ CREATE POLICY "HR/admin/finance/ops can view attendance"
   ON public.attendance FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_finance()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'finance') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -46,9 +46,9 @@ CREATE POLICY "Finance/admin/hr can view advances"
   ON public.advances FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -60,9 +60,9 @@ CREATE POLICY "Finance/admin/hr can view advance_installments"
   ON public.advance_installments FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -74,10 +74,10 @@ CREATE POLICY "Ops/HR/admin/finance can view daily_orders"
   ON public.daily_orders FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_finance()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'finance') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -89,9 +89,9 @@ CREATE POLICY "Ops/admin/hr can view vehicles"
   ON public.vehicles FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -103,9 +103,9 @@ CREATE POLICY "Ops/admin/hr can view vehicle_assignments"
   ON public.vehicle_assignments FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -117,8 +117,8 @@ CREATE POLICY "Ops/admin can view maintenance_logs"
   ON public.maintenance_logs FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -130,8 +130,8 @@ CREATE POLICY "Ops/admin can view vehicle_mileage"
   ON public.vehicle_mileage FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -143,8 +143,8 @@ CREATE POLICY "Ops/admin can view vehicle_mileage_daily"
   ON public.vehicle_mileage_daily FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -156,8 +156,8 @@ CREATE POLICY "HR/admin can view employee_tiers"
   ON public.employee_tiers FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')
     )
   );
 
@@ -169,9 +169,9 @@ CREATE POLICY "HR/admin/ops can view employee_apps"
   ON public.employee_apps FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'operations')
     )
   );
 
@@ -183,9 +183,9 @@ CREATE POLICY "HR/admin/finance can view employee_scheme"
   ON public.employee_scheme FOR SELECT
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_hr())    OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'hr')    OR
+      has_role(auth.uid(), 'finance')
     )
   );
 

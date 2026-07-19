@@ -1,4 +1,4 @@
-﻿-- Fix all foreign keys referencing auth.users(id) that lack ON DELETE behaviour.
+-- Fix all foreign keys referencing auth.users(id) that lack ON DELETE behaviour.
 -- Without this, deleting a user from auth.users via the admin Edge Function fails
 -- with "Database error deleting user" because of RESTRICT (the default).
 --

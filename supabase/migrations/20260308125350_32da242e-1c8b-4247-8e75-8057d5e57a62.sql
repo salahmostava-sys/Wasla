@@ -1,1 +1,1 @@
-﻿ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS preferred_language text NOT NULL DEFAULT 'ar' CHECK (preferred_language IN ('ar', 'en', 'ur'));
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS preferred_language text NOT NULL DEFAULT 'ar' CHECK (preferred_language IN ('ar', 'en', 'ur'));

@@ -1,4 +1,4 @@
-﻿-- Fix: fn_handle_employee_sponsorship_alerts references NEW.company_id which was dropped.
+-- Fix: fn_handle_employee_sponsorship_alerts references NEW.company_id which was dropped.
 -- Replace with commercial_record lookup (the field that replaced company_id).
 
 CREATE OR REPLACE FUNCTION public.fn_handle_employee_sponsorship_alerts()

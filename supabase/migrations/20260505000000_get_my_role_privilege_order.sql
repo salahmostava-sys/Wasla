@@ -1,4 +1,4 @@
-﻿-- Return highest-privilege role deterministically for multi-role users.
+-- Return highest-privilege role deterministically for multi-role users.
 CREATE OR REPLACE FUNCTION public.get_my_role()
 RETURNS text
 LANGUAGE sql

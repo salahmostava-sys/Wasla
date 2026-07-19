@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- LOGIC CHANGE: Flip admin/rider detection in salary engine
 --
 -- Old rule: admin = job title matches admin keywords list

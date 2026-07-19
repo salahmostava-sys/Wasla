@@ -1,4 +1,4 @@
-﻿-- Phase 1 ERD foundation (non-breaking):
+-- Phase 1 ERD foundation (non-breaking):
 -- - explicit roles catalog + employee_roles (many-to-many)
 -- - normalize orders semantics on existing daily_orders table
 -- - add stable salary tiers structure
@@ -51,7 +51,7 @@ CREATE INDEX IF NOT EXISTS idx_employees_role_id ON public.employees(role_id);
 -- 3) Orders table semantics on existing table
 ALTER TABLE public.daily_orders
   ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'confirmed'
-  CHECK (status IN ('draft', 'confirmed', _const_order_cancelled()));
+  CHECK (status IN ('draft', 'confirmed', 'cancelled'));
 
 ALTER TABLE public.daily_orders
   ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'manual';
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS public.salary_tiers (
   min_orders INTEGER NOT NULL DEFAULT 0,
   max_orders INTEGER,
   tier_type TEXT NOT NULL DEFAULT 'per_order' -- NOSONAR
-    CHECK (tier_type IN ('per_order', 'fixed', _const_work_hybrid())),
+    CHECK (tier_type IN ('per_order', 'fixed', 'hybrid')),
   rate_per_order NUMERIC(10,2),
   fixed_amount NUMERIC(10,2),
   extra_rate NUMERIC(10,2),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS public.salary_tiers (
   CONSTRAINT salary_tiers_payload_chk CHECK (
     (tier_type = 'per_order' AND rate_per_order IS NOT NULL) OR
     (tier_type = 'fixed' AND fixed_amount IS NOT NULL) OR
-    (tier_type = _const_work_hybrid() AND fixed_amount IS NOT NULL AND extra_rate IS NOT NULL)
+    (tier_type = 'hybrid' AND fixed_amount IS NOT NULL AND extra_rate IS NOT NULL)
   )
 );
 
@@ -116,8 +116,8 @@ CREATE TRIGGER update_salary_tiers_updated_at
 
 -- 6) Salary record lifecycle metadata
 ALTER TABLE public.salary_records
-  ADD COLUMN IF NOT EXISTS calc_status TEXT NOT NULL DEFAULT _const_calc_calculated()
-  CHECK (calc_status IN (_const_calc_calculated(), _const_approval_approved(), 'paid', _const_order_cancelled()));
+  ADD COLUMN IF NOT EXISTS calc_status TEXT NOT NULL DEFAULT 'calculated'
+  CHECK (calc_status IN ('calculated', 'approved', 'paid', 'cancelled'));
 
 ALTER TABLE public.salary_records
   ADD COLUMN IF NOT EXISTS calc_source TEXT NOT NULL DEFAULT 'engine_v1';
@@ -140,8 +140,8 @@ CREATE POLICY "Active users can view roles"
   USING (is_active_user(auth.uid()));
 CREATE POLICY "Admin can manage roles"
   ON public.roles FOR ALL
-  USING (has_role(auth.uid(), _const_role_admin()))
-  WITH CHECK (has_role(auth.uid(), _const_role_admin()));
+  USING (has_role(auth.uid(), 'admin'))
+  WITH CHECK (has_role(auth.uid(), 'admin'));
 
 DROP POLICY IF EXISTS "Active users can view employee_roles" ON public.employee_roles;
 DROP POLICY IF EXISTS "Admin or HR can manage employee_roles" ON public.employee_roles;
@@ -152,12 +152,12 @@ DROP POLICY IF EXISTS "Admin or HR can manage employee_roles" ON public.employee
 CREATE POLICY "Admin or HR can manage employee_roles"
   ON public.employee_roles FOR ALL
   USING (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'hr')
   )
   WITH CHECK (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'hr')
   );
 
 DROP POLICY IF EXISTS "Active users can view salary_tiers" ON public.salary_tiers;
@@ -169,10 +169,10 @@ DROP POLICY IF EXISTS "Finance admin can manage salary_tiers" ON public.salary_t
 CREATE POLICY "Finance admin can manage salary_tiers"
   ON public.salary_tiers FOR ALL
   USING (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'finance')
   )
   WITH CHECK (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'finance')
   );

@@ -1,4 +1,4 @@
-﻿-- Seed/update granular permissions matrix for role-based authorization.
+-- Seed/update granular permissions matrix for role-based authorization.
 
 UPDATE public.roles
 SET permissions = jsonb_build_object(
@@ -6,7 +6,7 @@ SET permissions = jsonb_build_object(
   jsonb_build_object('view', true, 'write', true, 'delete', true, 'approve', true), -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', true, 'delete', true),
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', true),
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true),
@@ -21,7 +21,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object(
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', true, 'delete', false),
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', false),
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true),
@@ -36,7 +36,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object(
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false),
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', false, 'delete', false),
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', false),
@@ -51,7 +51,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object(
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false),
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', false),
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true),
@@ -66,7 +66,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object(
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false),
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', false, 'delete', false),
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', false),

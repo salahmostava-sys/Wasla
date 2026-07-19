@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: calculate_employee_salary - wrong column names on
 --      external_deductions table.
 --

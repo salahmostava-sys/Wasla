@@ -1,4 +1,4 @@
-﻿-- Add SECURITY DEFINER to the employee sponsorship alerts trigger
+-- Add SECURITY DEFINER to the employee sponsorship alerts trigger
 -- so that any role (e.g. 'operations') that can update an employee
 -- can indirectly insert an alert without needing direct INSERT permissions on alerts table.
 

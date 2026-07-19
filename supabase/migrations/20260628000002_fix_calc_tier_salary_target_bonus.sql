@@ -1,4 +1,4 @@
-﻿-- Fix: calc_tier_salary should include target_bonus from salary_schemes
+-- Fix: calc_tier_salary should include target_bonus from salary_schemes
 -- when the number of orders meets or exceeds target_orders.
 
 CREATE OR REPLACE FUNCTION public.calc_tier_salary(

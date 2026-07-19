@@ -1,4 +1,4 @@
-﻿-- Dedicated admin action log (application-level audit trail).
+-- Dedicated admin action log (application-level audit trail).
 -- This complements DB triggers (audit_log) by capturing intent and UI actions.
 
 CREATE TABLE IF NOT EXISTS public.admin_action_log (
@@ -30,10 +30,10 @@ CREATE POLICY "Admin actions: select"
   USING (
     is_active_user(auth.uid())
     AND (
-      has_role(auth.uid(), _const_role_admin())
-      OR has_role(auth.uid(), _const_role_hr())
-      OR has_role(auth.uid(), _const_role_finance())
-      OR has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin')
+      OR has_role(auth.uid(), 'hr')
+      OR has_role(auth.uid(), 'finance')
+      OR has_role(auth.uid(), 'operations')
     )
   );
 
@@ -45,10 +45,10 @@ CREATE POLICY "Admin actions: insert"
   WITH CHECK (
     is_active_user(auth.uid())
     AND (
-      has_role(auth.uid(), _const_role_admin())
-      OR has_role(auth.uid(), _const_role_hr())
-      OR has_role(auth.uid(), _const_role_finance())
-      OR has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin')
+      OR has_role(auth.uid(), 'hr')
+      OR has_role(auth.uid(), 'finance')
+      OR has_role(auth.uid(), 'operations')
     )
     AND user_id IS NOT DISTINCT FROM auth.uid()
   );

@@ -1,4 +1,4 @@
-﻿-- Fleet: spare parts inventory (single-org RLS aligned with vehicles / fuel)
+-- Fleet: spare parts inventory (single-org RLS aligned with vehicles / fuel)
 
 BEGIN;
 
@@ -30,14 +30,14 @@ CREATE POLICY "Admin/operations can manage spare_parts"
   TO authenticated
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 

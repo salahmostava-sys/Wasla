@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FIX: Multiple user_roles rows causing wrong role resolution
 --
 -- Root cause: The original get_my_role() uses LIMIT 1 with no ORDER BY,

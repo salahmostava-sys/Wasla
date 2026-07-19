@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- CRITICAL FIX: calculate_salary_for_employee_month currently INSERTs into
 -- columns that do not exist on public.salary_records:
 --   total_orders, total_shift_days, platform_breakdown, status

@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- Read-only salary preview RPC (no persistence)
 -- Used by edge function to power Salaries table preview from backend engine.
 -- ============================================================================
@@ -34,7 +34,7 @@ BEGIN
   WITH active_emp AS (
     SELECT e.id
     FROM public.employees e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
       AND e.company_id = v_company_id
   ),
   orders_cte AS (
@@ -45,7 +45,7 @@ BEGIN
     JOIN active_emp ae ON ae.id = d.employee_id
     WHERE d.company_id = v_company_id
       AND d.date BETWEEN v_start AND v_end
-      AND (d.status IS NULL OR d.status <> _const_order_cancelled())
+      AND (d.status IS NULL OR d.status <> 'cancelled')
     GROUP BY d.employee_id
   ),
   ext_cte AS (
@@ -56,7 +56,7 @@ BEGIN
     JOIN active_emp ae ON ae.id = ed.employee_id
     WHERE ed.company_id = v_company_id
       AND ed.apply_month = p_month_year
-      AND ed.approval_status = _const_approval_approved()
+      AND ed.approval_status = 'approved'
     GROUP BY ed.employee_id
   ),
   adv_cte AS (
@@ -69,7 +69,7 @@ BEGIN
     WHERE ad.company_id = v_company_id
       AND ai.company_id = v_company_id
       AND ai.month_year = p_month_year
-      AND ai.status IN (_const_installment_pending(), _const_installment_deferred())
+      AND ai.status IN ('pending', 'deferred')
     GROUP BY ad.employee_id
   )
   SELECT

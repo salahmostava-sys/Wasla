@@ -1,4 +1,4 @@
-﻿-- Consolidates 6 separate existence checks (daily_orders, advances, attendance,
+-- Consolidates 6 separate existence checks (daily_orders, advances, attendance,
 -- vehicle_assignments, platform_accounts, salary_records) into a single RPC call,
 -- eliminating N+1 round-trips when guarding employee deletion.
 CREATE OR REPLACE FUNCTION public.check_employee_operational_records(p_employee_id UUID)

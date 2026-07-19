@@ -1,4 +1,4 @@
-﻿
+
 -- Create app_targets table for persisting monthly targets per platform
 CREATE TABLE IF NOT EXISTS public.app_targets (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -23,9 +23,9 @@ DROP POLICY IF EXISTS "Admin/operations can manage app_targets" ON public.app_ta
 CREATE POLICY "Admin/operations can manage app_targets"
   ON public.app_targets FOR ALL
   USING (is_active_user(auth.uid()) AND (
-    has_role(auth.uid(), _const_role_admin()) OR
-    has_role(auth.uid(), _const_role_operations()) OR
-    has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin') OR
+    has_role(auth.uid(), 'operations') OR
+    has_role(auth.uid(), 'finance')
   ));
 
 -- Add write_off fields to advances for bad debt tracking

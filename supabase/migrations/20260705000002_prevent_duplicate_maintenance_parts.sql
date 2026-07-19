@@ -1,4 +1,4 @@
-﻿-- Prevent duplicate spare parts in the same maintenance log
+-- Prevent duplicate spare parts in the same maintenance log
 -- This fixes 409 Conflict errors when the same part is added multiple times
 
 BEGIN;

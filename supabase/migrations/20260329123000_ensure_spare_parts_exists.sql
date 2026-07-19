@@ -1,4 +1,4 @@
-﻿-- Ensure fleet spare parts table exists on environments that missed prior migration.
+-- Ensure fleet spare parts table exists on environments that missed prior migration.
 -- Safe to re-run (IF NOT EXISTS / DROP POLICY IF EXISTS / DROP TRIGGER IF EXISTS).
 
 BEGIN;
@@ -31,14 +31,14 @@ CREATE POLICY "Admin/operations can manage spare_parts"
   TO authenticated
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 

@@ -1,4 +1,4 @@
-﻿-- Fix shift day threshold: count any day with hours_worked > 0 as a shift day.
+-- Fix shift day threshold: count any day with hours_worked > 0 as a shift day.
 -- Previously required >= 8 hours, but the UI now uses 1 = present / 0 = absent.
 
 CREATE OR REPLACE FUNCTION public.calculate_employee_salary(
@@ -65,11 +65,11 @@ BEGIN
 
   -- Loop through employee's active apps
   FOR v_app IN
-    SELECT a.id, a.name, COALESCE(a.work_type, _const_work_orders()) AS work_type
+    SELECT a.id, a.name, COALESCE(a.work_type, 'orders') AS work_type
     FROM public.apps a
     JOIN public.employee_apps ea ON ea.app_id = a.id
     WHERE ea.employee_id = p_employee_id
-      AND ea.status = _const_employee_active()
+      AND ea.status = 'active'
       AND a.is_active IS TRUE
     ORDER BY a.name
   LOOP
@@ -77,21 +77,21 @@ BEGIN
     v_app_shifts := 0;
     v_app_earnings := 0;
 
-    IF v_app.work_type = _const_work_orders() THEN
+    IF v_app.work_type = 'orders' THEN
       SELECT COALESCE(SUM(d.orders_count), 0)::INTEGER
       INTO v_app_orders
       FROM public.daily_orders AS d
       WHERE d.employee_id = p_employee_id
         AND d.app_id = v_app.id
         AND d.date BETWEEN v_start AND v_end
-        AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+        AND (d.status IS NULL OR d.status <> 'cancelled');
 
       v_total_orders := v_total_orders + v_app_orders;
 
       -- Use pricing rules for tier-based calculation
       v_app_earnings := public.calc_tier_salary(v_app_orders);
 
-    ELSIF v_app.work_type = _const_work_shift() THEN
+    ELSIF v_app.work_type = 'shift' THEN
       -- Count days with ANY positive hours as a shift day (present = 1, absent = 0)
       SELECT COUNT(*)::INTEGER
       INTO v_app_shifts
@@ -116,7 +116,7 @@ BEGIN
         v_app_earnings := v_app_shifts * 150;
       END IF;
 
-    ELSIF v_app.work_type = _const_work_hybrid() THEN
+    ELSIF v_app.work_type = 'hybrid' THEN
       SELECT * INTO v_hybrid_rule
       FROM public.app_hybrid_rules
       WHERE app_id = v_app.id;
@@ -128,7 +128,7 @@ BEGIN
         WHERE d.employee_id = p_employee_id
           AND d.app_id = v_app.id
           AND d.date BETWEEN v_start AND v_end
-          AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+          AND (d.status IS NULL OR d.status <> 'cancelled');
 
         v_total_orders := v_total_orders + v_app_orders;
         v_app_earnings := public.calc_tier_salary(v_app_orders);
@@ -153,7 +153,7 @@ BEGIN
               WHERE d.employee_id = p_employee_id
                 AND d.app_id = v_app.id
                 AND d.date = v_day.day_date
-                AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+                AND (d.status IS NULL OR d.status <> 'cancelled');
 
               v_total_orders := v_total_orders + v_app_orders;
               IF v_app_orders > 0 THEN
@@ -171,7 +171,7 @@ BEGIN
       'app_id', v_app.id,
       'app_name', v_app.name,
       'work_type', v_app.work_type,
-      _const_work_orders(), v_app_orders,
+      'orders', v_app_orders,
       'shift_days', v_app_shifts,
       'earnings', v_app_earnings
     );
@@ -185,7 +185,7 @@ BEGIN
   JOIN public.advances a ON a.id = ai.advance_id
   WHERE a.employee_id = p_employee_id
     AND ai.due_date BETWEEN v_start AND v_end
-    AND ai.status = _const_installment_pending();
+    AND ai.status = 'pending';
 
   -- External deductions
   SELECT COALESCE(SUM(ed.amount), 0)
@@ -193,9 +193,9 @@ BEGIN
   FROM public.external_deductions ed
   WHERE ed.employee_id = p_employee_id
     AND ed.month_year = p_month_year
-    AND ed.status = _const_approval_approved();
+    AND ed.status = 'approved';
 
-  v_payment_method := COALESCE(p_payment_method, CASE WHEN v_employee.iban IS NOT NULL THEN _const_payment_bank() ELSE _const_payment_cash() END);
+  v_payment_method := COALESCE(p_payment_method, CASE WHEN v_employee.iban IS NOT NULL THEN 'bank' ELSE 'cash' END);
 
   RETURN QUERY SELECT
     p_employee_id,

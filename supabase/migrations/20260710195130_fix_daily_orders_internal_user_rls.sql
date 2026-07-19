@@ -1,4 +1,4 @@
-﻿-- Fix RLS policies for daily_orders to use 'work_orders' instead of 'orders' for internal users
+-- Fix RLS policies for daily_orders to use 'work_orders' instead of 'orders' for internal users
 
 DROP POLICY IF EXISTS "unified_insert_policy" ON public."daily_orders";
 CREATE POLICY "unified_insert_policy" ON public."daily_orders" FOR INSERT

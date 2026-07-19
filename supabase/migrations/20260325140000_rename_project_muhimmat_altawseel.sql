@@ -1,4 +1,4 @@
-﻿-- Align branding with "Ù…Ù‡Ù…Ø© Ø§Ù„ØªÙˆØµÙŠÙ„" / Muhimmat alTawseel (defaults + existing row)
+-- Align branding with "Ù…Ù‡Ù…Ø© Ø§Ù„ØªÙˆØµÙŠÙ„" / Muhimmat alTawseel (defaults + existing row)
 ALTER TABLE public.system_settings
   ALTER COLUMN project_name_ar SET DEFAULT 'Ù…Ù‡Ù…Ø© Ø§Ù„ØªÙˆØµÙŠÙ„',
   ALTER COLUMN project_name_en SET DEFAULT 'Muhimmat alTawseel';

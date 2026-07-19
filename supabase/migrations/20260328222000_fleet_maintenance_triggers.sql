@@ -1,4 +1,4 @@
-﻿-- Triggers: auto employee, stock deduct/restore, total_cost rollup
+-- Triggers: auto employee, stock deduct/restore, total_cost rollup
 
 BEGIN;
 

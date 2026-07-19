@@ -1,4 +1,4 @@
-﻿-- Ø±Ø¨Ø· Ø®ØµÙ… Ø®Ø§Ø±Ø¬ÙŠ (Ù…Ø®Ø§Ù„ÙØ©) Ø¨Ø³Ù„ÙØ© Ø¹Ù†Ø¯ Ø§Ù„ØªØÙˆÙŠÙ„ â€” Ø¨Ø¯Ù„ Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯ Ø¹Ù„Ù‰ Ù†Øµ Ø§Ù„Ù…Ù„Ø§ØØ¸Ø© ÙÙ‚Ø·
+-- Ø±Ø¨Ø· Ø®ØµÙ… Ø®Ø§Ø±Ø¬ÙŠ (Ù…Ø®Ø§Ù„ÙØ©) Ø¨Ø³Ù„ÙØ© Ø¹Ù†Ø¯ Ø§Ù„ØªØÙˆÙŠÙ„ â€” Ø¨Ø¯Ù„ Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯ Ø¹Ù„Ù‰ Ù†Øµ Ø§Ù„Ù…Ù„Ø§ØØ¸Ø© ÙÙ‚Ø·
 ALTER TABLE public.external_deductions
   ADD COLUMN IF NOT EXISTS linked_advance_id UUID REFERENCES public.advances(id) ON DELETE SET NULL;
 

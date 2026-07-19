@@ -1,4 +1,4 @@
-﻿
+
 -- Create system_settings table (single-row configuration)
 CREATE TABLE IF NOT EXISTS public.system_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,13 +29,13 @@ CREATE POLICY "Anyone can view system_settings"
 DROP POLICY IF EXISTS "Admins can update system_settings" ON public.system_settings;
 CREATE POLICY "Admins can update system_settings"
   ON public.system_settings FOR UPDATE
-  USING (has_role(auth.uid(), _const_role_admin()));
+  USING (has_role(auth.uid(), 'admin'));
 
 -- Only admins can insert
 DROP POLICY IF EXISTS "Admins can insert system_settings" ON public.system_settings;
 CREATE POLICY "Admins can insert system_settings"
   ON public.system_settings FOR INSERT
-  WITH CHECK (has_role(auth.uid(), _const_role_admin()));
+  WITH CHECK (has_role(auth.uid(), 'admin'));
 
 -- Auto-update timestamp
 DROP TRIGGER IF EXISTS update_system_settings_updated_at ON public.system_settings;

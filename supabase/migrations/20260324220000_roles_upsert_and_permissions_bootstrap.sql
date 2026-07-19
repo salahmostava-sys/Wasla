@@ -1,4 +1,4 @@
-﻿-- Ensure roles exist in fresh environments, then apply permission matrix.
+-- Ensure roles exist in fresh environments, then apply permission matrix.
 
 -- Some environments may already have `roles_title_check` without `finance`.
 -- Ensure the constraint allows all expected role titles.
@@ -37,7 +37,7 @@ SET permissions = jsonb_build_object( -- NOSONAR
   jsonb_build_object('view', true, 'write', true, 'delete', true, 'approve', true), -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', true, 'delete', true), -- NOSONAR
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', true), -- NOSONAR
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true), -- NOSONAR
@@ -52,7 +52,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object( -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', true, 'delete', false), -- NOSONAR
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', false), -- NOSONAR
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true), -- NOSONAR
@@ -67,7 +67,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object( -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false), -- NOSONAR
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', false, 'delete', false), -- NOSONAR
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', false), -- NOSONAR
@@ -82,7 +82,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object( -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false), -- NOSONAR
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', true, 'delete', false), -- NOSONAR
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', true), -- NOSONAR
@@ -97,7 +97,7 @@ UPDATE public.roles
 SET permissions = jsonb_build_object( -- NOSONAR
   'employees', -- NOSONAR
   jsonb_build_object('view', true, 'write', false, 'delete', false), -- NOSONAR
-  _const_work_orders(),
+  'orders',
   jsonb_build_object('view', true, 'write', false, 'delete', false), -- NOSONAR
   'attendance', -- NOSONAR
   jsonb_build_object('view', true, 'write', false), -- NOSONAR

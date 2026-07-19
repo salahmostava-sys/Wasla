@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- Fix: Apply constants to remove literal duplication (SonarCloud CRITICAL)
 -- =============================================================================
 -- This migration refactors existing functions to use shared constants

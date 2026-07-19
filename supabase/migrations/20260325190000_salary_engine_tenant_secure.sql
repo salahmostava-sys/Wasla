@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- Salary engine hardening:
 -- 1) Tenant-aware calculation in DB functions
 -- 2) Restrict direct RPC execution to service_role (Edge Function only)
@@ -7,7 +7,7 @@
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_employee_month(
   p_employee_id UUID,
   p_month_year TEXT,
-  p_payment_method TEXT DEFAULT _const_payment_cash(),
+  p_payment_method TEXT DEFAULT 'cash',
   p_manual_deduction NUMERIC DEFAULT 0,
   p_manual_deduction_note TEXT DEFAULT NULL
 )
@@ -63,7 +63,7 @@ BEGIN
   WHERE d.employee_id = p_employee_id
     AND d.company_id = v_company_id
     AND d.date BETWEEN v_start AND v_end
-    AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+    AND (d.status IS NULL OR d.status <> 'cancelled');
 
   SELECT COALESCE(COUNT(*), 0)::INTEGER
     INTO v_attendance_days
@@ -81,7 +81,7 @@ BEGIN
   WHERE ed.employee_id = p_employee_id
     AND ed.company_id = v_company_id
     AND ed.apply_month = p_month_year
-    AND ed.approval_status = _const_approval_approved();
+    AND ed.approval_status = 'approved';
 
   SELECT COALESCE(SUM(ai.amount), 0)
     INTO v_advance_deduction
@@ -91,7 +91,7 @@ BEGIN
     AND ad.company_id = v_company_id
     AND ai.company_id = v_company_id
     AND ai.month_year = p_month_year
-    AND ai.status IN (_const_installment_pending(), _const_installment_deferred());
+    AND ai.status IN ('pending', 'deferred');
 
   v_attendance_deduction := 0;
   v_net := GREATEST(
@@ -130,8 +130,8 @@ BEGIN
     v_manual_deduction,
     p_manual_deduction_note,
     v_net,
-    COALESCE(NULLIF(TRIM(p_payment_method), ''), _const_payment_cash()),
-    _const_calc_calculated(),
+    COALESCE(NULLIF(TRIM(p_payment_method), ''), 'cash'),
+    'calculated',
     'engine_v3',
     false
   )
@@ -180,7 +180,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_month(
   p_month_year TEXT,
-  p_payment_method TEXT DEFAULT _const_payment_cash()
+  p_payment_method TEXT DEFAULT 'cash'
 )
 RETURNS TABLE (
   employee_id UUID,
@@ -210,7 +210,7 @@ BEGIN
   FOR r IN
     SELECT e.id
     FROM public.employees e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
       AND e.company_id = v_company_id
     ORDER BY e.name
   LOOP

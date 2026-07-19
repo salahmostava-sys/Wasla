@@ -1,4 +1,4 @@
-﻿BEGIN;
+BEGIN;
 
 CREATE OR REPLACE FUNCTION public._const_dashboard_month_format() RETURNS TEXT
 LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO public AS
@@ -68,10 +68,10 @@ BEGIN
   IF NOT (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
-      OR public.has_role(auth.uid(), _const_role_operations())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
+      OR public.has_role(auth.uid(), 'operations')
     )
   ) THEN
     RAISE EXCEPTION 'Not allowed';
@@ -298,7 +298,7 @@ BEGIN
     active_employees AS (
       SELECT COUNT(*)::INTEGER AS total
       FROM public.employees
-      WHERE status = _const_employee_active()
+      WHERE status = 'active'
     ),
     targets_summary AS (
       SELECT
@@ -494,7 +494,7 @@ BEGIN
             'appName', app_name,
             'brandColor', brand_color,
             'textColor', text_color,
-            _const_work_orders(), total_orders,
+            'orders', total_orders,
             'riders', rider_count,
             'targetOrders', target_orders,
             'targetAchievementPct', target_achievement_pct,
@@ -509,7 +509,7 @@ BEGIN
         SELECT jsonb_agg(
           jsonb_build_object(
             'city', city,
-            _const_work_orders(), orders
+            'orders', orders
           )
           ORDER BY orders DESC, city
         )
@@ -519,7 +519,7 @@ BEGIN
         SELECT jsonb_agg(
           jsonb_build_object(
             'date', date,
-            _const_work_orders(), orders
+            'orders', orders
           )
           ORDER BY date
         )
@@ -694,10 +694,10 @@ BEGIN
   IF NOT (
     public.is_active_user(auth.uid())
     AND (
-      public.has_role(auth.uid(), _const_role_admin())
-      OR public.has_role(auth.uid(), _const_role_hr())
-      OR public.has_role(auth.uid(), _const_role_finance())
-      OR public.has_role(auth.uid(), _const_role_operations())
+      public.has_role(auth.uid(), 'admin')
+      OR public.has_role(auth.uid(), 'hr')
+      OR public.has_role(auth.uid(), 'finance')
+      OR public.has_role(auth.uid(), 'operations')
     )
   ) THEN
     RAISE EXCEPTION 'Not allowed';
@@ -1016,7 +1016,7 @@ BEGIN
             'appId', pb.app_id,
             'appName', pb.app_name,
             'brandColor', pb.brand_color,
-            _const_work_orders(), pb.total_orders
+            'orders', pb.total_orders
           )
           ORDER BY pb.total_orders DESC, pb.app_name
         )
@@ -1026,7 +1026,7 @@ BEGIN
         SELECT jsonb_agg(
           jsonb_build_object(
             'date', rdo.date,
-            _const_work_orders(), rdo.total_orders
+            'orders', rdo.total_orders
           )
           ORDER BY rdo.date
         )

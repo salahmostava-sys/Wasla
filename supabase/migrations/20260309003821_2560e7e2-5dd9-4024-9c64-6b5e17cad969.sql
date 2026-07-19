@@ -1,4 +1,4 @@
-﻿
+
 -- Step 1: Create is_active_user helper function
 CREATE OR REPLACE FUNCTION public.is_active_user(_user_id uuid)
 RETURNS boolean

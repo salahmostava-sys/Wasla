@@ -1,4 +1,4 @@
-﻿-- Fix CUD RLS policies for employees and employee_apps to respect custom user_permissions
+-- Fix CUD RLS policies for employees and employee_apps to respect custom user_permissions
 
 -- 1. employees
 DROP POLICY IF EXISTS "unified_insert_policy" ON public.employees;

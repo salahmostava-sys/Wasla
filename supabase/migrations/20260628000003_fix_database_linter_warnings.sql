@@ -1,4 +1,4 @@
-﻿-- Fix: Database Linter Warnings
+-- Fix: Database Linter Warnings
 
 -- 1. function_search_path_mutable
 -- calc_tier_salary has a role mutable search_path

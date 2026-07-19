@@ -1,4 +1,4 @@
-﻿-- Add avatar_url to profiles
+-- Add avatar_url to profiles
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;
 
 -- Create avatars storage bucket (public)

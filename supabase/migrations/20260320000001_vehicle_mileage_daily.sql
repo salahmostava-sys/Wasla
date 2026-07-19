@@ -1,4 +1,4 @@
-﻿
+
 -- Daily fuel/km entries table
 CREATE TABLE IF NOT EXISTS public.vehicle_mileage_daily (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -24,14 +24,14 @@ CREATE POLICY "Admin/operations can manage vehicle_mileage_daily"
   ON public.vehicle_mileage_daily FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_operations())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'operations')
     )
   );
 

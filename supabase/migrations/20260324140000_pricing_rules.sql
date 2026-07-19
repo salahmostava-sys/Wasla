@@ -1,4 +1,4 @@
-﻿-- Pricing rules for payroll calculation (db-driven)
+-- Pricing rules for payroll calculation (db-driven)
 
 CREATE TABLE IF NOT EXISTS public.pricing_rules (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS public.pricing_rules (
   min_orders INTEGER NOT NULL DEFAULT 0,
   max_orders INTEGER,
   rule_type TEXT NOT NULL DEFAULT 'per_order' -- NOSONAR
-    CHECK (rule_type IN ('per_order', 'fixed', _const_work_hybrid())),
+    CHECK (rule_type IN ('per_order', 'fixed', 'hybrid')),
   rate_per_order NUMERIC(10,2),
   fixed_salary NUMERIC(10,2),
   bonus_target_orders INTEGER,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.pricing_rules (
   CONSTRAINT pricing_rules_payload_chk CHECK (
     (rule_type = 'per_order' AND rate_per_order IS NOT NULL) OR
     (rule_type = 'fixed' AND fixed_salary IS NOT NULL) OR
-    (rule_type = _const_work_hybrid() AND rate_per_order IS NOT NULL AND fixed_salary IS NOT NULL)
+    (rule_type = 'hybrid' AND rate_per_order IS NOT NULL AND fixed_salary IS NOT NULL)
   )
 );
 
@@ -42,14 +42,14 @@ CREATE POLICY "Finance/admin can manage pricing_rules"
   ON public.pricing_rules FOR ALL
   USING (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND (
-      has_role(auth.uid(), _const_role_admin()) OR
-      has_role(auth.uid(), _const_role_finance())
+      has_role(auth.uid(), 'admin') OR
+      has_role(auth.uid(), 'finance')
     )
   );
 

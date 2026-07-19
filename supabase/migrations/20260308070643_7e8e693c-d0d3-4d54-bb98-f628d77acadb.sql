@@ -1,4 +1,4 @@
-﻿
+
 CREATE TABLE IF NOT EXISTS public.scheme_month_snapshots (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   scheme_id uuid NOT NULL REFERENCES public.salary_schemes(id) ON DELETE CASCADE,
@@ -20,4 +20,4 @@ DROP POLICY IF EXISTS "Admins/finance can manage scheme_month_snapshots" ON publ
 CREATE POLICY "Admins/finance can manage scheme_month_snapshots"
   ON public.scheme_month_snapshots FOR ALL
   TO authenticated
-  USING (has_role(auth.uid(), _const_role_admin()) OR has_role(auth.uid(), _const_role_finance()));
+  USING (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'finance'));

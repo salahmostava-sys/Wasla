@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- SECURITY FIX: Revoke anon EXECUTE on all SECURITY DEFINER functions
 -- All these functions require an authenticated session; anon access is unintentional.
 -- ============================================================

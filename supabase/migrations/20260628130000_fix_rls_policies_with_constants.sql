@@ -1,4 +1,4 @@
-﻿-- supabase/migrations/20260628130000_fix_rls_policies_with_constants.sql
+-- supabase/migrations/20260628130000_fix_rls_policies_with_constants.sql
 -- Fix: Replace nested SELECTs and _const_role_* references with literals
 
 -- For salary_slip_templates

@@ -1,4 +1,4 @@
-﻿-- Fix Supabase Linter warnings:
+-- Fix Supabase Linter warnings:
 -- 1. security_definer_view â†’ security_invoker IS TRUE
 -- 2. function_search_path_mutable â†’ SET search_path = 'public'
 
@@ -20,7 +20,7 @@ FROM public.daily_orders AS d
 JOIN public.employees AS e ON e.id = d.employee_id
 JOIN public.apps AS a ON a.id = d.app_id
 WHERE d.orders_count > 0
-  AND (d.status IS NULL OR d.status <> _const_order_cancelled())
+  AND (d.status IS NULL OR d.status <> 'cancelled')
 GROUP BY d.employee_id, e.name, e.city, d.date, d.app_id, a.name, a.brand_color;
 
 -- v_rider_daily_performance and v_rider_monthly_performance depend on the first view,

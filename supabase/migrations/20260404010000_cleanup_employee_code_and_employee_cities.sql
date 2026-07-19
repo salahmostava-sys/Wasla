@@ -1,4 +1,4 @@
-﻿BEGIN;
+BEGIN;
 
 UPDATE public.employees
 SET preferred_language = 'ar'

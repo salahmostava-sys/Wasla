@@ -1,4 +1,4 @@
-﻿-- Fix salary_slip_templates RLS: remove `true OR ...` bypass and loose auth.role() checks.
+-- Fix salary_slip_templates RLS: remove `true OR ...` bypass and loose auth.role() checks.
 -- Environments that applied 20260606000007 before later fixes could expose templates to any user.
 
 DROP POLICY IF EXISTS "unified_select_policy" ON public.salary_slip_templates;

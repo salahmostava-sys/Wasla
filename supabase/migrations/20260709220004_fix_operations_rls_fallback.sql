@@ -1,4 +1,4 @@
-﻿-- Add operations role back to CUD policies for employees, employee_apps, and employee_tiers to prevent 403 errors
+-- Add operations role back to CUD policies for employees, employee_apps, and employee_tiers to prevent 403 errors
 -- while maintaining the user_permissions checks.
 
 -- 1. employee_apps

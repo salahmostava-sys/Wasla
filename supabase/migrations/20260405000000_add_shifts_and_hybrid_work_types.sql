@@ -1,6 +1,6 @@
-﻿-- Add work_type to apps table
-ALTER TABLE apps ADD COLUMN IF NOT EXISTS work_type TEXT DEFAULT _const_work_orders() 
-  CHECK (work_type IN (_const_work_orders(), _const_work_shift(), _const_work_hybrid()));
+-- Add work_type to apps table
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS work_type TEXT DEFAULT 'orders' 
+  CHECK (work_type IN ('orders', 'shift', 'hybrid'));
 
 COMMENT ON COLUMN apps.work_type IS 'Ù†ÙˆØ¹ Ø§Ù„Ø¹Ù…Ù„: orders (Ø·Ù„Ø¨Ø§Øª), shift (Ø¯ÙˆØ§Ù…), hybrid (Ù…Ø®ØªÙ„Ø·)';
 

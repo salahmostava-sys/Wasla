@@ -1,4 +1,4 @@
-﻿-- Shift salary = always full monthly_amount
+-- Shift salary = always full monthly_amount
 -- Attendance/daily_shifts are completely decoupled from salary calculation.
 -- Only orders-based platforms use daily data for salary.
 

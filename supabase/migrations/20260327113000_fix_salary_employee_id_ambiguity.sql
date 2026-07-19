@@ -1,10 +1,10 @@
-﻿-- Fix ambiguous employee_id references in salary RPC path.
+-- Fix ambiguous employee_id references in salary RPC path.
 -- Recreates salary functions with fully-qualified column references.
 
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_employee_month(
   p_employee_id uuid,
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash()::text,
+  p_payment_method text DEFAULT 'cash'::text,
   p_manual_deduction numeric DEFAULT 0,
   p_manual_deduction_note text DEFAULT NULL::text
 )
@@ -53,7 +53,7 @@ BEGIN
   FROM public.daily_orders AS d
   WHERE d.employee_id = p_employee_id
     AND d.date BETWEEN v_start AND v_end
-    AND (d.status IS NULL OR d.status <> _const_order_cancelled());
+    AND (d.status IS NULL OR d.status <> 'cancelled');
 
   SELECT COALESCE(COUNT(*), 0)::integer
   INTO v_attendance_days
@@ -69,7 +69,7 @@ BEGIN
   FROM public.external_deductions AS ed
   WHERE ed.employee_id = p_employee_id
     AND ed.apply_month = p_month_year
-    AND ed.approval_status = _const_approval_approved();
+    AND ed.approval_status = 'approved';
 
   SELECT COALESCE(SUM(ai.amount), 0)
   INTO v_advance_deduction
@@ -77,7 +77,7 @@ BEGIN
   JOIN public.advance_installments AS ai ON ai.advance_id = ad.id
   WHERE ad.employee_id = p_employee_id
     AND ai.month_year = p_month_year
-    AND ai.status IN (_const_installment_pending(), _const_installment_deferred());
+    AND ai.status IN ('pending', 'deferred');
 
   v_attendance_deduction := 0;
   v_net := GREATEST(
@@ -114,8 +114,8 @@ BEGIN
     v_manual_deduction,
     p_manual_deduction_note,
     v_net,
-    COALESCE(NULLIF(TRIM(p_payment_method), ''), _const_payment_cash()),
-    _const_calc_calculated(),
+    COALESCE(NULLIF(TRIM(p_payment_method), ''), 'cash'),
+    'calculated',
     'engine_v3',
     false
   )
@@ -163,7 +163,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.calculate_salary_for_month(
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash()::text
+  p_payment_method text DEFAULT 'cash'::text
 )
 RETURNS TABLE(
   employee_id uuid,
@@ -188,7 +188,7 @@ BEGIN
   FOR v_emp IN
     SELECT e.id
     FROM public.employees AS e
-    WHERE e.status = _const_employee_active()
+    WHERE e.status = 'active'
     ORDER BY e.name
   LOOP
     RETURN QUERY
@@ -207,7 +207,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.calculate_salary(
   p_employee_id uuid,
   p_month_year text,
-  p_payment_method text DEFAULT _const_payment_cash(),
+  p_payment_method text DEFAULT 'cash',
   p_manual_deduction numeric DEFAULT 0,
   p_manual_deduction_note text DEFAULT NULL
 )

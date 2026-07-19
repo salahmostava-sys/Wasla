@@ -1,4 +1,4 @@
-﻿-- Add commercial_record column to employees table
+-- Add commercial_record column to employees table
 -- This field stores the commercial registration number (Ø§Ù„Ø³Ø¬Ù„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ) for each employee
 
 ALTER TABLE public.employees

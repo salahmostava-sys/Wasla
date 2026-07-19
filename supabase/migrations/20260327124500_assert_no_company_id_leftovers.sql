@@ -1,4 +1,4 @@
-﻿-- Guardrail assertions: fail migration if any company_id leftovers still exist.
+-- Guardrail assertions: fail migration if any company_id leftovers still exist.
 -- This helps keep single-organization mode clean across future changes.
 
 DO $$

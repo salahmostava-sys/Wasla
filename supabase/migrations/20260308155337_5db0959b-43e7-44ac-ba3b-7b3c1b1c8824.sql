@@ -1,4 +1,4 @@
-﻿
+
 -- Auto-assign 'viewer' role to every new user on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user_role()
 RETURNS trigger

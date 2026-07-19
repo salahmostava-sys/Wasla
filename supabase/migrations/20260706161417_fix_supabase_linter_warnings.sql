@@ -1,4 +1,4 @@
-﻿-- Fix permissive RLS policies on vehicle_documents
+-- Fix permissive RLS policies on vehicle_documents
 DROP POLICY IF EXISTS "Authenticated users can insert vehicle documents" ON public.vehicle_documents;
 CREATE POLICY "Authenticated users can insert vehicle documents"
     ON public.vehicle_documents FOR INSERT

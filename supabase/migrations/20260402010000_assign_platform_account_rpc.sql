@@ -1,4 +1,4 @@
-﻿BEGIN;
+BEGIN;
 
 CREATE OR REPLACE FUNCTION public.assign_platform_account(
   p_account_id uuid,
@@ -18,8 +18,8 @@ BEGIN
   IF auth.uid() IS NULL
      OR NOT public.is_active_user(auth.uid())
      OR NOT (
-       public.has_role(auth.uid(), _const_role_admin())
-       OR public.has_role(auth.uid(), _const_role_hr())
+       public.has_role(auth.uid(), 'admin')
+       OR public.has_role(auth.uid(), 'hr')
      ) THEN
     RAISE EXCEPTION 'forbidden';
   END IF;

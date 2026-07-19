@@ -1,4 +1,4 @@
-﻿-- Migration: Update salary calculation to support shifts and hybrid work types
+-- Migration: Update salary calculation to support shifts and hybrid work types
 -- Date: 2025-01-XX
 -- Description: Enhances calculate_salary_for_employee_month to handle orders, shifts, and hybrid platforms
 
@@ -65,13 +65,13 @@ BEGIN
     FROM employee_apps ea
     JOIN apps a ON a.id = ea.app_id
     WHERE ea.employee_id = p_employee_id
-      AND ea.status = _const_employee_active()
+      AND ea.status = 'active'
       AND a.is_active IS TRUE
   LOOP
     v_app_earnings := 0;
 
     -- Handle based on work_type
-    IF v_app.work_type = _const_work_orders() OR v_app.work_type IS NULL THEN
+    IF v_app.work_type = 'orders' OR v_app.work_type IS NULL THEN
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       -- ORDERS-BASED PLATFORM
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -109,13 +109,13 @@ BEGIN
       v_breakdown := v_breakdown || jsonb_build_object(
         'app_id', v_app.app_id, -- NOSONAR
         'app_name', v_app.app_name, -- NOSONAR
-        'work_type', _const_work_orders(), -- NOSONAR
+        'work_type', 'orders', -- NOSONAR
         'orders_count', v_app_orders,
         'rate_per_order', COALESCE(v_pricing.rate_per_order, 0),
         'earnings', v_app_earnings -- NOSONAR
       );
 
-    ELSIF v_app.work_type = _const_work_shift() THEN
+    ELSIF v_app.work_type = 'shift' THEN
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       -- SHIFT-BASED PLATFORM
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -136,7 +136,7 @@ BEGIN
       FROM pricing_rules
       WHERE app_id = v_app.app_id
         AND is_active IS TRUE
-        AND rule_type = _const_work_shift()
+        AND rule_type = 'shift'
       ORDER BY priority ASC
       LIMIT 1;
 
@@ -151,14 +151,14 @@ BEGIN
       v_breakdown := v_breakdown || jsonb_build_object(
         'app_id', v_app.app_id,
         'app_name', v_app.app_name,
-        'work_type', _const_work_shift(),
+        'work_type', 'shift',
         'total_hours', v_app_shifts.total_hours, -- NOSONAR
         'total_shifts', v_app_shifts.total_shifts,
         'rate_per_hour', COALESCE(v_pricing.rate_per_order, 0),
         'earnings', v_app_earnings
       );
 
-    ELSIF v_app.work_type = _const_work_hybrid() THEN
+    ELSIF v_app.work_type = 'hybrid' THEN
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       -- HYBRID PLATFORM (Ninja-style)
       -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -188,8 +188,8 @@ BEGIN
         v_breakdown := v_breakdown || jsonb_build_object(
           'app_id', v_app.app_id,
           'app_name', v_app.app_name,
-          'work_type', _const_work_hybrid(),
-          'calculation_method', _const_work_shift(), -- NOSONAR
+          'work_type', 'hybrid',
+          'calculation_method', 'shift', -- NOSONAR
           'total_hours', v_app_shifts.total_hours,
           'min_hours_required', v_hybrid_rule.min_hours_for_shift, -- NOSONAR
           'shift_rate', v_hybrid_rule.shift_rate,
@@ -228,8 +228,8 @@ BEGIN
           v_breakdown := v_breakdown || jsonb_build_object(
             'app_id', v_app.app_id,
             'app_name', v_app.app_name,
-            'work_type', _const_work_hybrid(),
-            'calculation_method', _const_calc_method_orders_fallback(),
+            'work_type', 'hybrid',
+            'calculation_method', 'orders_fallback',
             'total_hours', v_app_shifts.total_hours,
             'min_hours_required', v_hybrid_rule.min_hours_for_shift,
             'orders_count', v_app_orders,
@@ -243,7 +243,7 @@ BEGIN
           v_breakdown := v_breakdown || jsonb_build_object(
             'app_id', v_app.app_id,
             'app_name', v_app.app_name,
-            'work_type', _const_work_hybrid(),
+            'work_type', 'hybrid',
             'calculation_method', 'none',
             'total_hours', v_app_shifts.total_hours,
             'min_hours_required', v_hybrid_rule.min_hours_for_shift,
@@ -260,10 +260,10 @@ BEGIN
   WHERE advance_id IN (
     SELECT id FROM advances 
     WHERE employee_id = p_employee_id 
-      AND status = _const_employee_active()
+      AND status = 'active'
   )
   AND month_year = p_month_year
-  AND status = _const_installment_pending();
+  AND status = 'pending';
 
   -- Return results
   RETURN QUERY SELECT

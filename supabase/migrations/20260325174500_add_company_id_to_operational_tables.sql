@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- Add canonical company_id to operational tables (multi-tenant SaaS baseline)
 -- Tables:
 --   profiles (users), attendance, daily_orders, advances,
@@ -316,10 +316,10 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -331,8 +331,8 @@ WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -344,16 +344,16 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -365,8 +365,8 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
   )
 );
 
@@ -380,10 +380,10 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -395,18 +395,18 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_operations())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'operations')
   )
 );
 
@@ -420,9 +420,9 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -434,16 +434,16 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -457,9 +457,9 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_hr())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'hr')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -471,16 +471,16 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -494,8 +494,8 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -507,16 +507,16 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -530,8 +530,8 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );
 
@@ -543,15 +543,15 @@ USING (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 )
 WITH CHECK (
   is_active_user(auth.uid())
   AND company_id = public.jwt_company_id()
   AND (
-    has_role(auth.uid(), _const_role_admin())
-    OR has_role(auth.uid(), _const_role_finance())
+    has_role(auth.uid(), 'admin')
+    OR has_role(auth.uid(), 'finance')
   )
 );

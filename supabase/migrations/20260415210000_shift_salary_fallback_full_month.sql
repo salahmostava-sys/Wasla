@@ -1,4 +1,4 @@
-﻿-- Fix: when no daily_shifts records exist for an employee+app in a given month,
+-- Fix: when no daily_shifts records exist for an employee+app in a given month,
 -- fall back to full monthly_amount (assume full attendance).
 -- This ensures months before the attendance system was introduced (April 2026)
 -- still calculate correctly.

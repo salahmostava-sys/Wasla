@@ -1,4 +1,4 @@
-﻿-- Allow users with orders:write permission to also delete from daily_orders
+-- Allow users with orders:write permission to also delete from daily_orders
 DROP POLICY IF EXISTS "unified_delete_policy" ON public."daily_orders";
 CREATE POLICY "unified_delete_policy" ON public."daily_orders" FOR DELETE
   USING (

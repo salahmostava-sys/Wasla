@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS public.locked_months (
+CREATE TABLE IF NOT EXISTS public.locked_months (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   month_year TEXT NOT NULL UNIQUE,
   locked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -17,10 +17,10 @@ CREATE POLICY "locked_months_manage"
   ON public.locked_months FOR ALL
   USING (
     is_active_user(auth.uid()) AND
-    has_role(auth.uid(), _const_role_admin())
+    has_role(auth.uid(), 'admin')
   )
   WITH CHECK (
     is_active_user(auth.uid()) AND
-    has_role(auth.uid(), _const_role_admin())
+    has_role(auth.uid(), 'admin')
   );
 
