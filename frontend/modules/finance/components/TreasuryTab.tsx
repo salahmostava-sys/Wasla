@@ -268,11 +268,11 @@ export function TreasuryTab() {
         <td className="ta-td">
           <div className="flex items-center gap-1 justify-center">
             <Button onClick={handleConfirmEdit} disabled={isUpdatingTransaction || !editAccountId || !editAmount}
-              size="icon" variant="ghost" className="h-7 w-7 text-emerald-600 hover:bg-emerald-50" title="حفظ">
+              size="icon" variant="ghost" className="h-7 w-7 text-emerald-600 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40" title="حفظ">
               {isUpdatingTransaction ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
             </Button>
             <Button onClick={() => setEditTarget(null)} disabled={isUpdatingTransaction}
-              size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-rose-500 hover:bg-rose-50" title="إلغاء">
+              size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:text-rose-300 dark:hover:bg-rose-950/40" title="إلغاء">
               <X size={13} />
             </Button>
           </div>
@@ -486,7 +486,7 @@ export function TreasuryTab() {
               <Input id="filter-desc" value={filterDesc} onChange={e => setFilterDesc(e.target.value)} placeholder="بحث في البيان..." className="h-7 text-xs w-36" />
             </div>
             {activeFilterCount > 0 && (
-              <Button variant="ghost" size="sm" className="h-7 text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 gap-1 mt-3.5" onClick={clearFilters}>
+              <Button variant="ghost" size="sm" className="h-7 text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 gap-1 mt-3.5 dark:hover:text-rose-300 dark:hover:bg-rose-950/40" onClick={clearFilters}>
                 <X size={11} /> مسح الفلاتر
               </Button>
             )}

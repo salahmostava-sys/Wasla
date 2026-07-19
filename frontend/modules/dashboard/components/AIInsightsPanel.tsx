@@ -11,10 +11,10 @@ interface AIInsightsPanelProps {
 }
 
 const severityStyles: Record<string, string> = {
-  success: 'border-emerald-200 bg-emerald-50/50 text-emerald-800',
-  info: 'border-blue-200 bg-blue-50/50 text-blue-800',
-  warning: 'border-amber-200 bg-amber-50/50 text-amber-800',
-  critical: 'border-rose-200 bg-rose-50/50 text-rose-800',
+  success: 'border-emerald-200 bg-emerald-50/50 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/35 dark:text-emerald-200',
+  info: 'border-blue-200 bg-blue-50/50 text-blue-800 dark:border-blue-700/60 dark:bg-blue-950/35 dark:text-blue-200',
+  warning: 'border-amber-200 bg-amber-50/50 text-amber-800 dark:border-amber-700/60 dark:bg-amber-950/35 dark:text-amber-200',
+  critical: 'border-rose-200 bg-rose-50/50 text-rose-800 dark:border-rose-700/60 dark:bg-rose-950/35 dark:text-rose-200',
 };
 
 function InsightRow({ insight }: Readonly<{ insight: AIInsight }>) {
@@ -36,7 +36,7 @@ export function AIInsightsPanel({ insights }: Readonly<AIInsightsPanelProps>) {
     : insights.insights.slice(0, 4);
 
   return (
-    <div className="bg-card -2xl shadow-card overflow-hidden rounded-2xl">
+    <div className="bg-card border border-border/70 shadow-card overflow-hidden rounded-2xl">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -48,7 +48,7 @@ export function AIInsightsPanel({ insights }: Readonly<AIInsightsPanelProps>) {
             <p className="text-[11px] text-muted-foreground">مبني على بيانات الأداء الحقيقية</p>
           </div>
         </div>
-        <span className="text-[11px] font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-lg">
+        <span className="text-[11px] font-bold text-violet-700 bg-violet-50 px-2.5 py-1 rounded-lg dark:bg-violet-950/45 dark:text-violet-300">
           AI
         </span>
       </div>

@@ -69,7 +69,7 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
                     <span className="text-sm font-bold text-foreground">{batch.file_name || 'بدون اسم ملف'}</span>
                     <span className="text-[11px] text-muted-foreground">{sourceLabel(batch.source_type)}</span>
                     {hasErrors && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium dark:bg-rose-950/45 dark:text-rose-300">
                         {batch.error_count} أخطاء
                       </span>
                     )}
@@ -107,7 +107,7 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-100"
+                      className="h-7 w-7 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-100 dark:hover:text-rose-300 dark:hover:bg-rose-950/45"
                       onClick={() => onDelete(batch.id)}
                       title="حذف السجل"
                     >
@@ -118,14 +118,14 @@ export function OrdersImportHistorySummary(props: Readonly<OrdersImportHistorySu
               </div>
 
               {isExpanded && hasErrors && batch.error_summary && (
-                <div className="px-3 py-2 bg-rose-50/50 border-t border-rose-100">
+                <div className="px-3 py-2 bg-rose-50/50 border-t border-rose-100 dark:bg-rose-950/30 dark:border-rose-800/60">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertCircle size={14} className="text-rose-500" />
-                    <span className="text-xs font-semibold text-rose-700">تفاصيل الأخطاء:</span>
+                    <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">تفاصيل الأخطاء:</span>
                   </div>
                   <ul className="space-y-1">
                     {batch.error_summary.map((err) => (
-                      <li key={`${err.row}-${err.reason}-${err.details ?? ''}`} className="text-[11px] text-rose-600">
+                      <li key={`${err.row}-${err.reason}-${err.details ?? ''}`} className="text-[11px] text-rose-600 dark:text-rose-300">
                         {err.row ? `الصف ${err.row}: ` : ''}{err.reason}
                         {err.details ? ` (${err.details})` : ''}
                       </li>

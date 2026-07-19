@@ -12,24 +12,24 @@ interface AIRecommendationsSectionProps {
 
 const typeStyles: Record<string, { border: string; bg: string; accent: string }> = {
   reward: {
-    border: 'border-emerald-200',
-    bg: 'bg-gradient-to-br from-emerald-50 to-teal-50/50',
-    accent: 'text-emerald-700',
+    border: 'border-emerald-200 dark:border-emerald-700/60',
+    bg: 'bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-950/45 dark:to-teal-950/25',
+    accent: 'text-emerald-700 dark:text-emerald-300',
   },
   follow_up: {
-    border: 'border-amber-200',
-    bg: 'bg-gradient-to-br from-amber-50 to-orange-50/50',
-    accent: 'text-amber-700',
+    border: 'border-amber-200 dark:border-amber-700/60',
+    bg: 'bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-amber-950/45 dark:to-orange-950/25',
+    accent: 'text-amber-700 dark:text-amber-300',
   },
   warning: {
-    border: 'border-rose-200',
-    bg: 'bg-gradient-to-br from-rose-50 to-pink-50/50',
-    accent: 'text-rose-700',
+    border: 'border-rose-200 dark:border-rose-700/60',
+    bg: 'bg-gradient-to-br from-rose-50 to-pink-50/50 dark:from-rose-950/45 dark:to-pink-950/25',
+    accent: 'text-rose-700 dark:text-rose-300',
   },
   improve: {
-    border: 'border-blue-200',
-    bg: 'bg-gradient-to-br from-blue-50 to-indigo-50/50',
-    accent: 'text-blue-700',
+    border: 'border-blue-200 dark:border-blue-700/60',
+    bg: 'bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-950/45 dark:to-indigo-950/25',
+    accent: 'text-blue-700 dark:text-blue-300',
   },
 };
 
@@ -58,7 +58,7 @@ function RecommendationCard({
             key={rider.employeeId}
             onClick={() => onRiderClick?.(rider.employeeId)}
             className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl
-                       bg-white/60 hover:bg-white/90 border border-white/50
+                       bg-card/70 hover:bg-card border border-border/70
                        transition-all duration-200 group text-start"
           >
             <div className="min-w-0">
@@ -83,7 +83,7 @@ export function AIRecommendationsSection({
   if (recommendations.length === 0) return null;
 
   return (
-    <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
+    <div className="bg-card border border-border/70 p-5 shadow-card rounded-2xl">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-card shadow-card rounded-2xl">
           <Lightbulb size={18} />

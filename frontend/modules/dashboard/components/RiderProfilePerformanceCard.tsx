@@ -249,10 +249,10 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
           <div className="flex items-center gap-2 mb-4">
             <Award size={20} className="text-violet-600" />
             <h3 className="text-base font-bold text-foreground">تحليل ذكي</h3>
-            <span className="text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md">AI</span>
+            <span className="text-xs font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-md dark:bg-violet-950/45 dark:text-violet-300">AI</span>
           </div>
-          <div className="rounded-xl bg-gradient-to-br from-violet-50 to-purple-50/50 border border-violet-100 px-4 py-3 mb-4">
-            <p className="text-base font-bold text-violet-900 leading-relaxed">
+          <div className="rounded-xl bg-gradient-to-br from-violet-50 to-purple-50/50 border border-violet-100 px-4 py-3 mb-4 dark:from-violet-950/45 dark:to-purple-950/25 dark:border-violet-700/60">
+            <p className="text-base font-bold text-violet-900 leading-relaxed dark:text-violet-200">
               {analysis.judgmentText}
             </p>
           </div>
@@ -265,8 +265,8 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
             ))}
           </div>
           {analysis.needsFollowUp && (
-            <div className="flex items-center gap-2 mt-5 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
-              <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+            <div className="flex items-center gap-2 mt-5 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-950/35 dark:border-amber-700/60">
+              <AlertTriangle size={16} className="text-amber-600 dark:text-amber-300 shrink-0" />
               <span className="text-sm font-bold text-amber-800">يحتاج متابعة</span>
             </div>
           )}
@@ -295,8 +295,8 @@ export function RiderProfilePerformanceCard({ data }: Readonly<RiderProfilePerfo
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                   salary.isApproved
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-amber-50 text-amber-700'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                    : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
                 }`}
               >
                 {salary.isApproved ? 'معتمد' : 'غير معتمد'}

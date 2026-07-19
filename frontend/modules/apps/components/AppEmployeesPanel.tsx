@@ -127,13 +127,13 @@ export const AppEmployeesPanel = ({
                         }
                         if (employee.onTrack) {
                           return (
-                            <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
+                            <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
                               <Check size={10} /> {t('onTrackTarget')}
                             </div>
                           );
                         }
                         return (
-                          <div className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600">
+                          <div className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
                             <X size={10} /> {t('belowTarget')}
                           </div>
                         );

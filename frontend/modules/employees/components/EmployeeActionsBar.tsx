@@ -72,13 +72,13 @@ export function EmployeeActionsBar({
       <div className="space-y-2 text-xs">
         <div className="grid grid-cols-3 gap-1">
           <div className="rounded bg-muted/40 px-2 py-1 text-center">{t('processedCount', { count: uploadReport.totalProcessed })}</div>
-          <div className="rounded bg-emerald-50 text-emerald-700 px-2 py-1 text-center">{t('successCount', { count: uploadReport.successfulRows })}</div>
-          <div className="rounded bg-rose-50 text-rose-700 px-2 py-1 text-center">{t('failureCount', { count: uploadReport.failedRows })}</div>
+          <div className="rounded bg-emerald-50 text-emerald-700 px-2 py-1 text-center dark:bg-emerald-950/40 dark:text-emerald-300">{t('successCount', { count: uploadReport.successfulRows })}</div>
+          <div className="rounded bg-rose-50 text-rose-700 px-2 py-1 text-center dark:bg-rose-950/40 dark:text-rose-300">{t('failureCount', { count: uploadReport.failedRows })}</div>
         </div>
         {uploadReport.errors.length > 0 && (
-          <div className="max-h-36 overflow-y-auto rounded border border-rose-200 bg-rose-50/40 p-2 space-y-1">
+          <div className="max-h-36 overflow-y-auto rounded border border-rose-200 bg-rose-50/40 p-2 space-y-1 dark:border-rose-700/60 dark:bg-rose-950/30">
             {uploadReport.errors.map((error) => (
-              <div key={error.rowIndex} className="text-rose-700">
+              <div key={error.rowIndex} className="text-rose-700 dark:text-rose-300">
                 {t('rowIssue', { row: error.rowIndex, issue: error.issue })}
               </div>
             ))}

@@ -39,11 +39,11 @@ interface MonthlyRecordProps {
 }
 
 const STATUS_MAP: Record<AttendanceStatus, { color: string; labelKey: string; arChar: string; enChar: string }> = {
-  present: { color: 'text-green-700 bg-green-100/50', labelKey: 'present', arChar: 'ح', enChar: 'P' },
+  present: { color: 'text-green-700 bg-green-100/50 dark:text-green-300 dark:bg-green-950/40', labelKey: 'present', arChar: 'ح', enChar: 'P' },
   absent: { color: 'text-destructive bg-destructive/10', labelKey: 'absent', arChar: 'غ', enChar: 'A' },
-  leave: { color: 'text-yellow-700 bg-yellow-100/50', labelKey: 'leave', arChar: 'ج', enChar: 'L' },
-  sick: { color: 'text-purple-700 bg-purple-100/50', labelKey: 'sick', arChar: 'م', enChar: 'S' },
-  late: { color: 'text-orange-700 bg-orange-100/50', labelKey: 'late', arChar: 'ت', enChar: 'T' },
+  leave: { color: 'text-yellow-700 bg-yellow-100/50 dark:text-yellow-300 dark:bg-yellow-950/40', labelKey: 'leave', arChar: 'ج', enChar: 'L' },
+  sick: { color: 'text-purple-700 bg-purple-100/50 dark:text-purple-300 dark:bg-purple-950/40', labelKey: 'sick', arChar: 'م', enChar: 'S' },
+  late: { color: 'text-orange-700 bg-orange-100/50 dark:text-orange-300 dark:bg-orange-950/40', labelKey: 'late', arChar: 'ت', enChar: 'T' },
   none: { color: 'text-muted-foreground bg-transparent', labelKey: 'unspecified', arChar: '-', enChar: '-' }
 };
 
@@ -315,11 +315,11 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                         </td>
                       );
                     })}
-                    <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5">{row.summary.presentCount || '-'}</td>
+                    <td className="p-3 text-center border-b border-border font-bold text-green-600 bg-green-500/5 dark:text-green-300">{row.summary.presentCount || '-'}</td>
                     <td className="p-3 text-center border-b border-border font-bold text-destructive bg-destructive/5">{row.summary.absentCount || '-'}</td>
-                    <td className="p-3 text-center border-b border-border font-bold text-yellow-600 bg-yellow-500/5">{row.summary.leaveCount || '-'}</td>
-                    <td className="p-3 text-center border-b border-border font-bold text-purple-600 bg-purple-500/5">{row.summary.sickCount || '-'}</td>
-                    <td className="p-3 text-center border-b border-border font-bold text-orange-600 bg-orange-500/5">{row.summary.lateCount || '-'}</td>
+                    <td className="p-3 text-center border-b border-border font-bold text-yellow-600 bg-yellow-500/5 dark:text-yellow-300">{row.summary.leaveCount || '-'}</td>
+                    <td className="p-3 text-center border-b border-border font-bold text-purple-600 bg-purple-500/5 dark:text-purple-300">{row.summary.sickCount || '-'}</td>
+                    <td className="p-3 text-center border-b border-border font-bold text-orange-600 bg-orange-500/5 dark:text-orange-300">{row.summary.lateCount || '-'}</td>
                   </tr>
                 ))
               )}
