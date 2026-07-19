@@ -69,7 +69,9 @@ export default function ViolationSearchTab({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {/* Plate number with autocomplete */}
           <div className="relative" ref={suggRef}>
-            <Label className="text-sm mb-1.5 block">رقم لوحة المركبة <span className="text-destructive">*</span></Label>
+            <div className="flex items-center justify-between mb-1.5 h-6">
+              <Label className="text-sm">رقم لوحة المركبة <span className="text-destructive">*</span></Label>
+            </div>
             <Input
               value={form.plate_number}
               onChange={e => {
@@ -113,7 +115,7 @@ export default function ViolationSearchTab({
 
           {/* Date / datetime toggle */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1.5 h-6">
               <Label className="text-sm">تاريخ المخالفة <span className="text-destructive">*</span></Label>
               <button
                 type="button"
@@ -142,7 +144,9 @@ export default function ViolationSearchTab({
 
           {/* Place */}
           <div>
-            <Label className="text-sm mb-1.5 block">مكان المخالفة</Label>
+            <div className="flex items-center justify-between mb-1.5 h-6">
+              <Label className="text-sm">مكان المخالفة</Label>
+            </div>
             <Input
               value={form.place}
               onChange={e => setForm(f => ({ ...f, place: e.target.value }))}
@@ -153,7 +157,9 @@ export default function ViolationSearchTab({
 
           {/* Amount */}
           <div>
-            <Label className="text-sm mb-1.5 block">المبلغ (ر.س)</Label>
+            <div className="flex items-center justify-between mb-1.5 h-6">
+              <Label className="text-sm">المبلغ (ر.س)</Label>
+            </div>
             <Input
               type="number"
               min={0}
