@@ -127,16 +127,6 @@ const groupIcons: Record<RouteGroup, ComponentType<{ size?: string | number; cla
   system: Settings2,
 };
 
-function setHoverStylesIf(
-  el: HTMLElement,
-  shouldApply: boolean,
-  enter: boolean
-) {
-  if (!shouldApply) return;
-  el.style.background = enter ? 'rgba(31, 84, 173, 0.08)' : 'transparent';
-  el.style.color = 'var(--ds-primary)';
-}
-
 type SidebarNavItemData = {
   label: string;
   icon: ComponentType<{ size?: string | number; className?: string }>;
@@ -164,22 +154,10 @@ const SidebarNavLink = memo(function SidebarNavLink({
       className={cn(
         'relative flex h-10 items-center gap-2.5 px-3 rounded-xl text-sm font-medium transition-all duration-150 overflow-hidden',
         collapsed && 'justify-center px-0',
-      )}
-      style={
         active
-          ? {
-              background: 'var(--ds-primary)',
-              color: '#ffffff',
-              fontWeight: 700,
-            }
-          : { color: '#061735', fontWeight: 600 }
-      }
-      onMouseEnter={(e) => {
-        setHoverStylesIf(e.currentTarget, !active, true);
-      }}
-      onMouseLeave={(e) => {
-        setHoverStylesIf(e.currentTarget, !active, false);
-      }}
+          ? 'bg-sidebar-primary text-sidebar-primary-foreground font-bold'
+          : 'text-sidebar-foreground font-semibold hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+      )}
       onClick={onNavigate}
     >
       {active && !collapsed && (
@@ -317,10 +295,10 @@ const AppSidebar = () => {
           'lg:translate-x-0',
         )}
         style={{
-          background: '#ffffff',
+          background: 'hsl(var(--sidebar-background))',
           boxShadow: 'none',
-          borderInlineStart: isRTL ? '6px solid #d9e0ea' : undefined,
-          borderInlineEnd: isRTL ? undefined : '6px solid #d9e0ea',
+          borderInlineStart: isRTL ? '6px solid hsl(var(--sidebar-border))' : undefined,
+          borderInlineEnd: isRTL ? undefined : '6px solid hsl(var(--sidebar-border))',
         }}
       >
 
@@ -334,8 +312,7 @@ const AppSidebar = () => {
             {!collapsed && (
               <div className="min-w-0">
                 <span
-                  className="text-sm font-bold leading-tight block truncate"
-                  style={{ color: '#061735' }}
+                  className="text-sm font-bold leading-tight block truncate text-sidebar-foreground"
                 >
                   {projectName}
                 </span>
@@ -427,7 +404,7 @@ const AppSidebar = () => {
                     'flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-start transition-all duration-150',
                     'hover:bg-[rgba(31,84,173,0.08)]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    'text-[#061735]'
+                    'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   )}
                   style={{ fontWeight: 600 }}
                 >
@@ -469,7 +446,7 @@ const AppSidebar = () => {
         {/* ── Collapse toggle — desktop only ────────────────── */}
         <div
           className="hidden lg:flex px-3 py-2.5 flex-shrink-0 justify-end"
-          style={{ borderTop: '1px solid #e5eaf2' }}
+          style={{ borderTop: '1px solid hsl(var(--sidebar-border))' }}
         >
           <button type="button"
             onClick={toggleCollapse}

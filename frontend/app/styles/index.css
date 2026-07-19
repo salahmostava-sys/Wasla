@@ -86,6 +86,9 @@
     --ds-on-surface:         #061735;
     --ds-on-surface-variant: #061735;
     --ds-outline-variant:    #dce2eb;
+    --ds-border:             #dce2eb;
+    --ds-hover-surface:      #f5f7fb;
+    --ds-glass-bg:           rgba(255, 255, 255, 0.80);
 
     /* ── Brand hex tokens ────────────────────────────────────── */
     --ds-primary:           #1f54ad;
@@ -99,6 +102,10 @@
     --ds-field-border:      #d8e0ec;
     --ds-table-header-bg:   #f4f6f9;
     --ds-table-header-text: #061735;
+    --ds-badge-error-text:   #9f1515;
+    --ds-badge-warning-text: #7a4a00;
+    --ds-badge-success-text: #0c6b4d;
+    --ds-badge-info-text:    #1459a6;
 
     /* ── shadcn chart palette (accessible & brand-aligned) ──── */
     --chart-1: 218 70% 40%;   /* reference admin blue */
@@ -129,23 +136,25 @@
     --shadow-card-md: 0px 14px 42px rgba(20, 31, 52, 0.075);
     --shadow-brand:   0 4px 16px rgba(31, 84, 173, 0.18);
     --shadow-focus:   0 0 0 3px rgba(31, 84, 173, 0.22);
+    --shadow-row:     0 4px 14px rgba(15, 23, 42, 0.08);
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 213 20% 92%;
-    --card: 222 40% 10%;
-    --card-foreground: 213 20% 92%;
-    --popover: 222 40% 10%;
-    --popover-foreground: 213 20% 92%;
-    --primary: 218 70% 40%;
+    color-scheme: dark;
+    --background: 220 20% 7%;
+    --foreground: 210 20% 96%;
+    --card: 215 25% 11%;
+    --card-foreground: 210 20% 96%;
+    --popover: 215 25% 11%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 216 60% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 215 28% 17%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 222 30% 16%;
-    --muted-foreground: 213 20% 92%;
-    --accent: 222 35% 20%;
-    --accent-foreground: 0 0% 100%;
+    --muted: 216 18% 16%;
+    --muted-foreground: 214 15% 78%;
+    --accent: 215 22% 19%;
+    --accent-foreground: 210 20% 96%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
     --success: 151 55% 46%;
@@ -154,38 +163,54 @@
     --warning-foreground: 0 0% 100%;
     --info: 199 80% 55%;
     --info-foreground: 0 0% 100%;
-    --border: 222 28% 20%;
-    --input: 222 28% 20%;
-    --ring: 218 70% 40%;
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 213 20% 92%;
-    --sidebar-primary: 218 70% 40%;
+    --border: 215 20% 24%;
+    --input: 215 20% 24%;
+    --ring: 216 72% 62%;
+    --sidebar-background: 215 25% 9%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 216 60% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 16%;
-    --sidebar-accent-foreground: 213 20% 92%;
-    --sidebar-border: 222 30% 14%;
-    --sidebar-ring: 218 70% 40%;
-    --sidebar-muted: 213 20% 92%;
+    --sidebar-accent: 215 22% 18%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 215 20% 20%;
+    --sidebar-ring: 216 72% 62%;
+    --sidebar-muted: 214 15% 78%;
 
     /* ── MD3 surface tokens — dark overrides ─────────────────── */
-    --ds-surface:            #0f1422;
-    --ds-surface-lowest:     #090d18;
-    --ds-surface-low:        #0c1119;
-    --ds-surface-container:  #18202f;
-    --ds-surface-high:       #1e2840;
-    --ds-on-surface:         #dde3ec;
-    --ds-on-surface-variant: #dde3ec;
-    --ds-outline-variant:    #2a3850;
-    --ds-success:           #25a576;
-    --ds-warning:           #f0a51a;
-    --ds-info:              #4f93e8;
-    --ds-field-bg:          #121b2c;
-    --ds-field-border:      #2a3850;
-    --ds-table-header-bg:   #18202f;
-    --ds-table-header-text: #dde3ec;
+    --ds-surface:            #0e1218;
+    --ds-surface-lowest:     #151b23;
+    --ds-surface-low:        #111820;
+    --ds-surface-container:  #1b2430;
+    --ds-surface-high:       #243040;
+    --ds-on-surface:         #f1f4f8;
+    --ds-on-surface-variant: #c5cfdb;
+    --ds-outline-variant:    #334154;
+    --ds-border:             #334154;
+    --ds-hover-surface:      #1d2733;
+    --ds-glass-bg:           rgba(21, 27, 35, 0.88);
+    --ds-primary:            #4f87db;
+    --ds-primary-container:  #2f66bd;
+    --ds-error:              #ff7373;
+    --ds-success:            #58c99b;
+    --ds-warning:            #f4b84a;
+    --ds-info:               #79acf0;
+    --ds-field-bg:           #111820;
+    --ds-field-border:       #334154;
+    --ds-table-header-bg:    #1b2430;
+    --ds-table-header-text:  #f1f4f8;
+    --ds-badge-error-text:   #ff9b9b;
+    --ds-badge-warning-text: #ffd17a;
+    --ds-badge-success-text: #7be0b7;
+    --ds-badge-info-text:    #9bc5f7;
 
     /* ── Header glass background — dark ─────────────────────── */
-    --header-glass-bg: rgba(12, 17, 25, 0.88);
+    --header-glass-bg: rgba(14, 18, 24, 0.92);
+
+    --shadow-card:    0 8px 28px rgba(0, 0, 0, 0.24);
+    --shadow-card-md: 0 14px 42px rgba(0, 0, 0, 0.34);
+    --shadow-brand:   0 4px 18px rgba(31, 84, 173, 0.30);
+    --shadow-focus:   0 0 0 3px rgba(79, 135, 219, 0.32);
+    --shadow-row:     0 5px 16px rgba(0, 0, 0, 0.22);
 
     /* ── shadcn chart palette — dark overrides ───────────────── */
     --chart-1: 218 70% 40%;   /* reference admin blue */
@@ -675,8 +700,8 @@
 
   .employees-table tbody tr:hover {
     position: relative;
-    background: color-mix(in srgb, var(--ds-surface-low) 82%, white);
-    box-shadow: inset 0 0 0 9999px rgba(31, 84, 173, 0.035), 0 6px 18px rgba(15, 23, 42, 0.10);
+    background: var(--ds-hover-surface);
+    box-shadow: inset 0 0 0 9999px rgba(31, 84, 173, 0.035), var(--shadow-row);
   }
 
   .employees-table .ta-td > * {
@@ -879,26 +904,26 @@
   /* ─── Badges — dot + color, no borders ────────────────────────── */
   .badge-urgent {
     @apply inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full;
-    background: color-mix(in srgb, var(--ds-error) 14%, white);
-    color: var(--ds-error);
+    background: color-mix(in srgb, var(--ds-error) 14%, var(--ds-surface-lowest));
+    color: var(--ds-badge-error-text);
   }
 
   .badge-warning {
     @apply inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full;
-    background: color-mix(in srgb, var(--ds-warning) 16%, white);
-    color: #7a4a00;
+    background: color-mix(in srgb, var(--ds-warning) 16%, var(--ds-surface-lowest));
+    color: var(--ds-badge-warning-text);
   }
 
   .badge-success {
     @apply inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full;
-    background: color-mix(in srgb, var(--ds-success) 15%, white);
-    color: var(--ds-success);
+    background: color-mix(in srgb, var(--ds-success) 15%, var(--ds-surface-lowest));
+    color: var(--ds-badge-success-text);
   }
 
   .badge-info {
     @apply inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full;
-    background: color-mix(in srgb, var(--ds-info) 14%, white);
-    color: var(--ds-info);
+    background: color-mix(in srgb, var(--ds-info) 14%, var(--ds-surface-lowest));
+    color: var(--ds-badge-info-text);
   }
 
   /* ─── Icon box ────────────────────────────────────────────────── */
@@ -912,7 +937,7 @@
 
   /* ─── Glass card ──────────────────────────────────────────────── */
   .glass-card {
-    background: rgba(255, 255, 255, 0.80);
+    background: var(--ds-glass-bg);
     backdrop-filter: blur(12px);
     box-shadow: var(--shadow-card);
   }

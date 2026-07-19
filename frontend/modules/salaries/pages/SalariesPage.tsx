@@ -462,7 +462,7 @@ const Salaries = () => {
 
       <Dialog open={showTemplateEditor} onOpenChange={setShowTemplateEditor}>
         <DialogContent className="max-w-[95vw] w-[1400px] max-h-[95vh] overflow-y-auto p-0 border-none bg-muted/20">
-          <DialogHeader className="p-6 bg-white border-b sticky top-0 z-10">
+          <DialogHeader className="p-6 bg-card border-b sticky top-0 z-10">
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Settings2 className="text-primary" /> إعدادات قوالب كشوف الرواتب
             </DialogTitle>

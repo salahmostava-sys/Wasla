@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo, useRef } from 'react';
+import { createContext, useContext, useLayoutEffect, useState, ReactNode, useCallback, useMemo, useRef } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -27,13 +27,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const isFirstRender = useRef(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
 
     // Skip the transition on initial mount so the page loads without a flash
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      if (theme === 'dark') root.classList.add('dark');
+      root.classList.toggle('dark', theme === 'dark');
+      root.style.colorScheme = theme;
       try { localStorage.setItem('theme', theme); } catch { /* ignore */ }
       return;
     }
@@ -42,11 +43,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     root.classList.add('theme-transitioning');
     setIsTransitioning(true);
 
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    root.classList.toggle('dark', theme === 'dark');
+    root.style.colorScheme = theme;
 
     const timer = setTimeout(() => {
       root.classList.remove('theme-transitioning');
