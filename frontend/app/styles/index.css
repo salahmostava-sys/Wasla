@@ -1099,6 +1099,15 @@
     color: #000000 !important;
   }
 
+  .dark .bg-yellow-50,
+  .dark .bg-yellow-100,
+  .dark .bg-yellow-200,
+  .dark .bg-amber-50,
+  .dark .bg-amber-100,
+  .dark .bg-amber-200 {
+    color: #fde68a !important;
+  }
+
   /* ─── NProgress bar — matches brand primary ──────────────────── */
   #nprogress .bar {
     background: var(--ds-primary) !important;
