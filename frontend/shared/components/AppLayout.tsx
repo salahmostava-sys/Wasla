@@ -209,8 +209,8 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                className={cn(
-                    'flex items-center gap-2 h-9 ps-1 pe-2 rounded-xl transition-colors border shadow-sm',
+                  className={cn(
+                    'flex items-center gap-2 h-auto py-1 ps-1.5 pe-2.5 rounded-xl transition-colors border shadow-sm',
                     'border-border/70 bg-card/95 hover:bg-muted/70',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                   )}
@@ -220,11 +220,11 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                       src={profileAvatarUrl}
                       alt={displayName}
                       title={displayName}
-                      className="w-7 h-7 rounded-full object-cover flex-shrink-0 ring-2 ring-background"
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-2 ring-background"
                     />
                   ) : (
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ring-2 ring-background"
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ring-2 ring-background"
                       style={{ background: 'var(--ds-primary)' }}
                       title={displayName}
                     >
@@ -233,15 +233,15 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                   )}
                   <div
                     className={cn(
-                      'hidden sm:flex flex-col leading-tight min-w-0 max-w-[120px] lg:max-w-[160px]',
+                      'hidden sm:flex flex-col justify-center min-w-0 max-w-[120px] lg:max-w-[160px]',
                       'items-start text-start'
                     )}
                   >
-                    <span className="text-xs font-semibold truncate" style={{ color: 'var(--ds-on-surface)' }}>
+                    <span className="text-xs font-semibold truncate w-full" style={{ color: 'var(--ds-on-surface)' }}>
                       {displayName || t('systemAdmin')}
                     </span>
                     {roleLabel && (
-                      <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-md mt-0.5 inline-block max-w-full truncate', roleBadgeCls)}>
+                      <span className={cn('text-[10px] font-medium px-1.5 py-[3px] rounded-md mt-0.5 inline-block max-w-full truncate leading-none', roleBadgeCls)}>
                         {roleLabel}
                       </span>
                     )}
