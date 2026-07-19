@@ -234,7 +234,7 @@ const AppLayoutInner = ({ children }: Readonly<AppLayoutProps>) => { // NOSONAR:
                   <div
                     className={cn(
                       'hidden sm:flex flex-col leading-tight min-w-0 max-w-[120px] lg:max-w-[160px]',
-                      isRTL ? 'items-end text-end' : 'items-start text-start'
+                      'items-start text-start'
                     )}
                   >
                     <span className="text-xs font-semibold truncate" style={{ color: 'var(--ds-on-surface)' }}>

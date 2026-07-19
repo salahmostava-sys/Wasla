@@ -23,11 +23,20 @@ export const DATE_FILTER_KEYS = new Set([
 ]);
 
 export function getContrastTextColor(hexColor: string): string {
-  const hex = hexColor.replaceAll('#', '');
+  if (!hexColor) return '#ffffff';
+  let hex = hexColor.replaceAll('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  
   const r = Number.parseInt(hex.substring(0, 2), 16);
   const g = Number.parseInt(hex.substring(2, 4), 16);
   const b = Number.parseInt(hex.substring(4, 6), 16);
-  return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#000000' : '#ffffff';
+  
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
+    const isLight = ['yellow', 'lime', 'cyan', 'white'].some(c => hexColor.toLowerCase().includes(c));
+    return isLight ? '#000000' : '#ffffff';
+  }
+
+  return (r * 299 + g * 587 + b * 114) / 1000 >= 128 ? '#000000' : '#ffffff';
 }
 
 export type FilterContext = {

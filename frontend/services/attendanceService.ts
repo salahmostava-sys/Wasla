@@ -135,6 +135,21 @@ const attendanceService = {
     if (error) handleSupabaseError(error, 'attendanceService.upsertDailyAttendance');
   },
 
+  bulkUpsertDailyAttendance: async (payloads: Array<{
+    employee_id: string;
+    date: string;
+    status: 'present' | 'absent' | 'leave' | 'sick' | 'late';
+    check_in: string | null;
+    check_out: string | null;
+    note: string | null;
+  }>) => {
+    if (!payloads.length) return;
+    const { error } = await supabase.from('attendance').upsert(payloads, {
+      onConflict: 'employee_id,date',
+    });
+    if (error) handleSupabaseError(error, 'attendanceService.bulkUpsertDailyAttendance');
+  },
+
   deleteDailyAttendance: async (id: string) => {
     const { error } = await supabase.from('attendance').delete().eq('id', id);
     if (error) handleSupabaseError(error, 'attendanceService.deleteDailyAttendance');

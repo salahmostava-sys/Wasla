@@ -8,6 +8,7 @@ import { employeeService } from '@services/employeeService';
 import { getErrorMessage } from '@services/serviceError';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@app/providers/LanguageContext';
+import { getContrastTextColor } from './table/EmployeeTableFilters';
 
 type PlatformApp = {
   id: string;
@@ -99,7 +100,7 @@ export function PlatformAppsEditor({
                 className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
                 style={{
                   backgroundColor: app.brand_color || '#1f54ad',
-                  color: '#ffffff'
+                  color: getContrastTextColor(app.brand_color || '#1f54ad')
                 }}
               >
                 {app.name}
@@ -150,7 +151,7 @@ export function PlatformAppsEditor({
                     className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
                     style={{
                       backgroundColor: app.brand_color || '#1f54ad',
-                      color: '#ffffff'
+                      color: getContrastTextColor(app.brand_color || '#1f54ad')
                     }}
                   >
                     {app.name}

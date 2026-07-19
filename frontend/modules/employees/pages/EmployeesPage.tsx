@@ -316,7 +316,6 @@ const Employees = () => {
 
   return (
     <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      <nav className="page-breadcrumb"><span>{t('home')}</span><span className="page-breadcrumb-sep">/</span><span>{t('employees')}</span></nav>
       {/* Real-time presence — who else is on this page */}
       {presence.onlineUsers.length > 0 && (
         <div className="flex items-center justify-end gap-2">

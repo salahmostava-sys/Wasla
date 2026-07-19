@@ -16,6 +16,7 @@ import { Button } from "@shared/components/ui/button";
 import { cn } from "@shared/lib/utils";
 import { buildAttendanceGridData } from "../lib/attendanceDomain";
 import { useTranslation } from 'react-i18next';
+import { BulkAttendanceDialog } from './BulkAttendanceDialog';
 
 export type AttendanceStatus = 'present' | 'absent' | 'leave' | 'sick' | 'late' | 'none';
 
@@ -158,8 +159,48 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
     record: CellData | null;
   } | null>(null);
 
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAppId, setSelectedAppId] = useState<string>('all');
+
+  const bulkMutation = useMutation({
+    mutationFn: async (payloads: Array<{
+      employee_id: string;
+      date: string;
+      status: 'present' | 'absent' | 'leave' | 'sick' | 'late' | 'none';
+      check_in: string | null;
+      check_out: string | null;
+      note: string | null;
+    }>) => {
+      const validPayloads = payloads.filter(p => p.status !== 'none') as Array<{
+        employee_id: string;
+        date: string;
+        status: 'present' | 'absent' | 'leave' | 'sick' | 'late';
+        check_in: string | null;
+        check_out: string | null;
+        note: string | null;
+      }>;
+      const deletePayloads = payloads.filter(p => p.status === 'none');
+      
+      const promises: Promise<void>[] = [];
+      if (validPayloads.length > 0) {
+        promises.push(attendanceService.bulkUpsertDailyAttendance(validPayloads));
+      }
+      for (const del of deletePayloads) {
+        promises.push(attendanceService.deleteDailyAttendanceByKeys(del.employee_id, del.date));
+      }
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      toast.success(t('attendanceSaved') || 'تم حفظ الحضور', { style: { background: "var(--ds-surface-container)", color: "var(--ds-on-surface)" } });
+      queryClient.invalidateQueries({ queryKey });
+      setIsBulkDialogOpen(false);
+    },
+    onError: () => {
+      toast.error(t('attendanceSaveFailed') || 'حدث خطأ أثناء الحفظ', { style: { background: "var(--destructive)", color: "white" } });
+    }
+  });
 
   const mutation = useMutation({
     mutationFn: async (payload: {
@@ -251,6 +292,11 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
             ))}
           </SelectContent>
         </Select>
+        <div className="flex-1 sm:flex-none flex justify-end">
+          <Button onClick={() => setIsBulkDialogOpen(true)} variant="default">
+            {t('bulkAttendance') || 'حضور جماعي'}
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border shadow-sm overflow-hidden bg-card">
@@ -346,6 +392,26 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
                check_out: data.check_out || null,
                note: data.note || null
              });
+          }}
+        />
+      )}
+      {isBulkDialogOpen && (
+        <BulkAttendanceDialog
+          open={isBulkDialogOpen}
+          onOpenChange={setIsBulkDialogOpen}
+          employees={filteredGridData}
+          isSaving={bulkMutation.isPending}
+          onSave={({ employeeIds, date, status, check_in, check_out, note }) => {
+            bulkMutation.mutate(
+              employeeIds.map((id) => ({
+                employee_id: id,
+                date,
+                status,
+                check_in,
+                check_out,
+                note,
+              }))
+            );
           }}
         />
       )}

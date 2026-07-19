@@ -360,7 +360,7 @@ export function renderEmployeeCell(ctx: CellContext): React.ReactNode {
   switch (col.key) {
     case "seq": return renderSeqCell(ctx);
     case "name": return renderNameCell(ctx);
-    case "name_en": return <td key="name_en" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderEditableTextCell(emp.id, "name_en", emp.name_en, { dir: "ltr", className: "employee-ltr-value", placeholder: t('englishNamePlaceholder') })}</td>;
+    case "name_en": return <td key="name_en" className="ta-td employee-ltr-cell !px-1 !text-left" dir="ltr">{renderEditableTextCell(emp.id, "name_en", emp.name_en, { dir: "ltr", className: "employee-ltr-value !text-left", placeholder: t('englishNamePlaceholder') })}</td>;
     case "national_id": return <td key="national_id" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderTextValue(emp.national_id, { dir: "ltr", className: "employee-ltr-value tabular-nums" })}</td>;
     case "phone": return <td key="phone" className="ta-td employee-ltr-cell !px-1" dir="ltr">{renderEditableTextCell(emp.id, "phone", emp.phone, { dir: "ltr", className: "employee-ltr-value", placeholder: t('phonePlaceholder') })}</td>;
     case "email": return (
