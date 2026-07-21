@@ -393,8 +393,8 @@ export function renderEmployeeCell(ctx: CellContext): React.ReactNode {
           <div className="flex flex-col items-center justify-center text-center">
             {renderTextValue(emp.bank_account_number, { dir: "ltr", className: "employee-ltr-value tabular-nums" })}
             {bankName && (
-              <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm mt-0.5 whitespace-nowrap">
-                🏦 {bankName}
+              <span className="text-[11px] text-muted-foreground mt-0.5">
+                {bankName}
               </span>
             )}
           </div>

@@ -326,8 +326,8 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
                     )}
                   </div>
                   {form.bank_account_number && isValidIBAN(form.bank_account_number) && getSaudiBankName(form.bank_account_number) && (
-                    <div className="text-[11px] font-medium text-primary bg-primary/5 w-fit px-2 py-0.5 rounded-sm">
-                      🏦 {getSaudiBankName(form.bank_account_number)}
+                    <div className="text-[12px] text-muted-foreground mt-1">
+                      {getSaudiBankName(form.bank_account_number)}
                     </div>
                   )}
                 </div>
