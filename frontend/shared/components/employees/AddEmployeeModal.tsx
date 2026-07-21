@@ -310,10 +310,9 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
                   <div className="relative">
                     <Input
                       value={form.bank_account_number}
-                      onChange={e => setField('bank_account_number', e.target.value.toUpperCase())}
-                      onBlur={() => setField('bank_account_number', formatIBAN(form.bank_account_number))}
+                      onChange={e => setField('bank_account_number', e.target.value.replace(/\s+/g, '').toUpperCase())}
                       dir="ltr"
-                      placeholder="SA00 0000 0000 0000 0000 0000"
+                      placeholder="SA0000000000000000000000"
                       className="pr-8"
                     />
                     {form.bank_account_number && (
