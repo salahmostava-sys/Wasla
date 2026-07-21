@@ -12,6 +12,7 @@ import { Loader2, Search, Filter } from 'lucide-react';
 import { Checkbox } from '@shared/components/ui/checkbox';
 import type { AttendanceStatus, Employee } from './MonthlyRecord';
 import { todayISO } from '@shared/lib/formatters';
+import { filterEmployeesBySearchAndApp } from '../lib/attendanceDomain';
 
 interface BulkAttendanceDialogProps {
   open: boolean;
@@ -53,18 +54,7 @@ export function BulkAttendanceDialog({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filteredEmployees = useMemo(() => {
-    let result = employees;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter((e) => e.name.toLowerCase().includes(q));
-    }
-    if (filterAppId !== 'all') {
-      const empIdsWithApp = new Set(
-        employeeApps.filter((ea) => ea.app_id === filterAppId).map((ea) => ea.employee_id)
-      );
-      result = result.filter((e) => empIdsWithApp.has(e.id));
-    }
-    return result;
+    return filterEmployeesBySearchAndApp(employees, searchQuery, filterAppId, employeeApps);
   }, [employees, searchQuery, filterAppId, employeeApps]);
 
   const allSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selectedIds.has(e.id));

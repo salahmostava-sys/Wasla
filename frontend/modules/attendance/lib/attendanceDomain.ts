@@ -45,3 +45,25 @@ export function buildAttendanceGridData(
     };
   });
 }
+
+export function filterEmployeesBySearchAndApp<T extends { id: string; name: string }>(
+  items: T[],
+  searchQuery: string,
+  appId: string,
+  employeeApps: { app_id: string; employee_id: string }[]
+): T[] {
+  let result = items;
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    result = result.filter(r => r.name.toLowerCase().includes(q));
+  }
+  if (appId !== 'all') {
+    const empIdsWithApp = new Set(
+      employeeApps
+        .filter(ea => ea.app_id === appId)
+        .map(ea => ea.employee_id)
+    );
+    result = result.filter(r => empIdsWithApp.has(r.id));
+  }
+  return result;
+}

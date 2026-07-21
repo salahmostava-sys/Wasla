@@ -14,7 +14,7 @@ import { Label } from "@shared/components/ui/label";
 import { Textarea } from "@shared/components/ui/textarea";
 import { Button } from "@shared/components/ui/button";
 import { cn } from "@shared/lib/utils";
-import { buildAttendanceGridData } from "../lib/attendanceDomain";
+import { buildAttendanceGridData, filterEmployeesBySearchAndApp } from "../lib/attendanceDomain";
 import { useTranslation } from 'react-i18next';
 import { BulkAttendanceDialog } from './BulkAttendanceDialog';
 
@@ -229,20 +229,7 @@ const MonthlyRecord = ({ selectedMonth, selectedYear }: Readonly<MonthlyRecordPr
   }, [data]);
 
   const filteredGridData = useMemo(() => {
-    let result = gridData;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(r => r.name.toLowerCase().includes(q));
-    }
-    if (selectedAppId !== 'all') {
-      const empIdsWithApp = new Set(
-        (data?.employeeApps ?? [])
-          .filter((ea: { app_id: string; employee_id: string }) => ea.app_id === selectedAppId)
-          .map((ea: { app_id: string; employee_id: string }) => ea.employee_id)
-      );
-      result = result.filter(r => empIdsWithApp.has(r.id));
-    }
-    return result;
+    return filterEmployeesBySearchAndApp(gridData, searchQuery, selectedAppId, data?.employeeApps ?? []);
   }, [gridData, searchQuery, selectedAppId, data?.employeeApps]);
 
   if (isLoading) {
