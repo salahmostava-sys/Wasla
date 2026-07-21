@@ -49,22 +49,18 @@ export function ImportPlatformDialog({ open, apps, onConfirm, onCancel }: Readon
         </DialogHeader>
         <div className="py-4">
           <RadioGroup value={selectedApp} onValueChange={setSelectedApp}>
-            <div className="flex items-center space-x-2 space-x-reverse mb-3">
+            <Label htmlFor="all" className="flex min-h-11 cursor-pointer items-center gap-2 font-medium mb-3">
               <RadioGroupItem value="all" id="all" />
-              <Label htmlFor="all" className="cursor-pointer font-medium">
-                جميع المنصات (السلوك القديم)
-              </Label>
-            </div>
+              <span>جميع المنصات (السلوك القديم)</span>
+            </Label>
             {apps.map((app) => (
-              <div key={app.id} className="flex items-center space-x-2 space-x-reverse mb-2 rounded-md border p-2">
+              <Label key={app.id} htmlFor={app.id} className="flex min-h-11 cursor-pointer items-center gap-2 mb-2 rounded-md border px-3 py-2">
                 <RadioGroupItem value={app.id} id={app.id} />
-                <Label htmlFor={app.id} className="cursor-pointer flex items-center gap-2">
-                  {app.logo_url && (
-                    <img src={app.logo_url} className="w-5 h-5 rounded-full object-cover" alt="" />
-                  )}
-                  {app.name}
-                </Label>
-              </div>
+                {app.logo_url && (
+                  <img src={app.logo_url} width={20} height={20} className="w-5 h-5 rounded-full object-cover" alt="" />
+                )}
+                <span>{app.name}</span>
+              </Label>
             ))}
           </RadioGroup>
         </div>

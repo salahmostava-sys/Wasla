@@ -114,8 +114,8 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
       />
       <div className="flex items-center justify-between mb-2.5 relative z-10">
         <span className="text-xs font-semibold text-foreground">يوم {state.day}</span>
-        <button type="button" aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground p-0.5 rounded">
-          <X size={13} />
+        <button type="button" aria-label="إغلاق" onClick={onClose} className="text-muted-foreground hover:text-foreground inline-flex min-h-11 min-w-11 items-center justify-center rounded">
+          <X size={16} />
         </button>
       </div>
       <form
@@ -137,9 +137,14 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
                   className="flex-shrink-0 w-[4.5rem] justify-center text-center py-0.5 px-1 text-[10px] leading-tight"
                 />
                 <input
+                  id={`order-value-${app.id}`}
+                  aria-label={app.name}
                   type="number" min={0} placeholder="0"
+                  inputMode="numeric"
                   {...register(`vals.${app.id}` as const)}
                   disabled={!canEdit}
+                  aria-invalid={canEdit && formState.isSubmitted && formState.isValid === false}
+                  aria-describedby={canEdit && formState.isSubmitted && formState.isValid === false ? "orders-error" : undefined}
                   className="flex-1 w-16 h-7 text-center text-sm rounded border border-border bg-background focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                   onKeyDown={e => {
                     if (e.key === 'Enter') handleApply();
@@ -151,7 +156,7 @@ export const OrdersCellPopover = ({ state, apps, data, appColorsList, canEdit, o
           })}
         </div>
         {canEdit && formState.isSubmitted && formState.isValid === false && (
-          <p className="text-[11px] text-destructive mt-2">تأكد أن القيم أرقام صحيحة.</p>
+          <p id="orders-error" role="alert" className="text-[11px] text-destructive mt-2">تأكد أن القيم أرقام صحيحة.</p>
         )}
       </form>
       {canEdit && (
