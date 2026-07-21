@@ -24,7 +24,7 @@ import {
   EMPLOYEE_INTL_PHONE_DIGITS,
   EMPLOYEE_NATIONAL_ID_DIGITS,
 } from '@modules/employees/model/employeeFieldValidation';
-import { getSaudiBankName, isValidIBAN } from '@shared/lib/banks';
+import { formatIBAN, getSaudiBankName, getSaudiBankColor, isValidIBAN } from "@shared/lib/banks";
 import {
   AddEmployeeModalProps as Props,
   STEPS,
@@ -326,7 +326,7 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
                     )}
                   </div>
                   {form.bank_account_number && isValidIBAN(form.bank_account_number) && getSaudiBankName(form.bank_account_number) && (
-                    <div className="text-[12px] text-muted-foreground mt-1">
+                    <div className={`text-[12px] font-medium mt-1 ${getSaudiBankColor(form.bank_account_number)}`}>
                       {getSaudiBankName(form.bank_account_number)}
                     </div>
                   )}

@@ -23,7 +23,7 @@ import {
   InlineSelectEditor,
 } from "@modules/employees/components/EmployeeInlineEditors";
 import { PlatformAppsEditor } from "@modules/employees/components/PlatformAppsEditor";
-import { getSaudiBankName } from "@shared/lib/banks";
+import { getSaudiBankName, getSaudiBankColor } from "@shared/lib/banks";
 import {
   dayColorByThreshold,
   probationColor,
@@ -388,12 +388,13 @@ export function renderEmployeeCell(ctx: CellContext): React.ReactNode {
       return renderEmployeeDatesCell(ctx);
     case "bank_account_number": {
       const bankName = getSaudiBankName(emp.bank_account_number);
+      const bankColor = getSaudiBankColor(emp.bank_account_number);
       return (
         <td key="bank_account_number" className="ta-td employee-ltr-cell !px-1" dir="ltr">
           <div className="flex flex-col items-center justify-center text-center">
             {renderTextValue(emp.bank_account_number, { dir: "ltr", className: "employee-ltr-value tabular-nums" })}
             {bankName && (
-              <span className="text-[11px] text-muted-foreground mt-0.5">
+              <span className={`text-[11px] font-medium mt-0.5 ${bankColor}`}>
                 {bankName}
               </span>
             )}

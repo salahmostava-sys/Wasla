@@ -23,6 +23,31 @@ export const SAUDI_BANKS: Record<string, string> = {
   '05': 'يور باي (Urpay)',
 };
 
+export const SAUDI_BANK_COLORS: Record<string, string> = {
+  '10': 'text-emerald-600',
+  '15': 'text-amber-700',
+  '20': 'text-red-600',
+  '30': 'text-sky-600',
+  '40': 'text-emerald-600',
+  '45': 'text-orange-600',
+  '50': 'text-orange-600',
+  '55': 'text-blue-500',
+  '60': 'text-teal-600',
+  '65': 'text-yellow-600',
+  '71': 'text-red-600',
+  '75': 'text-indigo-500',
+  '76': 'text-blue-600',
+  '79': 'text-blue-800',
+  '80': 'text-blue-800',
+  '82': 'text-red-700',
+  '85': 'text-green-600',
+  '90': 'text-red-500',
+  '95': 'text-blue-600',
+  '98': 'text-teal-500',
+  '99': 'text-purple-600',
+  '05': 'text-blue-500',
+};
+
 /**
  * Extracts the bank name from a Saudi IBAN.
  * @param iban - The IBAN string to check.
@@ -39,6 +64,20 @@ export function getSaudiBankName(iban: string | null | undefined): string | null
   // Extract the bank code (characters 5 and 6)
   const bankCode = cleanIban.substring(4, 6);
   return SAUDI_BANKS[bankCode] || null;
+}
+
+/**
+ * Extracts the bank color from a Saudi IBAN.
+ * @param iban - The IBAN string to check.
+ * @returns The Tailwind text color class for the bank, or a default color if unknown.
+ */
+export function getSaudiBankColor(iban: string | null | undefined): string {
+  if (!iban) return 'text-muted-foreground';
+  const cleanIban = iban.replace(/\s+/g, '').toUpperCase();
+  if (!cleanIban.startsWith('SA') || cleanIban.length < 6) return 'text-muted-foreground';
+  
+  const bankCode = cleanIban.substring(4, 6);
+  return SAUDI_BANK_COLORS[bankCode] || 'text-muted-foreground';
 }
 
 /**
