@@ -24,7 +24,7 @@ import {
   EMPLOYEE_INTL_PHONE_DIGITS,
   EMPLOYEE_NATIONAL_ID_DIGITS,
 } from '@modules/employees/model/employeeFieldValidation';
-import { getSaudiBankName } from '@shared/lib/banks';
+import { getSaudiBankName, isValidIBAN, formatIBAN } from '@shared/lib/banks';
 import {
   AddEmployeeModalProps as Props,
   STEPS,
@@ -305,11 +305,29 @@ const AddEmployeeModal = ({ onClose, onSuccess, editEmployee }: Readonly<Props>)
                   )}
                 </div>
               </F>
-              <F label="رقم الحساب البنكي">
+              <F label="رقم الحساب البنكي (IBAN)">
                 <div className="space-y-1.5">
-                  <Input value={form.bank_account_number} onChange={e => setField('bank_account_number', e.target.value)} dir="ltr" />
-                  {form.bank_account_number && getSaudiBankName(form.bank_account_number) && (
-                    <div className="text-[11px] font-medium text-primary">
+                  <div className="relative">
+                    <Input
+                      value={form.bank_account_number}
+                      onChange={e => setField('bank_account_number', e.target.value.toUpperCase())}
+                      onBlur={() => setField('bank_account_number', formatIBAN(form.bank_account_number))}
+                      dir="ltr"
+                      placeholder="SA00 0000 0000 0000 0000 0000"
+                      className="pr-8"
+                    />
+                    {form.bank_account_number && (
+                      <div className="absolute top-1/2 -translate-y-1/2 right-3 pointer-events-none">
+                        {isValidIBAN(form.bank_account_number) ? (
+                          <span className="text-success text-sm" title="رقم آيبان صحيح">✅</span>
+                        ) : (
+                          <span className="text-destructive text-sm" title="رقم آيبان غير صحيح">❌</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {form.bank_account_number && isValidIBAN(form.bank_account_number) && getSaudiBankName(form.bank_account_number) && (
+                    <div className="text-[11px] font-medium text-primary bg-primary/5 w-fit px-2 py-0.5 rounded-sm">
                       🏦 {getSaudiBankName(form.bank_account_number)}
                     </div>
                   )}

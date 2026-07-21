@@ -40,3 +40,47 @@ export function getSaudiBankName(iban: string | null | undefined): string | null
   const bankCode = cleanIban.substring(4, 6);
   return SAUDI_BANKS[bankCode] || null;
 }
+
+/**
+ * Validates an IBAN using the standard MOD-97 algorithm.
+ * @param iban - The IBAN string to check.
+ * @returns true if valid, false otherwise.
+ */
+export function isValidIBAN(iban: string | null | undefined): boolean {
+  if (!iban) return false;
+  const cleanIban = iban.replace(/\s+/g, '').toUpperCase();
+  
+  // Saudi IBAN is exactly 24 chars. We can generalize if needed, but for now focus on SA.
+  // Actually, standard IBAN validation handles any country if length is correct.
+  // Let's just check if it matches basic alphanumeric format.
+  if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{4,30}$/.test(cleanIban)) return false;
+  
+  // For SA specifically, it must be 24 chars
+  if (cleanIban.startsWith('SA') && cleanIban.length !== 24) return false;
+
+  // Move first 4 characters to the end
+  const rearranged = cleanIban.substring(4) + cleanIban.substring(0, 4);
+  
+  // Convert letters to numbers (A=10, B=11, ... Z=35)
+  const numericString = rearranged.replace(/[A-Z]/g, (match) => {
+    return (match.charCodeAt(0) - 55).toString();
+  });
+  
+  try {
+    return BigInt(numericString) % 97n === 1n;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Formats an IBAN with spaces every 4 characters.
+ * @param iban - The raw IBAN string.
+ * @returns Formatted IBAN string.
+ */
+export function formatIBAN(iban: string | null | undefined): string {
+  if (!iban) return '';
+  const cleanIban = iban.replace(/\s+/g, '').toUpperCase();
+  const match = cleanIban.match(/.{1,4}/g);
+  return match ? match.join(' ') : cleanIban;
+}
