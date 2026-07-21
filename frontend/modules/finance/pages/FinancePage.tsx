@@ -181,7 +181,7 @@ function TransactionTable(props: Readonly<TransactionTableProps>) {
                       onBlur={() => { saveEdit(t.id); }} onKeyDown={handleKeyDown}
                       className="h-7 text-sm text-center font-bold" />
                   ) : (
-                    <button type="button" className={t.is_auto ? '' : 'cursor-pointer hover:opacity-70'} onClick={() => { if (!t.is_auto) startEdit(t.id, 'amount', String(t.amount)); }} disabled={t.is_auto}>
+                    <button type="button" className="cursor-pointer hover:opacity-70" onClick={() => startEdit(t.id, 'amount', String(t.amount))}>
                       {t.amount.toLocaleString('en-US')}
                     </button>
                   )}
@@ -192,17 +192,15 @@ function TransactionTable(props: Readonly<TransactionTableProps>) {
                       onBlur={() => { saveEdit(t.id); }} onKeyDown={handleKeyDown}
                       className="h-7 text-sm" dir="rtl" />
                   ) : (
-                    <button type="button" className={t.is_auto ? '' : 'cursor-pointer hover:text-primary'} onClick={() => { if (!t.is_auto) startEdit(t.id, 'description', t.description || t.category); }} disabled={t.is_auto}>
+                    <button type="button" className="cursor-pointer hover:text-primary" onClick={() => startEdit(t.id, 'description', t.description || t.category)}>
                       {t.description || t.category}
-                      {t.is_auto && !isRev && <span className="text-[10px] text-muted-foreground ms-1.5">🔒</span>}
+                      {t.is_auto && !isRev && <span className="text-[10px] text-muted-foreground ms-1.5" title="هذا السجل يتم مزامنته تلقائياً، ولكن يمكنك تعديله. عند إعادة المزامنة سيتم استرجاع القيمة التلقائية.">🔄</span>}
                     </button>
                   )}
                 </td>
                 <td className="ta-td">
                   {t.is_auto && isRev ? <Lock size={12} className="mx-auto text-muted-foreground/40" /> : (
-                    (!t.is_auto || isRev) && (
-                      <button aria-label="حذف" type="button" onClick={() => { deleteTransaction(t.id); }} disabled={isDeleting} className="p-1 rounded hover:bg-destructive/10 text-destructive/60 hover:text-destructive"><Trash2 size={13} className="text-destructive" /></button>
-                    )
+                    <button aria-label="حذف" type="button" onClick={() => { deleteTransaction(t.id); }} disabled={isDeleting} className="p-1 rounded hover:bg-destructive/10 text-destructive/60 hover:text-destructive"><Trash2 size={13} className="text-destructive" /></button>
                   )}
                 </td>
               </tr>
