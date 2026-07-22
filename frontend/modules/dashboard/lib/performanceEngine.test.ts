@@ -67,6 +67,8 @@ describe('performanceEngine — Weekly & Best Days Analytics', () => {
       expect(res.topPeakDays).toHaveLength(3);
       expect(res.topPeakDays[0].orders).toBe(500);
       expect(res.topPeakDays[0].date).toBe('2026-07-02');
+      expect(res.allSortedDays).toHaveLength(5);
+      expect(res.allSortedDays.map((d) => d.orders)).toEqual([500, 400, 300, 200, 100]);
     });
   });
 

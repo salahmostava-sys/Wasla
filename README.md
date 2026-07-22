@@ -1,6 +1,8 @@
-# مهمات التوصيل — MuhimmatAltawseel
+# وصلة — Wasla
 
 نظام إدارة شركات التوصيل — يشمل إدارة الموظفين، الطلبات اليومية، الرواتب، السلف، المركبات، الحضور، والتنبيهات.
+
+> الاسم السابق: «مهمات التوصيل / MuhimmatAltawseel». اسم المجلد والمستودع لم يتغيّر؛ التغيير على الاسم الظاهر (البراند) فقط.
 
 **Stack:** React 18 · TypeScript · Vite · Supabase · Express (Node.js) · FastAPI (Python) · TanStack Query · Tailwind CSS · shadcn/ui
 

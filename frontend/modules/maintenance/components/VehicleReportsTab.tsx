@@ -8,6 +8,7 @@ import { Button } from '@shared/components/ui/button';
 import { Skeleton } from '@shared/components/ui/skeleton';
 import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useMaintenanceLogs } from '@modules/maintenance/hooks/useMaintenanceData';
+import { useSystemSettings } from '@app/providers/SystemSettingsContext';
 import type { MaintenanceLogWithDetails } from '@services/maintenanceService';
 import { loadXlsx } from '@modules/orders/utils/xlsx';
 import { isStringValue, usePersistentState } from '@shared/hooks/usePersistentState';
@@ -276,6 +277,7 @@ function VehicleGroupCard({ group }: Readonly<VehicleGroupCardProps>) {
 
 export function VehicleReportsTab() {
   const logsQ = useMaintenanceLogs();
+  const { projectName: companyName } = useSystemSettings();
   const [search, setSearch] = usePersistentState('report:vehicles:search:v1', '', isStringValue);
   const [fromDate, setFromDate] = usePersistentState('report:vehicles:date-from:v1', '', isStringValue);
   const [toDate, setToDate] = usePersistentState('report:vehicles:date-to:v1', '', isStringValue);
@@ -430,7 +432,7 @@ export function VehicleReportsTab() {
 
         return `
         <div class="page-break">
-          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+          <div class="company-name">${escapeHtml(companyName)}</div>
           <h1>تقرير صيانة المركبات والمخزون</h1>
           <div class="header-info">
             <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>
@@ -479,7 +481,7 @@ export function VehicleReportsTab() {
 
       bodyHtml = `
         <div>
-          <div class="company-name">شركة مهمة التوصيل للخدمات اللوجستية</div>
+          <div class="company-name">${escapeHtml(companyName)}</div>
           <h1>تقرير صيانة المركبات والمخزون المجمع</h1>
           <div class="header-info">
             <p>تاريخ الاستخراج: ${formatStandardDateTime()}</p>

@@ -121,6 +121,21 @@ export const REPLAY_REPAIRS = [
       '*/',
     ].join('\n'),
   },
+  {
+    file: '20260718000000_harden_exposed_security_definer_rpcs.sql',
+    reason: 'The hardening migration covers three dashboard compatibility overloads but omits the primary text/date overload checked by its own assertion.',
+    before: [
+      '-- These compatibility overloads only delegate to the already-invoker two-arg',
+      '-- dashboard RPC, so elevated execution is unnecessary.',
+      'ALTER FUNCTION public.dashboard_overview_rpc(text, integer, integer, date) SECURITY INVOKER;',
+    ].join('\n'),
+    after: [
+      '-- These compatibility overloads only delegate to the already-invoker two-arg',
+      '-- dashboard RPC, so elevated execution is unnecessary.',
+      'ALTER FUNCTION public.dashboard_overview_rpc(text, date) SECURITY INVOKER;',
+      'ALTER FUNCTION public.dashboard_overview_rpc(text, integer, integer, date) SECURITY INVOKER;',
+    ].join('\n'),
+  },
 ];
 
 function countOccurrences(source, search) {

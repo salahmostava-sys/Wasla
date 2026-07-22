@@ -10,8 +10,9 @@ const SAVING_EN = 'Saving...';
 const SAVE_ERROR_AR = 'خطأ في الحفظ';
 
 const TRANSLATION_ENTRIES: readonly TranslationEntry[] = [
-  ['appName', 'مهمة التوصيل', 'Delivery System'],
+  ['appName', 'وصلة', 'Wasla'],
   ['appSubtitle', 'إدارة المناديب', 'Rider Management'],
+  ['poweredBy', 'مدعوم بواسطة', 'Powered by'],
   ['systemAdmin', 'مدير النظام', 'System Admin'],
   ['dashboard', 'لوحة التحكم', 'Dashboard'],
   ['employees', 'الموظفون', 'Employees'],

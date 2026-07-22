@@ -1,6 +1,6 @@
 {
-  "name": "مهمة التوصيل",
-  "short_name": "مهمات",
+  "name": "وصلة",
+  "short_name": "وصلة",
   "description": "نظام متكامل لإدارة مناديب التوصيل",
   "start_url": "/",
   "display": "standalone",

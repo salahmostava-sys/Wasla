@@ -371,8 +371,8 @@ export default function ProjectSettings() {
         <ProjectSettingsSectionHeader icon={<Building2 size={14} />} title={t(isRTL, 'اسم المشروع', 'Project Name')} />
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <BaseInput label={t(isRTL, 'اسم المشروع (عربي)', 'Project Name (Arabic)')} value={nameAr} onChange={e => setNameAr(e.target.value)} placeholder="مهمة التوصيل" dir="rtl" />
-            <BaseInput label={t(isRTL, 'اسم المشروع (إنجليزي)', 'Project Name (English)')} value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder="Delivery System" dir="ltr" />
+            <BaseInput label={t(isRTL, 'اسم المشروع (عربي)', 'Project Name (Arabic)')} value={nameAr} onChange={e => setNameAr(e.target.value)} placeholder="وصلة" dir="rtl" />
+            <BaseInput label={t(isRTL, 'اسم المشروع (إنجليزي)', 'Project Name (English)')} value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder="Wasla" dir="ltr" />
           </div>
         </div>
       </div>

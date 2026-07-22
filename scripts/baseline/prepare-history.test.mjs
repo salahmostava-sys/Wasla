@@ -68,6 +68,12 @@ test('comments out vehicle document policies that precede their table', () => {
   assert.match(applyReplayRepair(policyRepairs[1].before, policyRepairs[1]), /\*\/$/u);
 });
 
+test('hardens the primary dashboard overview overload during replay', () => {
+  const repair = REPLAY_REPAIRS[15];
+  const repaired = applyReplayRepair(repair.before, repair);
+  assert.match(repaired, /dashboard_overview_rpc\(text, date\) SECURITY INVOKER/u);
+});
+
 test('rejects missing or repeated historical repair targets', () => {
   const repair = REPLAY_REPAIRS[0];
   assert.throws(() => applyReplayRepair('unrelated SQL', repair), /found 0/u);

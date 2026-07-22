@@ -268,6 +268,9 @@ function LoginBrandingPanel({
       <p className={`relative z-10 text-white/80 text-sm mt-8 ${isRtl ? 'text-right' : 'text-left'}`}>
         {`© ${new Date().getFullYear()} ${projectName}`}
       </p>
+      <p className={`relative z-10 text-white/50 text-xs mt-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+        {`${t('poweredBy')} ${t('appName')}`}
+      </p>
     </section>
   );
 }
@@ -503,6 +506,9 @@ function LoginFormSection(props: LoginFormSectionProps) {
 
       <p className="text-center text-xs text-muted-foreground mt-8 lg:hidden">
         {`© ${new Date().getFullYear()} ${projectName}`}
+      </p>
+      <p className="text-center text-[11px] text-muted-foreground/70 mt-1 lg:hidden">
+        {`${t('poweredBy')} ${t('appName')}`}
       </p>
     </section>
   );

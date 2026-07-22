@@ -29,10 +29,18 @@ interface SystemSettingsContextType {
   refresh: () => Promise<void>;
 }
 
+// Product (software) name — fixed brand, distinct from the client company name.
+// Used only as a fallback so the UI is never blank before a company is configured.
+const PRODUCT_NAME_AR = 'وصلة';
+const PRODUCT_NAME_EN = 'Wasla';
+
+// project_name_* is the CLIENT COMPANY name (the delivery company that runs this
+// deployment). It defaults to blank and is set by an admin from Project Settings —
+// it is NOT the software's name.
 const defaults: SystemSettings = {
   id: '',
-  project_name_ar: 'مهمة التوصيل',
-  project_name_en: 'Muhimmat alTawseel',
+  project_name_ar: '',
+  project_name_en: '',
   project_subtitle_ar: 'إدارة المناديب',
   project_subtitle_en: 'Rider Management',
   logo_url: null,
@@ -43,7 +51,7 @@ const defaults: SystemSettings = {
 
 const SystemSettingsContext = createContext<SystemSettingsContextType>({
   settings: defaults,
-  projectName: defaults.project_name_ar,
+  projectName: PRODUCT_NAME_AR,
   projectSubtitle: defaults.project_subtitle_ar,
   loading: true,
   refresh: async () => {},
@@ -70,7 +78,10 @@ export const SystemSettingsProvider = ({ children }: { children: ReactNode }) =>
 
   const s = query.data ?? defaults;
   const loading = enabled ? query.isLoading : authLoading;
-  const projectName = localizedText(lang, s.project_name_ar, s.project_name_en || s.project_name_ar);
+  // Show the configured company name; fall back to the product name only when the
+  // company hasn't been set yet, so the shell/reports are never blank.
+  const configuredName = localizedText(lang, s.project_name_ar, s.project_name_en || s.project_name_ar).trim();
+  const projectName = configuredName || localizedText(lang, PRODUCT_NAME_AR, PRODUCT_NAME_EN);
   const projectSubtitle = localizedText(
     lang,
     s.project_subtitle_ar,

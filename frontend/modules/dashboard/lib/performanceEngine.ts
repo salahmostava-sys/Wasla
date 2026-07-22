@@ -511,6 +511,7 @@ export interface DayOfWeekAverageItem {
 
 export interface BestDaysAnalytics {
   topPeakDays: PeakDayItem[];
+  allSortedDays: PeakDayItem[];
   bestDayOfWeek: DayOfWeekAverageItem | null;
   dayOfWeekAverages: DayOfWeekAverageItem[];
   highestSingleDayOrders: number;
@@ -610,6 +611,7 @@ export function computeBestDaysAnalytics(
   if (!dailyTrend || dailyTrend.length === 0) {
     return {
       topPeakDays: [],
+      allSortedDays: [],
       bestDayOfWeek: null,
       dayOfWeekAverages: [],
       highestSingleDayOrders: 0,
@@ -631,11 +633,12 @@ export function computeBestDaysAnalytics(
 
   // Top peak days
   const sortedByOrders = [...validDays].sort((a, b) => b.orders - a.orders);
-  const topPeakDays: PeakDayItem[] = sortedByOrders.slice(0, 3).map((item) => ({
+  const allSortedDays: PeakDayItem[] = sortedByOrders.map((item) => ({
     date: item.date,
     dayName: item.dayName,
     orders: item.orders,
   }));
+  const topPeakDays = allSortedDays.slice(0, 3);
 
   const highestSingleDayOrders = sortedByOrders[0]?.orders ?? 0;
 
@@ -667,6 +670,7 @@ export function computeBestDaysAnalytics(
 
   return {
     topPeakDays,
+    allSortedDays,
     bestDayOfWeek,
     dayOfWeekAverages,
     highestSingleDayOrders,
