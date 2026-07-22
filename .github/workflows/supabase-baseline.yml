@@ -33,7 +33,7 @@ jobs:
         run: node scripts/baseline/prepare-history.mjs --report baseline-artifacts/replay-adjustments.json
 
       - name: Start database from full migration history
-        run: npx --yes supabase@${SUPABASE_CLI_VERSION} start --exclude analytics,edge-runtime,functions,imgproxy,inbucket,kong,meta,realtime,rest,storage,studio,vector
+        run: npx --yes supabase@${SUPABASE_CLI_VERSION} start --exclude analytics,edge-runtime,functions,imgproxy,inbucket,meta,realtime,storage,studio,vector
 
       - name: Capture historical catalog
         run: npx --yes supabase@${SUPABASE_CLI_VERSION} db query --local --output-format json --file scripts/baseline/catalog-snapshot.sql > baseline-artifacts/historical-catalog.json
@@ -57,7 +57,7 @@ jobs:
           mv supabase/migrations/*.sql /tmp/full-migration-history/
           cp baseline-artifacts/${BASELINE_VERSION}_full_schema_baseline.sql supabase/migrations/${BASELINE_VERSION}_full_schema_baseline.sql
           cp baseline-artifacts/${BASELINE_VERSION}_full_reference_data.sql supabase/migrations/20260722160001_full_reference_data.sql
-          npx --yes supabase@${SUPABASE_CLI_VERSION} start --exclude analytics,edge-runtime,functions,imgproxy,inbucket,kong,meta,realtime,rest,storage,studio,vector
+          npx --yes supabase@${SUPABASE_CLI_VERSION} start --exclude analytics,edge-runtime,functions,imgproxy,inbucket,meta,realtime,storage,studio,vector
 
       - name: Capture baseline catalog
         run: npx --yes supabase@${SUPABASE_CLI_VERSION} db query --local --output-format json --file scripts/baseline/catalog-snapshot.sql > baseline-artifacts/baseline-catalog.json
