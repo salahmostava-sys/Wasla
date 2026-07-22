@@ -27,6 +27,7 @@ import { SalaryTable } from '@modules/salaries/components/SalaryTable';
 // Phase-5 extracted hooks
 import { useSalaryData } from '@modules/salaries/hooks/useSalaryData';
 import { useWpsExport } from '@modules/salaries/hooks/useWpsExport';
+import { WpsExportDialog } from '@modules/salaries/components/WpsExportDialog';
 import { useSalaryDraft } from '@modules/salaries/hooks/useSalaryDraft';
 
 import { months } from '@modules/salaries/lib/salaryMonths';
@@ -240,7 +241,7 @@ const Salaries = () => {
     setDetailRow,
   });
 
-  const { runWpsExport, wpsLoading } = useWpsExport({
+  const wps = useWpsExport({
     filtered, computeRow, selectedMonth, companyName: projectName, toast: sonnerToast,
   });
 
@@ -383,14 +384,22 @@ const Salaries = () => {
         batchQueue={batchQueue}
         batchIndex={batchIndex}
         openTemplateEditor={() => setShowTemplateEditor(true)}
-        runWpsExport={runWpsExport}
-        wpsLoading={wpsLoading}
+        openWpsDialog={wps.openWpsDialog}
       />
 
       <BatchProgressBar
         batchQueue={batchQueue}
         batchIndex={batchIndex}
         batchMonth={batchMonth}
+      />
+
+      <WpsExportDialog
+        open={wps.dialogOpen}
+        onOpenChange={wps.setDialogOpen}
+        loading={wps.previewLoading}
+        downloading={wps.downloading}
+        preview={wps.preview}
+        onDownload={wps.downloadWps}
       />
 
       {viewMode === 'cards' && (

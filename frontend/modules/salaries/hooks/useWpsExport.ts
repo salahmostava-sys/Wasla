@@ -6,11 +6,11 @@ import {
   buildWpsExport,
   toBankWpsAoa,
   toMudadCsv,
+  type WpsBuildResult,
   type WpsEmployeeInput,
   type WpsEstablishment,
 } from '@modules/salaries/lib/wpsExport';
-import type { SalaryRow } from '@modules/salaries/types/salary.types';
-import type { MergedPdfComputed } from '@modules/salaries/types/salary.types';
+import type { MergedPdfComputed, SalaryRow } from '@modules/salaries/types/salary.types';
 import { logError } from '@shared/lib/logger';
 import type { toast as sonnerToast } from '@shared/components/ui/sonner';
 
@@ -56,71 +56,91 @@ function downloadTextFile(text: string, fileName: string, mime: string) {
 }
 
 export function useWpsExport({ filtered, computeRow, selectedMonth, companyName, toast }: UseWpsExportParams) {
-  const [wpsLoading, setWpsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [preview, setPreview] = useState<WpsBuildResult | null>(null);
+  const [establishment, setEstablishment] = useState<WpsEstablishment | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
-  const runWpsExport = useCallback(
+  // Fetch data + build the WPS result (without downloading) for the preview dialog.
+  const openWpsDialog = useCallback(async () => {
+    setDialogOpen(true);
+    setPreview(null);
+    setPreviewLoading(true);
+    try {
+      const [employees, establishmentRecord] = await Promise.all([
+        employeeService.getActiveForSalaryContext(),
+        settingsHubService.getTradeRegister(),
+      ]);
+
+      const ibanById = new Map<string, string>();
+      for (const e of employees as Array<{ id: string; iban: string | null }>) {
+        ibanById.set(e.id, e.iban ?? '');
+      }
+
+      const inputs: WpsEmployeeInput[] = filtered.map((r) => {
+        const c = computeRow(r);
+        return {
+          employeeId: r.employeeId,
+          name: r.employeeName,
+          nationalId: r.nationalId,
+          iban: ibanById.get(r.employeeId) ?? '',
+          paymentMethod: r.paymentMethod,
+          basicSalary: c.totalPlatformSalary,
+          otherAllowances: c.totalAdditions,
+          deductions: c.totalDeductions,
+          netSalary: c.netSalary,
+        };
+      });
+
+      setEstablishment(toEstablishment(establishmentRecord as TradeRegisterWps, companyName));
+      setPreview(buildWpsExport(inputs));
+    } catch (err: unknown) {
+      logError('[WPS] preview failed', err);
+      toast.error('تعذّر تجهيز معاينة حماية الأجور');
+      setDialogOpen(false);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [filtered, computeRow, companyName, toast]);
+
+  const downloadWps = useCallback(
     async (format: WpsFormat) => {
-      setWpsLoading(true);
+      if (!preview || preview.included.length === 0) return;
+      setDownloading(true);
       try {
-        const [employees, establishmentRecord] = await Promise.all([
-          employeeService.getActiveForSalaryContext(),
-          settingsHubService.getTradeRegister(),
-        ]);
-
-        const ibanById = new Map<string, string>();
-        for (const e of employees as Array<{ id: string; iban: string | null }>) {
-          ibanById.set(e.id, e.iban ?? '');
-        }
-
-        const inputs: WpsEmployeeInput[] = filtered.map((r) => {
-          const c = computeRow(r);
-          return {
-            employeeId: r.employeeId,
-            name: r.employeeName,
-            nationalId: r.nationalId,
-            iban: ibanById.get(r.employeeId) ?? '',
-            paymentMethod: r.paymentMethod,
-            basicSalary: c.totalPlatformSalary,
-            otherAllowances: c.totalAdditions,
-            deductions: c.totalDeductions,
-            netSalary: c.netSalary,
-          };
-        });
-
-        const result = buildWpsExport(inputs);
-        if (result.included.length === 0) {
-          toast.error('لا يوجد موظفون مؤهلون للتصدير', {
-            description: 'كل الموظفين بدون آيبان صالح أو الدفع نقدي.',
-          });
-          return;
-        }
-
-        const establishment = toEstablishment(establishmentRecord as TradeRegisterWps, companyName);
-
         if (format === 'mudad') {
-          const csv = toMudadCsv(result.included, selectedMonth);
+          const csv = toMudadCsv(preview.included, selectedMonth);
           downloadTextFile(csv, `WPS_Mudad_${selectedMonth}.csv`, 'text/csv;charset=utf-8;');
         } else {
+          const est = establishment ?? toEstablishment(null, companyName);
           const XLSX = await loadXlsx();
-          const ws = XLSX.utils.aoa_to_sheet(toBankWpsAoa(result.included, establishment, selectedMonth));
+          const ws = XLSX.utils.aoa_to_sheet(toBankWpsAoa(preview.included, est, selectedMonth));
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, 'WPS');
           XLSX.writeFile(wb, `WPS_Bank_${selectedMonth}.xlsx`);
         }
-
-        const parts = [`تم تصدير ${result.included.length} موظف`];
-        if (result.excluded.length) parts.push(`استُبعد ${result.excluded.length} (بدون آيبان/نقدي)`);
-        if (result.warnings.length) parts.push(`${result.warnings.length} صافيهم < 50% (قد تُرفض من مُدد)`);
-        toast.success('تم تصدير ملف حماية الأجور', { description: parts.join(' • ') });
+        toast.success('تم تصدير ملف حماية الأجور', {
+          description: `${preview.included.length} موظف`,
+        });
+        setDialogOpen(false);
       } catch (err: unknown) {
-        logError('[WPS] export failed', err);
+        logError('[WPS] download failed', err);
         toast.error('تعذّر تصدير ملف حماية الأجور');
       } finally {
-        setWpsLoading(false);
+        setDownloading(false);
       }
     },
-    [filtered, computeRow, selectedMonth, companyName, toast],
+    [preview, establishment, selectedMonth, companyName, toast],
   );
 
-  return { runWpsExport, wpsLoading };
+  return {
+    dialogOpen,
+    setDialogOpen,
+    previewLoading,
+    preview,
+    downloading,
+    openWpsDialog,
+    downloadWps,
+  };
 }
