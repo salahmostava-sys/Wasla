@@ -4,6 +4,8 @@ import type { SalaryRow } from '@modules/salaries/types/salary.types';
 
 const buildRow = (overrides: Partial<SalaryRow> = {}): SalaryRow => ({
   id: 'row-1',
+  dbId: null,
+  dbVersion: null,
   employeeId: 'emp-1',
   employeeName: 'Employee One',
   jobTitle: 'Driver',

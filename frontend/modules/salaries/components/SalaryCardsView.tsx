@@ -57,6 +57,14 @@ export function SalaryCardsView(props: Readonly<SalaryCardsViewProps>) {
                     <p className="text-xs text-muted-foreground truncate">{r.jobTitle}</p>
                   </div>
                   <span className={statusStyles[r.status]}>{statusLabels[r.status]}</span>
+                  {r.snapshotStale && !r.isDirty && (
+                    <span
+                      className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-destructive/20 text-destructive border border-destructive/40 text-[10px] font-bold cursor-help"
+                      title="بيانات الطلبات تغيّرت منذ الاعتماد — أعد الاعتماد لتحديث الأرقام"
+                    >
+                      !
+                    </span>
+                  )}
                 </div>
                 {r.registeredApps.length > 0 && (
                   <div className="flex flex-wrap gap-1">

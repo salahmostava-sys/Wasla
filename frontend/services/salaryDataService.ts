@@ -98,6 +98,23 @@ export const salaryDataService = {
     await salaryService.delete(id);
   },
 
+  async deleteByEmployeeMonth(employeeId: string, monthYear: string) {
+    await salaryService.deleteByEmployeeMonth(employeeId, monthYear);
+  },
+
+  updateWithVersionCheck(dbId: string, expectedVersion: number | null, payload: Record<string, unknown>) {
+    return salaryService.updateWithVersionCheck(dbId, expectedVersion, payload);
+  },
+
+  insertNew(payload: Record<string, unknown>) {
+    return salaryService.insertNew(payload);
+  },
+
+  async getCurrentVersions(monthYear: string, employeeIds: string[]) {
+    if (employeeIds.length === 0) return [] as { employee_id: string; version: number | null }[];
+    return salaryService.getCurrentVersionsForMonth(monthYear, employeeIds);
+  },
+
   captureMonthSnapshot(monthYear: string) {
     return performanceService.captureSalaryMonthSnapshot(monthYear);
   },

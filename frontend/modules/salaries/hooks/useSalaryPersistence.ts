@@ -76,6 +76,25 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
     });
   }, [selectedMonth]);
 
+  // Optimistic-concurrency write: updates the existing row only if its version
+  // still matches what was loaded (row.dbVersion), or inserts a brand-new row
+  // if none exists yet. Returns { conflict: true } instead of writing when
+  // someone else changed this employee's salary since it was loaded — callers
+  // must NOT treat a conflict as success.
+  const writeSalaryRecordWithVersionCheck = useCallback(
+    (row: SalaryRow, payload: Record<string, unknown>) =>
+      row.dbId
+        ? salaryDataService.updateWithVersionCheck(row.dbId, row.dbVersion, payload)
+        : salaryDataService.insertNew(payload),
+    [],
+  );
+
+  const reportConflict = useCallback(() => {
+    toast.error('تم تعديل هذا الراتب من مستخدم آخر', {
+      description: 'الرجاء تحديث الصفحة والمحاولة مجددًا.',
+    });
+  }, [toast]);
+
 
   const updateRow = useCallback(
     (id: string, patch: Partial<SalaryRow>) => {
@@ -213,9 +232,9 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
         externalDeduction,
       });
 
-      const saved = await run(
-        async () => {
-          await salaryDataService.upsertSalaryRecord({
+      const writeResult = await run(
+        () =>
+          writeSalaryRecordWithVersionCheck(row, {
             employee_id: row.employeeId,
             month_year: selectedMonth,
             base_salary: baseSalary,
@@ -230,13 +249,16 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
             approved_at: new Date().toISOString(),
             payment_method: row.paymentMethod,
             sheet_snapshot: rowSnapshot,
-          });
-          return true;
-        },
+          }),
         { errorTitle: 'تعذّر حفظ الاعتماد' },
       );
-      if (!saved) {
+      if (!writeResult) {
         setApprovingRowId(null);
+        return;
+      }
+      if (writeResult.conflict) {
+        setApprovingRowId(null);
+        reportConflict();
         return;
       }
 
@@ -252,7 +274,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
 
 
     },
-    [selectedMonth, toast, user, run, computeServerSalaryForPayment, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow],
+    [selectedMonth, toast, user, run, computeServerSalaryForPayment, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow, writeSalaryRecordWithVersionCheck, reportConflict],
   );
 
   const unapproveRow = useCallback(
@@ -265,7 +287,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
       setApprovingRowId(id);
       const success = await run(
         async () => {
-          await salaryDataService.delete(row.id);
+          await salaryDataService.deleteByEmployeeMonth(row.employeeId, selectedMonth);
           return true;
         },
         { errorTitle: 'تعذّر إلغاء الاعتماد' },
@@ -281,7 +303,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
       setApprovingRowId(null);
       toast.success('تم إلغاء الاعتماد');
     },
-    [toast, run, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow],
+    [toast, run, updateRow, refreshMonthSnapshot, approvingRowId, getLatestRow, selectedMonth],
   );
 
 
@@ -309,7 +331,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
             externalDeduction,
           });
 
-          await salaryDataService.upsertSalaryRecord({
+          const writeResult = await writeSalaryRecordWithVersionCheck(row, {
             employee_id: row.employeeId,
             month_year: selectedMonth,
             base_salary: baseSalary,
@@ -325,6 +347,10 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
             payment_method: row.paymentMethod,
             sheet_snapshot: rowSnapshot,
           });
+          if (writeResult.conflict) {
+            reportConflict();
+            return;
+          }
 
           await settleAdvanceInstallments(row, nowStr);
 
@@ -346,7 +372,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
       );
       setMarkingPaid(null);
     },
-    [selectedMonth, toast, user, run, computeServerSalaryForPayment, settleAdvanceInstallments, updateRow, setMarkingPaid, refreshMonthSnapshot],
+    [selectedMonth, toast, user, run, computeServerSalaryForPayment, settleAdvanceInstallments, updateRow, setMarkingPaid, refreshMonthSnapshot, writeSalaryRecordWithVersionCheck, reportConflict],
   );
 
 
@@ -424,9 +450,32 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
         };
       });
 
-    const saved = await run(
+    // Re-check versions right before writing: catches an employee whose salary
+    // was approved/edited by someone else since this page loaded. Rows with no
+    // dbId yet (never approved before) have nothing to conflict against.
+    const rowByEmployeeId = new Map(approvalRows.map((r) => [r.employeeId, r]));
+    const employeeIdsToRecheck = approvalRows.filter((r) => r.dbId).map((r) => r.employeeId);
+    const currentVersions = await run(
+      () => salaryDataService.getCurrentVersions(selectedMonth, employeeIdsToRecheck),
+      { errorTitle: 'تعذّر التحقق من أحدث نسخة للرواتب' },
+    );
+    if (currentVersions === undefined) return;
+    const currentVersionMap = new Map(currentVersions.map((v) => [v.employee_id, v.version]));
+
+    const conflictedNames: string[] = [];
+    const finalRecords = records.filter((record) => {
+      const row = rowByEmployeeId.get(record.employee_id);
+      if (!row?.dbId) return true;
+      if (currentVersionMap.get(record.employee_id) !== row.dbVersion) {
+        conflictedNames.push(row.employeeName);
+        return false;
+      }
+      return true;
+    });
+
+    const saved = finalRecords.length === 0 ? true : await run(
       async () => {
-        await salaryDataService.upsertSalaryRecords(records);
+        await salaryDataService.upsertSalaryRecords(finalRecords);
         return true;
       },
       { errorTitle: 'خطأ أثناء الاعتماد' },
@@ -435,7 +484,7 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
 
     refreshMonthSnapshot();
 
-    const approvedIds = new Set(records.map((r) => r.employee_id));
+    const approvedIds = new Set(finalRecords.map((r) => r.employee_id));
     const approvedRowIds = new Set(
       approvalRows
         .filter((r) => approvedIds.has(r.employeeId))
@@ -462,7 +511,14 @@ export function useSalaryPersistence(params: UseSalaryPersistenceParams) {
         description: skippedRows.join('، '),
       });
     }
-    toast.success(`تم اعتماد ${records.length} راتب وحفظها`);
+    if (conflictedNames.length > 0) {
+      toast.warning(`تم تخطي ${conflictedNames.length} موظف (تم تعديله من مستخدم آخر)`, {
+        description: conflictedNames.join('، '),
+      });
+    }
+    if (finalRecords.length > 0) {
+      toast.success(`تم اعتماد ${finalRecords.length} راتب وحفظها`);
+    }
   }, [filtered, selectedMonth, toast, user, run, setRows, resolveBaseSalaryForPersistence, refreshMonthSnapshot, getLatestRows]);
 
 

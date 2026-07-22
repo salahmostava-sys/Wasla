@@ -476,6 +476,8 @@ export const salaryService = {
     // causing them to appear as "pending" on the salary page.
     const PAGE_SIZE = 1000;
     type SalaryRecordContextRow = {
+      id: string;
+      version: number | null;
       employee_id: string;
       is_approved: boolean;
       base_salary: number | null;
@@ -489,8 +491,8 @@ export const salaryService = {
       sheet_snapshot: unknown;
     };
 
-    const primarySelect = 'employee_id, is_approved, base_salary, allowances, advance_deduction, net_salary, manual_deduction, attendance_deduction, external_deduction, payment_method, sheet_snapshot';
-    const fallbackSelect = 'employee_id, is_approved, base_salary, allowances, advance_deduction, net_salary, manual_deduction, attendance_deduction, external_deduction, payment_method';
+    const primarySelect = 'id, version, employee_id, is_approved, base_salary, allowances, advance_deduction, net_salary, manual_deduction, attendance_deduction, external_deduction, payment_method, sheet_snapshot';
+    const fallbackSelect = 'id, version, employee_id, is_approved, base_salary, allowances, advance_deduction, net_salary, manual_deduction, attendance_deduction, external_deduction, payment_method';
 
     let useFallback = false;
 
@@ -590,6 +592,65 @@ export const salaryService = {
   delete: async (id: string) => {
     const { error } = await supabase.from('salary_records').delete().eq('id', id);
     if (error) handleSupabaseError(error, 'salaryService.delete');
+  },
+
+  // Unlike delete(id), this does not require the real DB uuid — it relies on
+  // the (employee_id, month_year) unique constraint, which the frontend
+  // always has available even though it never fetches the row's real id.
+  deleteByEmployeeMonth: async (employeeId: string, monthYear: string) => {
+    const { error } = await supabase
+      .from('salary_records')
+      .delete()
+      .eq('employee_id', employeeId)
+      .eq('month_year', monthYear);
+    if (error) handleSupabaseError(error, 'salaryService.deleteByEmployeeMonth');
+  },
+
+  // Optimistic-concurrency update: only succeeds if `version` still matches
+  // what the caller last read. Returns { conflict: true } if another write
+  // already bumped the version (0 rows affected), so callers can refuse to
+  // silently clobber a concurrent edit.
+  updateWithVersionCheck: async (
+    dbId: string,
+    expectedVersion: number | null,
+    payload: Record<string, unknown>,
+  ): Promise<{ conflict: boolean }> => {
+    const { data, error } = await supabase
+      .from('salary_records')
+      .update(payload as never)
+      .eq('id', dbId)
+      .eq('version', expectedVersion ?? 1)
+      .select('id');
+    if (error) handleSupabaseError(error, 'salaryService.updateWithVersionCheck');
+    return { conflict: (data?.length ?? 0) === 0 };
+  },
+
+  // First-time approval for a row with no existing salary_records entry yet.
+  // A unique_violation (23505) means someone else approved this employee's
+  // month between our read and this write — treat that as the same conflict.
+  insertNew: async (payload: Record<string, unknown>): Promise<{ conflict: boolean }> => {
+    const { error } = await supabase.from('salary_records').insert(payload as never);
+    if (error) {
+      if ((error as { code?: string }).code === '23505') return { conflict: true };
+      handleSupabaseError(error, 'salaryService.insertNew');
+    }
+    return { conflict: false };
+  },
+
+  // Lightweight pre-write check used by bulk approve (approveAll) to catch
+  // rows another user modified since they were loaded into the page, without
+  // re-fetching every column for every employee.
+  getCurrentVersionsForMonth: async (
+    monthYear: string,
+    employeeIds: string[],
+  ): Promise<{ employee_id: string; version: number | null }[]> => {
+    const { data, error } = await supabase
+      .from('salary_records')
+      .select('employee_id, version')
+      .eq('month_year', monthYear)
+      .in('employee_id', employeeIds);
+    if (error) handleSupabaseError(error, 'salaryService.getCurrentVersionsForMonth');
+    return data ?? [];
   },
 
   getMonthTotal: async (monthYear: string) => {

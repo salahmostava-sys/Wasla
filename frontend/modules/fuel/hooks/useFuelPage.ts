@@ -19,6 +19,7 @@ import {
 } from '@modules/fuel/model/fuelCalculations';
 import type {
   DailyRow,
+  DailyMileageResponseRow,
   Employee,
   AppRow,
 } from '@modules/fuel/types/fuel.types';
@@ -60,7 +61,6 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [apps, setApps] = useState<AppRow[]>([]);
   const [employeeAppLinks, setEmployeeAppLinks] = useState<{ employee_id: string; app_id: string }[]>([]);
-  const [monthOrdersMap, setMonthOrdersMap] = useState<Record<string, number>>({});
   const [showImport, setShowImport] = useState(false);
   const [expandedRider, setExpandedRider] = useState<string | null>(null);
   const [savingEntry, setSavingEntry] = useState(false);
@@ -103,6 +103,7 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
         employees: employeesWithVehicles,
         apps: (appRows || []),
         links: (linkRows || []),
+        vehicleMap,
       };
     },
     retry: defaultQueryRetry,
@@ -163,19 +164,6 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     toast({ title: 'خطأ في تحميل البيانات', description: message, variant: 'destructive' });
   }, [fuelBaseError, toast]);
 
-  const { data: monthlyOrdersData = [] } = useQuery({
-    queryKey: ['fuel', uid, 'monthly-orders', monthYear],
-    enabled,
-    queryFn: async () => {
-      const ms = `${monthYear}-01`;
-      const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
-      const rows = await fuelApi.getMonthlyOrders(ms, me);
-      return (rows || []);
-    },
-    retry: defaultQueryRetry,
-    staleTime: 30_000,
-  });
-
   /** Daily orders with date — used by spreadsheet view for per-day orders */
   const { data: dailyOrderRows = [] } = useQuery({
     queryKey: ['fuel', uid, 'daily-orders-by-date', monthYear],
@@ -189,84 +177,58 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     staleTime: 30_000,
   });
 
-  useEffect(() => {
-    const map: Record<string, number> = {};
-    monthlyOrdersData.forEach((o) => {
-      map[o.employee_id] = (map[o.employee_id] || 0) + (Number(o.orders_count) || 0);
-    });
-    setMonthOrdersMap(map);
-  }, [monthlyOrdersData]);
+  const monthOrdersMap = useMemo(() => buildOrdersMap(dailyOrderRows), [dailyOrderRows]);
 
   useEffect(() => {
     setNewEntry(ne => ({ ...ne, date: defaultEntryDate }));
   }, [monthYear, defaultEntryDate]);
 
   const {
-    data: monthlyRows = [],
-    isLoading: monthlyLoading,
-    error: monthlyError,
-    refetch: refetchMonthly,
+    data: mileageRowsRaw = [],
+    isLoading: mileageLoading,
+    error: mileageError,
+    refetch: refetchMileage,
   } = useQuery({
-    queryKey: ['fuel', uid, 'monthly', monthYear, platformTab, employees.map((e) => e.id).join(',')],
-    enabled: enabled,
+    queryKey: ['fuel', uid, 'mileage-by-month', monthYear],
+    enabled,
     queryFn: async () => {
       const ms = `${monthYear}-01`;
       const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
-      const [dailyRowsRaw, orderRows, assignmentRows] = await Promise.all([
-        fuelApi.getMonthlyDailyMileage(ms, me),
-        fuelApi.getMonthlyOrders(ms, me),
-        fuelApi.getActiveVehicleAssignments(),
-      ]);
-      const ordersMap = buildOrdersMap((orderRows || []));
-      const vehicleMap = buildVehicleMap((assignmentRows || []));
-      const aggMap = buildMonthlyAggMap((dailyRowsRaw || []), employeeIdsOnPlatform);
-      const allEmps = fuelBaseData?.employees?.length ? fuelBaseData.employees : employees;
-      return buildMonthlyRows(aggMap, ordersMap, vehicleMap, employees, allEmps, employeeIdsOnPlatform);
+      const rows = await fuelApi.getDailyMileageByMonth(ms, me);
+      return (rows || []) as DailyMileageResponseRow[];
     },
     retry: defaultQueryRetry,
     staleTime: 30_000,
   });
 
-  const {
-    data: dailyRows = [],
-    isLoading: dailyLoading,
-    error: dailyError,
-    refetch: refetchDaily,
-  } = useQuery({
-    queryKey: ['fuel', uid, 'daily', monthYear, selectedEmployee, platformTab],
-    enabled: enabled,
-    queryFn: async () => {
-      const ms = `${monthYear}-01`;
-      const me = format(endOfMonth(new Date(`${monthYear}-01`)), ISO_DATE_FORMAT);
-      const dailyData = await fuelApi.getDailyMileageByMonth(ms, me);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mappedRows = mapDailyRows((dailyData || []) as any);
-      return applyDailyFilters(mappedRows, selectedEmployee, employeeIdsOnPlatform);
-    },
-    retry: defaultQueryRetry,
-    staleTime: 30_000,
-  });
+  const dailyRows = useMemo(
+    () => applyDailyFilters(mapDailyRows(mileageRowsRaw), selectedEmployee, employeeIdsOnPlatform),
+    [mileageRowsRaw, selectedEmployee, employeeIdsOnPlatform],
+  );
+
+  const monthlyRows = useMemo(() => {
+    const aggMap = buildMonthlyAggMap(mileageRowsRaw, employeeIdsOnPlatform);
+    const allEmployees = fuelBaseData?.employees?.length ? fuelBaseData.employees : employees;
+    return buildMonthlyRows(
+      aggMap,
+      monthOrdersMap,
+      fuelBaseData?.vehicleMap ?? {},
+      employees,
+      allEmployees,
+      employeeIdsOnPlatform,
+    );
+  }, [mileageRowsRaw, employeeIdsOnPlatform, monthOrdersMap, fuelBaseData, employees]);
 
   useEffect(() => {
-    if (!monthlyError) return;
-    logError('[Fuel] monthly query failed', monthlyError);
-    toast({ title: 'خطأ في جلب البيانات', description: getErrorMessageOrFallback(monthlyError, 'تعذر جلب البيانات الشهرية'), variant: 'destructive' });
-  }, [monthlyError, toast]);
-
-  useEffect(() => {
-    if (!dailyError) return;
-    logError('[Fuel] daily query failed', dailyError);
-    toast({ title: 'خطأ في جلب البيانات', description: getErrorMessageOrFallback(dailyError, 'تعذر جلب البيانات اليومية'), variant: 'destructive' });
-  }, [dailyError, toast]);
+    if (!mileageError) return;
+    logError('[Fuel] mileage query failed', mileageError);
+    toast({ title: 'خطأ في جلب البيانات', description: getErrorMessageOrFallback(mileageError, 'تعذر جلب بيانات الكيلومترات والبنزين'), variant: 'destructive' });
+  }, [mileageError, toast]);
 
   const refresh = () => {
-    refetchMonthly().catch(() => {});
-    refetchDaily().catch(() => {});
+    refetchMileage().catch(() => {});
   };
-  const getLoadingStatus = () => {
-    return monthlyLoading || dailyLoading;
-  };
-  const loading = getLoadingStatus();
+  const loading = mileageLoading;
 
   const handleDeleteDaily = async (id: string) => {
     if (!confirm('هل تريد حذف هذا السجل؟')) return;
@@ -445,10 +407,10 @@ export function useFuelPage() { // NOSONAR: page data layer with many independen
     handleDeleteDaily,
     permissions,
     bulkUpsertDailyMileage: fuelApi.bulkUpsertDailyMileage,
-    refetchMonthly,
+    refetchMonthly: refetchMileage,
     monthOrdersMap,
     dailyOrderRows,
-    error: fuelBaseError || monthlyError || dailyError,
-    refetch: async () => { await Promise.all([refetchMonthly(), refetchDaily()]); },
+    error: fuelBaseError || mileageError,
+    refetch: async () => { await refetchMileage(); },
   };
 }

@@ -345,6 +345,64 @@ describe('salaryService', () => {
     });
   });
 
+  describe('deleteByEmployeeMonth', () => {
+    it('completes without error on success', async () => {
+      tableMocks.salary_records = { error: null };
+      await expect(
+        salaryService.deleteByEmployeeMonth('e1', '2026-03'),
+      ).resolves.toBeUndefined();
+    });
+  });
+
+  describe('updateWithVersionCheck', () => {
+    it('returns no conflict when a row was updated', async () => {
+      tableMocks.salary_records = { data: [{ id: '1' }], error: null };
+      const res = await salaryService.updateWithVersionCheck('1', 2, { is_approved: true });
+      expect(res).toEqual({ conflict: false });
+    });
+    it('returns a conflict when no row matched the expected version', async () => {
+      tableMocks.salary_records = { data: [], error: null };
+      const res = await salaryService.updateWithVersionCheck('1', 2, { is_approved: true });
+      expect(res).toEqual({ conflict: true });
+    });
+    it('throws on a non-conflict database error', async () => {
+      tableMocks.salary_records = { data: null, error: new Error('boom') };
+      await expect(
+        salaryService.updateWithVersionCheck('1', 2, { is_approved: true }),
+      ).rejects.toThrow('boom');
+    });
+  });
+
+  describe('insertNew', () => {
+    it('returns no conflict on success', async () => {
+      tableMocks.salary_records = { error: null };
+      const res = await salaryService.insertNew({ employee_id: 'e1', month_year: '2026-03' });
+      expect(res).toEqual({ conflict: false });
+    });
+    it('returns a conflict on a unique-violation error', async () => {
+      tableMocks.salary_records = { error: { code: '23505', message: 'duplicate key' } };
+      const res = await salaryService.insertNew({ employee_id: 'e1', month_year: '2026-03' });
+      expect(res).toEqual({ conflict: true });
+    });
+    it('throws on any other database error', async () => {
+      tableMocks.salary_records = { error: { code: '22P02', message: 'bad input' } };
+      await expect(
+        salaryService.insertNew({ employee_id: 'e1', month_year: '2026-03' }),
+      ).rejects.toThrow('bad input');
+    });
+  });
+
+  describe('getCurrentVersionsForMonth', () => {
+    it('returns employee/version pairs', async () => {
+      tableMocks.salary_records = {
+        data: [{ employee_id: 'e1', version: 3 }],
+        error: null,
+      };
+      const res = await salaryService.getCurrentVersionsForMonth('2026-03', ['e1']);
+      expect(res).toEqual([{ employee_id: 'e1', version: 3 }]);
+    });
+  });
+
   describe('getMonthTotal', () => {
     it('returns sum', async () => {
       tableMocks.salary_records = { data: [{ net_salary: 100 }, { net_salary: 200 }], error: null };

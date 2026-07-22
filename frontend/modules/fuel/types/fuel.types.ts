@@ -28,7 +28,7 @@ export type MonthlyRow = {
 
 export type Employee = { id: string; name: string; personal_photo_url?: string | null; status?: string | null; sponsorship_status?: string | null; probation_end_date?: string | null; job_title?: string | null; vehicle?: { plate_number: string; type: string; brand?: string | null; model?: string | null } | null };
 export type AppRow = { id: string; name: string };
-export type DailyMileageResponseRow = DailyRow & { employees?: { name: string; personal_photo_url?: string | null } };
+export type DailyMileageResponseRow = DailyRow & { employees?: { name: string; personal_photo_url?: string | null } | null };
 export type ImportStep = 1 | 2 | 3;
 export type FuelBranch = 'makkah' | 'jeddah';
 
@@ -53,7 +53,7 @@ export type DailyMileageAggSource = {
   employee_id: string;
   km_total: number;
   fuel_cost: number;
-  employees: { name: string; personal_photo_url: string | null } | null;
+  employees?: { name: string; personal_photo_url?: string | null } | null;
 };
 
 export type MonthlyAgg = { km: number; fuel: number; count: number; name: string; photo?: string | null };
@@ -129,7 +129,11 @@ export const buildMonthlyRows = (
       .filter(e => !employeeIdsOnPlatform || employeeIdsOnPlatform.has(e.id))
       .map(e => e.id),
     ...Object.keys(aggMap).filter((id) => !isAdminEmployeeId(id) && !isHiddenExcludedEmployeeId(id)),
-    ...Object.keys(ordersMap).filter((id) => (ordersMap[id] || 0) > 0 && !isAdminEmployeeId(id)),
+    ...Object.keys(ordersMap).filter((id) =>
+      (ordersMap[id] || 0) > 0
+      && !isAdminEmployeeId(id)
+      && (!employeeIdsOnPlatform || employeeIdsOnPlatform.has(id))
+    ),
   ]);
   return Array.from(allEmployeeIds).map((employeeId) => {
     const agg = aggMap[employeeId];

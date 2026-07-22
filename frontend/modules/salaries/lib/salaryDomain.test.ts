@@ -10,6 +10,8 @@ import type { PricingRule } from '@services/salaryService';
 
 const buildRow = (registeredApps: string[]): SalaryRow => ({
   id: `row-${registeredApps.join('-') || 'none'}`,
+  dbId: null,
+  dbVersion: null,
   employeeId: 'emp-1',
   employeeName: 'Employee One',
   jobTitle: 'Driver',
@@ -446,6 +448,141 @@ describe('buildSalaryRows', () => {
     expect(rows[0].customDeductions).toEqual({ 'manual___خصم يدوي': 25 });
     expect(rows[0].transfer).toBe(500);
     expect(rows[0].preferEngineBaseSalary).toBe(false);
+  });
+
+  const staleSnapshotBaseParams = {
+    employees: [
+      {
+        id: 'emp-1',
+        name: 'Employee One',
+        job_title: 'Driver',
+        national_id: '1234567890',
+        city: 'makkah',
+        iban: 'SA123456',
+        preferred_language: 'ar',
+        phone: '0550000000',
+      },
+    ],
+    selectedMonth: '2026-04',
+    platformNames: ['Keeta'],
+    appNameToId: { Keeta: 'keeta-id' },
+    appWorkTypeMap: { Keeta: 'orders' as const },
+    rulesMap: { 'keeta-id': [] },
+    appSchemeMap: {
+      Keeta: {
+        id: 'scheme-1',
+        name: 'Keeta Scheme',
+        name_en: null,
+        status: 'active',
+        scheme_type: 'order_based' as const,
+        target_orders: null,
+        target_bonus: null,
+        salary_scheme_tiers: [],
+      },
+    },
+    ordMap: { 'emp-1': { Keeta: 300 } },
+    attendanceDaysMap: {},
+    advRemainingMap: {},
+    fuelCostMap: {},
+  };
+
+  const savedSnapshotWith = (platformOrders: Record<string, number>) => ({
+    is_approved: true,
+    net_salary: 3320,
+    base_salary: 3100,
+    allowances: 220,
+    attendance_deduction: 30,
+    advance_deduction: 50,
+    external_deduction: 20,
+    manual_deduction: 0,
+    payment_method: 'cash',
+    sheet_snapshot: {
+      bankAccount: '654321',
+      hasIban: true,
+      paymentMethod: 'cash' as const,
+      platformOrders,
+      platformSalaries: { Keeta: 3100 },
+      platformMetrics: {
+        Keeta: {
+          appName: 'Keeta',
+          workType: 'orders' as const,
+          calculationMethod: 'orders',
+          ordersCount: platformOrders.Keeta ?? 0,
+          shiftDays: 0,
+          salary: 3100,
+        },
+      },
+      incentives: 180,
+      sickAllowance: 40,
+      violations: 30,
+      customDeductions: {},
+      transfer: 500,
+      advanceDeduction: 50,
+      externalDeduction: 20,
+      platformIncome: 7200,
+      engineBaseSalary: 3100,
+    },
+  });
+
+  const previewWithOrders = (ordersCount: number) => ({
+    'emp-1': {
+      base_salary: 2500,
+      advance_deduction: 10,
+      external_deduction: 5,
+      total_shift_days: 0,
+      platform_breakdown: {
+        Keeta: {
+          appName: 'Keeta',
+          workType: 'orders' as const,
+          calculationMethod: 'orders',
+          ordersCount,
+          shiftDays: 0,
+          salary: 2500,
+        },
+      },
+    },
+  });
+
+  it('flags snapshotStale when an approved row (still awaiting advance settlement) has fresh orders that differ from its saved snapshot', () => {
+    const rows = buildSalaryRows({
+      ...staleSnapshotBaseParams,
+      savedMap: { 'emp-1': savedSnapshotWith({ Keeta: 410 }) },
+      previewMap: previewWithOrders(300),
+      // A non-empty pending installment keeps resolveRowStatus at 'approved'
+      // instead of 'paid' — see resolveRowStatus in salaryDomain.ts.
+      advInstIds: { 'emp-1': ['inst-1'] },
+      deductedInstIds: {},
+    });
+
+    expect(rows[0].status).toBe('approved');
+    expect(rows[0].snapshotStale).toBe(true);
+  });
+
+  it('does not flag snapshotStale when the fresh orders still match the saved snapshot', () => {
+    const rows = buildSalaryRows({
+      ...staleSnapshotBaseParams,
+      savedMap: { 'emp-1': savedSnapshotWith({ Keeta: 300 }) },
+      previewMap: previewWithOrders(300),
+      advInstIds: { 'emp-1': ['inst-1'] },
+      deductedInstIds: {},
+    });
+
+    expect(rows[0].status).toBe('approved');
+    expect(rows[0].snapshotStale).toBe(false);
+  });
+
+  it('does not flag snapshotStale for a paid row even if fresh orders differ (closed historical record)', () => {
+    const rows = buildSalaryRows({
+      ...staleSnapshotBaseParams,
+      savedMap: { 'emp-1': savedSnapshotWith({ Keeta: 410 }) },
+      previewMap: previewWithOrders(300),
+      // No pending installments left → resolveRowStatus returns 'paid'.
+      advInstIds: {},
+      deductedInstIds: {},
+    });
+
+    expect(rows[0].status).toBe('paid');
+    expect(rows[0].snapshotStale).toBe(false);
   });
 
   it('falls back to saved aggregate fields when older records do not have a sheet snapshot', () => {

@@ -36,6 +36,8 @@ import type { WorkType } from '@shared/types/shifts';
 // Local fallback calculation was removed to ensure single source of truth.
 
 type SavedSalaryRecord = {
+  id?: string | null;
+  version?: number | null;
   is_approved: boolean;
   net_salary: number;
   base_salary?: number | null;
@@ -133,6 +135,18 @@ function valuesMatch(left: unknown, right: unknown): boolean {
   return false;
 }
 
+const platformOrdersDiffer = (
+  fresh: Record<string, number>,
+  snapshotOrders: Record<string, number> | undefined,
+): boolean => {
+  if (!snapshotOrders) return false;
+  const keys = new Set([...Object.keys(fresh), ...Object.keys(snapshotOrders)]);
+  for (const key of keys) {
+    if ((fresh[key] ?? 0) !== (snapshotOrders[key] ?? 0)) return true;
+  }
+  return false;
+};
+
 const rowDiffersFromDraft = (row: SalaryRow, patch: SalaryDraftPatch) =>
   Object.entries(patch).some(([key, value]) => {
     const rowValue = (row as unknown as Record<string, unknown>)[key];
@@ -143,6 +157,8 @@ export const buildSavedMap = (savedRecords: Array<{ employee_id: string } & Save
   const savedMap: Record<string, SavedSalaryRecord> = {};
   savedRecords?.forEach((r) => {
     savedMap[r.employee_id] = {
+      id: r.id ?? null,
+      version: r.version ?? null,
       is_approved: r.is_approved,
       // FIX #5: Use ?? instead of || to correctly preserve legitimate 0 values.
       // || treats 0 as falsy, which would incorrectly replace a real 0 with 0 anyway
@@ -495,6 +511,16 @@ function buildEmployeeSalaryRow(params: {
 
   const savedSnapshot = readSavedSnapshot(saved?.sheet_snapshot);
   const status = resolveRowStatus(saved, pendingInstallmentIds.length, deductedInstallmentIds.length);
+  // Once a salary is approved, its sheet_snapshot is shown instead of the fresh
+  // preview (see mergedRow below) so manual edits survive reloads. If new orders
+  // land afterward, the approved sheet would otherwise look "correct" forever.
+  // Flag the mismatch instead of silently overwriting an already-approved number —
+  // a paid salary is a closed historical record, so it's excluded from the check.
+  const snapshotStale =
+    !!saved?.is_approved &&
+    status !== 'paid' &&
+    !!savedSnapshot &&
+    platformOrdersDiffer(platformOrders, savedSnapshot.platformOrders);
   const hasIban = !!emp.iban;
   const rawCity = (emp.city as string | null | undefined) ?? null;
   const cityKey: 'makkah' | 'jeddah' | null = rawCity === 'makkah' || rawCity === 'jeddah' ? rawCity : null;
@@ -505,6 +531,9 @@ function buildEmployeeSalaryRow(params: {
 
   const baseRow: SalaryRow = {
     id: `${employeeId}-${selectedMonth}`,
+    dbId: saved?.id ?? null,
+    dbVersion: saved?.version ?? null,
+    snapshotStale,
     employeeId,
     // FIX #1: Use safeStr() instead of String() to guard against Supabase JOIN
     // returning an object (e.g. { id, name }) instead of a plain string.

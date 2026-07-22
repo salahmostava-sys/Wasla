@@ -6,6 +6,12 @@ export type SortDir = 'asc' | 'desc' | null;
 
 export interface SalaryRow {
   id: string;
+  /** Real salary_records.id (uuid), or null if no row has been saved for this month yet. */
+  dbId: string | null;
+  /** salary_records.version at load time, used for optimistic-concurrency writes. */
+  dbVersion: number | null;
+  /** True when the approved sheet_snapshot's platform orders no longer match live data. */
+  snapshotStale?: boolean;
   employeeId: string;
   employeeName: string;
   jobTitle: string;

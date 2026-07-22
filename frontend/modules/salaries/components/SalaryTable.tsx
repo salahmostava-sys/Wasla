@@ -159,6 +159,18 @@ const SalaryRowCells = memo(function SalaryRowCells({
               </Tooltip>
             </TooltipProvider>
           )}
+          {r.snapshotStale && !r.isDirty && (
+            <TooltipProvider delayDuration={120}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-destructive/20 text-destructive border border-destructive/40 cursor-help">
+                    <AlertTriangle size={11} />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">بيانات الطلبات تغيّرت منذ الاعتماد — أعد الاعتماد لتحديث الأرقام</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </td>
       <td className={`${tdClass} truncate`} title={r.jobTitle} style={{ ...fixedWidth(FROZEN_WIDTH.jobTitle), position: 'sticky', left: FROZEN_LEFT.jobTitle, zIndex: 10, background: 'hsl(var(--card))' }}>{r.jobTitle}</td>
