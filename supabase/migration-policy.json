@@ -1,5 +1,5 @@
 {
-  "immutableThrough": "20260722143039",
+  "immutableThrough": "20260722153804",
   "migrationsDirectory": "supabase/migrations",
   "draftDirectory": "supabase/migrations_consolidated_draft",
   "archiveDirectory": "supabase/migrations_archive"

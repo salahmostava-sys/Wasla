@@ -149,6 +149,19 @@ Approved by user: طلب تنفيذ المرحلة 4 بتاريخ 2026-07-14
 
 ## المرحلة 5: حذف فعلي
 
+الحالة: مكتملة ومطبقة على Supabase بتاريخ 2026-07-22.
+
+```text
+Decision: حذف جدول الصيانة القديم من public مع الاحتفاظ بنسخة استرجاع خاصة
+Target: public.maintenance_logs_legacy_pre_fleet
+Proposed change: نسخ الصفوف إلى app_archive.maintenance_logs_pre_fleet_20260328 ثم حذف الجدول العام باستخدام RESTRICT
+Evidence: صف واحد بحجم 80 KB، ولا توجد Views أو Functions أو Materialized Views أو Realtime أو مراجع تطبيقية تعتمد عليه
+Risk: لا يستطيع التطبيق قراءة الأرشيف مباشرة؛ وهذا مقصود لأن الجدول لم يعد مستخدمًا
+Rollback: إنشاء الجدول العام من نسخة app_archive ونسخ الصفوف إليه في migration عكسية
+Approved by user: طلب تنفيذ المرحلة الخامسة بتاريخ 2026-07-22
+Status: Complete; migration 20260722153804 applied remotely
+```
+
 الحذف آخر خطوة فقط.
 
 شروط الحذف:
@@ -211,6 +224,16 @@ Reason: Local and remote histories match, while no isolated clean-room baseline 
 Risk: None to runtime; reports and audit tooling only
 Rollback: Remove the generated report, audit script, and package command
 Status: Phase 2 complete
+```
+
+```text
+Date: 2026-07-22
+Target: public.maintenance_logs_legacy_pre_fleet
+Decision: Remove the obsolete public table after creating an isolated recovery copy in app_archive
+Reason: The table had one row, no application or SQL consumers, no inbound dependencies, and no Realtime publication
+Risk: Direct reads of the old public table stop; repository and live dependency scans found no consumer
+Rollback: Recreate public.maintenance_logs_legacy_pre_fleet from app_archive.maintenance_logs_pre_fleet_20260328
+Status: Phase 5 complete; migration 20260722153804 applied remotely and verified
 ```
 
 أضف أي قرار جديد هنا قبل التنفيذ:
