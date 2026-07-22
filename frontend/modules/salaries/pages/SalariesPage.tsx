@@ -26,6 +26,7 @@ import { SalaryTable } from '@modules/salaries/components/SalaryTable';
 
 // Phase-5 extracted hooks
 import { useSalaryData } from '@modules/salaries/hooks/useSalaryData';
+import { useWpsExport } from '@modules/salaries/hooks/useWpsExport';
 import { useSalaryDraft } from '@modules/salaries/hooks/useSalaryDraft';
 
 import { months } from '@modules/salaries/lib/salaryMonths';
@@ -239,6 +240,10 @@ const Salaries = () => {
     setDetailRow,
   });
 
+  const { runWpsExport, wpsLoading } = useWpsExport({
+    filtered, computeRow, selectedMonth, companyName: projectName, toast: sonnerToast,
+  });
+
   // FIX M5: useMemo so totalNet isn't recomputed on every render cycle
   const totalNet = useMemo(
     () => filtered.reduce((s, r) => s + computeRow(r).netSalary, 0),
@@ -378,6 +383,8 @@ const Salaries = () => {
         batchQueue={batchQueue}
         batchIndex={batchIndex}
         openTemplateEditor={() => setShowTemplateEditor(true)}
+        runWpsExport={runWpsExport}
+        wpsLoading={wpsLoading}
       />
 
       <BatchProgressBar

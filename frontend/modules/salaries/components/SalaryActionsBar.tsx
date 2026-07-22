@@ -28,6 +28,8 @@ interface SalaryActionsBarProps {
   batchQueue: SalaryRow[];
   batchIndex: number;
   openTemplateEditor: () => void;
+  runWpsExport: (format: 'mudad' | 'bank') => void;
+  wpsLoading: boolean;
 }
 
 import { loadXlsx, loadJsPdf } from '@modules/salaries/lib/salaryPdfLoaders';
@@ -55,6 +57,8 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
     batchQueue,
     batchIndex,
     openTemplateEditor,
+    runWpsExport,
+    wpsLoading,
   } = props;
 
   return (
@@ -134,6 +138,12 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={exportMergedPDF}>
               <FileText size={13} className="me-2" /> PDF مدمج للكل
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => runWpsExport('mudad')} disabled={wpsLoading}>
+              🏦 حماية الأجور — مُدد (CSV)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => runWpsExport('bank')} disabled={wpsLoading}>
+              🏦 حماية الأجور — ملف بنكي (Excel)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

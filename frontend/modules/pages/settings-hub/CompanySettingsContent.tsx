@@ -13,6 +13,21 @@ import { QueryErrorRetry } from '@shared/components/QueryErrorRetry';
 import { useAuthQueryGate } from '@shared/hooks/useAuthQueryGate';
 import { usePermissions } from '@shared/hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
+import { deriveSaudiBankCode, isValidSaudiIban, normalizeIban, saudiBankName } from '@shared/lib/saudiBank';
+
+// The generated Supabase types lag the WPS-fields migration; describe the extra
+// columns locally so reads stay typed until `npm run gen:types` is re-run.
+type TradeRegisterWps = {
+  id: string;
+  name: string | null;
+  name_en: string | null;
+  cr_number: string | null;
+  notes: string | null;
+  mol_establishment_number: string | null;
+  employer_iban: string | null;
+  employer_bank_code: string | null;
+  tax_number: string | null;
+};
 
 const SectionHeader = ({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) => (
   <div className="flex items-center gap-3 pb-4 mb-5" style={{ borderBottom: '1px solid var(--ds-surface-container)' }}>
@@ -47,26 +62,45 @@ export default function CompanySettingsContent() {
   const [nameEn, setNameEn] = useState('');
   const [crNumber, setCrNumber] = useState('');
   const [taxNumber, setTaxNumber] = useState('');
+  const [molNumber, setMolNumber] = useState('');
+  const [employerIban, setEmployerIban] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Sync form state from query data
   useEffect(() => {
     if (!tradeRegister) return;
-    setRecordId(tradeRegister.id);
-    setNameAr(tradeRegister.name ?? '');
-    setNameEn(tradeRegister.name_en ?? '');
-    setCrNumber(tradeRegister.cr_number ?? '');
-    setTaxNumber(tradeRegister.notes ?? '');
+    const tr = tradeRegister as unknown as TradeRegisterWps;
+    setRecordId(tr.id);
+    setNameAr(tr.name ?? '');
+    setNameEn(tr.name_en ?? '');
+    setCrNumber(tr.cr_number ?? '');
+    // tax_number is the dedicated column; fall back to the legacy notes value.
+    setTaxNumber(tr.tax_number ?? tr.notes ?? '');
+    setMolNumber(tr.mol_establishment_number ?? '');
+    setEmployerIban(tr.employer_iban ?? '');
   }, [tradeRegister]);
 
+  const cleanIban = normalizeIban(employerIban);
+  const ibanValid = cleanIban === '' || isValidSaudiIban(cleanIban);
+  const derivedBankCode = deriveSaudiBankCode(cleanIban);
+  const derivedBankName = saudiBankName(derivedBankCode, isRTL ? 'ar' : 'en');
+
   const handleSave = async () => {
+    if (!ibanValid) {
+      toast({ title: t('organizationSaveError'), description: t('invalidSaudiIban'), variant: 'destructive' });
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
         name: nameAr.trim(),
         name_en: nameEn.trim(),
         cr_number: crNumber.trim(),
-        notes: taxNumber.trim(),
+        tax_number: taxNumber.trim(),
+        mol_establishment_number: molNumber.trim(),
+        employer_iban: cleanIban,
+        // Derived from the IBAN so it's always consistent with it.
+        employer_bank_code: derivedBankCode,
       };
       if (recordId) {
         await settingsHubService.updateTradeRegister(recordId, payload);
@@ -132,6 +166,33 @@ export default function CompanySettingsContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <BaseInput label={t('commercialRegistration')} value={crNumber} onChange={e => setCrNumber(e.target.value)} placeholder="1010101010" dir="ltr" />
           <BaseInput label={t('taxNumber')} value={taxNumber} onChange={e => setTaxNumber(e.target.value)} placeholder="3000524140003" dir="ltr" />
+        </div>
+      </div>
+
+      {/* WPS / Wage Protection establishment data */}
+      <div className="bg-card border border-border/50 p-5 space-y-4 rounded-2xl">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {t('wpsEstablishmentData')}
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <BaseInput label={t('molEstablishmentNumber')} value={molNumber} onChange={e => setMolNumber(e.target.value)} placeholder="700xxxxxxx" dir="ltr" />
+          <div>
+            <BaseInput
+              label={t('employerIban')}
+              value={employerIban}
+              onChange={e => setEmployerIban(e.target.value)}
+              placeholder="SA0000000000000000000000"
+              dir="ltr"
+            />
+            {employerIban !== '' && !ibanValid && (
+              <p className="mt-1 text-xs text-destructive">{t('invalidSaudiIban')}</p>
+            )}
+            {ibanValid && derivedBankCode && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t('detectedBank')}: {derivedBankCode}{derivedBankName ? ` — ${derivedBankName}` : ''}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
