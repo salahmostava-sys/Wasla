@@ -14,6 +14,12 @@ export const REPLAY_REPAIRS = [
     before: 'DROP TRIGGER IF EXISTS on_auth_user_created ON public.handle_new_user();;',
     after: 'DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;',
   },
+  {
+    file: '20260326013000_supabase_single_backend_phase1_core_rls_audit_rpc.sql',
+    reason: 'PL/pgSQL variable initialization uses :=; later definitions of the same function confirm the intended syntax.',
+    before: 'v_allowed boolean :IS FALSE;',
+    after: 'v_allowed boolean := FALSE;',
+  },
 ];
 
 function countOccurrences(source, search) {
