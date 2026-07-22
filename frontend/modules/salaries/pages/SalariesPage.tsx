@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Suspense, lazy, useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { AlertTriangle, Settings2, Clock } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 import { useToast } from '@shared/hooks/use-toast';
 import { useAppColors } from '@shared/hooks/useAppColors';
 import { useAuth } from '@app/providers/AuthContext';
@@ -14,7 +14,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import Loading from '@shared/components/Loading';
 import { CardErrorBoundary } from '@shared/components/CardErrorBoundary';
 import { toast as sonnerToast } from '@shared/components/ui/sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/components/ui/dialog';
 
 import { SalarySchemeSelector } from '@modules/salaries/components/SalarySchemeSelector';
 import { useSalaryFilteredRows } from '@modules/salaries/hooks/useSalaryTable';

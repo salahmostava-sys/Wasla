@@ -2,7 +2,7 @@ import type React from 'react';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/components/ui/dropdown-menu';
-import { Search, FolderOpen, LayoutGrid, Table2, FileText, Archive, CheckCircle, Settings2 } from 'lucide-react';
+import { Search, FolderOpen, LayoutGrid, Table2, FileText, Archive, CheckCircle } from 'lucide-react';
 import type { SalaryRow } from '@modules/salaries/types/salary.types';
 
 interface SalaryActionsBarProps {
@@ -54,7 +54,6 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
     exportMergedPDF,
     batchQueue,
     batchIndex,
-    openTemplateEditor,
     openWpsDialog,
   } = props;
 
@@ -141,10 +140,6 @@ export function SalaryActionsBar(props: Readonly<SalaryActionsBarProps>) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <Button size="sm" variant="outline" onClick={openTemplateEditor} className="gap-1.5 h-9 border-primary/30 text-primary hover:bg-primary/5">
-          <Settings2 size={14} /> تخصيص الكشف
-        </Button>
       </div>
     </div>
   );
