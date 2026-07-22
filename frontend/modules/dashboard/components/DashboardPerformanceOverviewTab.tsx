@@ -18,13 +18,7 @@ import {
   buildRiderProfiles,
   type RiderPerformanceProfile,
 } from '@modules/dashboard/lib/performanceEngine';
-import {
-  generateFleetInsights,
-  type FleetAIInsights,
-} from '@modules/dashboard/lib/aiInsightsEngine';
 import { EnrichedStatCard } from './EnrichedStatCard';
-import { AIInsightsPanel } from './AIInsightsPanel';
-import { AIRecommendationsSection } from './AIRecommendationsSection';
 import { PerformanceDetailedTable } from './PerformanceDetailedTable';
 import { DashboardWeeklyBestDaysCard } from './DashboardWeeklyBestDaysCard';
 import { Skeleton } from '@shared/components/ui/skeleton';
@@ -81,12 +75,11 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 }>) {
   const { loading, dashboard, onRiderClick } = props;
 
-  // Compute AI insights & Fleet summary
-  const { fleetSummary, aiInsights, allProfiles } = useMemo(() => {
+  // Compute Fleet summary & rider profiles
+  const { fleetSummary, allProfiles } = useMemo(() => {
     if (!dashboard) {
       return {
         fleetSummary: null,
-        aiInsights: null as FleetAIInsights | null,
         allProfiles: [] as RiderPerformanceProfile[],
       };
     }
@@ -107,12 +100,10 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     });
     const profiles = buildRiderProfiles(unique);
 
-    const insights = generateFleetInsights(profiles, summary);
-
-    return { fleetSummary: summary, aiInsights: insights, allProfiles: profiles };
+    return { fleetSummary: summary, allProfiles: profiles };
   }, [dashboard]);
 
-  if (loading || !dashboard || !fleetSummary || !aiInsights) {
+  if (loading || !dashboard || !fleetSummary) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 8 }, (_, index) => (
@@ -167,41 +158,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
       {/* ── 2. Weekly Breakdown (W1-W5) & Best Days Analysis ─────────────── */}
       <DashboardWeeklyBestDaysCard dailyTrend={dailyTrend} />
 
-      {/* ── 3. AI Insights & Performance Distribution ───────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.3fr,0.7fr] gap-4">
-        <AIInsightsPanel insights={aiInsights} />
-
-        <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40 flex flex-col justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-foreground">توزيع أداء الفريق</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">تقسيم الموظفين حسب الفئات التشغيلية</p>
-          </div>
-          <div className="space-y-4 my-4">
-            {[
-              { key: 'excellent', label: 'ممتاز', value: distribution.excellent, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
-              { key: 'good', label: 'جيد', value: distribution.good, color: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
-              { key: 'average', label: 'متوسط', value: distribution.average, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
-              { key: 'weak', label: 'ضعيف', value: distribution.weak, color: 'bg-rose-500', text: 'text-rose-500' },
-            ].map((row) => {
-              const total = distribution.excellent + distribution.good + distribution.average + distribution.weak;
-              const pct = total > 0 ? Math.round((row.value / total) * 100) : 0;
-              return (
-                <div key={row.key} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-foreground">{row.label}</span>
-                    <span className={`font-black ${row.text}`}>{row.value} ({pct}%)</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <div className={`h-full rounded-full ${row.color}`} style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── 4. Platforms Grid & City Performance ─────────────────────────── */}
+      {/* ── 3. Platforms Grid & City / Distribution Performance ──────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-[1.4fr,0.8fr] gap-4">
         <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
           <div className="flex items-center justify-between gap-3 mb-4">
@@ -218,25 +175,55 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           </div>
         </div>
 
-        <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
-          <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
-          <div className="space-y-3">
-            {ordersByCity.map((row) => (
-              <div key={row.city} className="rounded-xl bg-muted/30 px-4 py-3 flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">{row.city}</span>
-                <span className="text-lg font-black text-foreground">{row.orders.toLocaleString('en-US')}</span>
-              </div>
-            ))}
+        <div className="space-y-4">
+          {/* Team Distribution Card */}
+          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">توزيع أداء الفريق</h3>
+              <p className="text-[11px] text-muted-foreground mt-1">تقسيم الموظفين حسب الفئات التشغيلية</p>
+            </div>
+            <div className="space-y-3 mt-4">
+              {[
+                { key: 'excellent', label: 'ممتاز', value: distribution.excellent, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+                { key: 'good', label: 'جيد', value: distribution.good, color: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
+                { key: 'average', label: 'متوسط', value: distribution.average, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+                { key: 'weak', label: 'ضعيف', value: distribution.weak, color: 'bg-rose-500', text: 'text-rose-500' },
+              ].map((row) => {
+                const total = distribution.excellent + distribution.good + distribution.average + distribution.weak;
+                const pct = total > 0 ? Math.round((row.value / total) * 100) : 0;
+                return (
+                  <div key={row.key} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-foreground">{row.label}</span>
+                      <span className={`font-black ${row.text}`}>{row.value} ({pct}%)</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className={`h-full rounded-full ${row.color}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* City Performance Card */}
+          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
+            <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
+            <div className="space-y-3">
+              {ordersByCity.map((row) => (
+                <div key={row.city} className="rounded-xl bg-muted/30 px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground">{row.city}</span>
+                  <span className="text-lg font-black text-foreground">{row.orders.toLocaleString('en-US')}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── 5. AI Recommendations ────────────────────────────────────────── */}
-      <AIRecommendationsSection recommendations={aiInsights.recommendations} onRiderClick={onRiderClick} />
-
-      {/* ── 6. Detailed Rider Performance Table ──────────────────────────── */}
+      {/* ── 4. Detailed Rider Performance Table ──────────────────────────── */}
       {allProfiles.length > 0 && (
-        <PerformanceDetailedTable riders={allProfiles} />
+        <PerformanceDetailedTable riders={allProfiles} onRiderClick={onRiderClick} />
       )}
     </div>
   );
