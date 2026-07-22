@@ -1,6 +1,6 @@
 /**
  * DashboardPerformanceOverviewTab — نظرة عامة على الأداء مع تحليلات ذكية
- * وتوصيات ودرجات أداء وجدول تفصيلي.
+ * ومقارنة الأسابيع وتوصيات وأفضل الأيام وجدول تفصيلي.
  */
 
 import { useMemo } from 'react';
@@ -30,13 +30,13 @@ import { EnrichedStatCard } from './EnrichedStatCard';
 import { AIInsightsPanel } from './AIInsightsPanel';
 import { AIRecommendationsSection } from './AIRecommendationsSection';
 import { PerformanceDetailedTable } from './PerformanceDetailedTable';
+import { DashboardWeeklyBestDaysCard } from './DashboardWeeklyBestDaysCard';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
 function formatPercent(value: number) {
   const rounded = Number.isFinite(value) ? value : 0;
   return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}%`;
 }
-
 
 function alertLabel(alert: PerformanceAlert) {
   switch (alert.alertType) {
@@ -75,7 +75,7 @@ function ComparisonCard(props: Readonly<{
   const { title, currentValue, previousValue, change, hint } = props;
   const positive = change >= 0;
   return (
-    <div className="bg-card -2xl p-4 shadow-card space-y-3 rounded-2xl">
+    <div className="bg-card p-4 shadow-card space-y-3 rounded-2xl border border-border/40">
       <div>
         <p className="text-sm font-bold text-foreground">{title}</p>
         <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>
@@ -85,7 +85,7 @@ function ComparisonCard(props: Readonly<{
           <p className="text-2xl font-black text-foreground">{currentValue}</p>
           <p className="text-[11px] text-muted-foreground">السابق: {previousValue}</p>
         </div>
-        <div className={`text-sm font-bold ${positive ? 'text-emerald-600' : 'text-rose-500'}`}>
+        <div className={`text-sm font-bold ${positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
           {positive ? <TrendingUp size={14} className="inline me-1" /> : <TrendingDown size={14} className="inline me-1" />}
           {formatPercent(change)}
         </div>
@@ -106,7 +106,7 @@ function AppCard(props: Readonly<{
 }>) {
   const { appName, orders, riders, targetOrders, targetAchievementPct, growthPct, brandColor, textColor } = props;
   return (
-    <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
+    <div className="bg-card p-4 shadow-card rounded-2xl border border-border/40">
       <div className="flex items-center justify-between gap-2 mb-3">
         <span
           className="text-xs font-bold px-2.5 py-1 rounded-lg"
@@ -114,7 +114,7 @@ function AppCard(props: Readonly<{
         >
           {appName}
         </span>
-        <span className={`text-xs font-bold ${growthPct >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+        <span className={`text-xs font-bold ${growthPct >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
           {formatPercent(growthPct)}
         </span>
       </div>
@@ -133,7 +133,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 }>) {
   const { loading, dashboard, onRiderClick } = props;
 
-  // Compute AI insights
+  // Compute AI insights & Fleet summary
   const { fleetSummary, aiInsights, allProfiles } = useMemo(() => {
     if (!dashboard) {
       return {
@@ -145,7 +145,6 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 
     const summary = buildFleetSummary(dashboard);
 
-    // Build all profiles from top + low + improved + declined
     const allEntries = [
       ...dashboard.rankings.topPerformers,
       ...dashboard.rankings.lowPerformers,
@@ -169,13 +168,13 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     return (
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 8 }, (_, index) => (
-          <Skeleton key={index}  className="bg-card -2xl h-32 shadow-card rounded-2xl" />
+          <Skeleton key={index} className="bg-card h-32 shadow-card rounded-2xl" />
         ))}
       </div>
     );
   }
 
-  const { summary, comparison, distribution, ordersByApp, ordersByCity, rankings, alerts, targets } = dashboard;
+  const { summary, comparison, distribution, ordersByApp, ordersByCity, rankings, alerts, targets, dailyTrend } = dashboard;
 
   let projectedText = '';
   if (fleetSummary.projectedOrders !== null) {
@@ -183,10 +182,9 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     projectedText = ` • متوقع: ${fleetSummary.projectedOrders.toLocaleString('en-US')} ${icon}`;
   }
 
-
   return (
     <div className="space-y-6">
-      {/* ── Top KPIs Row (Enriched) ───────────────────────────────────────── */}
+      {/* ── 1. Top Executive KPIs Row ───────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <EnrichedStatCard
           label="إجمالي الطلبات"
@@ -218,7 +216,10 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         />
       </div>
 
-      {/* ── AI Insights + Comparison ─────────────────────────────────────── */}
+      {/* ── 2. Weekly Comparison & Best Days Analysis (New Component) ──────── */}
+      <DashboardWeeklyBestDaysCard dailyTrend={dailyTrend} />
+
+      {/* ── 3. AI Insights + Comparison Cards ───────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.3fr,0.7fr] gap-4">
         <AIInsightsPanel insights={aiInsights} />
 
@@ -237,14 +238,14 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
             change={comparison.week.growthPct}
             hint="قراءة سريعة لتغيّر الزخم"
           />
-          <div className="bg-card -2xl p-4 shadow-card rounded-2xl">
+          <div className="bg-card p-4 shadow-card rounded-2xl border border-border/40">
             <p className="text-sm font-bold text-foreground">توزيع الأداء</p>
             <div className="space-y-3 mt-4">
               {(['excellent', 'good', 'average', 'weak'] as const).map((tier) => {
                 const labels: Record<string, { ar: string; color: string }> = {
-                  excellent: { ar: 'ممتاز', color: 'text-emerald-600' },
-                  good: { ar: 'جيد', color: 'text-blue-600' },
-                  average: { ar: 'متوسط', color: 'text-amber-600' },
+                  excellent: { ar: 'ممتاز', color: 'text-emerald-600 dark:text-emerald-400' },
+                  good: { ar: 'جيد', color: 'text-blue-600 dark:text-blue-400' },
+                  average: { ar: 'متوسط', color: 'text-amber-600 dark:text-amber-400' },
                   weak: { ar: 'ضعيف', color: 'text-rose-500' },
                 };
                 const l = labels[tier];
@@ -261,9 +262,9 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         </div>
       </div>
 
-      {/* ── Platform Performance ──────────────────────────────────────────── */}
+      {/* ── 4. Platform Performance & Cities ──────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-[1.4fr,0.8fr] gap-4">
-        <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
+        <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <h3 className="text-sm font-bold text-foreground">أداء المنصات</h3>
@@ -279,7 +280,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         </div>
 
         <div className="space-y-4">
-          <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
+          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
             <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
             <div className="space-y-3">
               {ordersByCity.map((row) => (
@@ -291,7 +292,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
             </div>
           </div>
 
-          <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
+          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
             <h3 className="text-sm font-bold text-foreground mb-4">ملخص سريع</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -317,11 +318,11 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         </div>
       </div>
 
-      {/* ── AI Recommendations ───────────────────────────────────────────── */}
+      {/* ── 5. AI Recommendations ────────────────────────────────────────── */}
       <AIRecommendationsSection recommendations={aiInsights.recommendations} onRiderClick={onRiderClick} />
 
-      {/* ── Smart Alerts ─────────────────────────────────────────────────── */}
-      <div className="bg-card -2xl p-5 shadow-card rounded-2xl">
+      {/* ── 6. Smart Operational Alerts ──────────────────────────────────── */}
+      <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm font-bold text-foreground">التنبيهات الذكية</h3>
@@ -335,7 +336,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {alerts.map((alert) => {
               const isHigh = alert.severity === 'high';
-              const severityClass = isHigh ? 'text-rose-500' : 'text-amber-600';
+              const severityClass = isHigh ? 'text-rose-500' : 'text-amber-600 dark:text-amber-400';
               const severityLabel = isHigh ? 'عالي' : 'متوسط';
               return (
                 <div key={alert.employeeId} className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
@@ -353,7 +354,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         )}
       </div>
 
-      {/* ── Detailed Table ───────────────────────────────────────────────── */}
+      {/* ── 7. Detailed Rider Performance Table ──────────────────────────── */}
       {allProfiles.length > 0 && (
         <PerformanceDetailedTable riders={allProfiles} />
       )}

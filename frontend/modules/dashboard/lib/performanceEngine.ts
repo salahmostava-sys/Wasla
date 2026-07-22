@@ -481,3 +481,189 @@ function computeMedian(values: number[]): number {
     ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
     : sorted[mid];
 }
+
+// ─── Weekly Breakdown & Best Days ───────────────────────────────────────────
+
+export interface WeeklyBreakdownItem {
+  weekNumber: number;
+  label: string;
+  dayRangeLabel: string;
+  totalOrders: number;
+  activeDaysCount: number;
+  avgDailyOrders: number;
+  growthVsPrevWeekPct: number | null;
+  shareOfTotalPct: number;
+}
+
+export interface PeakDayItem {
+  date: string;
+  dayName: string;
+  orders: number;
+}
+
+export interface DayOfWeekAverageItem {
+  dayName: string;
+  dayIndex: number;
+  avgOrders: number;
+  totalOrders: number;
+  occurrences: number;
+}
+
+export interface BestDaysAnalytics {
+  topPeakDays: PeakDayItem[];
+  bestDayOfWeek: DayOfWeekAverageItem | null;
+  dayOfWeekAverages: DayOfWeekAverageItem[];
+  highestSingleDayOrders: number;
+}
+
+const ARABIC_DAY_NAMES = [
+  'الأحد',
+  'الإثنين',
+  'الثلاثاء',
+  'الأربعاء',
+  'الخميس',
+  'الجمعة',
+  'السبت',
+];
+
+/**
+ * Compute weekly breakdown (W1-W5) across the month from dailyTrend data.
+ */
+export function computeWeeklyBreakdown(
+  dailyTrend: Array<{ date: string; orders: number }> = [],
+): WeeklyBreakdownItem[] {
+  if (!dailyTrend || dailyTrend.length === 0) return [];
+
+  const overallTotal = dailyTrend.reduce((sum, item) => sum + (item.orders || 0), 0);
+
+  // Group days into 5 potential weeks: 1-7, 8-14, 15-21, 22-28, 29-end
+  const weeksData: Array<{
+    weekNumber: number;
+    label: string;
+    dayRangeLabel: string;
+    ordersList: number[];
+  }> = [
+    { weekNumber: 1, label: 'الأسبوع الأول', dayRangeLabel: '1 - 7', ordersList: [] },
+    { weekNumber: 2, label: 'الأسبوع الثاني', dayRangeLabel: '8 - 14', ordersList: [] },
+    { weekNumber: 3, label: 'الأسبوع الثالث', dayRangeLabel: '15 - 21', ordersList: [] },
+    { weekNumber: 4, label: 'الأسبوع الرابع', dayRangeLabel: '22 - 28', ordersList: [] },
+    { weekNumber: 5, label: 'الأسبوع الخامس', dayRangeLabel: '29 - النهاية', ordersList: [] },
+  ];
+
+  for (const item of dailyTrend) {
+    if (!item.date) continue;
+    const dayNum = Number.parseInt(item.date.split('-')[2] ?? '0', 10);
+    if (dayNum >= 1 && dayNum <= 7) weeksData[0].ordersList.push(item.orders || 0);
+    else if (dayNum >= 8 && dayNum <= 14) weeksData[1].ordersList.push(item.orders || 0);
+    else if (dayNum >= 15 && dayNum <= 21) weeksData[2].ordersList.push(item.orders || 0);
+    else if (dayNum >= 22 && dayNum <= 28) weeksData[3].ordersList.push(item.orders || 0);
+    else if (dayNum >= 29) weeksData[4].ordersList.push(item.orders || 0);
+  }
+
+  const result: WeeklyBreakdownItem[] = [];
+  let prevWeekTotal = 0;
+
+  for (const w of weeksData) {
+    if (w.ordersList.length === 0) continue;
+
+    const totalOrders = w.ordersList.reduce((sum, val) => sum + val, 0);
+    const activeDaysCount = w.ordersList.filter((val) => val > 0).length;
+    const avgDailyOrders = activeDaysCount > 0 ? Math.round(totalOrders / activeDaysCount) : 0;
+    const shareOfTotalPct = overallTotal > 0 ? Math.round((totalOrders / overallTotal) * 100) : 0;
+
+    let growthVsPrevWeekPct: number | null = null;
+    if (prevWeekTotal > 0) {
+      growthVsPrevWeekPct = Math.round(((totalOrders - prevWeekTotal) / prevWeekTotal) * 100);
+    }
+
+    result.push({
+      weekNumber: w.weekNumber,
+      label: w.label,
+      dayRangeLabel: w.dayRangeLabel,
+      totalOrders,
+      activeDaysCount,
+      avgDailyOrders,
+      growthVsPrevWeekPct,
+      shareOfTotalPct,
+    });
+
+    if (totalOrders > 0) {
+      prevWeekTotal = totalOrders;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Compute best days analysis (top 3 peak dates + best day of the week) from dailyTrend.
+ */
+export function computeBestDaysAnalytics(
+  dailyTrend: Array<{ date: string; orders: number }> = [],
+): BestDaysAnalytics {
+  if (!dailyTrend || dailyTrend.length === 0) {
+    return {
+      topPeakDays: [],
+      bestDayOfWeek: null,
+      dayOfWeekAverages: [],
+      highestSingleDayOrders: 0,
+    };
+  }
+
+  const validDays = dailyTrend
+    .filter((item) => item.orders > 0)
+    .map((item) => {
+      const d = new Date(item.date);
+      const dayIdx = Number.isNaN(d.getDay()) ? 0 : d.getDay();
+      return {
+        date: item.date,
+        orders: item.orders,
+        dayName: ARABIC_DAY_NAMES[dayIdx] ?? '',
+        dayIndex: dayIdx,
+      };
+    });
+
+  // Top peak days
+  const sortedByOrders = [...validDays].sort((a, b) => b.orders - a.orders);
+  const topPeakDays: PeakDayItem[] = sortedByOrders.slice(0, 3).map((item) => ({
+    date: item.date,
+    dayName: item.dayName,
+    orders: item.orders,
+  }));
+
+  const highestSingleDayOrders = sortedByOrders[0]?.orders ?? 0;
+
+  // Day of week aggregation
+  const dayGroupMap = new Map<number, { dayName: string; totalOrders: number; count: number }>();
+  for (const item of validDays) {
+    const existing = dayGroupMap.get(item.dayIndex) ?? {
+      dayName: item.dayName,
+      totalOrders: 0,
+      count: 0,
+    };
+    existing.totalOrders += item.orders;
+    existing.count += 1;
+    dayGroupMap.set(item.dayIndex, existing);
+  }
+
+  const dayOfWeekAverages: DayOfWeekAverageItem[] = Array.from(dayGroupMap.entries()).map(
+    ([dayIndex, data]) => ({
+      dayName: data.dayName,
+      dayIndex,
+      totalOrders: data.totalOrders,
+      occurrences: data.count,
+      avgOrders: Math.round(data.totalOrders / Math.max(data.count, 1)),
+    }),
+  );
+
+  dayOfWeekAverages.sort((a, b) => b.avgOrders - a.avgOrders);
+  const bestDayOfWeek = dayOfWeekAverages[0] ?? null;
+
+  return {
+    topPeakDays,
+    bestDayOfWeek,
+    dayOfWeekAverages,
+    highestSingleDayOrders,
+  };
+}
+
