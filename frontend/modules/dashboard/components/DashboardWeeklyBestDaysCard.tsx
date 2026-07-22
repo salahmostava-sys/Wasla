@@ -9,6 +9,12 @@ interface Props {
   readonly dailyTrend?: Array<{ date: string; orders: number }>;
 }
 
+function getRankBadgeStyle(idx: number): string {
+  if (idx === 0) return 'bg-amber-500 text-white';
+  if (idx === 1) return 'bg-slate-300 text-slate-800';
+  return 'bg-amber-700/30 text-amber-900 dark:text-amber-200';
+}
+
 export function DashboardWeeklyBestDaysCard({ dailyTrend = [] }: Props) {
   const weeklyData = useMemo(() => computeWeeklyBreakdown(dailyTrend), [dailyTrend]);
   const bestDaysData = useMemo(() => computeBestDaysAnalytics(dailyTrend), [dailyTrend]);
@@ -158,13 +164,7 @@ export function DashboardWeeklyBestDaysCard({ dailyTrend = [] }: Props) {
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      idx === 0
-                        ? 'bg-amber-500 text-white'
-                        : idx === 1
-                        ? 'bg-slate-300 text-slate-800'
-                        : 'bg-amber-700/30 text-amber-900 dark:text-amber-200'
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${getRankBadgeStyle(idx)}`}
                   >
                     {idx + 1}
                   </span>

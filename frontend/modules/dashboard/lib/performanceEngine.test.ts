@@ -22,7 +22,7 @@ describe('performanceEngine — Weekly & Best Days Analytics', () => {
       ];
 
       const weeks = computeWeeklyBreakdown(dailyTrend);
-      expect(weeks.length).toBe(5);
+      expect(weeks).toHaveLength(5);
 
       // W1: July 1 and July 5 -> 250 orders
       expect(weeks[0].weekNumber).toBe(1);
@@ -64,7 +64,7 @@ describe('performanceEngine — Weekly & Best Days Analytics', () => {
 
       const res = computeBestDaysAnalytics(dailyTrend);
       expect(res.highestSingleDayOrders).toBe(500);
-      expect(res.topPeakDays.length).toBe(3);
+      expect(res.topPeakDays).toHaveLength(3);
       expect(res.topPeakDays[0].orders).toBe(500);
       expect(res.topPeakDays[0].date).toBe('2026-07-02');
     });
