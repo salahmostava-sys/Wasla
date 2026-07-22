@@ -51,11 +51,6 @@ const SalaryDetailDialog = lazy(() =>
     default: module.SalaryDetailDialog,
   })),
 );
-const SalarySlipTemplateEditor = lazy(() =>
-  import('@modules/salaries/components/SalarySlipTemplateEditor').then((module) => ({
-    default: module.SalarySlipTemplateEditor,
-  })),
-);
 
 const InlineLoader = ({ minHeightClassName = 'min-h-[220px]' }: Readonly<{ minHeightClassName?: string }>) => (
   <Loading minHeightClassName={minHeightClassName} />
@@ -98,7 +93,6 @@ const Salaries = () => {
   const [editingCell, setEditingCell] = useState<{ rowId: string; platform: string } | null>(null);
   const [employeeFieldSaving, setEmployeeFieldSaving] = useState<string | null>(null);
   const [detailRow, setDetailRow] = useState<SalaryRow | null>(null);
-  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
 
   // Batch PDF state — grouped to reduce individual useState calls
   const [batch, setBatch] = useState<{ queue: SalaryRow[]; index: number; zip: JSZip | null; month: string }>({
@@ -383,7 +377,6 @@ const Salaries = () => {
         exportMergedPDF={actions.exportMergedPDF}
         batchQueue={batchQueue}
         batchIndex={batchIndex}
-        openTemplateEditor={() => setShowTemplateEditor(true)}
         openWpsDialog={wps.openWpsDialog}
       />
 
@@ -475,23 +468,6 @@ const Salaries = () => {
           />
         </Suspense>
       )}
-
-      <Dialog open={showTemplateEditor} onOpenChange={setShowTemplateEditor}>
-        <DialogContent className="max-w-[95vw] w-[1400px] max-h-[95vh] overflow-y-auto p-0 border-none bg-muted/20">
-          <DialogHeader className="p-6 bg-card border-b sticky top-0 z-10">
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <Settings2 className="text-primary" /> إعدادات قوالب كشوف الرواتب
-            </DialogTitle>
-          </DialogHeader>
-          <div className="p-2">
-            {showTemplateEditor && (
-              <Suspense fallback={<InlineLoader minHeightClassName="min-h-[480px]" />}>
-                <SalarySlipTemplateEditor />
-              </Suspense>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

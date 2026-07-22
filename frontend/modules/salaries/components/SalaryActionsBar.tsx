@@ -27,7 +27,6 @@ interface SalaryActionsBarProps {
   exportMergedPDF: () => void;
   batchQueue: SalaryRow[];
   batchIndex: number;
-  openTemplateEditor: () => void;
   openWpsDialog: () => void;
 }
 
