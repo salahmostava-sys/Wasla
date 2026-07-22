@@ -66,6 +66,19 @@ export const REPLAY_REPAIRS = [
     ].join('\n'),
     after: '-- Replay repair: deferred is_admin_or_hr(uuid) comment until after creation.',
   },
+  {
+    file: '20260505000000_get_my_role_privilege_order.sql',
+    reason: 'PostgreSQL cannot change get_my_role() from app_role to text with CREATE OR REPLACE; no historical schema objects depend on it at this point.',
+    before: [
+      '-- Return highest-privilege role deterministically for multi-role users.',
+      'CREATE OR REPLACE FUNCTION public.get_my_role()',
+    ].join('\n'),
+    after: [
+      '-- Return highest-privilege role deterministically for multi-role users.',
+      'DROP FUNCTION public.get_my_role();',
+      'CREATE OR REPLACE FUNCTION public.get_my_role()',
+    ].join('\n'),
+  },
 ];
 
 function countOccurrences(source, search) {

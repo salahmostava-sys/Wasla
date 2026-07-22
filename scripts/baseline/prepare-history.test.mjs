@@ -45,6 +45,12 @@ test('defers is_admin_or_hr permissions until its historical creation', () => {
   }
 });
 
+test('drops get_my_role before changing its historical return type', () => {
+  const repair = REPLAY_REPAIRS[10];
+  const repaired = applyReplayRepair(repair.before, repair);
+  assert.match(repaired, /DROP FUNCTION public\.get_my_role\(\);\nCREATE OR REPLACE/u);
+});
+
 test('rejects missing or repeated historical repair targets', () => {
   const repair = REPLAY_REPAIRS[0];
   assert.throws(() => applyReplayRepair('unrelated SQL', repair), /found 0/u);
