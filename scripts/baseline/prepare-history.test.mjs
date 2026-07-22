@@ -61,6 +61,13 @@ test('skips the generated index for a nonexistent legacy maintenance column', ()
   assert.match(applyReplayRepair(repair.before, repair), /legacy_pre_fleet\.employee_id/u);
 });
 
+test('comments out vehicle document policies that precede their table', () => {
+  const policyRepairs = REPLAY_REPAIRS.slice(13, 15);
+  assert.equal(policyRepairs.length, 2);
+  assert.match(applyReplayRepair(policyRepairs[0].before, policyRepairs[0]), /\/\* Replay repair:/u);
+  assert.match(applyReplayRepair(policyRepairs[1].before, policyRepairs[1]), /\*\/$/u);
+});
+
 test('rejects missing or repeated historical repair targets', () => {
   const repair = REPLAY_REPAIRS[0];
   assert.throws(() => applyReplayRepair('unrelated SQL', repair), /found 0/u);

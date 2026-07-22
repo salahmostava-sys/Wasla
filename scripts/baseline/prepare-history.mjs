@@ -91,6 +91,36 @@ export const REPLAY_REPAIRS = [
     before: 'CREATE INDEX IF NOT EXISTS "idx_maintenance_logs_legacy_pre_fleet_employee_id" ON public."maintenance_logs_legacy_pre_fleet" ("employee_id");',
     after: '-- Replay repair: skipped index for nonexistent maintenance_logs_legacy_pre_fleet.employee_id.',
   },
+  {
+    file: '20260706161417_fix_supabase_linter_warnings.sql',
+    reason: 'vehicle_documents is created two days later; its creation and July hardening migrations supersede these premature policies.',
+    before: [
+      '-- Fix permissive RLS policies on vehicle_documents',
+      'DROP POLICY IF EXISTS "Authenticated users can insert vehicle documents" ON public.vehicle_documents;',
+    ].join('\n'),
+    after: [
+      '-- Fix permissive RLS policies on vehicle_documents',
+      '/* Replay repair: vehicle_documents does not exist until 20260708000000.',
+      'DROP POLICY IF EXISTS "Authenticated users can insert vehicle documents" ON public.vehicle_documents;',
+    ].join('\n'),
+  },
+  {
+    file: '20260706161417_fix_supabase_linter_warnings.sql',
+    reason: 'Closes the replay-only comment around policies that precede their table.',
+    before: [
+      'CREATE POLICY "Authenticated users can delete vehicle documents"',
+      '    ON public.vehicle_documents FOR DELETE',
+      '    TO authenticated',
+      '    USING ( auth.uid() = created_by OR public.is_internal_user() );',
+    ].join('\n'),
+    after: [
+      'CREATE POLICY "Authenticated users can delete vehicle documents"',
+      '    ON public.vehicle_documents FOR DELETE',
+      '    TO authenticated',
+      '    USING ( auth.uid() = created_by OR public.is_internal_user() );',
+      '*/',
+    ].join('\n'),
+  },
 ];
 
 function countOccurrences(source, search) {
