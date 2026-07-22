@@ -593,7 +593,9 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     if (!canEdit) return;
     const name = newUserForm.name.trim();
     const email = newUserForm.email.trim().toLowerCase();
-    const password = newUserForm.password;
+    // Trim so a stray space can't become an invisible part of the stored
+    // password (the login flow trims too — both sides must match).
+    const password = newUserForm.password.trim();
 
     const errorMsg = validateUserForm(t, name, email, password);
     if (errorMsg) {
@@ -644,7 +646,8 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     if (!canEdit || !editTarget) return;
     const name = editUserForm.name.trim();
     const email = editUserForm.email.trim().toLowerCase();
-    const password = editUserForm.password;
+    // Trim so a reset password never carries a stray space (login trims too).
+    const password = editUserForm.password.trim();
 
     const errorMsg = validateUserForm(t, name, email, password || undefined);
     if (errorMsg) {

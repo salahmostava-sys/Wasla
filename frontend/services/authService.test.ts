@@ -79,6 +79,14 @@ describe('authService', () => {
       signInWithPasswordMock.mockResolvedValue({ data: { session: null, user: null }, error: new Error('signIn err') });
       await expect(authService.signIn('a', 'b')).rejects.toThrow('authService.signIn: signIn err');
     });
+    it('normalizes email (trim+lowercase) and trims password before authenticating', async () => {
+      signInWithPasswordMock.mockResolvedValue({ data: { session: { id: 's1' }, user: { id: 'u1' } }, error: null });
+      await authService.signIn('  Admin@Test.COM  ', '  secret123  ');
+      expect(signInWithPasswordMock).toHaveBeenCalledWith({
+        email: 'admin@test.com',
+        password: 'secret123',
+      });
+    });
   });
 
   describe('signOut', () => {

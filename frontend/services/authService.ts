@@ -76,14 +76,23 @@ function isMissingSessionError(error: unknown): boolean {
 
 export const authService = {
   signIn: async (email: string, password: string): Promise<{ session: Session | null; user: User | null }> => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // Normalize the same way admin user-creation does (email trimmed+lowercased,
+    // password trimmed). Without this, an invisible stray space in either field
+    // — common with autofill, paste, or mobile keyboards — makes Supabase return
+    // a generic "Invalid login credentials" that looks like a wrong password.
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: normalizedPassword,
+    });
     throwIfError(error, "authService.signIn");
     if (data.user) {
       const { error: logError } = await supabase.from('audit_log').insert({
         user_id: data.user.id,
         action: 'auth.login',
         table_name: 'auth.users',
-        new_value: { meta: { email } },
+        new_value: { meta: { email: normalizedEmail } },
       });
       if (logError) console.warn('[authService] Failed to log login action:', logError);
     }
