@@ -115,6 +115,25 @@ function getPermissionPageLabel(
   return lang === 'ar' ? entry.labelAr : entry.labelEn;
 }
 
+function buildRoleChangeMessage(
+  t: TFunction,
+  target: { user: UserRow; newRole: AppRole } | null,
+): string {
+  if (!target) return '';
+  return t('changeRoleConfirm', {
+    role: t(ROLE_LABEL_KEYS[target.newRole]),
+    name: target.user.name || t('unnamedUser'),
+  });
+}
+
+function buildApplyDefaultsMessage(t: TFunction, user: UserRow | null): string {
+  if (!user) return '';
+  return t('applyRoleDefaultsConfirm', {
+    role: t(ROLE_LABEL_KEYS[user.role]),
+    name: user.name || t('unnamedUser'),
+  });
+}
+
 function UserStatusBadge({ isActive, t }: Readonly<{ isActive: boolean; t: TFunction }>) {
   return (
     <span className={cn(
@@ -196,6 +215,12 @@ async function handleUserDeletion(params: {
   setDeletingUserId(target.id);
   try {
     await authService.deleteManagedUser(target.id);
+    await auditService.logAdminAction({
+      action: 'users.delete',
+      table_name: 'auth.users',
+      record_id: target.id,
+      meta: { name: target.name, email: target.email, role: target.role },
+    });
     toast({ title: t('userDeleted') });
     if (permUserId === target.id) {
       setPermUserId(null);
@@ -374,6 +399,11 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
   const [editUserForm, setEditUserForm] = useState({ name: '', email: '', password: '', role: 'viewer' as AppRole, isActive: true });
   const [editingUser, setEditingUser] = useState(false);
 
+  const [roleChangeTarget, setRoleChangeTarget] = useState<{ user: UserRow; newRole: AppRole } | null>(null);
+  const [applyingRole, setApplyingRole] = useState(false);
+  const [applyDefaultsOpen, setApplyDefaultsOpen] = useState(false);
+  const [applyingDefaults, setApplyingDefaults] = useState(false);
+
   // Access to this page (viewing and managing other users' roles/permissions) is driven by the
   // "settings" permission itself, not hardcoded to the admin role — an admin can delegate it to
   // anyone via the permissions matrix below (see supabase/migrations/*_allow_settings_delegate_*).
@@ -436,14 +466,27 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     loadMatrix(u.id, u.role).catch(() => {});
   }, [permUserId, rows, canView, loadMatrix]);
 
+  // Applies a role change AND writes the role's default permissions into
+  // user_permissions (the real source of truth for both UI and RLS). Without
+  // this, changing the role alone would leave the user's actual access
+  // unchanged. Runs only after explicit confirmation (see roleChangeTarget).
   const updateRole = async (userId: string, role: AppRole) => {
     if (!canEdit) return;
+    const previousRole = rows.find((r) => r.id === userId)?.role ?? null;
     setSavingId(userId);
     try {
       await userPermissionService.upsertRole(userId, role);
+      await Promise.all(getDefaultPermissionUpserts(userId, role));
+      await auditService.logAdminAction({
+        action: 'users.role_change',
+        table_name: 'user_roles',
+        record_id: userId,
+        meta: { new_role: role, previous_role: previousRole },
+      });
 
       setRows((prev) => prev.map((r) => (r.id === userId ? { ...r, role } : r)));
       toast({ title: t('roleUpdated') });
+      await queryClient.invalidateQueries({ queryKey: ['permissions', userId] });
       if (userId === permUserId) {
         await loadMatrix(userId, role);
       }
@@ -459,12 +502,57 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
     }
   };
 
+  const confirmRoleChange = async () => {
+    if (!roleChangeTarget) return;
+    setApplyingRole(true);
+    await updateRole(roleChangeTarget.user.id, roleChangeTarget.newRole);
+    setApplyingRole(false);
+    setRoleChangeTarget(null);
+  };
+
+  const applyRoleDefaults = async () => {
+    if (!canEdit || !selectedUser) return;
+    setApplyingDefaults(true);
+    try {
+      await Promise.all(getDefaultPermissionUpserts(selectedUser.id, selectedUser.role));
+      await auditService.logAdminAction({
+        action: 'permissions.reset_to_role_defaults',
+        table_name: 'user_permissions',
+        record_id: selectedUser.id,
+        meta: { role: selectedUser.role },
+      });
+      toast({ title: t('roleDefaultsApplied') });
+      await queryClient.invalidateQueries({ queryKey: ['permissions', selectedUser.id] });
+      await loadMatrix(selectedUser.id, selectedUser.role);
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, t('permissionsSaveFailed'));
+      toast({ title: t('errorSaving'), description: message, variant: 'destructive' });
+    } finally {
+      setApplyingDefaults(false);
+      setApplyDefaultsOpen(false);
+    }
+  };
+
   const setCell = (pageKey: string, field: keyof PagePermission, value: boolean) => {
     setMatrix((prev) => ({
       ...prev,
       [pageKey]: { ...prev[pageKey], [field]: value },
     }));
   };
+
+  const setColumnAll = (field: keyof PagePermission, value: boolean) => {
+    setMatrix((prev) => {
+      const next: Record<string, PagePermission> = { ...prev };
+      for (const { key } of PERMISSION_PAGE_ENTRIES) {
+        if (next[key]) next[key] = { ...next[key], [field]: value };
+      }
+      return next;
+    });
+  };
+
+  const isColumnAllChecked = (field: keyof PagePermission) =>
+    PERMISSION_PAGE_ENTRIES.length > 0 &&
+    PERMISSION_PAGE_ENTRIES.every(({ key }) => matrix[key]?.[field]);
 
   const saveMatrix = async () => {
     if (!canEdit || !selectedUser) return;
@@ -708,7 +796,11 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                           <td className="ta-td">
                             <Select
                               value={row.role}
-                              onValueChange={(value) => updateRole(row.id, value as AppRole)}
+                              onValueChange={(value) => {
+                                const nextRole = value as AppRole;
+                                if (nextRole === row.role) return;
+                                setRoleChangeTarget({ user: row, newRole: nextRole });
+                              }}
                               disabled={!canEdit || savingId === row.id}
                             >
                               <SelectTrigger className="h-9 w-[170px]">
@@ -790,6 +882,17 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                       ))}
                     </SelectContent>
                   </Select>
+                  {canEdit && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setApplyDefaultsOpen(true)}
+                      disabled={savingMatrix || matrixLoading || applyingDefaults}
+                    >
+                      {t('applyRoleDefaults')}
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     size="sm"
@@ -813,7 +916,18 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
                         <tr>
                           <th className="ta-th text-start w-[40%]">{t('page')}</th>
                           {PERMISSION_COLUMNS.map(({ field, labelKey }) => (
-                            <th key={field} className="ta-th">{t(labelKey)}</th>
+                            <th key={field} className="ta-th">
+                              <div className="flex flex-col items-center gap-1">
+                                <span>{t(labelKey)}</span>
+                                <Checkbox
+                                  checked={isColumnAllChecked(field)}
+                                  onCheckedChange={(checked) => setColumnAll(field, checked === true)}
+                                  disabled={!canEdit || matrixLoading}
+                                  aria-label={`${t('selectAll')} — ${t(labelKey)}`}
+                                  className="mx-auto"
+                                />
+                              </div>
+                            </th>
                           ))}
                         </tr>
                       </thead>
@@ -971,6 +1085,50 @@ const UsersAndPermissions = ({ embedded = false }: Readonly<UsersAndPermissionsP
               disabled={deletingUserId !== null}
             >
               {deletingUserId ? t('deletingUser') : t('confirmDelete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={roleChangeTarget !== null}
+        onOpenChange={(open) => {
+          if (!open && !applyingRole) setRoleChangeTarget(null);
+        }}
+      >
+        <AlertDialogContent dir={direction}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('changeRoleTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {buildRoleChangeMessage(t, roleChangeTarget)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={applyingRole}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { confirmRoleChange(); }} disabled={applyingRole}>
+              {applyingRole ? t('applyingRole') : t('applyRole')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={applyDefaultsOpen}
+        onOpenChange={(open) => {
+          if (!open && !applyingDefaults) setApplyDefaultsOpen(false);
+        }}
+      >
+        <AlertDialogContent dir={direction}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('applyRoleDefaultsTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {buildApplyDefaultsMessage(t, selectedUser)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={applyingDefaults}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { applyRoleDefaults(); }} disabled={applyingDefaults}>
+              {applyingDefaults ? t('applyingRole') : t('applyRole')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

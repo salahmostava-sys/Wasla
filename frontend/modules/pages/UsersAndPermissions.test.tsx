@@ -3,7 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '@app/i18n';
 import UsersAndPermissions from './UsersAndPermissions';
 
-const { toastMock, refetchMock, invalidateQueriesMock, authServiceMock, queryRowsMock, languageState } = vi.hoisted(() => ({
+const {
+  toastMock,
+  refetchMock,
+  invalidateQueriesMock,
+  authServiceMock,
+  userPermissionServiceMock,
+  auditServiceMock,
+  queryRowsMock,
+  languageState,
+} = vi.hoisted(() => ({
   toastMock: vi.fn(),
   refetchMock: vi.fn().mockResolvedValue(undefined),
   invalidateQueriesMock: vi.fn().mockResolvedValue(undefined),
@@ -12,6 +21,13 @@ const { toastMock, refetchMock, invalidateQueriesMock, authServiceMock, queryRow
     deleteManagedUser: vi.fn(),
     updateManagedUser: vi.fn(),
   },
+  userPermissionServiceMock: {
+    getUserPermissions: vi.fn().mockResolvedValue([]),
+    upsertRole: vi.fn().mockResolvedValue(undefined),
+    deletePermission: vi.fn().mockResolvedValue(undefined),
+    upsertPermission: vi.fn().mockResolvedValue(undefined),
+  },
+  auditServiceMock: { logAdminAction: vi.fn().mockResolvedValue(undefined) },
   queryRowsMock: [
     { id: 'admin-1', name: 'Admin User', email: 'admin@test.com', isActive: true, role: 'admin' },
     { id: 'user-2', name: 'Second User', email: 'user@test.com', isActive: true, role: 'viewer' },
@@ -66,12 +82,11 @@ vi.mock('@shared/hooks/usePermissions', async () => {
 });
 
 vi.mock('@services/userPermissionService', () => ({
-  userPermissionService: {
-    getUserPermissions: vi.fn().mockResolvedValue([]),
-    upsertRole: vi.fn(),
-    deletePermission: vi.fn(),
-    upsertPermission: vi.fn(),
-  },
+  userPermissionService: userPermissionServiceMock,
+}));
+
+vi.mock('@services/auditService', () => ({
+  auditService: auditServiceMock,
 }));
 
 vi.mock('@services/authService', () => ({
@@ -135,6 +150,11 @@ describe('UsersAndPermissions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'تأكيد الحذف' }));
 
     await waitFor(() => expect(authServiceMock.deleteManagedUser).toHaveBeenCalledWith('user-2'));
+    await waitFor(() =>
+      expect(auditServiceMock.logAdminAction).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'users.delete', record_id: 'user-2' }),
+      ),
+    );
   }, 15000);
 
   it('allows admins to open the edit-user dialog and submit changes', async () => {
@@ -178,6 +198,46 @@ describe('UsersAndPermissions', () => {
     const selectTriggers = screen.getAllByRole('combobox');
     expect(selectTriggers.length).toBeGreaterThan(0);
   });
+
+  it('applies role defaults with confirmation, writing permissions and an audit log', async () => {
+    render(<UsersAndPermissions />);
+
+    const permissionsTab = screen.getByRole('tab', { name: 'الصلاحيات' });
+    fireEvent.mouseDown(permissionsTab, { button: 0 });
+    fireEvent.click(permissionsTab);
+
+    const applyButton = await screen.findByRole('button', { name: 'تطبيق إعدادات الدور' });
+    fireEvent.click(applyButton);
+
+    // Confirm dialog opens; nothing written before confirming.
+    expect(userPermissionServiceMock.upsertPermission).not.toHaveBeenCalled();
+
+    const confirmButton = await screen.findByRole('button', { name: 'تطبيق الدور' });
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => expect(userPermissionServiceMock.upsertPermission).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(auditServiceMock.logAdminAction).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'permissions.reset_to_role_defaults' }),
+      ),
+    );
+  }, 15000);
+
+  it('toggles a whole permission column via the select-all header checkbox', async () => {
+    render(<UsersAndPermissions />);
+
+    const permissionsTab = screen.getByRole('tab', { name: 'الصلاحيات' });
+    fireEvent.mouseDown(permissionsTab, { button: 0 });
+    fireEvent.click(permissionsTab);
+
+    const headerCheckboxView = await screen.findByRole('checkbox', { name: /تحديد الكل — عرض/ });
+    const initial = headerCheckboxView.getAttribute('aria-checked');
+    fireEvent.click(headerCheckboxView);
+
+    await waitFor(() =>
+      expect(headerCheckboxView.getAttribute('aria-checked')).not.toEqual(initial),
+    );
+  }, 15000);
 
   it('renders the users and permissions interface in English', async () => {
     languageState.lang = 'en';
