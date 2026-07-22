@@ -85,6 +85,12 @@ export const REPLAY_REPAIRS = [
     before: 'CREATE INDEX IF NOT EXISTS "idx_salary_slip_templates_created_by" ON public."salary_slip_templates" ("created_by");',
     after: '-- Replay repair: skipped index for nonexistent salary_slip_templates.created_by.',
   },
+  {
+    file: '20260606000009_index_foreign_keys.sql',
+    reason: 'The preserved pre-fleet maintenance table has no employee_id column, so this generated index cannot exist.',
+    before: 'CREATE INDEX IF NOT EXISTS "idx_maintenance_logs_legacy_pre_fleet_employee_id" ON public."maintenance_logs_legacy_pre_fleet" ("employee_id");',
+    after: '-- Replay repair: skipped index for nonexistent maintenance_logs_legacy_pre_fleet.employee_id.',
+  },
 ];
 
 function countOccurrences(source, search) {

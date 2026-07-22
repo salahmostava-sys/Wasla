@@ -56,6 +56,11 @@ test('skips the generated index for a nonexistent salary template column', () =>
   assert.match(applyReplayRepair(repair.before, repair), /skipped index/u);
 });
 
+test('skips the generated index for a nonexistent legacy maintenance column', () => {
+  const repair = REPLAY_REPAIRS[12];
+  assert.match(applyReplayRepair(repair.before, repair), /legacy_pre_fleet\.employee_id/u);
+});
+
 test('rejects missing or repeated historical repair targets', () => {
   const repair = REPLAY_REPAIRS[0];
   assert.throws(() => applyReplayRepair('unrelated SQL', repair), /found 0/u);
