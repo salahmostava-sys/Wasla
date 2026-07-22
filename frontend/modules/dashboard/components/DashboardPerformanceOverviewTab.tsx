@@ -1,14 +1,11 @@
 /**
- * DashboardPerformanceOverviewTab — نظرة عامة على الأداء مع تحليلات ذكية
- * ومقارنة الأسابيع وتوصيات وأفضل الأيام وجدول تفصيلي.
+ * DashboardPerformanceOverviewTab — لوحة تحكم موحدة ونقية ذات استجابة فائقة
  */
 
 import { useMemo } from 'react';
 import {
   Activity,
   Target,
-  TrendingDown,
-  TrendingUp,
   Trophy,
   Zap,
 } from 'lucide-react';
@@ -32,11 +29,6 @@ import { AIRecommendationsSection } from './AIRecommendationsSection';
 import { PerformanceDetailedTable } from './PerformanceDetailedTable';
 import { DashboardWeeklyBestDaysCard } from './DashboardWeeklyBestDaysCard';
 import { Skeleton } from '@shared/components/ui/skeleton';
-
-function formatPercent(value: number) {
-  const rounded = Number.isFinite(value) ? value : 0;
-  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}%`;
-}
 
 function alertLabel(alert: PerformanceAlert) {
   switch (alert.alertType) {
@@ -65,35 +57,6 @@ function scoreTier(score: number): 'good' | 'average' | 'weak' {
   return 'weak';
 }
 
-function ComparisonCard(props: Readonly<{
-  title: string;
-  currentValue: string;
-  previousValue: string;
-  change: number;
-  hint: string;
-}>) {
-  const { title, currentValue, previousValue, change, hint } = props;
-  const positive = change >= 0;
-  return (
-    <div className="bg-card p-4 shadow-card space-y-3 rounded-2xl border border-border/40">
-      <div>
-        <p className="text-sm font-bold text-foreground">{title}</p>
-        <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>
-      </div>
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="text-2xl font-black text-foreground">{currentValue}</p>
-          <p className="text-[11px] text-muted-foreground">السابق: {previousValue}</p>
-        </div>
-        <div className={`text-sm font-bold ${positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-          {positive ? <TrendingUp size={14} className="inline me-1" /> : <TrendingDown size={14} className="inline me-1" />}
-          {formatPercent(change)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AppCard(props: Readonly<{
   appName: string;
   orders: number;
@@ -105,8 +68,9 @@ function AppCard(props: Readonly<{
   textColor: string;
 }>) {
   const { appName, orders, riders, targetOrders, targetAchievementPct, growthPct, brandColor, textColor } = props;
+  const growthSign = growthPct >= 0 ? '+' : '';
   return (
-    <div className="bg-card p-4 shadow-card rounded-2xl border border-border/40">
+    <div className="bg-card p-4 shadow-card rounded-2xl border border-border/40 hover:border-border/80 transition-colors">
       <div className="flex items-center justify-between gap-2 mb-3">
         <span
           className="text-xs font-bold px-2.5 py-1 rounded-lg"
@@ -115,7 +79,7 @@ function AppCard(props: Readonly<{
           {appName}
         </span>
         <span className={`text-xs font-bold ${growthPct >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-          {formatPercent(growthPct)}
+          {growthSign}{growthPct.toFixed(1)}%
         </span>
       </div>
       <p className="text-2xl font-black text-foreground">{orders.toLocaleString('en-US')}</p>
@@ -174,7 +138,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
     );
   }
 
-  const { summary, comparison, distribution, ordersByApp, ordersByCity, rankings, alerts, targets, dailyTrend } = dashboard;
+  const { summary, distribution, ordersByApp, ordersByCity, alerts, targets, dailyTrend } = dashboard;
 
   let projectedText = '';
   if (fleetSummary.projectedOrders !== null) {
@@ -184,7 +148,7 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
 
   return (
     <div className="space-y-6">
-      {/* ── 1. Top Executive KPIs Row ───────────────────────────────────────── */}
+      {/* ── 1. Executive KPIs Row ───────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <EnrichedStatCard
           label="إجمالي الطلبات"
@@ -216,53 +180,44 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
         />
       </div>
 
-      {/* ── 2. Weekly Comparison & Best Days Analysis (New Component) ──────── */}
+      {/* ── 2. Weekly Breakdown (W1-W5) & Best Days Analysis ─────────────── */}
       <DashboardWeeklyBestDaysCard dailyTrend={dailyTrend} />
 
-      {/* ── 3. AI Insights + Comparison Cards ───────────────────────────────── */}
+      {/* ── 3. AI Insights & Performance Distribution ───────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.3fr,0.7fr] gap-4">
         <AIInsightsPanel insights={aiInsights} />
 
-        <div className="space-y-4">
-          <ComparisonCard
-            title="الشهر الحالي vs السابق"
-            currentValue={comparison.month.currentOrders.toLocaleString('en-US')}
-            previousValue={comparison.month.previousOrders.toLocaleString('en-US')}
-            change={comparison.month.growthPct}
-            hint={`أيام العمل: ${comparison.month.currentActiveDays} مقابل ${comparison.month.previousActiveDays}`}
-          />
-          <ComparisonCard
-            title="الأسبوع الحالي vs السابق"
-            currentValue={comparison.week.currentOrders.toLocaleString('en-US')}
-            previousValue={comparison.week.previousOrders.toLocaleString('en-US')}
-            change={comparison.week.growthPct}
-            hint="قراءة سريعة لتغيّر الزخم"
-          />
-          <div className="bg-card p-4 shadow-card rounded-2xl border border-border/40">
-            <p className="text-sm font-bold text-foreground">توزيع الأداء</p>
-            <div className="space-y-3 mt-4">
-              {(['excellent', 'good', 'average', 'weak'] as const).map((tier) => {
-                const labels: Record<string, { ar: string; color: string }> = {
-                  excellent: { ar: 'ممتاز', color: 'text-emerald-600 dark:text-emerald-400' },
-                  good: { ar: 'جيد', color: 'text-blue-600 dark:text-blue-400' },
-                  average: { ar: 'متوسط', color: 'text-amber-600 dark:text-amber-400' },
-                  weak: { ar: 'ضعيف', color: 'text-rose-500' },
-                };
-                const l = labels[tier];
-                const val = distribution[tier];
-                return (
-                  <div key={tier} className="flex items-center justify-between text-sm">
-                    <span>{l.ar}</span>
-                    <span className={`font-black ${l.color}`}>{val}</span>
+        <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40 flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-foreground">توزيع أداء الفريق</h3>
+            <p className="text-[11px] text-muted-foreground mt-1">تقسيم الموظفين حسب الفئات التشغيلية</p>
+          </div>
+          <div className="space-y-4 my-4">
+            {[
+              { key: 'excellent', label: 'ممتاز', value: distribution.excellent, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+              { key: 'good', label: 'جيد', value: distribution.good, color: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
+              { key: 'average', label: 'متوسط', value: distribution.average, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+              { key: 'weak', label: 'ضعيف', value: distribution.weak, color: 'bg-rose-500', text: 'text-rose-500' },
+            ].map((row) => {
+              const total = distribution.excellent + distribution.good + distribution.average + distribution.weak;
+              const pct = total > 0 ? Math.round((row.value / total) * 100) : 0;
+              return (
+                <div key={row.key} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-foreground">{row.label}</span>
+                    <span className={`font-black ${row.text}`}>{row.value} ({pct}%)</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                    <div className={`h-full rounded-full ${row.color}`} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* ── 4. Platform Performance & Cities ──────────────────────────────── */}
+      {/* ── 4. Platforms Grid & City Performance ─────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-[1.4fr,0.8fr] gap-4">
         <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
           <div className="flex items-center justify-between gap-3 mb-4">
@@ -279,41 +234,15 @@ export function DashboardPerformanceOverviewTab(props: Readonly<{
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
-            <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
-            <div className="space-y-3">
-              {ordersByCity.map((row) => (
-                <div key={row.city} className="rounded-xl bg-muted/30 px-4 py-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">{row.city}</span>
-                  <span className="text-lg font-black text-foreground">{row.orders.toLocaleString('en-US')}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
-            <h3 className="text-sm font-bold text-foreground mb-4">ملخص سريع</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span>أفضل مندوب</span>
-                <span className="font-bold text-foreground">
-                  {rankings.topPerformers[0]?.employeeName ?? 'لا يوجد'}
-                </span>
+        <div className="bg-card p-5 shadow-card rounded-2xl border border-border/40">
+          <h3 className="text-sm font-bold text-foreground mb-4">حسب المدينة</h3>
+          <div className="space-y-3">
+            {ordersByCity.map((row) => (
+              <div key={row.city} className="rounded-xl bg-muted/30 px-4 py-3 flex items-center justify-between">
+                <span className="text-sm font-medium text-foreground">{row.city}</span>
+                <span className="text-lg font-black text-foreground">{row.orders.toLocaleString('en-US')}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>أكبر تحسّن</span>
-                <span className="font-bold text-foreground">
-                  {rankings.mostImproved[0]?.employeeName ?? 'لا يوجد'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>أكبر انخفاض</span>
-                <span className="font-bold text-foreground">
-                  {rankings.mostDeclined[0]?.employeeName ?? 'لا يوجد'}
-                </span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
