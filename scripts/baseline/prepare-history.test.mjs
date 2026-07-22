@@ -36,6 +36,15 @@ test('skips the unusable session-local constants block during historical replay'
   assert.match(repaired, /DO \$\$ BEGIN\n  RETURN;/u);
 });
 
+test('defers is_admin_or_hr permissions until its historical creation', () => {
+  const permissionRepairs = REPLAY_REPAIRS.slice(8, 10);
+  assert.equal(permissionRepairs.length, 2);
+
+  for (const repair of permissionRepairs) {
+    assert.match(applyReplayRepair(repair.before, repair), /^-- Replay repair:/u);
+  }
+});
+
 test('rejects missing or repeated historical repair targets', () => {
   const repair = REPLAY_REPAIRS[0];
   assert.throws(() => applyReplayRepair('unrelated SQL', repair), /found 0/u);

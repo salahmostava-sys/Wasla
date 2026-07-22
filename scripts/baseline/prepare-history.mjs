@@ -46,6 +46,26 @@ export const REPLAY_REPAIRS = [
     before: 'DO $$ BEGIN\n  -- Order statuses',
     after: 'DO $$ BEGIN\n  RETURN;\n  -- Order statuses',
   },
+  {
+    file: '20260416000002_fix_security_definer_permissions.sql',
+    reason: 'is_admin_or_hr(uuid) is first created in May; later security migrations apply its final grants after creation.',
+    before: [
+      '-- is_admin_or_hr: checks if user is admin or HR',
+      'REVOKE EXECUTE ON FUNCTION public.is_admin_or_hr(UUID) FROM anon;',
+      'GRANT EXECUTE ON FUNCTION public.is_admin_or_hr(UUID) TO authenticated;',
+      'GRANT EXECUTE ON FUNCTION public.is_admin_or_hr(UUID) TO service_role;',
+    ].join('\n'),
+    after: '-- Replay repair: is_admin_or_hr(uuid) is created by 20260504000001.',
+  },
+  {
+    file: '20260416000002_fix_security_definer_permissions.sql',
+    reason: 'The April comment also precedes creation of is_admin_or_hr(uuid) and is superseded by the later security definition.',
+    before: [
+      "COMMENT ON FUNCTION public.is_admin_or_hr(UUID) IS ",
+      "  'SECURITY DEFINER - authenticated only. Checks if user is admin or HR.';",
+    ].join('\n'),
+    after: '-- Replay repair: deferred is_admin_or_hr(uuid) comment until after creation.',
+  },
 ];
 
 function countOccurrences(source, search) {
