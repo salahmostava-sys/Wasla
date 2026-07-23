@@ -278,6 +278,7 @@ export const employeeService = {
       salary_type: string | null;
       base_salary: number | null;
       iban: string | null;
+      bank_account_number: string | null;
       city: string | null;
       preferred_language: string | null;
       phone: string | null;
@@ -292,7 +293,7 @@ export const employeeService = {
       const { data, error } = await supabase
         .from('employees')
         .select(
-          'id, name, job_title, national_id, salary_type, base_salary, iban, city, preferred_language, phone, sponsorship_status, probation_end_date, status'
+          'id, name, job_title, national_id, salary_type, base_salary, iban, bank_account_number, city, preferred_language, phone, sponsorship_status, probation_end_date, status'
         )
         .order('name')
         .range(offset, offset + PAGE_SIZE - 1);

@@ -521,7 +521,8 @@ function buildEmployeeSalaryRow(params: {
     status !== 'paid' &&
     !!savedSnapshot &&
     platformOrdersDiffer(platformOrders, savedSnapshot.platformOrders);
-  const hasIban = !!emp.iban;
+  const rawIban = safeStr((emp as Record<string, unknown>).iban || (emp as Record<string, unknown>).bank_account_number).trim();
+  const hasIban = rawIban.length > 0;
   const rawCity = (emp.city as string | null | undefined) ?? null;
   const cityKey: 'makkah' | 'jeddah' | null = rawCity === 'makkah' || rawCity === 'jeddah' ? rawCity : null;
   const preferredLanguage = (emp.preferred_language as SlipLanguage | null | undefined) ?? 'ar';
@@ -543,7 +544,7 @@ function buildEmployeeSalaryRow(params: {
     nationalId: safeStr(emp.national_id, '•'),
     city: toCityArabicLabel(rawCity),
     cityKey,
-    bankAccount: emp.iban ? safeStr(emp.iban).slice(-6) : '',
+    bankAccount: rawIban ? rawIban.slice(-6) : '',
     hasIban,
     paymentMethod: normalizePaymentMethod(saved?.payment_method, fallbackPaymentMethod),
     registeredApps: platformNames.filter((platformName) => hasPlatformActivity(platformMetrics[platformName])),

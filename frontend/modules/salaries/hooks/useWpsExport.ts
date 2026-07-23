@@ -76,8 +76,8 @@ export function useWpsExport({ filtered, computeRow, selectedMonth, companyName,
       ]);
 
       const ibanById = new Map<string, string>();
-      for (const e of employees as Array<{ id: string; iban: string | null }>) {
-        ibanById.set(e.id, e.iban ?? '');
+      for (const e of employees as Array<{ id: string; iban: string | null; bank_account_number: string | null }>) {
+        ibanById.set(e.id, (e.iban || e.bank_account_number || '').trim());
       }
 
       const inputs: WpsEmployeeInput[] = filtered.map((r) => {
