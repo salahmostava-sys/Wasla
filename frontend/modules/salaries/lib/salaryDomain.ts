@@ -521,7 +521,7 @@ function buildEmployeeSalaryRow(params: {
     status !== 'paid' &&
     !!savedSnapshot &&
     platformOrdersDiffer(platformOrders, savedSnapshot.platformOrders);
-  const rawIban = safeStr((emp as Record<string, unknown>).iban || (emp as Record<string, unknown>).bank_account_number).trim();
+  const rawIban = safeStr((emp).iban || (emp).bank_account_number).trim();
   const hasIban = rawIban.length > 0;
   const rawCity = (emp.city as string | null | undefined) ?? null;
   const cityKey: 'makkah' | 'jeddah' | null = rawCity === 'makkah' || rawCity === 'jeddah' ? rawCity : null;

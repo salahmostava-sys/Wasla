@@ -23,7 +23,13 @@ const SANITIZE_CONFIG: Config = {
 
 const sanitizeTemplateHtml = (html?: string): string => {
   if (!html) return '';
-  return String(DOMPurify.sanitize(html, SANITIZE_CONFIG));
+  const trimmed = html.trim();
+  if (!trimmed) return '';
+  const hasHtmlTags = /<[a-z][\s\S]*>/i.test(trimmed);
+  if (!hasHtmlTags) {
+    return `<div style="margin-bottom: 12px; line-height: 1.6; font-size: 12px; font-weight: 500;">${escapeHtml(trimmed).replace(/\n/g, '<br/>')}</div>`;
+  }
+  return String(DOMPurify.sanitize(trimmed, SANITIZE_CONFIG));
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────

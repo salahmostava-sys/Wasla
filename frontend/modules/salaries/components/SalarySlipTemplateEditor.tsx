@@ -356,27 +356,35 @@ export function SalarySlipTemplateEditor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="header_html" className="text-sm font-bold flex items-center gap-2"><Layout size={14} /> كود HTML للهيدر (Header)</label>
-                  <CardDescription className="text-xs mb-1">اترك فارغاً لاستخدام الهيدر الافتراضي</CardDescription>
+                  <label htmlFor="header_html" className="text-sm font-bold flex items-center gap-2">
+                    <Layout size={14} /> نص الترويسة (الهيدر)
+                  </label>
+                  <CardDescription className="text-xs mb-1">
+                    أدخل النص أو الملاحظات التي ترغب بظهورها أعلى كشف الراتب (نص عادي أو HTML اختيارياً)
+                  </CardDescription>
                   <Textarea
                     id="header_html"
                     value={currentTemplate.header_html ?? ''}
                     onChange={e => setCurrentTemplate({ ...currentTemplate, header_html: e.target.value })}
-                    placeholder="<div class='header'>...</div>"
-                    className="font-mono text-xs min-h-[250px] bg-slate-950 text-emerald-400 border-slate-800"
-                    dir="ltr"
+                    placeholder="ملاحظة مهمة: يتم تسليم الرواتب وفقاً لنظام حماية الأجور واللائحة الداخلية..."
+                    className="text-sm min-h-[180px] bg-background border-border text-foreground leading-relaxed shadow-sm resize-y"
+                    dir="auto"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="footer_html" className="text-sm font-bold flex items-center gap-2"><Layout size={14} /> كود HTML للفوتر (Footer)</label>
-                  <CardDescription className="text-xs mb-1">اترك فارغاً لاستخدام الفوتر الافتراضي</CardDescription>
+                  <label htmlFor="footer_html" className="text-sm font-bold flex items-center gap-2">
+                    <Layout size={14} /> نص التذييل (الفوتر)
+                  </label>
+                  <CardDescription className="text-xs mb-1">
+                    أدخل النص أو الملاحظات التي ترغب بظهورها أسفل كشف الراتب (نص عادي أو HTML اختيارياً)
+                  </CardDescription>
                   <Textarea
                     id="footer_html"
                     value={currentTemplate.footer_html ?? ''}
                     onChange={e => setCurrentTemplate({ ...currentTemplate, footer_html: e.target.value })}
-                    placeholder="<div class='footer'>...</div>"
-                    className="font-mono text-xs min-h-[250px] bg-slate-950 text-amber-400 border-slate-800"
-                    dir="ltr"
+                    placeholder="ملاحظات ختامية: يُرجى الاحتفاظ بنسخة من الكشف، للإستفسارات تواصل مع..."
+                    className="text-sm min-h-[180px] bg-background border-border text-foreground leading-relaxed shadow-sm resize-y"
+                    dir="auto"
                   />
                 </div>
               </div>
