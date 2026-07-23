@@ -21,15 +21,31 @@ const SANITIZE_CONFIG: Config = {
   ALLOW_UNKNOWN_PROTOCOLS: false,
 };
 
-const sanitizeTemplateHtml = (html?: string): string => {
+const sanitizeTemplateHtml = (html?: string, section: 'header' | 'footer' = 'header'): string => {
   if (!html) return '';
   const trimmed = html.trim();
   if (!trimmed) return '';
+
   const hasHtmlTags = /<[a-z][\s\S]*>/i.test(trimmed);
-  if (!hasHtmlTags) {
-    return `<div style="margin-bottom: 12px; line-height: 1.6; font-size: 12px; font-weight: 500;">${escapeHtml(trimmed).replace(/\n/g, '<br/>')}</div>`;
-  }
-  return String(DOMPurify.sanitize(trimmed, SANITIZE_CONFIG));
+  const content = hasHtmlTags
+    ? String(DOMPurify.sanitize(trimmed, SANITIZE_CONFIG))
+    : escapeHtml(trimmed).replace(/\n/g, '<br/>');
+
+  return `
+    <div class="custom-template-block custom-template-${section}" style="
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #334155;
+      font-weight: 500;
+    ">
+      ${content}
+    </div>
+  `;
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -168,15 +184,17 @@ const buildHeader = (
 ): string => {
   // The official bilingual company header (data-driven) always leads the slip.
   const companyHeader = branding ? buildCompanyHeaderHtml(branding) : '';
-  // Any custom template header is optional and rendered below the official one.
-  if (templateHeader) return companyHeader + sanitizeTemplateHtml(templateHeader);
-  return `${companyHeader}
+  const customHeader = templateHeader ? sanitizeTemplateHtml(templateHeader, 'header') : '';
+  const standardHeader = `
     <div class="header">
       <div>
-        <div class="header-subtitle">${escapeHtml(employee.month)}</div>
+        <div class="header-brand">${escapeHtml(employee.companyName || projectName || 'شركة مهمة التوصيل')}</div>
+        <div class="header-subtitle">كشف راتب شهر: ${escapeHtml(employee.month)}</div>
       </div>
       <span class="badge ${STATUS_CLASSES[employee.status] || 'badge-pending'}">${STATUS_LABELS[employee.status] || employee.status}</span>
     </div>`;
+
+  return `${companyHeader}${standardHeader}${customHeader}`;
 };
 
 const buildRiskBanner = (analysis?: BuildSalarySlipOptions['analysis']): string => {
@@ -204,40 +222,45 @@ const buildInfoGrid = (infoFields: SlipField[]): string => {
 const buildPlatformsTable = (platforms: SlipPlatformRow[]): string => {
   if (platforms.length === 0) return '';
   const totalOrders = platforms.reduce((s, p) => s + p.orders, 0);
-  const totalPlatformSalary = platforms.reduce((s, p) => s + p.salary, 0);
+  const totalSalary = platforms.reduce((s, p) => s + p.salary, 0);
+
   return `
-    <div class="section-title">الطلبات والراتب حسب المنصة</div>
+    <div class="section-title">تفاصيل منصات التوصيل</div>
     <table>
-      <tr>
-        <th>المنصة</th>
-        <th>الطلبات</th>
-        <th>الراتب</th>
-      </tr>
-      ${platforms.map(p => `
+      <thead>
         <tr>
-          <td class="label-cell">${escapeHtml(p.name)}</td>
-          <td class="value-cell">${fmt(p.orders)}</td>
-          <td class="value-cell" style="color:#1f54ad">${fmt(p.salary)} ر.س</td>
-        </tr>`).join('')}
-      <tr class="total-row">
-        <td class="label-cell">إجمالي المنصات</td>
-        <td class="value-cell">${fmt(totalOrders)}</td>
-        <td class="value-cell" style="color:#1f54ad">${fmt(totalPlatformSalary)} ر.س</td>
-      </tr>
+          <th>اسم المنصة</th>
+          <th>عدد الطلبات</th>
+          <th>مستحقات المنصة</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${platforms.map(p => `
+          <tr>
+            <td>${escapeHtml(p.name)}</td>
+            <td class="value-cell">${p.orders.toLocaleString('en-US')}</td>
+            <td class="value-cell">${p.salary.toLocaleString('en-US')} ر.س</td>
+          </tr>`).join('')}
+        <tr class="total-row">
+          <td>الإجمالي</td>
+          <td class="value-cell">${totalOrders.toLocaleString('en-US')}</td>
+          <td class="value-cell">${totalSalary.toLocaleString('en-US')} ر.س</td>
+        </tr>
+      </tbody>
     </table>`;
 };
 
 const buildEarningsTable = (earningFields: SlipField[], totalFields: SlipField[]): string => {
-  if (earningFields.length === 0) return '';
+  if (earningFields.length === 0 && totalFields.length === 0) return '';
   return `
-    <div class="section-title">الاستحقاقات</div>
+    <div class="section-title">الإضافات والمستحقات</div>
     <table>
       ${earningFields.map(f => `
         <tr>
           <td class="label-cell">${escapeHtml(f.label)}</td>
-          <td class="value-cell" style="${colorStyle(f.color || 'green')}">${typeof f.value === 'number' ? `+ ${fmt(f.value)} ر.س` : fmt(f.value)}</td>
+          <td class="value-cell" style="${colorStyle(f.color || 'green')}">+ ${fmt(f.value)} ر.س</td>
         </tr>`).join('')}
-      ${totalFields.filter(f => f.key.includes('earning')).map(f => `
+      ${totalFields.filter(f => !f.key.includes('deduction')).map(f => `
         <tr class="total-row">
           <td class="label-cell">${escapeHtml(f.label)}</td>
           <td class="value-cell" style="${colorStyle(f.color || 'blue')}">${fmt(f.value)} ر.س</td>
@@ -290,8 +313,8 @@ const buildMiscTable = (miscTotals: SlipField[]): string => {
 
 const buildFooter = (templateFooter?: string, branding?: CompanyBranding): string => {
   const addressFooter = branding ? buildCompanyFooterHtml(branding) : '';
-  if (templateFooter) return sanitizeTemplateHtml(templateFooter) + addressFooter;
-  return `
+  const customFooter = templateFooter ? sanitizeTemplateHtml(templateFooter, 'footer') : '';
+  const standardSignatures = `
     <div class="footer">
       <div class="signature-box">
         <div class="signature-line"></div>
